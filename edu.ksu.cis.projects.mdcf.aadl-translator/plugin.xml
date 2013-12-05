@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+     <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="org.osate.analysis.architecture.actionSet"
+            label="%actionSet.label"
+            visible="false">
+
+         <menu
+               id="menu.osate"
+               label="%menu.osate.label"
+               path="project">
+            <groupMarker name="file.grp"/>
+            <separator name="instance.grp"/>
+            <separator name="general.grp"/>
+         </menu>
+
+         <menu
+               id="menu.analyses"
+               label="%menu.analyses.label"
+               path="menu.osate">
+            <groupMarker name="top.grp"/>
+            <groupMarker name="bottom.grp"/>
+         </menu>
+
+         <menu
+               id="menu.semantic"
+               label="%menu.semantic.label"
+               path="menu.analyses/top.grp">
+            <groupMarker name="stuff.grp"/>
+         </menu>
+
+         <menu
+               id="menu.arch"
+               label="%menu.arch.label"
+               path="menu.analyses/top.grp">
+            <groupMarker name="stuff.grp"/>
+         </menu>
+         
+         <action
+               id="org.osate.analysis.architecture.actions.CheckMissRate.action"
+               label="%CheckMissRate.label"
+               tooltip="%CheckMissRate.toolTip"
+               icon="%CheckMissRate.icon"
+               class="org.osate.analysis.architecture.actions.CheckMissRate"
+               menubarPath="menu.analyses/menu.arch/stuff.grp"
+               toolbarPath="arch.toolbar"
+               enablesFor="1">
+            <enablement>
+               <or>
+                  <and>
+                     <objectClass name="org.eclipse.core.resources.IFile"/>
+                     <objectState name="extension" value="aaxl2"/>
+                  </and>
+                   <objectClass name="org.osate.aadl2.instance.SystemInstance"/>
+               </or>
+            </enablement>
+         </action>
+         
+         <action
+               id="org.osate.analysis.architecture.actions.CheckRequiredConnection.action"
+               label="%CheckRequiredConnection.label"
+               tooltip="%CheckRequiredConnection.toolTip"
+               icon="%CheckRequiredConnection.icon"
+               class="org.osate.analysis.architecture.actions.CheckRequiredConnection"
+               menubarPath="menu.analyses/menu.semantic/stuff.grp"
+               toolbarPath="arch.toolbar"
+               enablesFor="1">
+            <enablement>
+               <or>
+                  <and>
+                     <objectClass name="org.eclipse.core.resources.IFile"/>
+                     <objectState name="extension" value="aaxl2"/>
+                  </and>
+                  <objectClass name="org.osate.aadl2.instance.SystemInstance"/>
+               </or>
+            </enablement>
+         </action>
+         
+          
+         <action
+               id="org.osate.analysis.architecture.actions.CheckConnectionBindingConsistency.action"
+              label="%DoConnectionBindingConsistency.label"
+               tooltip="%DoConnectionBindingConsistency.toolTip"
+               icon="%DoConnectionBindingConsistency.icon"
+               class="org.osate.analysis.architecture.actions.CheckConnectionBindingConsistency"
+               menubarPath="menu.analyses/menu.semantic/stuff.grp"
+               toolbarPath="arch.toolbar"
+               enablesFor="1">
+            <enablement>
+               <or>
+                  <and>
+                     <objectClass name="org.eclipse.core.resources.IFile"/>
+                     <objectState name="extension" value="aaxl2"/>
+                  </and>
+                  <objectClass name="org.osate.aadl2.instance.SystemInstance"/>
+               </or>
+            </enablement>
+         </action>
+            
+         <action
+               id="org.osate.analysis.architecture.actions.PortConnectionConsistency.action"
+               label="%PortConnectionConsistency.label"
+               tooltip="%PortConnectionConsistency.toolTip"
+               icon="%PortConnectionConsistency.icon"
+               class="org.osate.analysis.architecture.actions.DoPortConnectionConsistency"
+               menubarPath="menu.analyses/menu.arch/stuff.grp"
+               toolbarPath="arch.toolbar"
+               enablesFor="1">
+            <enablement>
+               <or>
+                  <and>
+                     <objectClass name="org.eclipse.core.resources.IFile"/>
+                     <objectState name="extension" value="aaxl2"/>
+                  </and>
+                   <objectClass name="org.osate.aadl2.instance.SystemInstance"/>
+              </or>
+            </enablement>
+         </action>
+          
+         <action
+               id="org.osate.analysis.architecture.actions.CheckA429PortConnectionConsistency.action"
+               label="%A429ConnectionConsistency.label"
+               tooltip="%A429ConnectionConsistency.toolTip"
+               icon="%A429ConnectionConsistency.icon"
+               class="org.osate.analysis.architecture.actions.CheckA429PortConnectionConsistency"
+               menubarPath="menu.analyses/menu.arch/stuff.grp"
+               toolbarPath="arch.toolbar"
+               enablesFor="1">
+            <enablement>
+               <or>
+                  <and>
+                     <objectClass name="org.eclipse.core.resources.IFile"/>
+                     <objectState name="extension" value="aaxl2"/>
+                  </and>
+                  <objectClass name="org.osate.aadl2.instance.SystemInstance"/>
+               </or>
+            </enablement>
+         </action>
+        
+         <action
+               id="org.osate.analysis.architecture.actions.DoModelStatistics.action"
+               label="%DoModelStatistics.label"
+               tooltip="%DoModelStatistics.toolTip"
+               icon="%DoModelStatistics.icon"
+               disabledIcon="%DoModelStatistics.disabledIcon"
+               class="org.osate.analysis.architecture.actions.DoModelStatistics"
+               menubarPath="menu.analyses/menu.arch/stuff.grp"
+               toolbarPath="arch.toolbar"
+               enablesFor="*">
+            <enablement>
+               <or>
+                  <and>
+                     <objectClass name="org.eclipse.core.resources.IFile"/>
+                     <objectState name="extension" value="aadl"/>
+                  </and>
+                  <and>
+                     <objectClass name="org.eclipse.core.resources.IFile"/>
+                     <objectState name="extension" value="aaxl2"/>
+                  </and>
+                  <objectClass name="org.eclipse.jface.text.ITextSelection"/>
+                  <objectClass name="org.osate.aadl2.instance.SystemInstance"/>
+               </or>
+            </enablement> 
+         </action>
+         
+         <action
+               id="org.osate.analysis.architecture.actions.PropertyTotals.action"
+               label="%CheckPropertyTotals.label"
+               tooltip="%CheckPropertyTotals.toolTip"
+               icon="%CheckPropertyTotals.icon"
+               class="org.osate.analysis.architecture.actions.DoPropertyTotals"
+               menubarPath="menu.analyses/menu.arch/stuff.grp"
+               toolbarPath="arch.toolbar"
+               enablesFor="1">
+            <enablement>
+               <or>
+                  <and>
+                     <objectClass name="org.eclipse.core.resources.IFile"/>
+                     <objectState name="extension" value="aaxl2"/>
+                  </and>
+                  <objectClass name="org.osate.aadl2.instance.SystemInstance"/>
+               </or>
+            </enablement>
+         </action>
+         
+      </actionSet>
+   </extension>
+   
+   <extension
+   	   point="org.eclipse.ui.perspectiveExtensions">
+   	   <perspectiveExtension
+   		   targetID="org.osate.ui.perspective.AadlPerspective">
+   		   <actionSet
+   		 	   id="org.osate.analysis.architecture.actionSet"/>
+   	   </perspectiveExtension>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="org.osate.analysis.architecture.oc1"
+            objectClass="java.lang.Object">
+         <visibility>
+            <or>
+               <and>
+                  <objectClass name="org.eclipse.core.resources.IFile"/>
+                  <objectState name="extension" value="aaxl2"/>
+               </and>
+               <objectClass name="org.osate.aadl2.instance.SystemInstance"/>
+            </or>
+         </visibility> 
+
+         <menu
+               id="org.osate.ui.popupMenu.Analyses"
+               label="%popupMenu.analyses.label"
+               path="additions">
+            <groupMarker name="anal.grp"/>
+            <groupMarker name="subMenus.grp"/>
+         </menu>
+
+         <menu
+               id="org.osate.analysis.architecture.popupMenu.Arch"
+               label="%popupMenu.Arch.label"
+               path="org.osate.ui.popupMenu.Analyses/subMenus.grp">
+            <groupMarker name="anal.grp"/>
+         </menu>
+
+         <menu
+               id="org.osate.analysis.architecture.popupMenu.Semantic"
+               label="%popupMenu.Semantic.label"
+               path="org.osate.ui.popupMenu.Analyses/subMenus.grp">
+            <groupMarker name="anal.grp"/>
+         </menu>
+         
+         <action
+               id="org.osate.analysis.architecture.actions.CheckRequiredConnection.popupAction"
+               label="%CheckRequiredConnection.label"
+               tooltip="%CheckRequiredConnection.toolTip"
+               icon="%CheckRequiredConnection.icon"
+               class="org.osate.analysis.architecture.actions.CheckRequiredConnection"
+               menubarPath="org.osate.ui.popupMenu.Analyses/org.osate.analysis.architecture.popupMenu.Semantic/anal.grp"
+               enablesFor="1"/>
+        
+         <action
+               id="org.osate.analysis.architecture.actions.CheckConnectionBindingConsistency.popupAction"
+               label="%DoConnectionBindingConsistency.label"
+               tooltip="%DoConnectionBindingConsistency.toolTip"
+               icon="%DoConnectionBindingConsistency.icon"
+               class="org.osate.analysis.architecture.actions.CheckConnectionBindingConsistency"
+               menubarPath="org.osate.ui.popupMenu.Analyses/org.osate.analysis.architecture.popupMenu.Semantic/anal.grp"
+               enablesFor="1"/>
+
+         <action
+               id="org.osate.analysis.architecture.actions.PortConnectionConsistency.popupAction"
+               label="%PortConnectionConsistency.label"
+               tooltip="%PortConnectionConsistency.toolTip"
+               icon="%PortConnectionConsistency.icon"
+               class="org.osate.analysis.architecture.actions.DoPortConnectionConsistency"
+               menubarPath="org.osate.ui.popupMenu.Analyses/org.osate.analysis.architecture.popupMenu.Arch/anal.grp"
+               enablesFor="1"/>
+        
+         <action
+               id="org.osate.analysis.architecture.actions.CheckA429PortConnectionConsistency.popupAction"
+               label="%A429ConnectionConsistency.label"
+               tooltip="%A429ConnectionConsistency.toolTip"
+               icon="%A429ConnectionConsistency.icon"
+               class="org.osate.analysis.architecture.actions.CheckA429PortConnectionConsistency"
+               menubarPath="org.osate.ui.popupMenu.Analyses/org.osate.analysis.architecture.popupMenu.Arch/anal.grp"
+               enablesFor="1"/>
+         
+         <action
+               id="org.osate.analysis.architecture.actions.DoModelStatistics.popupAction"
+               label="%DoModelStatistics.label"
+               tooltip="%DoModelStatistics.toolTip"
+               icon="%DoModelStatistics.icon"
+               class="org.osate.analysis.architecture.actions.DoModelStatistics"
+               menubarPath="org.osate.ui.popupMenu.Analyses/org.osate.analysis.architecture.popupMenu.Arch/anal.grp"
+               enablesFor="1"/>
+         
+         <action
+               id="org.osate.analysis.architecture.actions.DoPropertyTotals.popupAction"
+               label="%CheckPropertyTotals.label"
+               tooltip="%CheckPropertyTotals.toolTip"
+               icon="%CheckPropertyTotals.icon"
+               class="org.osate.analysis.architecture.actions.DoPropertyTotals"
+               menubarPath="org.osate.ui.popupMenu.Analyses/org.osate.analysis.architecture.popupMenu.Arch/anal.grp"
+               enablesFor="1"/>
+      </objectContribution>
+
+      <objectContribution
+            id="org.osate.analysis.architecture.oc2"
+            objectClass="java.lang.Object">
+         <visibility>
+            <or>
+               <and>
+                  <objectClass name="org.eclipse.core.resources.IFile"/>
+                  <objectState name="extension" value="aaxl2"/>
+               </and>
+               <objectClass name="org.osate.aadl2.instance.SystemInstance"/>
+            </or>
+         </visibility>
+
+         <menu
+               id="org.osate.ui.popupMenu.Analyses"
+               label="%popupMenu.analyses.label"
+               path="additions">
+            <groupMarker name="anal.grp"/>
+            <groupMarker name="subMenus.grp"/>
+         </menu>
+
+         <menu
+               id="org.osate.analysis.architecture.popupMenu.Arch"
+               label="%popupMenu.Arch.label"
+               path="org.osate.ui.popupMenu.Analyses/subMenus.grp">
+            <groupMarker name="anal.grp"/>
+         </menu>
+
+         <action
+               id="org.osate.analysis.architecture.actions.CheckMissRate.popupAction"
+               label="%CheckMissRate.label"
+               tooltip="%CheckMissRate.toolTip"
+               icon="%CheckMissRate.icon"
+               class="org.osate.analysis.architecture.actions.CheckMissRate"
+               menubarPath="org.osate.ui.popupMenu.Analyses/org.osate.analysis.architecture.popupMenu.Arch/anal.grp"
+               enablesFor="1"/>
+         
+     </objectContribution>
+   </extension>
+
+   <extension
+         id="ModelStatisticsObjectMarker"
+         name="Model Statistics Marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.osate.aadl2.modelsupport.AadlObjectMarker"/>
+      <persistent value="true"/>
+   </extension>
+   
+   <extension
+         id="MissRateObjectMarker"
+         name="Miss Rate Marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.osate.aadl2.modelsupport.AadlObjectMarker"/>
+      <persistent value="true"/>
+   </extension>
+   
+   <extension
+         id="RequiredConnectionObjectMarker"
+         name="Required Connection Marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.osate.aadl2.modelsupport.AadlObjectMarker"/>
+      <persistent value="true"/>
+   </extension>
+   
+   <extension
+         id="ConnectionBindingConsistencyObjectMarker"
+         name="Connection Binding Consistency Marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.osate.aadl2.modelsupport.AadlObjectMarker"/>
+      <persistent value="true"/>
+   </extension>
+   
+   <extension
+         id="A429ConnectionConsistencyObjectMarker"
+         name="A429 Connection Consistency Marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.osate.aadl2.modelsupport.AadlObjectMarker"/>
+      <persistent value="true"/>
+   </extension>
+   
+   <extension
+         id="PortConnectionConsistencyObjectMarker"
+         name="Port Connection Consistency Marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.osate.aadl2.modelsupport.AadlObjectMarker"/>
+      <persistent value="true"/>
+   </extension>
+   
+   <extension
+         id="WeightTotalObjectMarker"
+         name="Weight Total Marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.osate.aadl2.modelsupport.AadlObjectMarker"/>
+      <persistent value="true"/>
+   </extension>
+   
+</plugin>
