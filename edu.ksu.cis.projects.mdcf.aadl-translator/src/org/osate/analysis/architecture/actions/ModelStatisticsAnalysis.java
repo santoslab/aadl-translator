@@ -57,20 +57,6 @@ public class ModelStatisticsAnalysis extends AbstractAnalysis {
 		stats.defaultTraversalAllDeclarativeModels();
 		if (si != null)
 			stats.processPreOrderAll(si);
-
-		// Report the results using info markers attached to the root model object.
-		final String modelStats = stats.getModelResult();
-		final String flowStats = stats.getFlowResult();
-		getErrorManager().info(getParameter(), modelStats);
-		getErrorManager().info(getParameter(), flowStats);
-
-		if (si != null) // Do we have instance statistics?
-		{
-			final String appStats = stats.getApplicationResult();
-			final String epStats = stats.getExecutionPlatformResult();
-			getErrorManager().info(getParameter(), appStats);
-			getErrorManager().info(getParameter(), epStats);
-		}
 		return true;
 	}
 
