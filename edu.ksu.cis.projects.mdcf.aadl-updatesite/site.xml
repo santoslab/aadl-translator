@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/edu.ksu.cis.projects.mdcf.aadlplugin_0.0.1.jar" id="edu.ksu.cis.projects.mdcf.aadlplugin" version="0.0.1"/>
+</site>
