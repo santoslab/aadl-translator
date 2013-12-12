@@ -4,15 +4,15 @@ Bundle-Name: AADL Translator
 Bundle-SymbolicName: edu.ksu.cis.projects.mdcf.aadl-translator;singleton:=true
 Bundle-Version: 0.0.1
 Bundle-ClassPath: .
-Bundle-Activator: org.osate.analysis.architecture.ArchitecturePlugin
-Bundle-Vendor: SAnToS Lab, Kansas State University
+Bundle-Activator: edu.ksu.cis.projects.mdcf.aadltranslator.ArchitecturePlugin
+Bundle-Vendor: SAnToS Lab
 Bundle-Localization: plugin
 Export-Package: 
- org.osate.analysis.architecture,
- org.osate.analysis.architecture.actions
+ edu.ksu.cis.projects.mdcf.aadltranslator
 Require-Bundle: org.osate.aadl2,
  org.osate.ui,
  org.osate.xtext.aadl2.properties;bundle-version="1.0.0",
- org.osate.xtext.aadl2;bundle-version="1.0.0"
+ org.osate.xtext.aadl2;bundle-version="1.0.0",
+ org.osate.contribution.sei
 Eclipse-LazyStart: true
 

@@ -1,11 +1,11 @@
-package org.osate.analysis.architecture.actions;
+package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.instance.SystemInstance;
-import org.osate.analysis.architecture.ArchitecturePlugin;
-import org.osate.analysis.architecture.ModelStatistics;
+import edu.ksu.cis.projects.mdcf.aadltranslator.ArchitecturePlugin;
+import edu.ksu.cis.projects.mdcf.aadltranslator.ModelStatistics;
 import org.osate.ui.actions.AaxlReadOnlyActionAsJob;
 import org.osgi.framework.Bundle;
 

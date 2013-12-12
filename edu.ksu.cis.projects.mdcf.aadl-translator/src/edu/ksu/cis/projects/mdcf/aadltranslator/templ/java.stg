@@ -1,0 +1,204 @@
+class(model) ::=<<
+<packageAndImports(model)>
+<headerAndFields(model)>
+
+  <portDeclarations(model)>
+  <constructor(model)>
+  <initAndGetters(model)>
+  <subAndPubChannelAssignments(model)>
+  <if(model.isDisplay)>
+  <abstractMethods(model)>
+  <endif>
+  <tasks(model)>
+}
+>>
+
+tasks(model) ::=<<
+
+<model.exchanges.keys:{k |<task(k, model.exchanges.(k))>}>
+>>
+
+task(exchName, exchType) ::=<<
+
+
+public class <exchName>ReceiverTask implements Task {
+  @Override
+  public void run() {
+    <if(model.isDisplay)>MdcfMessage message = <exchName>ReceiverPort.getReceiver().getLastMsg();<endif>
+    try {
+      <if(model.isDisplay)>
+      <exchType> <exchName>Data = <exchName>ReceiverPort.getLastMsgContent();
+      <exchName>ListenerOnMessage(message, <exchName>Data);
+      <else>
+      <exchName>SenderPort.send(<exchName>ReceiverPort.getLastMsgContent());
+      <endif>
+    } catch (MdcfDecodeMessageException e) {
+      System.err.println(getComponentTypeName() + ".<exchName>Task task: invalid message:" + message.getTextMsg());
+      e.printStackTrace();
+    }
+  }
+}
+>>
+
+abstractMethods(model) ::=<<
+
+
+protected abstract void initComponent();
+  
+<model.exchanges.keys:{k |<abstractListener(k, model.exchanges.(k))>
+}>
+>>
+
+abstractListener(exchName, exchType) ::=<<
+protected abstract void <exchName>ListenerOnMessage(MdcfMessage msg, <exchType> <exchName>Data);
+>>
+
+subAndPubChannelAssignments(model) ::=<<
+
+@Override
+public void processSubscriberChannelAssignment(SubChannelAssignmentMsg subAssign) {
+  <model.exchanges.keys:{k |<subChannelAssignment(k)>
+  }>}
+
+@Override
+public void processPublisherChannelAssignment(PubChannelAssignmentMsg pubAssign) {
+<if(model.isDisplay)>
+  // Displays don't publish anything, so this method is empty
+<else>
+  <model.exchanges.keys:{k |<pubChannelAssignment(k)>
+  }><endif>}
+>>
+
+pubChannelAssignment(exchName) ::=<<
+publisherChannelAssignmentHelper(pubAssign, this.<exchName>SenderPort);
+>>
+
+subChannelAssignment(exchName) ::=<<
+subscriberChannelAssignmentHelper(subAssign, this.<exchName>ReceiverPort);
+>>
+
+initAndGetters(model) ::=<<
+
+
+@Override
+public void init(){
+<if(model.isDisplay)>
+  initComponent();
+<else>
+  // No initialization required
+<endif>
+}
+
+@Override
+protected Map\<String, Task> getTaskInstanceMap() {
+  return this.taskInstanceMap;
+}
+
+@Override
+protected Map\<String, MdcfReceiverPort\<?>\> getReceiverPortMap(){
+  return this.receiverPortMap;
+}
+
+>>
+
+constructor(model) ::=<<
+<if(model.isDisplay)>
+public <model.objectName>SuperType(String GUID) {
+<else>
+public <model.objectName>PseudoDevice(String GUID) {
+<endif>
+  super(GUID, "<model.objectName>");
+  taskInstanceMap = new HashMap\<>();
+  receiverPortMap = new HashMap\<>();
+  <model.exchanges.keys:{k |<taskInstanceMapEntry(k)>
+  }><model.exchanges.keys:{k |<receiverPortMapEntry(k)>
+  }>}
+>>
+
+receiverPortMapEntry(exchName) ::=<<
+  receiverPortMap.put(<exchName>ReceiverPort.getName(), <exchName>ReceiverPort);
+>>
+
+taskInstanceMapEntry(exchName) ::=<<
+taskInstanceMap.put(<exchName>ReceiverTask.class.getSimpleName(), new <exchName>ReceiverTask());
+>>
+
+portDeclarations(model) ::=<<
+<model.exchanges.keys:{k |<receiverDeclaration(k, model.exchanges.(k))>}>
+<if(!model.isDisplay)>
+<model.exchanges.keys:{k |<senderDeclaration(k, model.exchanges.(k))>}>
+<endif>
+>>
+
+senderDeclaration(exchName, exchType) ::=<<
+private MdcfSenderPort\<<exchType>\> <exchName>SenderPort = new MdcfSenderPort\<>("<exchName>Out", <exchType>.class);
+
+>>
+
+receiverDeclaration(exchName, exchType) ::=<<
+private MdcfReceiverPort\<<exchType>\> <exchName>ReceiverPort = new MdcfReceiverPort\<>("<exchName>In", <exchType>.class);
+
+>>
+
+headerAndFields(model) ::=<<
+<if(model.isDisplay)>
+public class <model.objectName>SuperType extends AppPanelComponent{
+<else>
+public class <model.objectName>PseudoDevice extends LogicComponent{
+<endif>
+  private HashMap\<String, Task> taskInstanceMap;
+  private HashMap\<String, MdcfReceiverPort\<?>\> receiverPortMap;
+>>
+
+packageAndImports(model) ::=<<
+package mdcf.app.<model.objectName>;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import mdcf.channelservice.common.MdcfDecodeMessageException;
+import mdcf.channelservice.common.MdcfReceiverPort;
+import mdcf.channelservice.common.MdcfSenderPort;
+import mdcf.core.ctypes.Task;
+<if(model.isDisplay)>
+import mdcf.core.ctypes.apppanel.AppPanelComponent;
+<else>
+import mdcf.core.ctypes.logic.LogicComponent;
+<endif>
+import mdcf.core.messagetypes.devicemgmt.PubChannelAssignmentMsg;
+import mdcf.core.messagetypes.devicemgmt.SubChannelAssignmentMsg;
+<importMessageTypes(model)>
+>>
+
+importMessageTypes(model) ::=<<
+<model.exchanges.values:{v |import mdcf.device.messages.<v>
+}>
+>>
+
+userimpl(model) ::=<<
+package mdcf.app.<model.objectName>;
+
+import mdcf.channelservice.common.MdcfMessage;
+<importMessageTypes(model)>
+public class <model.objectName> extends <model.objectName>SuperType {
+
+  public <model.objectName>(String GUID) {
+    super(GUID);
+  }
+
+  @Override
+  protected void initComponent() {
+    // TODO Fill in custom initialization code here
+  }
+  <model.exchanges.keys:{k |<userImplOnMessageStub(k, model.exchanges.(k))>
+  }>}
+>>
+
+userImplOnMessageStub(exchName, exchType) ::=<<
+
+
+@Override
+protected void <exchName>ListenerOnMessage(MdcfMessage msg, <exchType> <exchName>Data) {
+  // TODO Fill in custom listener code here
+}
+>>

@@ -1,0 +1,59 @@
+compsig(model) ::=<<
+<mdcf.core.ctypes.AppModuleSignature>
+  $typeTasksAndPorts(model)$
+</mdcf.core.ctypes.AppModuleSignature>
+>>
+
+typeTasksAndPorts(model) ::=<<
+<type>$model.objectName$PseudoDevice</type>
+<moduleTasks>
+  $model.exchanges.keys:{k |$task(k)$
+  }$</moduleTasks>
+<portSignatures>
+  $model.exchanges.keys:{k |$ports(k, model.exchanges.(k), model)$
+  }$</portSignatures>
+>>
+
+ports(exchName, exchType, model) ::=<<
+$if(!model.isDisplay)$
+$publishPort(exchName, exchType)$
+$endif$
+$subscribePort(exchName, exchType)$
+>>
+
+publishPort(exchName, exchType) ::=<<
+<entry>
+  <string>$exchName$Out</string>
+  <mdcf.core.ctypes.PortSignature>
+    <portName>$exchName$Out</portName>
+    <minPeriod>-1</minPeriod>
+    <maxPeriod>-1</maxPeriod>
+    <portDirection>PUBLISH</portDirection>
+    <portType>mdcf.device.messages.$exchType$</portType>
+  </mdcf.core.ctypes.PortSignature>
+</entry>
+>>
+
+subscribePort(exchName, exchType) ::=<<
+<entry>
+  <string>$exchName$In</string>
+  <mdcf.core.ctypes.PortSignature>
+    <portName>$exchName$In</portName>
+    <minPeriod>-1</minPeriod>
+    <maxPeriod>-1</maxPeriod>
+    <portDirection>SUBSCRIBE</portDirection>
+    <portType>mdcf.device.messages.$exchType$</portType>
+  </mdcf.core.ctypes.PortSignature>
+</entry>
+>>
+
+task(exchName) ::=<<
+<mdcf.core.ctypes.TaskSignature>
+  <type>PORT_SPORADIC</type>
+  <taskName>$exchName$ReceiverTask</taskName>
+  <periodMs>-1</periodMs>
+  <deadlineMs>50</deadlineMs>
+  <wcetMs>5</wcetMs>
+  <trigPortName>$exchName$In</trigPortName>
+</mdcf.core.ctypes.TaskSignature>
+>>

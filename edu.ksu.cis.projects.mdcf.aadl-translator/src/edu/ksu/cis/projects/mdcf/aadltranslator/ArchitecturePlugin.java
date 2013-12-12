@@ -1,4 +1,4 @@
-package org.osate.analysis.architecture;
+package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -22,7 +22,7 @@ public class ArchitecturePlugin extends AbstractUIPlugin {
 		super();
 		plugin = this;
 		try {
-			resourceBundle = ResourceBundle.getBundle("org.osate.analysis.architecture.PluginResources");
+			resourceBundle = ResourceBundle.getBundle("edu.ksu.cis.projects.mdcf.aadltranslator.PluginResources");
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}

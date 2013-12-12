@@ -27,11 +27,11 @@
          </menu>
           
          <action
-               id="org.osate.analysis.architecture.actions.DoModelStatistics.action"
+               id="edu.ksu.cis.projects.mdcf.aadltranslator.DoModelStatistics.action"
                label="%DoModelStatistics.label"
                tooltip="%DoModelStatistics.toolTip"
                icon="%DoModelStatistics.icon"
-               class="org.osate.analysis.architecture.actions.DoModelStatistics"
+               class="edu.ksu.cis.projects.mdcf.aadltranslator.DoModelStatistics"
                menubarPath="menu.analyses/top.grp"
                toolbarPath="arch.toolbar"
                enablesFor="*">
@@ -105,7 +105,7 @@
                label="%DoModelStatistics.label"
                tooltip="%DoModelStatistics.toolTip"
                icon="%DoModelStatistics.icon"
-               class="org.osate.analysis.architecture.actions.DoModelStatistics"
+               class="edu.ksu.cis.projects.mdcf.aadltranslator.DoModelStatistics"
                menubarPath="org.osate.ui.popupMenu.Analyses/org.osate.analysis.architecture.popupMenu.Arch/anal.grp"
                enablesFor="1"/>
       </objectContribution>
