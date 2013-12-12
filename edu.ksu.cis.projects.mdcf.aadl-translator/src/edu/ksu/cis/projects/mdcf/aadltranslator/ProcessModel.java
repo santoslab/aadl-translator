@@ -1,57 +1,57 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
-import java.util.LinkedList;
-
-import org.osate.aadl2.DirectionType;
-import org.osate.aadl2.PortCategory;
+import java.util.HashMap;
 
 public class ProcessModel {
 
 	private String objectName;
-	private LinkedList<PortModel> ports;
 
+	// port name -> port type
+	private HashMap<String, String> receivePorts;
+
+	// port name -> port type
+	private HashMap<String, String> sendPorts;
+
+	// This is a placeholder until I get actual tasks implemented
+	private HashMap<String, String> tasks;
+	
 	public ProcessModel() {
-		ports = new LinkedList<>();
+		receivePorts = new HashMap<>();
+		sendPorts = new HashMap<>();
+		tasks = new HashMap<>();
+		tasks.put("PlaceholderTaskName", "PlaceholderTaskType");
 	}
-
 	public void setObjectName(String name) {
 		objectName = name;
 	}
 
-	public void addPort(String name, DirectionType direction,
-			PortCategory category, String representation) {
-		ports.add(new PortModel(name, direction, category, representation));
+	public void addReceivePort(String name, String representation) {
+		// TODO: Throw exception if we already have a port with the given name?
+		receivePorts.put(name, representation);
 	}
 
-	public class PortModel {
-		private String portName;
-		private DirectionType direction;
-		private PortCategory category;
-		private String representation;
+	public void addSendPort(String name, String representation) {
+		// TODO: Throw exception if we already have a port with the given name?
+		sendPorts.put(name, representation);
+	}
 
-		public PortModel(String name, DirectionType direction,
-				PortCategory category, String representation) {
-			portName = name;
-			this.direction = direction;
-			this.category = category;
-			this.representation = representation;
-		}
+	public String getObjectName() {
+		return objectName;
+	}
 
-		public String getRepresentation() {
-			return representation;
-		}
-		
-		public String getPortName() {
-			return portName;
-		}
+	public HashMap<String, String> getReceivePorts() {
+		return receivePorts;
+	}
 
-		public DirectionType getDirection() {
-			return direction;
-		}
+	public HashMap<String, String> getSendPorts() {
+		return sendPorts;
+	}
 
-		public PortCategory getCategory() {
-			return category;
-		}
-
+	public HashMap<String, String> getTasks() {
+		return tasks;
+	}
+	
+	public boolean isDisplay(){
+		return false;
 	}
 }

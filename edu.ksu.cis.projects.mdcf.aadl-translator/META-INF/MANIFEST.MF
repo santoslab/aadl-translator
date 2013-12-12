@@ -3,7 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: AADL Translator
 Bundle-SymbolicName: edu.ksu.cis.projects.mdcf.aadl-translator;singleton:=true
 Bundle-Version: 0.0.1
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ lib/string-template.jar
 Bundle-Activator: edu.ksu.cis.projects.mdcf.aadltranslator.ArchitecturePlugin
 Bundle-Vendor: SAnToS Lab
 Bundle-Localization: plugin

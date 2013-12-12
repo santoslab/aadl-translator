@@ -6,16 +6,14 @@ class(model) ::=<<
   <constructor(model)>
   <initAndGetters(model)>
   <subAndPubChannelAssignments(model)>
-  <if(model.isDisplay)>
   <abstractMethods(model)>
-  <endif>
   <tasks(model)>
 }
 >>
 
 tasks(model) ::=<<
 
-<model.exchanges.keys:{k |<task(k, model.exchanges.(k))>}>
+<model.tasks.keys:{k |<task(k, model.tasks.(k))>}>
 >>
 
 task(exchName, exchType) ::=<<
@@ -24,14 +22,10 @@ task(exchName, exchType) ::=<<
 public class <exchName>ReceiverTask implements Task {
   @Override
   public void run() {
-    <if(model.isDisplay)>MdcfMessage message = <exchName>ReceiverPort.getReceiver().getLastMsg();<endif>
+    MdcfMessage message = <exchName>ReceiverPort.getReceiver().getLastMsg();
     try {
-      <if(model.isDisplay)>
       <exchType> <exchName>Data = <exchName>ReceiverPort.getLastMsgContent();
       <exchName>ListenerOnMessage(message, <exchName>Data);
-      <else>
-      <exchName>SenderPort.send(<exchName>ReceiverPort.getLastMsgContent());
-      <endif>
     } catch (MdcfDecodeMessageException e) {
       System.err.println(getComponentTypeName() + ".<exchName>Task task: invalid message:" + message.getTextMsg());
       e.printStackTrace();
@@ -45,7 +39,7 @@ abstractMethods(model) ::=<<
 
 protected abstract void initComponent();
   
-<model.exchanges.keys:{k |<abstractListener(k, model.exchanges.(k))>
+<model.receivePorts.keys:{k |<abstractListener(k, model.receivePorts.(k))>
 }>
 >>
 
@@ -57,16 +51,13 @@ subAndPubChannelAssignments(model) ::=<<
 
 @Override
 public void processSubscriberChannelAssignment(SubChannelAssignmentMsg subAssign) {
-  <model.exchanges.keys:{k |<subChannelAssignment(k)>
+  <model.receivePorts.keys:{k |<subChannelAssignment(k)>
   }>}
 
 @Override
 public void processPublisherChannelAssignment(PubChannelAssignmentMsg pubAssign) {
-<if(model.isDisplay)>
-  // Displays don't publish anything, so this method is empty
-<else>
-  <model.exchanges.keys:{k |<pubChannelAssignment(k)>
-  }><endif>}
+  <model.sendPorts.keys:{k |<pubChannelAssignment(k)>
+  }>}
 >>
 
 pubChannelAssignment(exchName) ::=<<
@@ -82,11 +73,7 @@ initAndGetters(model) ::=<<
 
 @Override
 public void init(){
-<if(model.isDisplay)>
   initComponent();
-<else>
-  // No initialization required
-<endif>
 }
 
 @Override
@@ -102,16 +89,12 @@ protected Map\<String, MdcfReceiverPort\<?>\> getReceiverPortMap(){
 >>
 
 constructor(model) ::=<<
-<if(model.isDisplay)>
 public <model.objectName>SuperType(String GUID) {
-<else>
-public <model.objectName>PseudoDevice(String GUID) {
-<endif>
   super(GUID, "<model.objectName>");
   taskInstanceMap = new HashMap\<>();
   receiverPortMap = new HashMap\<>();
-  <model.exchanges.keys:{k |<taskInstanceMapEntry(k)>
-  }><model.exchanges.keys:{k |<receiverPortMapEntry(k)>
+  <model.tasks.keys:{k |<taskInstanceMapEntry(k)>
+  }><model.receivePorts.keys:{k |<receiverPortMapEntry(k)>
   }>}
 >>
 
@@ -124,10 +107,8 @@ taskInstanceMap.put(<exchName>ReceiverTask.class.getSimpleName(), new <exchName>
 >>
 
 portDeclarations(model) ::=<<
-<model.exchanges.keys:{k |<receiverDeclaration(k, model.exchanges.(k))>}>
-<if(!model.isDisplay)>
-<model.exchanges.keys:{k |<senderDeclaration(k, model.exchanges.(k))>}>
-<endif>
+<model.receivePorts.keys:{k |<receiverDeclaration(k, model.receivePorts.(k))>}>
+<model.sendPorts.keys:{k |<senderDeclaration(k, model.sendPorts.(k))>}>
 >>
 
 senderDeclaration(exchName, exchType) ::=<<
@@ -167,13 +148,9 @@ import mdcf.core.ctypes.logic.LogicComponent;
 <endif>
 import mdcf.core.messagetypes.devicemgmt.PubChannelAssignmentMsg;
 import mdcf.core.messagetypes.devicemgmt.SubChannelAssignmentMsg;
-<importMessageTypes(model)>
 >>
 
-importMessageTypes(model) ::=<<
-<model.exchanges.values:{v |import mdcf.device.messages.<v>
-}>
->>
+
 
 userimpl(model) ::=<<
 package mdcf.app.<model.objectName>;
@@ -190,7 +167,7 @@ public class <model.objectName> extends <model.objectName>SuperType {
   protected void initComponent() {
     // TODO Fill in custom initialization code here
   }
-  <model.exchanges.keys:{k |<userImplOnMessageStub(k, model.exchanges.(k))>
+  <model.tasks.keys:{k |<userImplOnMessageStub(k, model.tasks.(k))>
   }>}
 >>
 

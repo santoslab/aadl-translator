@@ -1,15 +1,24 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.instance.SystemInstance;
+
 import edu.ksu.cis.projects.mdcf.aadltranslator.ArchitecturePlugin;
 import edu.ksu.cis.projects.mdcf.aadltranslator.ModelStatistics;
+
 import org.osate.ui.actions.AaxlReadOnlyActionAsJob;
 import org.osgi.framework.Bundle;
 
 public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
+	private final STGroup javaSTG = new STGroupFile(
+			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/templ/java.stg");
+	private final STGroup midasSTG = new STGroupFile(
+			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/templ/midas.stg");
+
 	protected Bundle getBundle() {
 		return ArchitecturePlugin.getDefault().getBundle();
 	}
@@ -94,6 +103,8 @@ public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 		if (si != null) {
 			stats.defaultTraversal(si);
 		}
+		System.out.println(javaSTG.getInstanceOf("class")
+				.add("model", stats.getProcessModel()).render());
 		monitor.done();
 	}
 }
