@@ -3,7 +3,9 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.osate.aadl2.AccessConnection;
 import org.osate.aadl2.Data;
+import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DeviceImplementation;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.EventDataPort;
@@ -15,27 +17,24 @@ import org.osate.aadl2.Process;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.Thread;
 import org.osate.aadl2.ThreadImplementation;
+import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.Type;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
 import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitchWithProgress;
-import org.osate.aadl2.properties.InvalidModelException;
-import org.osate.aadl2.properties.PropertyAcc;
-import org.osate.aadl2.properties.PropertyDoesNotApplyToHolderException;
-import org.osate.aadl2.properties.PropertyIsListException;
-import org.osate.aadl2.properties.PropertyIsModalException;
-import org.osate.aadl2.properties.PropertyNotPresentException;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.contribution.sei.names.DataModel;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 
-public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
-	public class MyAadl2Switch extends Aadl2Switch<String> {
+import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 
-		private ArrayList<ProcessModel> proModel = new ArrayList<>();
-		private int currentProcessModel;
+public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
+	private enum ElementType {PROCESS, THREAD, NONE}; 
+	public class MyAadl2Switch extends Aadl2Switch<String> {
+		private ArrayList<ProcessModel> processModels = new ArrayList<>();
+		private ElementType lastElemProcessed = ElementType.NONE;
 
 		@Override
 		public String caseSystemImplementation(SystemImplementation obj) {
@@ -44,7 +43,11 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		}
 
 		@Override
-		public String caseThread(Thread obj) {
+		public String caseThreadType(ThreadType obj) {
+			System.out.println("Thread: " + obj.getName());
+			processModels.get(processModels.size() - 1)
+					.addTask(obj.getName());
+			lastElemProcessed = ElementType.THREAD;
 			return DONE;
 		}
 
@@ -62,8 +65,10 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		@Override
 		public String caseProcess(Process obj) {
 			System.out.println("Process: " + obj.getName());
-			proModel.add(new ProcessModel());
-			proModel.get(proModel.size()-1).setObjectName(obj.getName());
+			processModels.add(new ProcessModel());
+			processModels.get(processModels.size() - 1).setObjectName(
+					obj.getName());
+			lastElemProcessed = ElementType.PROCESS;
 			return DONE;
 		}
 
@@ -89,7 +94,7 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		}
 
 		private void handlePort(Port obj) {
-			if (proModel.size() > 0) {
+			if (lastElemProcessed == ElementType.PROCESS) {
 				if (obj.getCategory() == PortCategory.EVENT_DATA) {
 					Property prop = GetProperties.lookupPropertyDefinition(
 							((EventDataPort) obj).getDataFeatureClassifier(),
@@ -98,23 +103,24 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 						String typeName = getJavaType(PropertyUtils
 								.getEnumLiteral(obj, prop).getName());
 						if (obj.getDirection() == DirectionType.IN) {
-							proModel.get(proModel.size()-1)
+							processModels.get(processModels.size() - 1)
 									.addReceivePort(obj.getName(), typeName);
 						} else if (obj.getDirection() == DirectionType.OUT) {
-							proModel.get(proModel.size()-1).addSendPort(obj.getName(), typeName);
+							processModels.get(processModels.size() - 1)
+									.addSendPort(obj.getName(), typeName);
 						} else {
-							throw new NotImplementedException("Port " + obj.getName()
-									+ " is neither in nor out");
+							throw new NotImplementedException("Port "
+									+ obj.getName() + " is neither in nor out");
 						}
 					} catch (NotImplementedException e) {
-						handleException(e);
+						handleException("Port", obj.getName(), e);
 					}
 				}
 			}
 		}
 
-		private void handleException(Exception e) {
-			System.err.println("An error has occurred: "
+		private void handleException(String elemType, String elemName, Exception e) {
+			System.err.println("An error has occurred: in " + elemType + " " + elemName
 					+ e.getLocalizedMessage());
 			e.printStackTrace();
 		}
@@ -146,6 +152,27 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		}
 
 		@Override
+		public String caseDataAccess(DataAccess obj) {
+			return DONE;
+		}
+		
+		@Override
+		public String caseAccessConnection(AccessConnection obj) {
+			String parentName;
+			if(obj.getAllSource().getOwner() instanceof ThreadType){
+				// Write
+				parentName = ((ThreadType)obj.getAllSource().getOwner()).getName();
+			} else {
+				// Read
+				parentName = ((ThreadType)obj.getAllDestination().getOwner()).getName();
+			}
+			String srcName = obj.getAllSource().getName();
+			String dstName = obj.getAllDestination().getName();
+			//TODO: Next step: add these usages into the models (as either incoming globals, or values to be set)
+			return DONE;
+		}
+		
+		@Override
 		public String casePortConnection(PortConnection obj) {
 			System.out.print("Connection: ");
 			if (obj.getAllSource().getContainingClassifier() == null)
@@ -165,7 +192,7 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		}
 
 		public ProcessModel getProcessModel() {
-			return proModel.get(0);
+			return processModels.get(0);
 		}
 	}
 

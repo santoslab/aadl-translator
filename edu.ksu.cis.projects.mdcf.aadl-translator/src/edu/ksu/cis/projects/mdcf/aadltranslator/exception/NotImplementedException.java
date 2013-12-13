@@ -1,4 +1,4 @@
-package edu.ksu.cis.projects.mdcf.aadltranslator;
+package edu.ksu.cis.projects.mdcf.aadltranslator.exception;
 
 public class NotImplementedException extends Exception {
 	private static final long serialVersionUID = 7862752843582919995L;

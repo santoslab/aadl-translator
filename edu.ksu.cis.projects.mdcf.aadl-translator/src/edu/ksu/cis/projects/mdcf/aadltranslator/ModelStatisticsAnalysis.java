@@ -36,7 +36,6 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.instance.SystemInstance;
-import edu.ksu.cis.projects.mdcf.aadltranslator.ModelStatistics;
 import org.osate.ui.actions.AbstractAnalysis;
 
 

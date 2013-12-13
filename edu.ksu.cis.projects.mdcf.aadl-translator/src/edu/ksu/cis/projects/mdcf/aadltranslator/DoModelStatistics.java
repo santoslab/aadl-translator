@@ -8,16 +8,15 @@ import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.instance.SystemInstance;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.ArchitecturePlugin;
-import edu.ksu.cis.projects.mdcf.aadltranslator.ModelStatistics;
 
 import org.osate.ui.actions.AaxlReadOnlyActionAsJob;
 import org.osgi.framework.Bundle;
 
 public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 	private final STGroup javaSTG = new STGroupFile(
-			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/templ/java.stg");
+			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/java.stg");
 	private final STGroup midasSTG = new STGroupFile(
-			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/templ/midas.stg");
+			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/midas.stg");
 
 	protected Bundle getBundle() {
 		return ArchitecturePlugin.getDefault().getBundle();

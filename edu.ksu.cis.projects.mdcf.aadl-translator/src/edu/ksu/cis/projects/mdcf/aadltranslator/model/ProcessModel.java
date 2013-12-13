@@ -1,5 +1,6 @@
-package edu.ksu.cis.projects.mdcf.aadltranslator;
+package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ProcessModel {
@@ -13,14 +14,17 @@ public class ProcessModel {
 	private HashMap<String, String> sendPorts;
 
 	// This is a placeholder until I get actual tasks implemented
-	private HashMap<String, String> tasks;
+	private ArrayList<TaskModel> tasks;
+	
+	// variable name -> type
+	private HashMap<String, String> globals;
 	
 	public ProcessModel() {
 		receivePorts = new HashMap<>();
 		sendPorts = new HashMap<>();
-		tasks = new HashMap<>();
-		tasks.put("PlaceholderTaskName", "PlaceholderTaskType");
+		tasks = new ArrayList<>();
 	}
+	
 	public void setObjectName(String name) {
 		objectName = name;
 	}
@@ -47,11 +51,20 @@ public class ProcessModel {
 		return sendPorts;
 	}
 
-	public HashMap<String, String> getTasks() {
+	public ArrayList<TaskModel> getTasks() {
 		return tasks;
 	}
 	
 	public boolean isDisplay(){
 		return false;
+	}
+
+	public TaskModel getLastThread(){
+		return tasks.get(tasks.size() - 1);
+	}
+	
+	public void addTask(String name) {
+		tasks.add(new TaskModel());
+		tasks.get(tasks.size() - 1).setTaskName(name);
 	}
 }
