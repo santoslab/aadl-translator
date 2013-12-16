@@ -13,8 +13,8 @@ public class ProcessModel {
 	// port name -> port type
 	private HashMap<String, String> sendPorts;
 
-	// This is a placeholder until I get actual tasks implemented
-	private ArrayList<TaskModel> tasks;
+	// task name -> task model
+	private HashMap<String, TaskModel> tasks;
 	
 	// variable name -> type
 	private HashMap<String, String> globals;
@@ -22,7 +22,7 @@ public class ProcessModel {
 	public ProcessModel() {
 		receivePorts = new HashMap<>();
 		sendPorts = new HashMap<>();
-		tasks = new ArrayList<>();
+		tasks = new HashMap<>();
 	}
 	
 	public void setObjectName(String name) {
@@ -51,8 +51,21 @@ public class ProcessModel {
 		return sendPorts;
 	}
 
-	public ArrayList<TaskModel> getTasks() {
+	public HashMap<String, TaskModel> getTasks() {
 		return tasks;
+	}
+	
+	/**
+	 * This will return the type of a global variable
+	 * @param name The name of the global variable
+	 * @return The type of the global variable
+	 */
+	public String getGlobalType(String name){
+		return globals.get(name);
+	}
+	
+	public TaskModel getTask(String name){
+		return tasks.get(name);
 	}
 	
 	public boolean isDisplay(){
@@ -64,7 +77,6 @@ public class ProcessModel {
 	}
 	
 	public void addTask(String name) {
-		tasks.add(new TaskModel());
-		tasks.get(tasks.size() - 1).setTaskName(name);
+		tasks.put(name, new TaskModel());
 	}
 }

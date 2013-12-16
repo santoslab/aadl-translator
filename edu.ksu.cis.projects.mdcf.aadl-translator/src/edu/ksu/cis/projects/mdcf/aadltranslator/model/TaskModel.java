@@ -6,18 +6,41 @@ import java.util.HashMap;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 
 public class TaskModel {
+	
+	/**
+	 * The name of this task
+	 */
 	private String taskName;
+	
+	/**
+	 * The name of the triggering port
+	 */
 	private String trigPortName;
+	
+	/**
+	 * The type of the triggering port
+	 */
 	private String trigPortType;
 
 	/**
-	 * This stores a mapping from global name -> global type
+	 * This is a list of globals read by this task.
 	 */
-	private HashMap<String, String> incomingGlobals;
+	private ArrayList<VariableModel> incomingGlobals;
+
+	/**
+	 * This is a list of globals written by this task.
+	 */
+	private ArrayList<VariableModel> outgoingGlobals;
+
+	/**
+	 * The names (in order) of methods that will be called when this task is
+	 * executed
+	 */
 	private ArrayList<MethodModel> callSequence;
 
 	public TaskModel() {
-		incomingGlobals = new HashMap<>();
+		incomingGlobals = new ArrayList<>();
+		outgoingGlobals = new ArrayList<>();
 		callSequence = new ArrayList<>();
 		trigPortName = null;
 	}
@@ -26,13 +49,22 @@ public class TaskModel {
 		this.taskName = taskName;
 	}
 
-	public void setTrigPortName(String trigPortName) throws NotImplementedException {
-		if (this.trigPortName == null){
+	public void setTrigPortName(String trigPortName)
+			throws NotImplementedException {
+		if (this.trigPortName == null) {
 			this.trigPortName = trigPortName;
-		} else{
+		} else {
 			throw new NotImplementedException("A task with triggering port "
 					+ this.trigPortName + " tried to add a second port named "
 					+ trigPortName);
 		}
+	}
+
+	public void addIncGlobal(VariableModel vm) {
+		incomingGlobals.add(vm);
+	}
+
+	public void addOutGlobal(VariableModel vm) {
+		outgoingGlobals.add(vm);
 	}
 }

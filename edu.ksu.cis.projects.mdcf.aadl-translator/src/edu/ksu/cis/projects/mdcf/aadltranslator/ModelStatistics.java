@@ -18,6 +18,7 @@ import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.ThreadImplementation;
+import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.Type;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
@@ -26,9 +27,12 @@ import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.contribution.sei.names.DataModel;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
+import org.osate.xtext.aadl2.unparsing.AadlUnparser;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.VariableModel;
 
 public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 	private enum ElementType {PROCESS, THREAD, NONE}; 
@@ -36,23 +40,31 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		private ArrayList<ProcessModel> processModels = new ArrayList<>();
 		private ElementType lastElemProcessed = ElementType.NONE;
 
+		private String DONE = null;
+		
 		@Override
 		public String caseSystemImplementation(SystemImplementation obj) {
 			System.out.println("System: " + obj.getName());
+			return DONE;
+		}
+		
+		@Override
+		public String caseThreadSubcomponent(ThreadSubcomponent obj){
+			System.out.println("ThreadSubcomponent: " + obj.getName());
+//			processModels.get(processModels.size() - 1).addTask(obj.getName());
 			return DONE;
 		}
 
 		@Override
 		public String caseThreadType(ThreadType obj) {
 			System.out.println("Thread: " + obj.getName());
-			processModels.get(processModels.size() - 1)
-					.addTask(obj.getName());
 			lastElemProcessed = ElementType.THREAD;
 			return DONE;
 		}
 
 		@Override
 		public String caseThreadImplementation(ThreadImplementation obj) {
+			System.out.println("ThreadImplementation: " + obj.getName());
 			return DONE;
 		}
 
@@ -158,18 +170,37 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		
 		@Override
 		public String caseAccessConnection(AccessConnection obj) {
+//			if(lastElemProcessed == ElementType.PROCESS){
+//				handleProcessDataConnection(obj);
+//			}
+			System.out.println("AccessConnection: " + obj.getName());
+			return DONE;
+		}
+		
+		private void handleProcessDataConnection(AccessConnection obj){
+			ProcessModel proc = processModels.get(processModels.size() - 1);
 			String parentName;
+			TaskModel task;
+			VariableModel vm = new VariableModel();
+			String srcName = obj.getAllSource().getName();
+			String dstName = obj.getAllDestination().getName();
 			if(obj.getAllSource().getOwner() instanceof ThreadType){
 				// Write
 				parentName = ((ThreadType)obj.getAllSource().getOwner()).getName();
+				task = proc.getTask(parentName);
+				vm.setOuterName(srcName);
+				vm.setInnerName(dstName);
+				vm.setType(proc.getGlobalType(srcName));
+				task.addIncGlobal(vm);
 			} else {
 				// Read
 				parentName = ((ThreadType)obj.getAllDestination().getOwner()).getName();
+				task = proc.getTask(parentName);
+				vm.setOuterName(dstName);
+				vm.setInnerName(srcName);
+				vm.setType(proc.getGlobalType(dstName));
+				task.addOutGlobal(vm);
 			}
-			String srcName = obj.getAllSource().getName();
-			String dstName = obj.getAllDestination().getName();
-			//TODO: Next step: add these usages into the models (as either incoming globals, or values to be set)
-			return DONE;
 		}
 		
 		@Override
@@ -198,6 +229,7 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 
 	public ModelStatistics(final IProgressMonitor monitor) {
 		super(monitor, PROCESS_PRE_ORDER_ALL);
+		
 	}
 
 	public ModelStatistics(final IProgressMonitor monitor,

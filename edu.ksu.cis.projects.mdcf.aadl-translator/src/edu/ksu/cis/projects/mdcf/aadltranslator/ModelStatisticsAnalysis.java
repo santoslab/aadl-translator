@@ -54,8 +54,10 @@ public class ModelStatisticsAnalysis extends AbstractAnalysis {
 		ModelStatistics stats = new ModelStatistics(new NullProgressMonitor());
 		// run statistics on all declarative models in the workspace
 		stats.defaultTraversalAllDeclarativeModels();
-		if (si != null)
-			stats.processPreOrderAll(si);
+		if (si != null){
+//			stats.processPreOrderAll(si);
+			stats.processPostOrderAll(si);
+		}
 		return true;
 	}
 

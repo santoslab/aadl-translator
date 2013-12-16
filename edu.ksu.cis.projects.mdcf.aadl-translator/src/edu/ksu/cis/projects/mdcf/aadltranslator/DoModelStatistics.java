@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.instance.SystemInstance;
+import org.osate.aadl2.modelsupport.UnparseText;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.ArchitecturePlugin;
 
@@ -96,14 +97,22 @@ public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 		 * info markers attached to the root model object.
 		 */
 		// run statistics on all declarative models in the workspace
+		
+		UnparseText ut = new UnparseText();
+		String st = ut.getParseOutput();
+		
 		stats.defaultTraversalAllDeclarativeModels();
+//		stats.processPreOrderWithLeavesAll();
+//		stats.processPostOrderAll();
+//		System.out.println("=====");
+//		stats.processPreOrderAll();
 		final StringBuffer msg = new StringBuffer();
 
 		if (si != null) {
 			stats.defaultTraversal(si);
 		}
-		System.out.println(javaSTG.getInstanceOf("class")
-				.add("model", stats.getProcessModel()).render());
+//		System.out.println(javaSTG.getInstanceOf("class")
+//				.add("model", stats.getProcessModel()).render());
 		monitor.done();
 	}
 }
