@@ -1,17 +1,21 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupFile;
+import java.util.HashSet;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.modelsupport.UnparseText;
-
-import edu.ksu.cis.projects.mdcf.aadltranslator.ArchitecturePlugin;
-
+import org.osate.aadl2.modelsupport.modeltraversal.TraverseWorkspace;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.ui.actions.AaxlReadOnlyActionAsJob;
 import org.osgi.framework.Bundle;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
 
 public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 	private final STGroup javaSTG = new STGroupFile(
@@ -98,21 +102,30 @@ public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 		 */
 		// run statistics on all declarative models in the workspace
 		
-		UnparseText ut = new UnparseText();
-		String st = ut.getParseOutput();
-		
-		stats.defaultTraversalAllDeclarativeModels();
+//		stats.defaultTraversalAllDeclarativeModels();
 //		stats.processPreOrderWithLeavesAll();
 //		stats.processPostOrderAll();
 //		System.out.println("=====");
 //		stats.processPreOrderAll();
+		
+		// TODO: This is pretty ugly.  It works as a testing rig, but it should
+		// probably get cleaned up considerably before any sort of release
+		HashSet<IFile> files = TraverseWorkspace.getAadlandInstanceFilesInWorkspace();
+		ResourceSet rs = OsateResourceUtil.createResourceSet();
+		for(IFile f : files){
+			Resource res = rs.getResource(OsateResourceUtil.getResourceURI((IResource)f), true);
+			Element target = (Element)res.getContents().get(0);
+			stats.process(target);
+		}
 		final StringBuffer msg = new StringBuffer();
 
-		if (si != null) {
-			stats.defaultTraversal(si);
-		}
+//		if (si != null) {
+//			stats.defaultTraversal(si);
+//		}
 //		System.out.println(javaSTG.getInstanceOf("class")
 //				.add("model", stats.getProcessModel()).render());
+		String st = stats.goForTheGold();
+		System.out.println(st);
 		monitor.done();
 	}
 }
