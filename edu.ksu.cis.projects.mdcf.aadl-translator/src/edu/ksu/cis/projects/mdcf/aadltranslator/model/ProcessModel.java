@@ -18,11 +18,12 @@ public class ProcessModel {
 	
 	// variable name -> type
 	private HashMap<String, String> globals;
-	
+
 	public ProcessModel() {
 		receivePorts = new HashMap<>();
 		sendPorts = new HashMap<>();
 		tasks = new HashMap<>();
+		globals = new HashMap<>();
 	}
 	
 	public void setObjectName(String name) {
@@ -54,6 +55,10 @@ public class ProcessModel {
 	public HashMap<String, TaskModel> getTasks() {
 		return tasks;
 	}
+
+	public HashMap<String, String> getGlobals() {
+		return globals;
+	}
 	
 	/**
 	 * This will return the type of a global variable
@@ -78,5 +83,9 @@ public class ProcessModel {
 	
 	public void addTask(String name) {
 		tasks.put(name, new TaskModel());
+	}
+	
+	public void addGlobal(String name, String type) {
+		globals.put(name, type);
 	}
 }

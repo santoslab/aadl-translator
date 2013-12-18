@@ -12,7 +12,6 @@ class(model) ::=<<
 >>
 
 tasks(model) ::=<<
-
 <model.tasks.keys:{k |<task(k, model.tasks.(k))>}>
 >>
 
@@ -48,7 +47,6 @@ protected abstract void <exchName>ListenerOnMessage(MdcfMessage msg, <exchType> 
 >>
 
 subAndPubChannelAssignments(model) ::=<<
-
 @Override
 public void processSubscriberChannelAssignment(SubChannelAssignmentMsg subAssign) {
   <model.receivePorts.keys:{k |<subChannelAssignment(k)>
@@ -84,6 +82,15 @@ protected Map\<String, Task> getTaskInstanceMap() {
 @Override
 protected Map\<String, MdcfReceiverPort\<?>\> getReceiverPortMap(){
   return this.receiverPortMap;
+}
+
+<model.globals.keys:{k |<globalGetter(k, model.globals.(k))>
+}>
+>>
+
+globalGetter(name, type) ::=<<
+private <type> get<name>(){
+  return <name>;
 }
 
 >>
@@ -129,6 +136,11 @@ public class <model.objectName>PseudoDevice extends LogicComponent{
 <endif>
   private HashMap\<String, Task> taskInstanceMap;
   private HashMap\<String, MdcfReceiverPort\<?>\> receiverPortMap;
+<model.globals.keys:{k |<globalDeclaration(k, model.globals.(k))>
+}> >>
+
+globalDeclaration(name, type) ::=<<
+  private <type> <name>;
 >>
 
 packageAndImports(model) ::=<<
@@ -156,8 +168,7 @@ userimpl(model) ::=<<
 package mdcf.app.<model.objectName>;
 
 import mdcf.channelservice.common.MdcfMessage;
-<importMessageTypes(model)>
-public class <model.objectName> extends <model.objectName>SuperType {
+<importMessageTypes(model)>public class <model.objectName> extends <model.objectName>SuperType {
 
   public <model.objectName>(String GUID) {
     super(GUID);
