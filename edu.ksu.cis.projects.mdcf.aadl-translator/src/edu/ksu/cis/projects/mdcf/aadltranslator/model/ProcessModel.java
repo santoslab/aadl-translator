@@ -82,7 +82,7 @@ public class ProcessModel {
 	}
 	
 	public void addTask(String name) {
-		tasks.put(name, new TaskModel());
+		tasks.put(name, new TaskModel(name));
 	}
 	
 	public void addGlobal(String name, String type) {

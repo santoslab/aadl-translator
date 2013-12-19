@@ -15,5 +15,17 @@ public class VariableModel {
 	
 	public void setInnerName(String innerName) {
 		this.innerName = innerName;
-	}	
+	}
+	
+	public String getType() {
+		return type;
+	}
+
+	public String getOuterName() {
+		return outerName;
+	}
+
+	public String getInnerName() {
+		return innerName;
+	}
 }

@@ -15,22 +15,36 @@ tasks(model) ::=<<
 <model.tasks.keys:{k |<task(k, model.tasks.(k))>}>
 >>
 
-task(exchName, exchType) ::=<<
+task(taskName, taskModel) ::=<<
 
 
-public class <exchName>ReceiverTask implements Task {
+public class <taskName>Task implements Task {
+<[taskModel.incomingGlobals, taskModel.outgoingGlobals]:{vm | <globalDeclaration(vm.innerName, vm.type)>
+}>
   @Override
   public void run() {
-    MdcfMessage message = <exchName>ReceiverPort.getReceiver().getLastMsg();
+    <taskModel.incomingGlobals:{vm | <initGlobal(vm.innerName, vm.outerName)>
+    }>
+    MdcfMessage message = <taskModel.trigPortName>ReceiverPort.getReceiver().getLastMsg();
     try {
-      <exchType> <exchName>Data = <exchName>ReceiverPort.getLastMsgContent();
+      <taskModel.trigPortType> <taskModel.trigPortLocalName>Data = <taskModel.trigPortName>ReceiverPort.getLastMsgContent();
       <exchName>ListenerOnMessage(message, <exchName>Data);
     } catch (MdcfDecodeMessageException e) {
-      System.err.println(getComponentTypeName() + ".<exchName>Task task: invalid message:" + message.getTextMsg());
+      System.err.println(getComponentTypeName() + ".<taskName>Task task: invalid message:" + message.getTextMsg());
       e.printStackTrace();
     }
+    <taskModel.outgoingGlobals:{vm | <updateGlobal(vm.innerName, vm.outerName)>
+    }>
   }
 }
+>>
+
+initGlobal(innerName, outerName) ::=<<
+<innerName> = get<outerName>();
+>>
+
+updateGlobal(innerName, outerName) ::=<<
+set<outerName>(<innerName>);
 >>
 
 abstractMethods(model) ::=<<
@@ -85,12 +99,20 @@ protected Map\<String, MdcfReceiverPort\<?>\> getReceiverPortMap(){
 }
 
 <model.globals.keys:{k |<globalGetter(k, model.globals.(k))>
+}><model.globals.keys:{k |<globalSetter(k, model.globals.(k))>
 }>
 >>
 
 globalGetter(name, type) ::=<<
 private <type> get<name>(){
   return <name>;
+}
+
+>>
+
+globalSetter(name, type) ::=<<
+private void set<name>(<type> val){
+  <name> = val;
 }
 
 >>
