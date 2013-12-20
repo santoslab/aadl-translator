@@ -2,12 +2,13 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.util.ArrayList;
 
+import org.eclipse.core.commands.common.HandleObject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AccessConnection;
+import org.osate.aadl2.CallSpecification;
 import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.Data;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DeviceImplementation;
@@ -18,11 +19,14 @@ import org.osate.aadl2.Port;
 import org.osate.aadl2.PortCategory;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.PortSpecification;
-import org.osate.aadl2.Process;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.Property;
-import org.osate.aadl2.PropertyAssociation;
+import org.osate.aadl2.Subprogram;
+import org.osate.aadl2.SubprogramCall;
+import org.osate.aadl2.SubprogramCallSequence;
+import org.osate.aadl2.SubprogramImplementation;
+import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
@@ -30,24 +34,21 @@ import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.Type;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
 import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitchWithProgress;
-import org.osate.aadl2.properties.InvalidModelException;
-import org.osate.aadl2.properties.PropertyDoesNotApplyToHolderException;
-import org.osate.aadl2.properties.PropertyIsListException;
-import org.osate.aadl2.properties.PropertyIsModalException;
-import org.osate.aadl2.properties.PropertyNotPresentException;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.contribution.sei.names.DataModel;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.MethodModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.VariableModel;
 
 public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 	private enum ElementType {
-		SYSTEM, PROCESS, THREAD, NONE
+		SYSTEM, PROCESS, THREAD, SUBPROGRAM, NONE
 	};
 
 	public class MyAadl2Switch extends Aadl2Switch<String> {
@@ -111,7 +112,7 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 			System.out.println("ProcessImplementation: " + obj.getName());
 			return NOT_DONE;
 		}
-		
+
 		@Override
 		public String caseProperty(Property obj) {
 			System.out.println("Property: " + obj.getName());
@@ -173,7 +174,8 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		 *             Thrown if there's no java equivalent of the supplied type
 		 */
 		private String getJavaType(String name) throws NotImplementedException {
-			if (name.equals("Integer") || name.equals("Double") || name.equals("Boolean")) {
+			if (name.equals("Integer") || name.equals("Double")
+					|| name.equals("Boolean")) {
 				return name;
 			} else {
 				throw new NotImplementedException(
@@ -221,6 +223,8 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		public String caseAccessConnection(AccessConnection obj) {
 			if (lastElemProcessed == ElementType.PROCESS) {
 				handleProcessDataConnection(obj);
+			} else if (lastElemProcessed == ElementType.THREAD) {
+				handleSubprogramDataConnection(obj);
 			}
 			System.out.println("AccessConnection: " + obj.getName());
 			return NOT_DONE;
@@ -246,6 +250,35 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 			if (!obj.getOwnedPropertyAssociations().isEmpty())
 				processEList(obj.getOwnedPropertyAssociations());
 			return DONE;
+		}
+
+		@Override
+		public String caseSubprogramType(SubprogramType obj) {
+			lastElemProcessed = ElementType.SUBPROGRAM;
+			return NOT_DONE;
+		}
+
+		@Override
+		public String caseSubprogramCallSequence(SubprogramCallSequence obj) {
+			handleCallSequence(
+					((ThreadImplementation) obj.getOwner()).getTypeName(),
+					obj.getOwnedCallSpecifications());
+			return NOT_DONE;
+		}
+
+		private void handleCallSequence(String taskName,
+				EList<CallSpecification> calls) {
+			ProcessModel proc = processModels.get(processModels.size() - 1);
+			TaskModel task = proc.getTask(taskName);
+			SubprogramCall call;
+			SubprogramImplementation subProgramImpl;
+			for (CallSpecification callSpec : calls) {
+				call = (SubprogramCall) callSpec;
+				subProgramImpl = (SubprogramImplementation) call
+						.getCalledSubprogram();
+				task.addCalledMethod(call.getName(),
+						subProgramImpl.getTypeName());
+			}
 		}
 
 		private void handleProcessPortConnection(PortConnection obj) {
@@ -281,6 +314,77 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 			}
 		}
 
+		private void handleSubprogramDataConnection(AccessConnection obj) {
+			// TODO: This method currently creates methods as necessary --
+			// instead, they should be declared at the process level and
+			// initialized ahead of time
+			ProcessModel proc = processModels.get(processModels.size() - 1);
+			String parentName, internalName, formalParam, actualParam;
+			TaskModel task;
+			if (obj.getAllSource().getOwner() instanceof ThreadType) {
+				// A passed parameter: From thread to method
+				formalParam = obj.getAllDestination().getName();
+				actualParam = obj.getAllSource().getName();
+				internalName = obj.getAllDestinationContext().getName();
+				parentName = ((ThreadType) obj.getAllSource().getOwner())
+						.getName();
+				task = proc.getTask(parentName);
+				String paramType = null;
+				String methodName = task.getMethodProcessName(internalName);
+				for (DataAccess data : ((SubprogramType) obj
+						.getAllDestination().getOwner()).getOwnedDataAccesses()) {
+					if (data.getName().equals(formalParam)) {
+						try {
+							Property prop = GetProperties
+									.lookupPropertyDefinition(
+											data.getDataFeatureClassifier(),
+											DataModel._NAME,
+											DataModel.Data_Representation);
+							paramType = getJavaType(PropertyUtils
+									.getEnumLiteral(data, prop).getName());
+							proc.addParameterToMethod(methodName, formalParam,
+									paramType);
+						} catch (NotImplementedException e) {
+							handleException("AccessConnection", obj.getName(),
+									e);
+						} catch (DuplicateElementException e) {
+							handleException("AccessConnection", obj.getName(),
+									e);
+						}
+					}
+				}
+				task.addParameterToCalledMethod(internalName, formalParam,
+						actualParam);
+			} else {
+				// A returned value: From method to thread
+				parentName = ((ThreadType) obj.getAllDestination().getOwner())
+						.getName();
+				task = proc.getTask(parentName);
+				internalName = obj.getAllSourceContext().getName();
+				String methodName = task.getMethodProcessName(internalName);
+				String returnType = null;
+				formalParam = obj.getAllSource().getName();
+				for (DataAccess data : ((SubprogramType) obj.getAllSource()
+						.getOwner()).getOwnedDataAccesses()) {
+					if (data.getName().equals(formalParam)) {
+						try {
+							Property prop = GetProperties
+									.lookupPropertyDefinition(
+											data.getDataFeatureClassifier(),
+											DataModel._NAME,
+											DataModel.Data_Representation);
+							returnType = getJavaType(PropertyUtils
+									.getEnumLiteral(data, prop).getName());
+						} catch (NotImplementedException e) {
+							handleException("AccessConnection", obj.getName(),
+									e);
+						}
+					}
+				}
+				proc.addReturnToMethod(methodName, returnType);
+			}
+		}
+
 		private void handleProcessDataConnection(AccessConnection obj) {
 			ProcessModel proc = processModels.get(processModels.size() - 1);
 			String parentName;
@@ -290,7 +394,8 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 			String dstName = obj.getAllDestination().getName();
 			if (obj.getAllSource().getOwner() instanceof ThreadType) {
 				// From thread to process
-				parentName = ((ThreadType) obj.getAllSource().getOwner()).getName();
+				parentName = ((ThreadType) obj.getAllSource().getOwner())
+						.getName();
 				task = proc.getTask(parentName);
 				vm.setOuterName(dstName);
 				vm.setInnerName(srcName);
@@ -298,7 +403,8 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 				task.addOutGlobal(vm);
 			} else {
 				// From process to thread
-				parentName = ((ThreadType) obj.getAllDestination().getOwner()).getName();
+				parentName = ((ThreadType) obj.getAllDestination().getOwner())
+						.getName();
 				task = proc.getTask(parentName);
 				vm.setOuterName(srcName);
 				vm.setInnerName(dstName);

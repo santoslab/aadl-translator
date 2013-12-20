@@ -3,6 +3,8 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
+
 public class ProcessModel {
 
 	private String objectName;
@@ -18,11 +20,15 @@ public class ProcessModel {
 	
 	// variable name -> type
 	private HashMap<String, String> globals;
+	
+	// method name -> method model
+	private HashMap<String, MethodModel> methods;
 
 	public ProcessModel() {
 		receivePorts = new HashMap<>();
 		sendPorts = new HashMap<>();
 		tasks = new HashMap<>();
+		methods = new HashMap<>();
 		globals = new HashMap<>();
 	}
 	
@@ -87,5 +93,25 @@ public class ProcessModel {
 	
 	public void addGlobal(String name, String type) {
 		globals.put(name, type);
+	}
+
+	public HashMap<String, MethodModel> getMethods() {
+		return methods;
+	}
+
+	public void addMethod(String methodName, MethodModel method) {
+		methods.put(methodName, method);
+	}
+	
+	public void addParameterToMethod(String methodName, String parameterName, String parameterType) throws DuplicateElementException{
+		if(!methods.containsKey(methodName))
+			methods.put(methodName, new MethodModel(methodName));
+		methods.get(methodName).addParameter(parameterName, parameterType);
+	}
+
+	public void addReturnToMethod(String methodName, String returnType) {
+		if(!methods.containsKey(methodName))
+			methods.put(methodName, new MethodModel(methodName));
+		methods.get(methodName).setRetType(returnType);
 	}
 }

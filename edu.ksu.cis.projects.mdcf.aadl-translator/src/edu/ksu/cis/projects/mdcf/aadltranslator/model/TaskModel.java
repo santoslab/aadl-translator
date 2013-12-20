@@ -32,21 +32,31 @@ public class TaskModel {
 	 * This is a list of globals read by this task.
 	 */
 	private ArrayList<VariableModel> incomingGlobals;
+	
 	/**
 	 * This is a list of globals written by this task.
 	 */
 	private ArrayList<VariableModel> outgoingGlobals;
 
-	/**
-	 * The names (in order) of methods that will be called when this task is
-	 * executed
-	 */
-	private ArrayList<MethodModel> callSequence;
+//	/**
+//	 * The names of called methods mapped to the variables that make up the
+//	 * parameter list
+//	 */
+//	private HashMap<String, ArrayList<String>> methodParameters;
+//	
+//	/**
+//	 * This maps the task's name for a method to its real name
+//	 */
+//	private HashMap<String, String> methodNames;
+//	
+	private ArrayList<CallModel> callSequence;
 
 	public TaskModel(String name) {
 		incomingGlobals = new ArrayList<>();
 		outgoingGlobals = new ArrayList<>();
 		callSequence = new ArrayList<>();
+//		methodParameters = new HashMap<>();
+//		methodNames = new HashMap<>();
 		trigPortName = null;
 		taskName = name;
 	}
@@ -76,6 +86,37 @@ public class TaskModel {
 		outgoingGlobals.add(vm);
 	}
 
+	public void addCalledMethod(String internalName, String externalName) {
+		//TODO: Handle pre-existing method
+//		methodParameters.put(internalName, new ArrayList<String>());
+//		methodNames.put(internalName, externalName);
+		callSequence.add(new CallModel(internalName, externalName));
+	}
+	
+	/**
+	 * This gets the name of a method from a task's local name for it
+	 * @param internalName The task's name for a method
+	 * @return The method's actual name
+	 */
+	public String getMethodProcessName(String internalName) {
+		for(CallModel call : callSequence){
+			if(call.getInternalName().equals(internalName)){
+				return call.getExternalName();
+			}
+		}
+		return null;
+	}
+	
+	public void addParameterToCalledMethod(String internalName, String formal, String actual){
+		//TODO: Handle wrong method name
+//		methodParameters.get(methodName).add(parameter);
+		for(CallModel call : callSequence){
+			if(call.getInternalName().equals(internalName)){
+				call.addParam(formal, actual);
+			}
+		}
+	}
+
 	public String getTaskName() {
 		return taskName;
 	}
@@ -100,7 +141,11 @@ public class TaskModel {
 		return outgoingGlobals;
 	}
 
-	public ArrayList<MethodModel> getCallSequence() {
-		return callSequence;
+	public void addReturnToCalledMethod(String internalName, String methodName,	String taskName) {
+		
 	}
+
+//	public HashMap<String, ArrayList<String>> getMethodParameters() {
+//		return methodParameters;
+//	}
 }
