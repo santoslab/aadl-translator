@@ -5,13 +5,13 @@ compsig(model) ::=<<
 >>
 
 typeTasksAndPorts(model) ::=<<
-<type>$model.objectName$PseudoDevice</type>
+<type>$model.objectName$</type>
 <moduleTasks>
-  $model.exchanges.keys:{k |$task(k)$
+  $model.tasks.values:{k |$task(k)$
   }$</moduleTasks>
 <portSignatures>
-  $model.exchanges.keys:{k |$ports(k, model.exchanges.(k), model)$
-  }$</portSignatures>
+  $! model.exchanges.keys:{k |$ports(k, model.exchanges.(k), model)$
+  } !$</portSignatures>
 >>
 
 ports(exchName, exchType, model) ::=<<
@@ -47,13 +47,19 @@ subscribePort(exchName, exchType) ::=<<
 </entry>
 >>
 
-task(exchName) ::=<<
+task(task) ::=<<
 <mdcf.core.ctypes.TaskSignature>
+  $if(task.sporadic)$
   <type>PORT_SPORADIC</type>
-  <taskName>$exchName$ReceiverTask</taskName>
-  <periodMs>-1</periodMs>
-  <deadlineMs>50</deadlineMs>
-  <wcetMs>5</wcetMs>
-  <trigPortName>$exchName$In</trigPortName>
+  <trigPortName>$task.trigPortName$</trigPortName>
+  <periodMs><!-- Placeholder value: Sporadic task's periods are derived from their triggering port --> -1</periodMs>
+  $else$
+  <type>PERIODIC</type>
+  <trigPortName><!-- Placeholder value: Periodic tasks are triggered by time, not message arrival --> Placeholder</trigPortName>
+  <periodMs>$task.period$</periodMs>
+  $endif$
+  <taskName>$task.taskName$</taskName>
+  <deadlineMs>$task.deadline$</deadlineMs>
+  <wcetMs>$task.wcet$</wcetMs>
 </mdcf.core.ctypes.TaskSignature>
 >>

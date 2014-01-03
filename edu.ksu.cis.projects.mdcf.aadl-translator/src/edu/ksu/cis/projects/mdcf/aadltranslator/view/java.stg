@@ -28,7 +28,7 @@ public class <taskName>Task implements Task {
     MdcfMessage message = <taskModel.trigPortName>ReceiverPort.getReceiver().getLastMsg();
     try {
       <taskModel.trigPortType> <taskModel.trigPortLocalName>Data = <taskModel.trigPortName>ReceiverPort.getLastMsgContent();
-      <exchName>ListenerOnMessage(message, <exchName>Data);
+      <taskModel.trigPortLocalName>ListenerOnMessage(message, <taskModel.trigPortLocalName>Data);
     } catch (MdcfDecodeMessageException e) {
       System.err.println(getComponentTypeName() + ".<taskName>Task task: invalid message:" + message.getTextMsg());
       e.printStackTrace();
@@ -56,8 +56,8 @@ protected abstract void initComponent();
 }>
 >>
 
-abstractListener(exchName, exchType) ::=<<
-protected abstract void <exchName>ListenerOnMessage(MdcfMessage msg, <exchType> <exchName>Data);
+abstractListener(portName, portType) ::=<<
+protected abstract void <portName>ListenerOnMessage(MdcfMessage msg, <portType> <portName>Data);
 >>
 
 subAndPubChannelAssignments(model) ::=<<

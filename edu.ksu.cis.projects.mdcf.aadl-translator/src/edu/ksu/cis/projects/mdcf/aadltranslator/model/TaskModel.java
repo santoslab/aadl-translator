@@ -6,7 +6,7 @@ import java.util.HashMap;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 
 public class TaskModel {
-
+	
 	/**
 	 * The name of this task
 	 */
@@ -37,6 +37,34 @@ public class TaskModel {
 	 * This is a list of globals written by this task.
 	 */
 	private ArrayList<VariableModel> outgoingGlobals;
+	
+	/**
+	 * This task's period in milliseconds
+	 */
+	private int period;
+	
+	/**
+	 * This task's deadline in milliseconds
+	 */
+	private int deadline;
+
+	/**
+	 * The type of this task's trigger -- periodic, sporadic, etc.
+	 */
+	private boolean sporadic;
+	
+	public boolean isSporadic() {
+		return sporadic;
+	}
+
+	public void setSporadic(boolean sporadic) {
+		this.sporadic = sporadic;
+	}
+
+	/**
+	 * This task's worst case execution time
+	 */
+	private int wcet;
 
 //	/**
 //	 * The names of called methods mapped to the variables that make up the
@@ -139,6 +167,34 @@ public class TaskModel {
 
 	public ArrayList<VariableModel> getOutgoingGlobals() {
 		return outgoingGlobals;
+	}
+
+	public int getPeriod() {
+		return period;
+	}
+
+	public int getDeadline() {
+		return deadline;
+	}
+
+	public int getWcet() {
+		return wcet;
+	}
+
+	public ArrayList<CallModel> getCallSequence() {
+		return callSequence;
+	}
+
+	public void setPeriod(int period) {
+		this.period = period;
+	}
+
+	public void setDeadline(int deadline) {
+		this.deadline = deadline;
+	}
+
+	public void setWcet(int wcet) {
+		this.wcet = wcet;
 	}
 
 	public void addReturnToCalledMethod(String internalName, String methodName,	String taskName) {

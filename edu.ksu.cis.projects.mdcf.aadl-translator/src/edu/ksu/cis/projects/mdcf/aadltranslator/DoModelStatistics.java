@@ -122,8 +122,12 @@ public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 //		if (si != null) {
 //			stats.defaultTraversal(si);
 //		}
-		System.out.println(javaSTG.getInstanceOf("class")
-				.add("model", stats.getProcessModel()).render());
+//		System.out.println(javaSTG.getInstanceOf("class").add("model", stats.getProcessModel()).render());
+		
+		midasSTG.delimiterStartChar = '$';
+		midasSTG.delimiterStopChar = '$';
+		
+		System.out.println(midasSTG.getInstanceOf("compsig").add("model", stats.getProcessModel()).render());
 		monitor.done();
 	}
 }
