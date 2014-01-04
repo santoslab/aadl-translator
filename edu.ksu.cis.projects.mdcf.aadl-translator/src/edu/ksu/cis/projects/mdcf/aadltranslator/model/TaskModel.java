@@ -1,7 +1,6 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 

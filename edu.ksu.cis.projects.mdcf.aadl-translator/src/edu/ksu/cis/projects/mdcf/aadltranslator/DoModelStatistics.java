@@ -8,8 +8,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.osate.aadl2.Element;
-import org.osate.aadl2.instance.InstanceObject;
-import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.modelsupport.modeltraversal.TraverseWorkspace;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.ui.actions.AaxlReadOnlyActionAsJob;
@@ -43,15 +41,15 @@ public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 		 */
 		monitor.beginTask("Gathering model statistics",
 				IProgressMonitor.UNKNOWN);
-		// Get the root object of the model
-		Element root = obj.getElementRoot();
-
-		// Get the system instance (if any)
-		SystemInstance si;
-		if (obj instanceof InstanceObject)
-			si = ((InstanceObject) obj).getSystemInstance();
-		else
-			si = null;
+//		// Get the root object of the model
+//		Element root = obj.getElementRoot();
+//
+//		// Get the system instance (if any)
+//		SystemInstance si;
+//		if (obj instanceof InstanceObject)
+//			si = ((InstanceObject) obj).getSystemInstance();
+//		else
+//			si = null;
 
 		/**
 		 * Examples of using the Index to look up a specific package,
@@ -117,7 +115,7 @@ public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 			Element target = (Element)res.getContents().get(0);
 			stats.process(target);
 		}
-		final StringBuffer msg = new StringBuffer();
+//		final StringBuffer msg = new StringBuffer();
 
 //		if (si != null) {
 //			stats.defaultTraversal(si);

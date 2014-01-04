@@ -1,7 +1,7 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 
@@ -9,11 +9,13 @@ public class ProcessModel {
 
 	private String objectName;
 
-	// port name -> port type
-	private HashMap<String, String> receivePorts;
-
-	// port name -> port type
-	private HashMap<String, String> sendPorts;
+//	// port name -> port type
+//	private HashMap<String, String> receivePorts;
+//
+//	// port name -> port type
+//	private HashMap<String, String> sendPorts;
+	
+	private HashMap<String, PortModel> ports;
 
 	// task name -> task model
 	private HashMap<String, TaskModel> tasks;
@@ -25,8 +27,9 @@ public class ProcessModel {
 	private HashMap<String, MethodModel> methods;
 
 	public ProcessModel() {
-		receivePorts = new HashMap<>();
-		sendPorts = new HashMap<>();
+//		receivePorts = new HashMap<>();
+//		sendPorts = new HashMap<>();
+		ports = new HashMap<>();
 		tasks = new HashMap<>();
 		methods = new HashMap<>();
 		globals = new HashMap<>();
@@ -36,26 +39,21 @@ public class ProcessModel {
 		objectName = name;
 	}
 
-	public void addReceivePort(String name, String representation) {
+	public void addPort(PortModel pm) {
 		// TODO: Throw exception if we already have a port with the given name?
-		receivePorts.put(name, representation);
+		ports.put(pm.getPortName(), pm);
 	}
-
-	public void addSendPort(String name, String representation) {
-		// TODO: Throw exception if we already have a port with the given name?
-		sendPorts.put(name, representation);
+	
+	public PortModel getPortByName(String portName){
+		return ports.get(portName);
 	}
 
 	public String getObjectName() {
 		return objectName;
 	}
 
-	public HashMap<String, String> getReceivePorts() {
-		return receivePorts;
-	}
-
-	public HashMap<String, String> getSendPorts() {
-		return sendPorts;
+	public Map<String, PortModel> getPorts() {
+		return ports;
 	}
 
 	public HashMap<String, TaskModel> getTasks() {

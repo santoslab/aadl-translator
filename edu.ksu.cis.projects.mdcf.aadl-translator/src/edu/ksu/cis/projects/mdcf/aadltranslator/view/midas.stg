@@ -10,39 +10,23 @@ typeTasksAndPorts(model) ::=<<
   $model.tasks.values:{k |$task(k)$
   }$</moduleTasks>
 <portSignatures>
-  $! model.exchanges.keys:{k |$ports(k, model.exchanges.(k), model)$
-  } !$</portSignatures>
+  $ model.ports.values:{k |$port(k)$
+  } $</portSignatures>
 >>
 
-ports(exchName, exchType, model) ::=<<
-$if(!model.isDisplay)$
-$publishPort(exchName, exchType)$
-$endif$
-$subscribePort(exchName, exchType)$
->>
-
-publishPort(exchName, exchType) ::=<<
+port(port) ::=<<
 <entry>
-  <string>$exchName$Out</string>
+  <string>$port.portName$</string>
   <mdcf.core.ctypes.PortSignature>
-    <portName>$exchName$Out</portName>
-    <minPeriod>-1</minPeriod>
-    <maxPeriod>-1</maxPeriod>
-    <portDirection>PUBLISH</portDirection>
-    <portType>mdcf.device.messages.$exchType$</portType>
-  </mdcf.core.ctypes.PortSignature>
-</entry>
->>
-
-subscribePort(exchName, exchType) ::=<<
-<entry>
-  <string>$exchName$In</string>
-  <mdcf.core.ctypes.PortSignature>
-    <portName>$exchName$In</portName>
-    <minPeriod>-1</minPeriod>
-    <maxPeriod>-1</maxPeriod>
+    <portName>$port.portName$</portName>
+    <minPeriod>$port.minPeriod$</minPeriod>
+    <maxPeriod>$port.maxPeriod$</maxPeriod>
+    $if(port.subscribe)$
     <portDirection>SUBSCRIBE</portDirection>
-    <portType>mdcf.device.messages.$exchType$</portType>
+    $else$
+    <portDirection>PUBLISH</portDirection>
+    $endif$
+    <portType>$port.type$</portType>
   </mdcf.core.ctypes.PortSignature>
 </entry>
 >>
@@ -52,10 +36,14 @@ task(task) ::=<<
   $if(task.sporadic)$
   <type>PORT_SPORADIC</type>
   <trigPortName>$task.trigPortName$</trigPortName>
-  <periodMs><!-- Placeholder value: Sporadic task's periods are derived from their triggering port --> -1</periodMs>
+  <periodMs><!-- Placeholder value: Sporadic 
+  task's periods are derived from their 
+  triggering port --> -1</periodMs>
   $else$
   <type>PERIODIC</type>
-  <trigPortName><!-- Placeholder value: Periodic tasks are triggered by time, not message arrival --> Placeholder</trigPortName>
+  <trigPortName><!-- Placeholder value: Periodic
+  tasks are triggered by time, not message
+  arrival --> Placeholder</trigPortName>
   <periodMs>$task.period$</periodMs>
   $endif$
   <taskName>$task.taskName$</taskName>
