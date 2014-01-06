@@ -5,7 +5,7 @@ compsig(model) ::=<<
 >>
 
 typeTasksAndPorts(model) ::=<<
-<type>$model.objectName$</type>
+<type>$model.name$</type>
 <moduleTasks>
   $model.tasks.values:{k |$task(k)$
   }$</moduleTasks>

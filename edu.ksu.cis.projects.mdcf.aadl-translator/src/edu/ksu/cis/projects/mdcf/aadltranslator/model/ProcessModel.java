@@ -8,9 +8,9 @@ import com.google.common.collect.Maps;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 
-public class ProcessModel {
+public class ProcessModel implements IComponentModel{
 
-	private String objectName;
+	private String name;
 
 //	// port name -> port type
 //	private HashMap<String, String> receivePorts;
@@ -39,8 +39,8 @@ public class ProcessModel {
 		globals = new HashMap<>();
 	}
 	
-	public void setObjectName(String name) {
-		objectName = name;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void addPort(PortModel pm) {
@@ -52,8 +52,8 @@ public class ProcessModel {
 		return ports.get(portName);
 	}
 
-	public String getObjectName() {
-		return objectName;
+	public String getName() {
+		return name;
 	}
 
 	public Map<String, PortModel> getPorts() {

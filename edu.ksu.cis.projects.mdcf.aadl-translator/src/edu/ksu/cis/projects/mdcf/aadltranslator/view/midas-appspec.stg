@@ -1,0 +1,16 @@
+appspec(system) ::=<<
+<mdcf.core.app.AppSpec>
+  $appName(system)$
+  $components(system)$
+</mdcf.core.app.AppSpec>
+>>
+
+appName(system) ::=<<
+<appName>$system.name$</appName>
+>>
+
+components(system) ::=<<
+<components>
+
+</components>
+>>

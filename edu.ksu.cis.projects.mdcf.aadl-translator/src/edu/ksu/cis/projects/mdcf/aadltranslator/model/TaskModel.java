@@ -9,7 +9,7 @@ public class TaskModel {
 	/**
 	 * The name of this task
 	 */
-	private String taskName;
+	private String name;
 
 	/**
 	 * The name of the triggering port
@@ -85,11 +85,11 @@ public class TaskModel {
 //		methodParameters = new HashMap<>();
 //		methodNames = new HashMap<>();
 		trigPortName = null;
-		taskName = name;
+		this.name = name;
 	}
 
-	public void setTaskName(String taskName) {
-		this.taskName = taskName;
+	public void setName(String taskName) {
+		this.name = taskName;
 	}
 
 	public void setTrigPortInfo(String portName, String portType,
@@ -99,7 +99,7 @@ public class TaskModel {
 			trigPortType = portType;
 			trigPortLocalName = localName;
 		} else {
-			throw new NotImplementedException("The task" + taskName
+			throw new NotImplementedException("The task" + name
 					+ " with triggering port " + this.trigPortName
 					+ " tried to add a second port named " + trigPortName);
 		}
@@ -144,8 +144,8 @@ public class TaskModel {
 		}
 	}
 
-	public String getTaskName() {
-		return taskName;
+	public String getName() {
+		return name;
 	}
 
 	public String getTrigPortName() {

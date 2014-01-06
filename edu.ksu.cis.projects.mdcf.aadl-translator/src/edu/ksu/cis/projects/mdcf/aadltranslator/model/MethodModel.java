@@ -9,7 +9,7 @@ public class MethodModel {
 	 * This stores a mapping from param name -> param type
 	 */
 	private HashMap<String, String> parameters;
-	private String methodName;
+	private String name;
 	private String retType;
 
 //	/**
@@ -19,16 +19,16 @@ public class MethodModel {
 //	private String retName;
 
 	public MethodModel(String methodName) {
-		this.methodName = methodName;
+		this.name = methodName;
 		parameters = new HashMap<>();
 	}
 
-	public String getMethodName() {
-		return methodName;
+	public String getName() {
+		return name;
 	}
 
-	public void setMethodName(String methodName) {
-		this.methodName = methodName;
+	public void setName(String methodName) {
+		this.name = methodName;
 	}
 
 	public String getRetType() {
@@ -51,12 +51,12 @@ public class MethodModel {
 		return parameters;
 	}
 
-	public void addParameter(String name, String type)
+	public void addParameter(String paramName, String type)
 			throws DuplicateElementException {
-		if (parameters.containsKey(name))
-			throw new DuplicateElementException("Method " + methodName
-					+ " is trying to add a parameter called " + name
+		if (parameters.containsKey(paramName))
+			throw new DuplicateElementException("Method " + name
+					+ " is trying to add a parameter called " + paramName
 					+ " but it already has one by that name.");
-		parameters.put(name, type);
+		parameters.put(paramName, type);
 	}
 }

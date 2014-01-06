@@ -119,8 +119,8 @@ private void set<name>(<type> val){
 >>
 
 constructor(model) ::=<<
-public <model.objectName>SuperType(String GUID) {
-  super(GUID, "<model.objectName>");
+public <model.name>SuperType(String GUID) {
+  super(GUID, "<model.name>");
   taskInstanceMap = new HashMap\<>();
   receiverPortMap = new HashMap\<>();
   <model.tasks.keys:{k |<taskInstanceMapEntry(k)>
@@ -144,9 +144,9 @@ private MdcfSenderPort\<<port.type>\> <port.name>SenderPort = new MdcfSenderPort
 
 headerAndFields(model) ::=<<
 <if(model.isDisplay)>
-public class <model.objectName>SuperType extends AppPanelComponent{
+public class <model.name>SuperType extends AppPanelComponent{
 <else>
-public class <model.objectName>PseudoDevice extends LogicComponent{
+public class <model.name>PseudoDevice extends LogicComponent{
 <endif>
   private HashMap\<String, Task> taskInstanceMap;
   private HashMap\<String, MdcfReceiverPort\<?>\> receiverPortMap;
@@ -158,7 +158,7 @@ globalDeclaration(name, type) ::=<<
 >>
 
 packageAndImports(model) ::=<<
-package mdcf.app.<model.objectName>;
+package mdcf.app.<model.name>;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -179,12 +179,12 @@ import mdcf.core.messagetypes.devicemgmt.SubChannelAssignmentMsg;
 
 
 userimpl(model) ::=<<
-package mdcf.app.<model.objectName>;
+package mdcf.app.<model.name>;
 
 import mdcf.channelservice.common.MdcfMessage;
-<importMessageTypes(model)>public class <model.objectName> extends <model.objectName>SuperType {
+<importMessageTypes(model)>public class <model.name> extends <model.name>SuperType {
 
-  public <model.objectName>(String GUID) {
+  public <model..nameectName>(String GUID) {
     super(GUID);
   }
 
