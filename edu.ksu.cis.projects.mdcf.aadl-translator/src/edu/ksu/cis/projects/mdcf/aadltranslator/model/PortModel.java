@@ -1,14 +1,14 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 public class PortModel {
-	private String portName;
+	private String name;
 	private boolean subscribe;
 	private String type;
 	private int minPeriod;
 	private int maxPeriod;
 
-	public String getPortName() {
-		return portName;
+	public String getName() {
+		return name;
 	}
 	
 	public boolean isSubscribe() {
@@ -27,8 +27,8 @@ public class PortModel {
 		return maxPeriod;
 	}
 	
-	public void setPortName(String portName) {
-		this.portName = portName;
+	public void setName(String portName) {
+		this.name = portName;
 	}
 
 	public void setSubscribe(boolean subscribe) {

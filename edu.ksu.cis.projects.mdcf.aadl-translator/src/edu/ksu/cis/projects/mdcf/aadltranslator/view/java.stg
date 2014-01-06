@@ -2,7 +2,8 @@ class(model) ::=<<
 <packageAndImports(model)>
 <headerAndFields(model)>
 
-  <portDeclarations(model)>
+  <model.ports.values:{v |<portDeclarations(v)>}>
+  
   <constructor(model)>
   <initAndGetters(model)>
   <subAndPubChannelAssignments(model)>
@@ -135,19 +136,10 @@ taskInstanceMapEntry(exchName) ::=<<
 taskInstanceMap.put(<exchName>ReceiverTask.class.getSimpleName(), new <exchName>ReceiverTask());
 >>
 
-portDeclarations(model) ::=<<
-<model.receivePorts.keys:{k |<receiverDeclaration(k, model.receivePorts.(k))>}>
-<model.sendPorts.keys:{k |<senderDeclaration(k, model.sendPorts.(k))>}>
->>
-
-senderDeclaration(exchName, exchType) ::=<<
-private MdcfSenderPort\<<exchType>\> <exchName>SenderPort = new MdcfSenderPort\<>("<exchName>Out", <exchType>.class);
-
->>
-
-receiverDeclaration(exchName, exchType) ::=<<
-private MdcfReceiverPort\<<exchType>\> <exchName>ReceiverPort = new MdcfReceiverPort\<>("<exchName>In", <exchType>.class);
-
+portDeclarations(port) ::=<<
+<if(port.subscribe)>
+private MdcfReceiverPort\<<port.type>\> <port.name>ReceiverPort = new MdcfReceiverPort\<>("<port.name>In", <port.type>.class);<else>
+private MdcfSenderPort\<<port.type>\> <port.name>SenderPort = new MdcfSenderPort\<>("<port.name>Out", <port.type>.class);<endif> 
 >>
 
 headerAndFields(model) ::=<<

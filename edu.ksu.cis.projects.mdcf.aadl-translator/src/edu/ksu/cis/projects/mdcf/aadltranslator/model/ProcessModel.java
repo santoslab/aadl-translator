@@ -3,6 +3,9 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Maps;
+
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 
 public class ProcessModel {
@@ -15,6 +18,7 @@ public class ProcessModel {
 //	// port name -> port type
 //	private HashMap<String, String> sendPorts;
 	
+	// port name -> port model
 	private HashMap<String, PortModel> ports;
 
 	// task name -> task model
@@ -41,7 +45,7 @@ public class ProcessModel {
 
 	public void addPort(PortModel pm) {
 		// TODO: Throw exception if we already have a port with the given name?
-		ports.put(pm.getPortName(), pm);
+		ports.put(pm.getName(), pm);
 	}
 	
 	public PortModel getPortByName(String portName){
@@ -54,6 +58,14 @@ public class ProcessModel {
 
 	public Map<String, PortModel> getPorts() {
 		return ports;
+	}
+	
+	public Map<String, PortModel> getReceivePorts() {
+		return Maps.filterValues(ports, receivePortFilter);
+	}
+	
+	public Map<String, PortModel> getSendPorts() {
+		return Maps.filterValues(ports, sendPortFilter);
 	}
 
 	public HashMap<String, TaskModel> getTasks() {
@@ -112,4 +124,16 @@ public class ProcessModel {
 			methods.put(methodName, new MethodModel(methodName));
 		methods.get(methodName).setRetType(returnType);
 	}
+	
+	Predicate<PortModel> receivePortFilter = new Predicate<PortModel>() {
+		public boolean apply(PortModel pm) {
+			return !pm.isSubscribe();
+		}
+	};
+	
+	Predicate<PortModel> sendPortFilter = new Predicate<PortModel>() {
+		public boolean apply(PortModel pm) {
+			return pm.isSubscribe();
+		}
+	};
 }

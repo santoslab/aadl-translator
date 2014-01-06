@@ -174,7 +174,7 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 						}
 
 						PortModel pm = new PortModel();
-						pm.setPortName(obj.getName());
+						pm.setName(obj.getName());
 						pm.setType(typeName);
 						pm.setMinPeriod(Integer.valueOf(minPeriod));
 						pm.setMaxPeriod(Integer.valueOf(maxPeriod));
