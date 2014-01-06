@@ -11,6 +11,7 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.Element;
+import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.modelsupport.modeltraversal.TraverseWorkspace;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
@@ -127,8 +128,10 @@ public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 					OsateResourceUtil.getResourceURI((IResource) f), true);
 
 			Element target = (Element) res.getContents().get(0);
-			if (!(target instanceof AadlPackage))
+			if ((target instanceof PropertySet)){
+				stats.addPropertySetName(((PropertySet)target).getName());
 				continue;
+			}
 			AadlPackage pack = (AadlPackage) target;
 			PublicPackageSection sect = pack.getPublicSection();
 			Classifier ownedClassifier = sect.getOwnedClassifiers().get(0);
@@ -157,16 +160,16 @@ public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 		midas_compsigSTG.delimiterStopChar = '$';
 		for (ProcessModel pm : stats.getSystemModel().getLogicComponents()
 				.values()) {
-			System.out.println(javaSTG.getInstanceOf("class").add("model", pm)
-					.render());
-			System.out.println(midas_compsigSTG.getInstanceOf("compsig")
-					.add("model", pm).render());
+//			System.out.println(javaSTG.getInstanceOf("class").add("model", pm)
+//					.render());
+//			System.out.println(midas_compsigSTG.getInstanceOf("compsig")
+//					.add("model", pm).render());
 		}
-		midas_appspecSTG.delimiterStartChar = '$';
-		midas_appspecSTG.delimiterStopChar = '$';
+		midas_appspecSTG.delimiterStartChar = '#';
+		midas_appspecSTG.delimiterStopChar = '#';
 
 		System.out.println(midas_appspecSTG.getInstanceOf("appspec")
-				.add("model", stats.getSystemModel()).render());
+				.add("system", stats.getSystemModel()).render());
 		monitor.done();
 	}
 }

@@ -10,8 +10,8 @@ import org.osate.aadl2.CallSpecification;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataSubcomponent;
-import org.osate.aadl2.DeviceImplementation;
 import org.osate.aadl2.DeviceSubcomponent;
+import org.osate.aadl2.DeviceType;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.NamedElement;
@@ -19,8 +19,7 @@ import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortCategory;
 import org.osate.aadl2.PortConnection;
-import org.osate.aadl2.PortSpecification;
-import org.osate.aadl2.ProcessImplementation;
+import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertySet;
@@ -28,11 +27,9 @@ import org.osate.aadl2.SubprogramCall;
 import org.osate.aadl2.SubprogramCallSequence;
 import org.osate.aadl2.SubprogramImplementation;
 import org.osate.aadl2.SubprogramType;
-import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
-import org.osate.aadl2.Type;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
 import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitchWithProgress;
 import org.osate.aadl2.properties.PropertyNotPresentException;
@@ -45,7 +42,10 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementExcept
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.MissingRequiredPropertyException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.PropertyOutOfRangeException;
+import edu.ksu.cis.projects.mdcf.aadltranslator.exception.UseBeforeDeclarationException;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.IComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
@@ -58,22 +58,20 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 	};
 
 	private SystemModel systemModel = null;
+	private ArrayList<String> propertySetNames = new ArrayList<>();
 
 	public class MyAadl2Switch extends Aadl2Switch<String> {
-		// private ArrayList<ProcessModel> processModels = new ArrayList<>();
-
 		/**
 		 * A reference to the "current" process model, stored for convenience
 		 */
 		private ProcessModel procModel = null;
 		private ElementType lastElemProcessed = ElementType.NONE;
-		private ArrayList<String> propertySetNames = new ArrayList<>();
 
 		private String DONE = "Done";
 		private String NOT_DONE = null;
 
 		@Override
-		public String caseSystemImplementation(SystemImplementation obj) {
+		public String caseSystem(org.osate.aadl2.System obj) {
 			try {
 				if (systemModel != null)
 					throw new NotImplementedException("Got a system called "
@@ -83,20 +81,19 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 				handleException("System", obj.getName(), e);
 			}
 			systemModel = new SystemModel();
+			systemModel.setName(obj.getName());
 			lastElemProcessed = ElementType.SYSTEM;
 			return NOT_DONE;
 		}
 
 		@Override
 		public String caseThreadSubcomponent(ThreadSubcomponent obj) {
-			// System.out.println("ThreadSubcomponent: " + obj.getName());
 			procModel.addTask(obj.getName());
 			return NOT_DONE;
 		}
 
 		@Override
 		public String caseThreadType(ThreadType obj) {
-			// System.out.println("Thread: " + obj.getName());
 			lastElemProcessed = ElementType.THREAD;
 			handleThreadProperties(obj);
 			return NOT_DONE;
@@ -109,61 +106,47 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		}
 
 		@Override
-		public String caseThreadImplementation(ThreadImplementation obj) {
-			// System.out.println("ThreadImplementation: " + obj.getName());
-			return NOT_DONE;
-		}
-
-		@Override
 		public String casePackageSection(PackageSection obj) {
 			processEList(obj.getOwnedClassifiers());
 			return DONE;
 		}
 
 		@Override
-		public String caseDeviceImplementation(DeviceImplementation obj) {
-			// System.out.println("Device: " + obj.getName());
+		public String caseDeviceSubcomponent(DeviceSubcomponent obj) {
+			DeviceModel dm = new DeviceModel();
+			dm.setName(obj.getComponentType().getName());
+			systemModel.addDevice(obj.getName(), dm);
 			return NOT_DONE;
 		}
 
 		@Override
-		public String caseDeviceSubcomponent(DeviceSubcomponent obj) {
-			DeviceModel dm = new DeviceModel();
-			dm.setName(obj.getName());
-			dm.setType(obj.getComponentType().getName());
-			systemModel.addDevice(dm);
+		public String caseProcessSubcomponent(ProcessSubcomponent obj) {
+			ProcessModel pm = new ProcessModel();
+			pm.setName(obj.getComponentType().getName());
+			systemModel.addProcess(obj.getName(), pm);
 			return NOT_DONE;
 		}
 
 		@Override
 		public String caseProcessType(ProcessType obj) {
-			// System.out.println("Process: " + obj.getName());
-			procModel = new ProcessModel();
-			procModel.setName(obj.getName());
-			systemModel.addProcess(procModel);
+			try {
+				if (systemModel.hasProcessType(obj.getName()))
+					procModel = systemModel.getProcessByType(obj.getName());
+				else
+					throw new UseBeforeDeclarationException(
+							"Attempted to define a process that wasn't declared as a system component");
+			} catch (UseBeforeDeclarationException e) {
+				handleException("Process", obj.getName(), e);
+			}
 			lastElemProcessed = ElementType.PROCESS;
 			processEList(obj.getOwnedElements());
 			return NOT_DONE;
 		}
 
 		@Override
-		public String caseProcessImplementation(ProcessImplementation obj) {
-			// System.out.println("ProcessImplementation: " + obj.getName());
-			return NOT_DONE;
-		}
-
-		@Override
-		public String caseProperty(Property obj) {
-			// System.out.println("Property: " + obj.getName());
-			return NOT_DONE;
-		}
-
-		@Override
 		public String casePort(Port obj) {
-			// System.out.print("Port: ");
-			// System.out.println(obj.getContainingClassifier().getName() + "."
-			// + obj.getName());
-			handlePort(obj);
+			if (lastElemProcessed == ElementType.PROCESS)
+				handlePort(obj);
 			return NOT_DONE;
 		}
 
@@ -235,7 +218,7 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 			// translation
 			System.err.println("An error has occurred in " + elemType + " "
 					+ elemName + ": " + e.getLocalizedMessage());
-			//e.printStackTrace();
+			// e.printStackTrace();
 		}
 
 		/**
@@ -259,14 +242,7 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		}
 
 		@Override
-		public String caseType(Type obj) {
-			// System.out.println("Type: " + obj.getName());
-			return NOT_DONE;
-		}
-
-		@Override
 		public String caseDataSubcomponent(DataSubcomponent obj) {
-			// System.out.println("Data: " + obj.getName());
 			if (lastElemProcessed == ElementType.PROCESS) {
 				Property prop = GetProperties.lookupPropertyDefinition(
 						obj.getDataSubcomponentType(), DataModel._NAME,
@@ -280,16 +256,6 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 				}
 				procModel.addGlobal(obj.getName(), typeName);
 			}
-			return NOT_DONE;
-		}
-
-		@Override
-		public String casePortSpecification(PortSpecification obj) {
-			return NOT_DONE;
-		}
-
-		@Override
-		public String caseDataAccess(DataAccess obj) {
 			return NOT_DONE;
 		}
 
@@ -312,7 +278,6 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 
 		@Override
 		public String caseComponentImplementation(ComponentImplementation obj) {
-			// System.out.println("ComponentImplementation: " + obj.getName());
 			if (!obj.getOwnedSubcomponents().isEmpty())
 				processEList(obj.getOwnedSubcomponents());
 			if (obj instanceof ThreadImplementation
@@ -513,6 +478,70 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 			}
 		}
 
+		private void handleSystemPortConnection(PortConnection obj) {
+			try {
+				if (obj.isBidirectional())
+					throw new NotImplementedException(
+							"Bidirectional ports are not yet allowed.");
+			} catch (NotImplementedException e) {
+				handleException("PortConnection", obj.getName(), e);
+			}
+			String pubTypeName, pubPortName, subPortName, subTypeName, pubName, subName;
+			IComponentModel pubModel = null, subModel = null;
+			ConnectionModel connModel = new ConnectionModel();
+			try {
+				if (obj.getAllSource().getOwner() instanceof DeviceType) {
+					// From device to process
+					pubTypeName = ((DeviceType) obj.getAllSource().getOwner())
+							.getName();
+					subTypeName = ((ProcessType) obj.getAllDestination()
+							.getOwner()).getName();
+					pubModel = systemModel.getDeviceByType(pubTypeName);
+					subModel = systemModel.getProcessByType(subTypeName);
+					connModel.setDevicePublished(true);
+					connModel.setDeviceSubscribed(false);
+				} else if (obj.getAllSource().getOwner() instanceof ProcessType) {
+					// From process to device
+					pubTypeName = ((ProcessType) obj.getAllSource().getOwner())
+							.getName();
+					subTypeName = ((DeviceType) obj.getAllDestination()
+							.getOwner()).getName();
+					pubModel = systemModel.getProcessByType(pubTypeName);
+					subModel = systemModel.getDeviceByType(subTypeName);
+					connModel.setDevicePublished(false);
+					connModel.setDeviceSubscribed(true);
+				} else if ((obj.getAllSource().getOwner() instanceof ProcessType)
+						&& (obj.getAllDestination().getOwner() instanceof ProcessType)) {
+					// From process to process
+					pubTypeName = ((ProcessType) obj.getAllSource().getOwner())
+							.getName();
+					subTypeName = ((ProcessType) obj.getAllDestination()
+							.getOwner()).getName();
+					pubModel = systemModel.getProcessByType(pubTypeName);
+					subModel = systemModel.getProcessByType(subTypeName);
+					connModel.setDevicePublished(false);
+					connModel.setDeviceSubscribed(false);
+				} else {
+					throw new NotImplementedException(
+							"Device to device connections are not yet allowed.");
+				}
+			} catch (NotImplementedException e) {
+				handleException("PortConnection", obj.getName(), e);
+			}
+
+			pubName = obj.getAllSourceContext().getName();
+			subName = obj.getAllDestinationContext().getName();
+			pubPortName = obj.getAllSource().getName();
+			subPortName = obj.getAllDestination().getName();
+			connModel.setPublisher(pubModel);
+			connModel.setSubscriber(subModel);
+			connModel.setPubName(pubName);
+			connModel.setSubName(subName);
+			connModel.setPubPortName(pubPortName);
+			connModel.setSubPortName(subPortName);
+			systemModel.addConnection(connModel);
+		}
+
 		private void handleSubprogramDataConnection(AccessConnection obj) {
 			// TODO: This method currently creates methods as necessary --
 			// instead, they should be declared at the process level and
@@ -628,6 +657,8 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 			// + "." + obj.getAllDestination().getName());
 			if (lastElemProcessed == ElementType.PROCESS) {
 				handleProcessPortConnection(obj);
+			} else if (lastElemProcessed == ElementType.SYSTEM) {
+				handleSystemPortConnection(obj);
 			}
 			return NOT_DONE;
 		}
@@ -650,5 +681,9 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 
 	public SystemModel getSystemModel() {
 		return systemModel;
+	}
+
+	public void addPropertySetName(String propSetName) {
+		propertySetNames.add(propSetName);
 	}
 }

@@ -10,6 +10,11 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementExcept
 
 public class ProcessModel implements IComponentModel{
 
+	/**
+	 * The name of this process -- note that this is a type name, rather than
+	 * an instance name (since there could be several instances of this
+	 * process, all named different things)
+	 */
 	private String name;
 
 //	// port name -> port type

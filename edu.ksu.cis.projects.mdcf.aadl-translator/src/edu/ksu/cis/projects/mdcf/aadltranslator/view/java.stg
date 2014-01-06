@@ -184,7 +184,7 @@ package mdcf.app.<model.name>;
 import mdcf.channelservice.common.MdcfMessage;
 <importMessageTypes(model)>public class <model.name> extends <model.name>SuperType {
 
-  public <model..nameectName>(String GUID) {
+  public <model.name>(String GUID) {
     super(GUID);
   }
 

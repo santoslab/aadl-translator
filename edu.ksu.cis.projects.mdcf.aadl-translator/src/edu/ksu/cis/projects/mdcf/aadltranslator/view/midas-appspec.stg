@@ -1,16 +1,98 @@
 appspec(system) ::=<<
 <mdcf.core.app.AppSpec>
-  $appName(system)$
-  $components(system)$
+  #appName(system)#
+  #components(system)#
+  #channels(system)#
 </mdcf.core.app.AppSpec>
 >>
 
 appName(system) ::=<<
-<appName>$system.name$</appName>
+<appName>#system.name#</appName>
 >>
 
 components(system) ::=<<
 <components>
-
+  #system.logicComponents.keys:{k |#virtualComponent(k, system.logicComponents.(k))#}#
 </components>
+>>
+
+virtualComponent(name, process) ::=<<
+<mdcf.core.app.VirtualComponent>
+  <name>#name#</name>
+  <type>#process.name#</type>
+  #if(process.display)#
+  <role>AppPanel</role>
+  #else#
+  <role>Logic</role>
+  #endif#
+</mdcf.core.app.VirtualComponent> 
+>>
+
+channels(system) ::=<<
+<channels>
+  #system.channels:{c |#channel(c)#}#
+</channels>
+>>
+
+channel(chan) ::=<<
+<mdcf.core.app.Channel>
+  <chanName>$PLACEHOLDER$</chanName>
+  #if(chan.devicePublished)#
+  <pubName>$PLACEHOLDER$</pubName>
+  <subName>#chan.subPortName#</subName>
+  <pubComp>
+    <name>$PLACEHOLDER$</name>
+    <type>$PLACEHOLDER$</type>
+    <role>Device</role>
+  </pubComp>
+  <subComp>
+    <name>#chan.subName#</name>
+    <type>#chan.subscriber.name#</type>
+    #if(chan.subscriber.display)#
+    <role>AppPanel</role>
+    #else#
+    <role>Logic</role>
+    #endif#
+  </subComp>
+  #elseif (chan.deviceSubscribed)#
+  <pubName>#chan.pubName#</pubName>
+  <subName>$PLACEHOLDER$</subName>
+  <pubComp>
+    <name>#chan.pubName#</name>
+    <type>#chan.publisher.name#</type>
+    #if(chan.publisher.display)#
+    <role>AppPanel</role>
+    #else#
+    <role>Logic</role>
+    #endif#
+  </pubComp>
+  <subComp>
+    <name>$PLACEHOLDER$</name>
+    <type>$PLACEHOLDER$</type>
+    <role>Device</role>
+  </subComp>
+  #else#
+  <pubName>#chan.pubName#</pubName>
+  <subName>#chan.subName#</subName>
+  <pubComp>
+    <name>#chan.pubName#</name>
+    <type>#chan.publisher.name#</type>
+    #if(chan.publisher.display)#
+    <role>AppPanel</role>
+    #else#
+    <role>Logic</role>
+    #endif#
+  </pubComp>
+  <subComp>
+    <name>#chan.subName#</name>
+    <type>#chan.subscriber.name#</type>
+    #if(chan.subscriber.display)#
+    <role>AppPanel</role>
+    #else#
+    <role>Logic</role>
+    #endif#
+  </subComp>
+  #endif#
+  <channelDelay>0</channelDelay>
+</mdcf.core.app.Channel>
 >>

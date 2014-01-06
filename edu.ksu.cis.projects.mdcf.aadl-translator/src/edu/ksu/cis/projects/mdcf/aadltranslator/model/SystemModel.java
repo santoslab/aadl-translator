@@ -9,26 +9,50 @@ public class SystemModel {
 	private HashMap<String, DeviceModel> devices;
 	private ArrayList<ConnectionModel> channels;
 	
+	// Type name -> Process Model
+	private HashMap<String, IComponentModel> typeToComponent;
+	
 	public SystemModel(){
 		logicComponents = new HashMap<>();
+		typeToComponent = new HashMap<>();
 		channels = new ArrayList<>();
 		devices = new HashMap<>();
 	}
 	
-	public ProcessModel getProcessByName(String processName) {
-		return logicComponents.get(processName);
+	public ProcessModel getProcessByType(String processTypeName) {
+		if(typeToComponent.get(processTypeName) instanceof ProcessModel)
+			return (ProcessModel)typeToComponent.get(processTypeName);
+		else
+			return null;
 	}
 	
-	public void addProcess(ProcessModel pm){
-		logicComponents.put(pm.getName(), pm);
+	public DeviceModel getDeviceByType(String deviceTypeName) {
+		if(typeToComponent.get(deviceTypeName) instanceof DeviceModel)
+			return (DeviceModel)typeToComponent.get(deviceTypeName);
+		else
+			return null;
 	}
 	
-	public void addDevice(DeviceModel dm){
-		devices.put(dm.getName(), dm);
+	public void addProcess(String instanceName, ProcessModel pm){
+		logicComponents.put(instanceName, pm);
+		typeToComponent.put(pm.getName(), pm);
+	}
+	
+	public void addDevice(String deviceName, DeviceModel dm){
+		devices.put(deviceName, dm);
+		typeToComponent.put(dm.getName(), dm);
 	}
 
+	public void addConnection(ConnectionModel cm){
+		channels.add(cm);
+	}
+	
 	public String getName() {
 		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public HashMap<String, ProcessModel> getLogicComponents() {
@@ -37,5 +61,9 @@ public class SystemModel {
 
 	public ArrayList<ConnectionModel> getChannels() {
 		return channels;
+	}
+	
+	public boolean hasProcessType(String typeName){
+		return typeToComponent.containsKey(typeName);				
 	}
 }
