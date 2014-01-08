@@ -27,6 +27,8 @@ public class ConnectionModel {
 	 */
 	private String subPortName;
 	
+	private int channelDelay;
+	
 	public void setPublisher(IComponentModel publisher) {
 		this.publisher = publisher;
 	}
@@ -89,5 +91,13 @@ public class ConnectionModel {
 
 	public String getSubPortName() {
 		return subPortName;
+	}
+
+	public int getChannelDelay() {
+		return channelDelay;
+	}
+
+	public void setChannelDelay(int channelDelay) {
+		this.channelDelay = channelDelay;
 	}
 }

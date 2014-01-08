@@ -16,6 +16,8 @@ public class ProcessModel implements IComponentModel{
 	 * process, all named different things)
 	 */
 	private String name;
+	
+	private boolean display;
 
 //	// port name -> port type
 //	private HashMap<String, String> receivePorts;
@@ -95,7 +97,11 @@ public class ProcessModel implements IComponentModel{
 	}
 	
 	public boolean isDisplay(){
-		return false;
+		return display;
+	}
+
+	public void setDisplay(boolean display) {
+		this.display = display;
 	}
 
 	public TaskModel getLastThread(){

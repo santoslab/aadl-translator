@@ -160,10 +160,10 @@ public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 		midas_compsigSTG.delimiterStopChar = '$';
 		for (ProcessModel pm : stats.getSystemModel().getLogicComponents()
 				.values()) {
-//			System.out.println(javaSTG.getInstanceOf("class").add("model", pm)
-//					.render());
-//			System.out.println(midas_compsigSTG.getInstanceOf("compsig")
-//					.add("model", pm).render());
+			System.out.println(javaSTG.getInstanceOf("class").add("model", pm)
+					.render());
+			System.out.println(midas_compsigSTG.getInstanceOf("compsig")
+					.add("model", pm).render());
 		}
 		midas_appspecSTG.delimiterStartChar = '#';
 		midas_appspecSTG.delimiterStopChar = '#';

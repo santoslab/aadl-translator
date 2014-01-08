@@ -93,6 +93,6 @@ channel(chan) ::=<<
     #endif#
   </subComp>
   #endif#
-  <channelDelay>0</channelDelay>
+  <channelDelay>#chan.channelDelay#</channelDelay>
 </mdcf.core.app.Channel>
 >>

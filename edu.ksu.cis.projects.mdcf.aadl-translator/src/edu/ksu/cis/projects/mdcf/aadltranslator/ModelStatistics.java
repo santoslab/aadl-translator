@@ -130,12 +130,23 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		@Override
 		public String caseProcessType(ProcessType obj) {
 			try {
-				if (systemModel.hasProcessType(obj.getName()))
+				if (systemModel.hasProcessType(obj.getName())) {
 					procModel = systemModel.getProcessByType(obj.getName());
-				else
+				} else {
 					throw new UseBeforeDeclarationException(
 							"Attempted to define a process that wasn't declared as a system component");
-			} catch (UseBeforeDeclarationException e) {
+				}
+
+				if (checkCustomProperty(obj, "Component_Type", "enum",
+						"Process Declaration").equalsIgnoreCase("logic")) {
+					procModel.setDisplay(false);
+				} else if (checkCustomProperty(obj, "Component_Type", "enum",
+						"Process Declaration").equalsIgnoreCase("display")) {
+					procModel.setDisplay(true);
+				} else {
+					throw new PropertyOutOfRangeException("Processes must declare their component type to be either display or logic");
+				}
+			} catch (UseBeforeDeclarationException | PropertyOutOfRangeException e) {
 				handleException("Process", obj.getName(), e);
 			}
 			lastElemProcessed = ElementType.PROCESS;
@@ -203,9 +214,7 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 									+ obj.getName() + " is neither in nor out");
 						}
 						procModel.addPort(pm);
-					} catch (NotImplementedException e) {
-						handleException("Port", obj.getName(), e);
-					} catch (MissingRequiredPropertyException e) {
+					} catch (NotImplementedException | MissingRequiredPropertyException e) {
 						handleException("Port", obj.getName(), e);
 					}
 				}
@@ -355,8 +364,9 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 
 		}
 
-		private String handleThreadProperty(ThreadType obj, String defaultName,
-				String overridePropertySet, String overrideName, String propType) {
+		private String handleThreadProperty(NamedElement obj,
+				String defaultName, String overridePropertySet,
+				String overrideName, String propType) {
 			Property prop = GetProperties.lookupPropertyDefinition(obj,
 					overridePropertySet, overrideName);
 			String ret = null;
@@ -368,19 +378,27 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 			try {
 				ret = handlePropertyValue(obj, prop, propType);
 			} catch (PropertyNotPresentException e) {
-				for (String propertySetName : propertySetNames) {
-					try {
-						prop = GetProperties.lookupPropertyDefinition(obj,
-								propertySetName, defaultName);
-						ret = handlePropertyValue(obj, prop, propType);
-					} catch (PropertyNotPresentException e2) {
-						// Do nothing, the property may be in another set
-					} catch (PropertyOutOfRangeException e2) {
-						handleException("Thread", obj.getName(), e2);
-					}
-				}
+				ret = checkCustomProperty(obj, defaultName, propType, "Thread");
 			} catch (PropertyOutOfRangeException e) {
 				handleException("Thread", obj.getName(), e);
+			}
+			return ret;
+		}
+
+		private String checkCustomProperty(NamedElement obj,
+				String propertyName, String propType, String elementType) {
+			String ret = null;
+			Property prop;
+			for (String propertySetName : propertySetNames) {
+				try {
+					prop = GetProperties.lookupPropertyDefinition(obj,
+							propertySetName, propertyName);
+					ret = handlePropertyValue(obj, prop, propType);
+				} catch (PropertyNotPresentException e) {
+					// Do nothing, the property may be in another set
+				} catch (PropertyOutOfRangeException e) {
+					handleException(elementType, obj.getName(), e);
+				}
 			}
 			return ret;
 		}
@@ -539,7 +557,11 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 			connModel.setSubName(subName);
 			connModel.setPubPortName(pubPortName);
 			connModel.setSubPortName(subPortName);
+			connModel.setChannelDelay(Integer.valueOf(checkCustomProperty(obj,
+					"Default_Channel_Delay", "int",
+					"System-level port connection")));
 			systemModel.addConnection(connModel);
+
 		}
 
 		private void handleSubprogramDataConnection(AccessConnection obj) {
