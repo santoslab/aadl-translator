@@ -49,7 +49,7 @@ task(task) ::=<<
   arrival --> Placeholder</trigPortName>
   <periodMs>$task.period$</periodMs>
   $endif$
-  <taskName>$task.taskName$</taskName>
+  <taskName>$task.name$</taskName>
   <deadlineMs>$task.deadline$</deadlineMs>
   <wcetMs>$task.wcet$</wcetMs>
 </mdcf.core.ctypes.TaskSignature>

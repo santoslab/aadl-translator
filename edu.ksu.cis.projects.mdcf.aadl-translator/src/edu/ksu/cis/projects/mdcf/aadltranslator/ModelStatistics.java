@@ -179,22 +179,8 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 									"Missing the required data representation");
 						}
 
-						for (String propertySetName : propertySetNames) {
-							try {
-								prop = GetProperties.lookupPropertyDefinition(
-										obj, propertySetName,
-										"Default_Output_Rate");
-								minPeriod = handlePropertyValue(obj, prop,
-										"range_min");
-								maxPeriod = handlePropertyValue(obj, prop,
-										"range_max");
-							} catch (PropertyNotPresentException e) {
-								// Do nothing, the property may be in another
-								// set
-							} catch (PropertyOutOfRangeException e) {
-								handleException("Port", obj.getName(), e);
-							}
-						}
+						minPeriod = checkCustomProperty(obj, "Default_Output_Rate", "range_min", "Port");
+						maxPeriod = checkCustomProperty(obj, "Default_Output_Rate", "range_max", "Port");
 
 						if (minPeriod == null || maxPeriod == null)
 							throw new MissingRequiredPropertyException(
@@ -474,12 +460,6 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 				portName = obj.getAllDestination().getName();
 				portType = procModel.getPortByName(portName).getType();
 				task = procModel.getTask(taskName);
-				// Commented out because outgoing ports don't "trigger" anything
-				// try {
-				// task.setTrigPortInfo(portName, portType, localName);
-				// } catch (NotImplementedException e) {
-				// handleException("PortConnection", obj.getName(), e);
-				// }
 			} else {
 				// From process to thread
 				taskName = ((ThreadType) obj.getAllDestination().getOwner())
