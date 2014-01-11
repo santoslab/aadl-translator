@@ -118,5 +118,19 @@
       <super type="org.osate.aadl2.modelsupport.AadlObjectMarker"/>
       <persistent value="true"/>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="edu.ksu.cis.projects.mdcf.aadltranslator.preference.TranslatorPreferencePage"
+            id="edu.ksu.cis.projects.mdcf.aadltranslator.TranslatorPreferencePage"
+            name="AADL Translator">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="edu.ksu.cis.projects.mdcf.aadltranslator.preference.PreferenceInitializer">
+      </initializer>
+   </extension>
    
 </plugin>

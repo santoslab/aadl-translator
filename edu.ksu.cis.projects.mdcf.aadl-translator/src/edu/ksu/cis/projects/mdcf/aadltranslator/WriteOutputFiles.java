@@ -5,13 +5,30 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-public class WriteOutputFiles {
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 
-	private static String appDevDirectory = "/Users/Sam/Desktop/";
+import edu.ksu.cis.projects.mdcf.aadltranslator.preference.PreferenceConstants;
+
+public class WriteOutputFiles {
 
 	public static void writeFiles(HashMap<String, String> compsigs,
 			HashMap<String, String> javaClasses, String appName,
 			String appSpecContents) {
+
+		IPreferencesService service = Platform.getPreferencesService();
+		String appDevDirectory = service.getString("edu.ksu.cis.projects.mdcf.aadl-translator", PreferenceConstants.P_PATH, null, null);
+		
+		if (appDevDirectory == null){
+			//TODO: Handle this
+			System.err.println("Error: AppDev Directory not set");
+			return;
+		}
+		
+		// Make sure we have a trailing slash
+		if(appDevDirectory.charAt(appDevDirectory.length() - 1) != '/')
+			appDevDirectory += "/";
+		
 		File cfgDir = new File(appDevDirectory + appName + "/appcfg");
 		File compDir = new File(appDevDirectory + appName + "/appcomp");
 
@@ -20,8 +37,8 @@ public class WriteOutputFiles {
 		try {
 			// TODO: Handle failure / permission problems
 			cfgDir.mkdirs();
-			compDir.mkdirs();
-
+			compDir.mkdirs();			
+			
 			for (String fileName : javaClasses.keySet()) {
 				fw = new FileWriter(appDevDirectory + appName + "/" + fileName
 						+ ".java");
