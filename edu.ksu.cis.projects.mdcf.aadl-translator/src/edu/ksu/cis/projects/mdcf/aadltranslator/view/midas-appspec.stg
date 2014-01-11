@@ -56,7 +56,7 @@ channel(chan) ::=<<
     #endif#
   </subComp>
   #elseif (chan.deviceSubscribed)#
-  <pubName>#chan.pubName#</pubName>
+  <pubName>#chan.pubPortName#</pubName>
   <subName>$PLACEHOLDER$</subName>
   <pubComp>
     <name>#chan.pubName#</name>
@@ -73,8 +73,8 @@ channel(chan) ::=<<
     <role>Device</role>
   </subComp>
   #else#
-  <pubName>#chan.pubName#</pubName>
-  <subName>#chan.subName#</subName>
+  <pubName>#chan.pubPortName#</pubName>
+  <subName>#chan.subPortName#</subName>
   <pubComp>
     <name>#chan.pubName#</name>
     <type>#chan.publisher.name#</type>

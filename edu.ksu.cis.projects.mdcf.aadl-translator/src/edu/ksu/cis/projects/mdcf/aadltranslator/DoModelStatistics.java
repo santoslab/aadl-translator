@@ -1,5 +1,6 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -87,21 +88,30 @@ public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 			monitor.worked(1);
 		}
 		
+		// Filename -> file contents
+		HashMap<String, String> compsigs = new HashMap<>();
+		
+		// Filename -> file contents
+		HashMap<String, String> javaClasses = new HashMap<>();
+		
+		String appName;
+		String appSpecContents;
+		
 		midas_compsigSTG.delimiterStartChar = '$';
 		midas_compsigSTG.delimiterStopChar = '$';
 		for (ProcessModel pm : stats.getSystemModel().getLogicComponents()
 				.values()) {
-			System.out.println(javaSTG.getInstanceOf("class").add("model", pm)
-					.render());
-			System.out.println(midas_compsigSTG.getInstanceOf("compsig")
-					.add("model", pm).render());
+			javaClasses.put(pm.getName(), javaSTG.getInstanceOf("class").add("model", pm).render());
+			compsigs.put(pm.getName(), midas_compsigSTG.getInstanceOf("compsig").add("model", pm).render());
 		}
 		midas_appspecSTG.delimiterStartChar = '#';
 		midas_appspecSTG.delimiterStopChar = '#';
 
-		System.out.println(midas_appspecSTG.getInstanceOf("appspec")
-				.add("system", stats.getSystemModel()).render());
+		appName = stats.getSystemModel().getName();
+		appSpecContents = midas_appspecSTG.getInstanceOf("appspec").add("system", stats.getSystemModel()).render();
 
+		WriteOutputFiles.writeFiles(compsigs, javaClasses, appName, appSpecContents);
+		
 		monitor.worked(1);
 		
 		monitor.done();
