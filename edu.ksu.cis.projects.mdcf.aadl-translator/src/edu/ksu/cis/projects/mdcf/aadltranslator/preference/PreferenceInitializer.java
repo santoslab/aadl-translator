@@ -13,7 +13,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
 	public void initializeDefaultPreferences() {
-//		IPreferenceStore store = ArchitecturePlugin.getDefault().getPreferenceStore();
+//		IPreferenceStore store = AadlTranslatorPlugin.getDefault().getPreferenceStore();
 //		store.setDefault(PreferenceConstants.P_BOOLEAN, true);
 	}
 

@@ -32,7 +32,7 @@ public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/midas-appspec.stg");
 
 	protected Bundle getBundle() {
-		return ArchitecturePlugin.getDefault().getBundle();
+		return AadlTranslatorPlugin.getDefault().getBundle();
 	}
 
 	protected String getMarkerType() {

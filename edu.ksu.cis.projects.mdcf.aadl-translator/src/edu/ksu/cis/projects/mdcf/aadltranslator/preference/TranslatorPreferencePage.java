@@ -3,7 +3,7 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.preference;
 import org.eclipse.jface.preference.*;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.IWorkbench;
-import edu.ksu.cis.projects.mdcf.aadltranslator.ArchitecturePlugin;
+import edu.ksu.cis.projects.mdcf.aadltranslator.AadlTranslatorPlugin;
 
 /**
  * This class represents a preference page that
@@ -25,7 +25,7 @@ public class TranslatorPreferencePage
 	
 	public TranslatorPreferencePage() {
 		super(GRID);
-		setPreferenceStore(ArchitecturePlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(AadlTranslatorPlugin.getDefault().getPreferenceStore());
 		setDescription("Preferences for the AADL to Java / MIDAS translator");
 	}
 	

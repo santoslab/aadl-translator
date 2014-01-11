@@ -9,16 +9,16 @@ import org.osgi.framework.BundleContext;
 /**
  * The main plugin class to be used in the desktop.
  */
-public class ArchitecturePlugin extends AbstractUIPlugin {
+public class AadlTranslatorPlugin extends AbstractUIPlugin {
 	//The shared instance.
-	private static ArchitecturePlugin plugin;
+	private static AadlTranslatorPlugin plugin;
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
 
 	/**
 	 * The constructor.
 	 */
-	public ArchitecturePlugin() {
+	public AadlTranslatorPlugin() {
 		super();
 		plugin = this;
 		try {
@@ -45,7 +45,7 @@ public class ArchitecturePlugin extends AbstractUIPlugin {
 	/**
 	 * Returns the shared instance.
 	 */
-	public static ArchitecturePlugin getDefault() {
+	public static AadlTranslatorPlugin getDefault() {
 		return plugin;
 	}
 
@@ -54,7 +54,7 @@ public class ArchitecturePlugin extends AbstractUIPlugin {
 	 * found.
 	 */
 	public static String getResourceString(String key) {
-		ResourceBundle bundle = ArchitecturePlugin.getDefault().getResourceBundle();
+		ResourceBundle bundle = AadlTranslatorPlugin.getDefault().getResourceBundle();
 		try {
 			return (bundle != null) ? bundle.getString(key) : key;
 		} catch (MissingResourceException e) {

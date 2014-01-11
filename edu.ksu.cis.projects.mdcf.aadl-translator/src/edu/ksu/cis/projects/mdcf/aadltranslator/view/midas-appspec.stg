@@ -12,7 +12,8 @@ appName(system) ::=<<
 
 components(system) ::=<<
 <components>
-  #system.logicComponents.keys:{k |#virtualComponent(k, system.logicComponents.(k))#}#
+  #system.logicComponents.keys:{k |#virtualComponent(k, system.logicComponents.(k))#
+  }#
 </components>
 >>
 

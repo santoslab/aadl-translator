@@ -5,22 +5,29 @@ Bundle-SymbolicName: edu.ksu.cis.projects.mdcf.aadl-translator;singleton:=true
 Bundle-Version: 0.0.1
 Bundle-ClassPath: .,
  lib/string-template.jar
-Bundle-Activator: edu.ksu.cis.projects.mdcf.aadltranslator.ArchitecturePlugin
+Bundle-Activator: edu.ksu.cis.projects.mdcf.aadltranslator.AadlTranslatorPlugin
 Bundle-Vendor: SAnToS Lab
 Bundle-Localization: plugin
 Export-Package: 
- edu.ksu.cis.projects.mdcf.aadltranslator
+ edu.ksu.cis.projects.mdcf.aadltranslator,
+ edu.ksu.cis.projects.mdcf.aadltranslator.exception,
+ edu.ksu.cis.projects.mdcf.aadltranslator.model,
+ edu.ksu.cis.projects.mdcf.aadltranslator.preference,
+ edu.ksu.cis.projects.mdcf.aadltranslator.view,
+ org.stringtemplate.v4,
+ org.stringtemplate.v4.compiler,
+ org.stringtemplate.v4.debug,
+ org.stringtemplate.v4.gui,
+ org.stringtemplate.v4.misc,
+ st4hidden.org.antlr.runtime,
+ st4hidden.org.antlr.runtime.misc,
+ st4hidden.org.antlr.runtime.tree,
+ st4hidden.org.antlr.stringtemplate.language
 Require-Bundle: org.osate.aadl2,
  org.osate.ui,
  org.osate.xtext.aadl2.properties;bundle-version="1.0.0",
  org.osate.xtext.aadl2;bundle-version="1.0.0",
- org.osate.contribution.sei,
- com.google.guava,
- org.osate.aadl2.modelsupport,
- org.eclipse.emf.ecore,
- org.eclipse.core.resources,
- org.eclipse.uml2.uml,
- org.eclipse.core.runtime,
- org.eclipse.ui
+ org.osate.contribution.sei
 Eclipse-LazyStart: true
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 
