@@ -30,7 +30,8 @@ virtualComponent(name, process) ::=<<
 
 channels(system) ::=<<
 <channels>
-  #system.channels:{c |#channel(c)#}#
+  #system.channels:{c |#channel(c)#
+  }#
 </channels>
 >>
 

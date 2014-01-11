@@ -3,6 +3,8 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
+
 public class SystemModel {
 	private String name;
 	private HashMap<String, ProcessModel> logicComponents;
@@ -33,12 +35,16 @@ public class SystemModel {
 			return null;
 	}
 	
-	public void addProcess(String instanceName, ProcessModel pm){
+	public void addProcess(String instanceName, ProcessModel pm) throws DuplicateElementException{
+		if(logicComponents.containsKey(instanceName))
+			throw new DuplicateElementException(instanceName + " already exists");
 		logicComponents.put(instanceName, pm);
 		typeToComponent.put(pm.getName(), pm);
 	}
 	
-	public void addDevice(String deviceName, DeviceModel dm){
+	public void addDevice(String deviceName, DeviceModel dm) throws DuplicateElementException{
+		if(devices.containsKey(deviceName))
+			throw new DuplicateElementException(deviceName + " already exists");
 		devices.put(deviceName, dm);
 		typeToComponent.put(dm.getName(), dm);
 	}

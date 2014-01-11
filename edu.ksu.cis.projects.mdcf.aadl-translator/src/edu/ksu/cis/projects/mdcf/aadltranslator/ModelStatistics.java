@@ -88,7 +88,11 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 
 		@Override
 		public String caseThreadSubcomponent(ThreadSubcomponent obj) {
-			procModel.addTask(obj.getName());
+			try{
+				procModel.addTask(obj.getName());
+			} catch (DuplicateElementException e){
+				handleException("Thread", obj.getName(), e);
+			}
 			return NOT_DONE;
 		}
 
@@ -115,7 +119,11 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		public String caseDeviceSubcomponent(DeviceSubcomponent obj) {
 			DeviceModel dm = new DeviceModel();
 			dm.setName(obj.getComponentType().getName());
-			systemModel.addDevice(obj.getName(), dm);
+			try{
+				systemModel.addDevice(obj.getName(), dm);
+			} catch (DuplicateElementException e) {
+				handleException("Device", obj.getName(), e);
+			}
 			return NOT_DONE;
 		}
 
@@ -123,7 +131,11 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		public String caseProcessSubcomponent(ProcessSubcomponent obj) {
 			ProcessModel pm = new ProcessModel();
 			pm.setName(obj.getComponentType().getName());
-			systemModel.addProcess(obj.getName(), pm);
+			try {
+				systemModel.addProcess(obj.getName(), pm); 
+			} catch (DuplicateElementException e) {
+				handleException("Process", obj.getName(), e);
+			}
 			return NOT_DONE;
 		}
 
@@ -200,7 +212,7 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 									+ obj.getName() + " is neither in nor out");
 						}
 						procModel.addPort(pm);
-					} catch (NotImplementedException | MissingRequiredPropertyException e) {
+					} catch (NotImplementedException | MissingRequiredPropertyException | DuplicateElementException e) {
 						handleException("Port", obj.getName(), e);
 					}
 				}
@@ -498,7 +510,7 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 					subModel = systemModel.getProcessByType(subTypeName);
 					connModel.setDevicePublished(true);
 					connModel.setDeviceSubscribed(false);
-				} else if (obj.getAllSource().getOwner() instanceof ProcessType) {
+				} else if (obj.getAllDestination().getOwner() instanceof DeviceType) {
 					// From process to device
 					pubTypeName = ((ProcessType) obj.getAllSource().getOwner())
 							.getName();

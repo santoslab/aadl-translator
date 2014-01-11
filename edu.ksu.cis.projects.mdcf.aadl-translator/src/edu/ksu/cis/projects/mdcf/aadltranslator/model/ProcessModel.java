@@ -50,8 +50,9 @@ public class ProcessModel implements IComponentModel{
 		this.name = name;
 	}
 
-	public void addPort(PortModel pm) {
-		// TODO: Throw exception if we already have a port with the given name?
+	public void addPort(PortModel pm) throws DuplicateElementException {
+		if(ports.containsKey(pm.getName()))
+			throw new DuplicateElementException("Ports cannot share names");
 		ports.put(pm.getName(), pm);
 	}
 	
@@ -108,7 +109,9 @@ public class ProcessModel implements IComponentModel{
 		return tasks.get(tasks.size() - 1);
 	}
 	
-	public void addTask(String name) {
+	public void addTask(String name) throws DuplicateElementException {
+		if(tasks.containsKey(name))
+			throw new DuplicateElementException("Tasks cannot have the same name");
 		tasks.put(name, new TaskModel(name));
 	}
 	
