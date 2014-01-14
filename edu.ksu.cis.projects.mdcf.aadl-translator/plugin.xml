@@ -31,7 +31,7 @@
          name="Translate Handler"
          point="org.eclipse.ui.handlers">
       <handler
-            class="edu.ksu.cis.projects.mdcf.aadltranslator.DoModelStatistics"
+            class="edu.ksu.cis.projects.mdcf.aadltranslator.DoTranslation"
             commandId="edu.ksu.cis.projects.mdcf.aadl-translator.translate">
       </handler>
    </extension>

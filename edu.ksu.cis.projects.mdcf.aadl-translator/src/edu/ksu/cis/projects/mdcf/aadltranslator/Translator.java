@@ -30,7 +30,6 @@ import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
-import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
 import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitchWithProgress;
 import org.osate.aadl2.properties.PropertyNotPresentException;
 import org.osate.aadl2.util.Aadl2Switch;
@@ -52,7 +51,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.VariableModel;
 
-public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
+public final class Translator extends AadlProcessingSwitchWithProgress {
 	private enum ElementType {
 		SYSTEM, PROCESS, THREAD, SUBPROGRAM, NONE
 	};
@@ -678,16 +677,11 @@ public final class ModelStatistics extends AadlProcessingSwitchWithProgress {
 		}
 	}
 
-	public ModelStatistics(final IProgressMonitor monitor) {
+	public Translator(final IProgressMonitor monitor) {
 		super(monitor, PROCESS_PRE_ORDER_ALL);
 
 	}
-
-	public ModelStatistics(final IProgressMonitor monitor,
-			AnalysisErrorReporterManager errmgr) {
-		super(monitor, PROCESS_PRE_ORDER_ALL, errmgr);
-	}
-
+	
 	@Override
 	protected final void initSwitches() {
 		aadl2Switch = new MyAadl2Switch();

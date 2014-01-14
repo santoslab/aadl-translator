@@ -29,7 +29,7 @@ import org.stringtemplate.v4.STGroupFile;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 
-public final class DoModelStatistics implements IHandler, IRunnableWithProgress{
+public final class DoTranslation implements IHandler, IRunnableWithProgress{
 	private final STGroup javaSTG = new STGroupFile(
 			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/java.stg");
 	private final STGroup midas_compsigSTG = new STGroupFile(
@@ -37,19 +37,7 @@ public final class DoModelStatistics implements IHandler, IRunnableWithProgress{
 	private final STGroup midas_appspecSTG = new STGroupFile(
 			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/midas-appspec.stg");
 
-//	protected Bundle getBundle() {
-//		return AadlTranslatorPlugin.getDefault().getBundle();
-//	}
-//
-//	protected String getMarkerType() {
-//		return "org.osate.analysis.architecture.ModelStatisticsObjectMarker";
-//	}
-//
-//	protected String getActionName() {
-//		return "Model statistics";
-//	}
-
-	public void doAaxlAction(IProgressMonitor monitor, Element obj) {
+	public void doAaxlAction(IProgressMonitor monitor) {
 		
 		OsateResourceUtil.refreshResourceSet();
 		
@@ -60,10 +48,7 @@ public final class DoModelStatistics implements IHandler, IRunnableWithProgress{
 		
 		monitor.beginTask("Translating AADL to Java / MIDAS", files.size() + 1);
 
-		ModelStatistics stats = new ModelStatistics(monitor);
-		
-		// TODO: This is pretty ugly. It works as a testing rig, but it should
-		// probably get cleaned up considerably before any sort of release
+		Translator stats = new Translator(monitor);
 		
 		// The system _has_ to come first, so we make sure it's first
 		for (IFile f : files) {
@@ -125,13 +110,12 @@ public final class DoModelStatistics implements IHandler, IRunnableWithProgress{
 
 	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
-		// TODO Auto-generated method stub
-		return;
+		// We don't track handlers, so we do nothing here
 	}
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IRunnableWithProgress runnable = new DoModelStatistics();
+		IRunnableWithProgress runnable = new DoTranslation();
 		try {
 			new ProgressMonitorDialog(new Shell()).run(true, true, runnable);
 		} catch (InvocationTargetException | InterruptedException e) {
@@ -149,25 +133,23 @@ public final class DoModelStatistics implements IHandler, IRunnableWithProgress{
 
 	@Override
 	public boolean isHandled() {
-		// TODO Auto-generated method stub
+		// If we're enabled, then we can handle input
 		return true;
 	}
 
 	@Override
 	public void removeHandlerListener(IHandlerListener handlerListener) {
-		// TODO Auto-generated method stub
-		
+		// We don't track handlers, so we do nothing here
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
-		
+		// We have nothing to dispose of, so we do nothing here
 	}
 
 	@Override
 	public void run(IProgressMonitor monitor) throws InvocationTargetException,
 			InterruptedException {
-		doAaxlAction(monitor, null);
+		doAaxlAction(monitor);
 	}
 }
