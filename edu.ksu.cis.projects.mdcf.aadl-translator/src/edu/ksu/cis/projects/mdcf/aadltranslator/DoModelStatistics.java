@@ -1,14 +1,22 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.IHandler;
+import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.widgets.Shell;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.Element;
@@ -16,14 +24,12 @@ import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.modelsupport.modeltraversal.TraverseWorkspace;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
-import org.osate.ui.actions.AaxlReadOnlyActionAsJob;
-import org.osgi.framework.Bundle;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 
-public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
+public final class DoModelStatistics implements IHandler, IRunnableWithProgress{
 	private final STGroup javaSTG = new STGroupFile(
 			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/java.stg");
 	private final STGroup midas_compsigSTG = new STGroupFile(
@@ -31,17 +37,17 @@ public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 	private final STGroup midas_appspecSTG = new STGroupFile(
 			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/midas-appspec.stg");
 
-	protected Bundle getBundle() {
-		return AadlTranslatorPlugin.getDefault().getBundle();
-	}
-
-	protected String getMarkerType() {
-		return "org.osate.analysis.architecture.ModelStatisticsObjectMarker";
-	}
-
-	protected String getActionName() {
-		return "Model statistics";
-	}
+//	protected Bundle getBundle() {
+//		return AadlTranslatorPlugin.getDefault().getBundle();
+//	}
+//
+//	protected String getMarkerType() {
+//		return "org.osate.analysis.architecture.ModelStatisticsObjectMarker";
+//	}
+//
+//	protected String getActionName() {
+//		return "Model statistics";
+//	}
 
 	public void doAaxlAction(IProgressMonitor monitor, Element obj) {
 		
@@ -54,7 +60,7 @@ public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 		
 		monitor.beginTask("Translating AADL to Java / MIDAS", files.size() + 1);
 
-		ModelStatistics stats = new ModelStatistics(monitor, getErrorManager());
+		ModelStatistics stats = new ModelStatistics(monitor);
 		
 		// TODO: This is pretty ugly. It works as a testing rig, but it should
 		// probably get cleaned up considerably before any sort of release
@@ -115,5 +121,53 @@ public final class DoModelStatistics extends AaxlReadOnlyActionAsJob {
 		monitor.worked(1);
 		
 		monitor.done();
+	}
+
+	@Override
+	public void addHandlerListener(IHandlerListener handlerListener) {
+		// TODO Auto-generated method stub
+		return;
+	}
+
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		IRunnableWithProgress runnable = new DoModelStatistics();
+		try {
+			new ProgressMonitorDialog(new Shell()).run(true, true, runnable);
+		} catch (InvocationTargetException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public boolean isHandled() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public void removeHandlerListener(IHandlerListener handlerListener) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void run(IProgressMonitor monitor) throws InvocationTargetException,
+			InterruptedException {
+		doAaxlAction(monitor, null);
 	}
 }

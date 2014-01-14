@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/edu.ksu.cis.projects.mdcf.aadlplugin_0.0.1.jar" id="edu.ksu.cis.projects.mdcf.aadlplugin" version="0.0.1"/>
+   <feature url="features/edu.ksu.cis.projects.mdcf.aadlplugin_0.1.0.201401131758.jar" id="edu.ksu.cis.projects.mdcf.aadlplugin" version="0.1.0.201401131758"/>
 </site>
