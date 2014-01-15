@@ -79,6 +79,10 @@ public class ProcessModel implements IComponentModel{
 	public HashMap<String, TaskModel> getTasks() {
 		return tasks;
 	}
+	
+	public Map<String, TaskModel> getSporadicTasks() {
+		return Maps.filterValues(tasks, sporadicTaskFilter);
+	}
 
 	public HashMap<String, String> getGlobals() {
 		return globals;
@@ -148,6 +152,12 @@ public class ProcessModel implements IComponentModel{
 	Predicate<PortModel> sendPortFilter = new Predicate<PortModel>() {
 		public boolean apply(PortModel pm) {
 			return pm.isSubscribe();
+		}
+	};
+	
+	Predicate<TaskModel> sporadicTaskFilter = new Predicate<TaskModel>() {
+		public boolean apply(TaskModel tm) {
+			return tm.isSporadic();
 		}
 	};
 }

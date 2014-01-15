@@ -30,8 +30,10 @@ import org.stringtemplate.v4.STGroupFile;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 
 public final class DoTranslation implements IHandler, IRunnableWithProgress{
-	private final STGroup javaSTG = new STGroupFile(
-			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/java.stg");
+	private final STGroup java_superclassSTG = new STGroupFile(
+			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/java-superclass.stg");
+	private final STGroup java_userimplSTG = new STGroupFile(
+			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/java-userimpl.stg");
 	private final STGroup midas_compsigSTG = new STGroupFile(
 			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/midas-compsig.stg");
 	private final STGroup midas_appspecSTG = new STGroupFile(
@@ -92,7 +94,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress{
 		midas_compsigSTG.delimiterStopChar = '$';
 		for (ProcessModel pm : stats.getSystemModel().getLogicComponents()
 				.values()) {
-			javaClasses.put(pm.getName(), javaSTG.getInstanceOf("class").add("model", pm).render());
+			javaClasses.put(pm.getName() + "SuperType", java_superclassSTG.getInstanceOf("class").add("model", pm).render());
+			javaClasses.put(pm.getName(), java_userimplSTG.getInstanceOf("userimpl").add("model", pm).render());
 			compsigs.put(pm.getName(), midas_compsigSTG.getInstanceOf("compsig").add("model", pm).render());
 		}
 		midas_appspecSTG.delimiterStartChar = '#';

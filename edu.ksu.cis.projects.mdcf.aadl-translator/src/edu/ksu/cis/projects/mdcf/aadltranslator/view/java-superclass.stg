@@ -175,32 +175,3 @@ import mdcf.core.ctypes.logic.LogicComponent;
 import mdcf.core.messagetypes.devicemgmt.PubChannelAssignmentMsg;
 import mdcf.core.messagetypes.devicemgmt.SubChannelAssignmentMsg;
 >>
-
-
-
-userimpl(model) ::=<<
-package mdcf.app.<model.name>;
-
-import mdcf.channelservice.common.MdcfMessage;
-<importMessageTypes(model)>public class <model.name> extends <model.name>SuperType {
-
-  public <model.name>(String GUID) {
-    super(GUID);
-  }
-
-  @Override
-  protected void initComponent() {
-    // TODO Fill in custom initialization code here
-  }
-  <model.tasks.keys:{k |<userImplOnMessageStub(k, model.tasks.(k))>
-  }>}
->>
-
-userImplOnMessageStub(exchName, exchType) ::=<<
-
-
-@Override
-protected void <exchName>ListenerOnMessage(MdcfMessage msg, <exchType> <exchName>Data) {
-  // TODO Fill in custom listener code here
-}
->>
