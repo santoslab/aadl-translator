@@ -145,13 +145,13 @@ public class ProcessModel implements IComponentModel{
 	
 	Predicate<PortModel> receivePortFilter = new Predicate<PortModel>() {
 		public boolean apply(PortModel pm) {
-			return !pm.isSubscribe();
+			return pm.isSubscribe();
 		}
 	};
 	
 	Predicate<PortModel> sendPortFilter = new Predicate<PortModel>() {
 		public boolean apply(PortModel pm) {
-			return pm.isSubscribe();
+			return !pm.isSubscribe();
 		}
 	};
 	

@@ -58,8 +58,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 	private SystemModel systemModel = null;
 	private ArrayList<String> propertySetNames = new ArrayList<>();
-
-	public class MyAadl2Switch extends Aadl2Switch<String> {
+	
+	public class TranslatorSwitch extends Aadl2Switch<String> {
 		/**
 		 * A reference to the "current" process model, stored for convenience
 		 */
@@ -281,7 +281,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			processEList(obj.getOwnedPublicSection().getChildren());
 			return DONE;
 		}
-
+		
 		@Override
 		public String caseComponentImplementation(ComponentImplementation obj) {
 			if (!obj.getOwnedSubcomponents().isEmpty())
@@ -388,11 +388,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			Property prop;
 			for (String propertySetName : propertySetNames) {
 				try {
-					prop = GetProperties.lookupPropertyDefinition(obj,
-							propertySetName, propertyName);
-					ret = handlePropertyValue(obj, prop, propType);
-				} catch (PropertyNotPresentException e) {
-					// Do nothing, the property may be in another set
+					prop = GetProperties.lookupPropertyDefinition(obj, propertySetName, propertyName);
+					if(prop == null)
+						continue;
+					else
+						ret = handlePropertyValue(obj, prop, propType);
 				} catch (PropertyOutOfRangeException e) {
 					handleException(elementType, obj.getName(), e);
 				}
@@ -654,20 +654,6 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		@Override
 		public String casePortConnection(PortConnection obj) {
-			// System.out.print("Connection: ");
-			// if (obj.getAllSource().getContainingClassifier() == null)
-			// System.out.print(obj.getAllSource().getName());
-			// else
-			// System.out.print(obj.getAllSource().getContainingClassifier()
-			// .getName()
-			// + "." + obj.getAllSource().getName());
-			// System.out.print(" -> ");
-			// if (obj.getAllDestination().getContainingClassifier() == null)
-			// System.out.println(obj.getAllDestination().getName());
-			// else
-			// System.out.println(obj.getAllDestination()
-			// .getContainingClassifier().getName()
-			// + "." + obj.getAllDestination().getName());
 			if (lastElemProcessed == ElementType.PROCESS) {
 				handleProcessPortConnection(obj);
 			} else if (lastElemProcessed == ElementType.SYSTEM) {
@@ -684,7 +670,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	
 	@Override
 	protected final void initSwitches() {
-		aadl2Switch = new MyAadl2Switch();
+		aadl2Switch = new TranslatorSwitch();
 	}
 
 	public SystemModel getSystemModel() {
