@@ -18,9 +18,13 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.text.TextSelection;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.texteditor.ITextEditor;
+import org.eclipse.ui.part.FileEditorInput;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.Element;
@@ -31,8 +35,6 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
-
-import com.google.common.collect.Sets;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 
@@ -53,10 +55,16 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				new NullProgressMonitor());
 
 		// 1) Get the current selection, convert it to an IFile
-		IStructuredSelection ts = (IStructuredSelection) HandlerUtil
-				.getCurrentSelection(triggeringEvent);
-		IFile file = (IFile) ((IAdaptable) ts.getFirstElement())
-				.getAdapter(IFile.class);
+		ISelection selection = HandlerUtil.getCurrentSelection(triggeringEvent);
+		IFile file = null;
+		if (selection instanceof TextSelection) {
+			file = ((FileEditorInput) ((ITextEditor) HandlerUtil
+					.getActiveEditor(triggeringEvent)).getEditorInput())
+					.getFile();
+		} else if (selection instanceof IStructuredSelection) {
+			file = (IFile) ((IAdaptable) ((IStructuredSelection) selection)
+					.getFirstElement()).getAdapter(IFile.class);
+		}
 
 		// 2) Verify that the selection contains a system. If it does: continue;
 		// if not: abort the translation
@@ -97,7 +105,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			Element target = (Element) res.getContents().get(0);
 			if ((target instanceof PropertySet)) {
 				String propertySetName = ((PropertySet) target).getName();
-				if (!AadlUtil.getPredeclaredPropertySetNames().contains(propertySetName))
+				if (!AadlUtil.getPredeclaredPropertySetNames().contains(
+						propertySetName))
 					stats.addPropertySetName(propertySetName);
 				continue;
 			}

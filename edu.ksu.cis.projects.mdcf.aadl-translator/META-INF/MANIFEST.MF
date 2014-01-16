@@ -24,10 +24,10 @@ Export-Package:
  st4hidden.org.antlr.runtime.tree,
  st4hidden.org.antlr.stringtemplate.language
 Require-Bundle: org.osate.aadl2,
- org.osate.ui,
  org.osate.xtext.aadl2.properties;bundle-version="1.0.0",
  org.osate.xtext.aadl2;bundle-version="1.0.0",
- org.osate.contribution.sei
+ org.osate.contribution.sei,
+ org.eclipse.ui.ide;bundle-version="3.9.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 
