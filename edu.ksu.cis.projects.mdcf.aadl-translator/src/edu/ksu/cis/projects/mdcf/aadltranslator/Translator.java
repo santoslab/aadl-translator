@@ -338,14 +338,18 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					throw new MissingRequiredPropertyException(
 							"Thread WCET must either be set with Default_Thread_WCET (at package level) or with Timing_Properties::Compute_Execution_Time (on individual thread)");
 				else {
-					if (trigType.equalsIgnoreCase("sporadic"))
+					if(procModel.getTask(obj.getName()) == null){
+						throw new UseBeforeDeclarationException("Threads must be declared as subcomponents before being defined"); 
+					}
+					if (trigType.equalsIgnoreCase("sporadic")){
 						procModel.getTask(obj.getName()).setSporadic(true);
-					else if (trigType.equalsIgnoreCase("periodic"))
+					} else if (trigType.equalsIgnoreCase("periodic")) {
 						procModel.getTask(obj.getName()).setSporadic(false);
-					else
+					} else {
 						throw new NotImplementedException(
 								"Thread dispatch must be either sporadic or periodic, instead got "
 										+ trigType);
+					}
 					procModel.getTask(obj.getName()).setPeriod(
 							Integer.valueOf(period));
 					procModel.getTask(obj.getName()).setDeadline(
@@ -353,9 +357,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					procModel.getTask(obj.getName()).setWcet(
 							Integer.valueOf(wcet));
 				}
-			} catch (MissingRequiredPropertyException e) {
-				handleException("Thread", obj.getName(), e);
-			} catch (NotImplementedException e) {
+			} catch (MissingRequiredPropertyException | NotImplementedException | UseBeforeDeclarationException e) {
 				handleException("Thread", obj.getName(), e);
 			}
 
@@ -498,6 +500,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			String pubTypeName, pubPortName, subPortName, subTypeName, pubName, subName;
 			IComponentModel pubModel = null, subModel = null;
 			ConnectionModel connModel = new ConnectionModel();
+			String channelDelay = null;
 			try {
 				if (obj.getAllSource().getOwner() instanceof DeviceType) {
 					// From device to process
@@ -534,7 +537,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					throw new NotImplementedException(
 							"Device to device connections are not yet allowed.");
 				}
-			} catch (NotImplementedException e) {
+				channelDelay = checkCustomProperty(obj,"Default_Channel_Delay", "int", "System-level port connection");
+				if(channelDelay == null)
+					throw new MissingRequiredPropertyException("Missing required property 'Default_Channel_Delay'");
+			} catch (NotImplementedException | MissingRequiredPropertyException e) {
 				handleException("PortConnection", obj.getName(), e);
 			}
 
@@ -548,9 +554,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			connModel.setSubName(subName);
 			connModel.setPubPortName(pubPortName);
 			connModel.setSubPortName(subPortName);
-			connModel.setChannelDelay(Integer.valueOf(checkCustomProperty(obj,
-					"Default_Channel_Delay", "int",
-					"System-level port connection")));
+			connModel.setChannelDelay(Integer.valueOf(channelDelay));
 			systemModel.addConnection(connModel);
 
 		}
