@@ -14,6 +14,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -37,6 +39,7 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.preference.PreferenceConstants;
 
 public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
@@ -137,6 +140,13 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 		String appName;
 		String appSpecContents;
+		IPreferencesService service = Platform.getPreferencesService();
+		boolean generateShells = service.getBoolean(
+				"edu.ksu.cis.projects.mdcf.aadl-translator",
+				PreferenceConstants.P_USERSHELLS, true, null);
+		String appDevDirectory = service.getString(
+				"edu.ksu.cis.projects.mdcf.aadl-translator",
+				PreferenceConstants.P_APPDEVPATH, null, null);
 
 		midas_compsigSTG.delimiterStartChar = '$';
 		midas_compsigSTG.delimiterStopChar = '$';
@@ -144,9 +154,12 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				.values()) {
 			javaClasses.put(pm.getName() + "SuperType", java_superclassSTG
 					.getInstanceOf("class").add("model", pm).render());
-			javaClasses.put(pm.getName(),
-					java_userimplSTG.getInstanceOf("userimpl").add("model", pm)
-							.render());
+			if (generateShells) {
+				javaClasses.put(
+						pm.getName(),
+						java_userimplSTG.getInstanceOf("userimpl")
+								.add("model", pm).render());
+			}
 			compsigs.put(pm.getName(), midas_compsigSTG
 					.getInstanceOf("compsig").add("model", pm).render());
 		}
@@ -158,7 +171,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				.add("system", stats.getSystemModel()).render();
 
 		WriteOutputFiles.writeFiles(compsigs, javaClasses, appName,
-				appSpecContents);
+				appSpecContents, appDevDirectory);
 
 		monitor.worked(1);
 

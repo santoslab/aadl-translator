@@ -5,7 +5,7 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.preference;
  */
 public class PreferenceConstants {
 
-	public static final String P_PATH = "appDevPath";
-
+	public static final String P_APPDEVPATH = "appDevPath";
+	public static final String P_USERSHELLS = "userShells";
 	
 }

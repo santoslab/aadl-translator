@@ -14,10 +14,7 @@ public class WriteOutputFiles {
 
 	public static void writeFiles(HashMap<String, String> compsigs,
 			HashMap<String, String> javaClasses, String appName,
-			String appSpecContents) {
-
-		IPreferencesService service = Platform.getPreferencesService();
-		String appDevDirectory = service.getString("edu.ksu.cis.projects.mdcf.aadl-translator", PreferenceConstants.P_PATH, null, null);
+			String appSpecContents, String appDevDirectory) {
 		
 		if (appDevDirectory == null){
 			//TODO: Handle this
