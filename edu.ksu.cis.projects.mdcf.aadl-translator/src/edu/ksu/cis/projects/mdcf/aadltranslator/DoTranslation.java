@@ -25,16 +25,22 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
+import org.osate.aadl2.modelsupport.errorreporting.LogParseErrorReporter;
+import org.osate.aadl2.modelsupport.errorreporting.MarkerParseErrorReporter;
+import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter;
+import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterFactory;
+import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
 import org.osate.aadl2.modelsupport.modeltraversal.TraverseWorkspace;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
+import org.osate.core.OsateCorePlugin;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
@@ -123,10 +129,28 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			}
 		}
 
+		// The ParseErrorReporter provided by the OSATE model support is nearly
+		// perfect here, we only change the marker id (much of the code is
+		// directly lifted from elsewhere in the OSATE codebase 
+		final ParseErrorReporterFactory parseErrorLoggerFactory = new LogParseErrorReporter.Factory(
+				OsateCorePlugin.getDefault().getBundle());
+		final ParseErrorReporterManager parseErrManager = new ParseErrorReporterManager(
+				new MarkerParseErrorReporter.Factory(
+						"edu.ksu.cis.projects.mdcf.aadl-translator.TranslatorErrorMarker",
+						parseErrorLoggerFactory));
+
+		stats.setErrorManager(parseErrManager);
 		// Now we process all the files, with the system first.
 		for (IFile f : fileList) {
 			Resource res = rs.getResource(
 					OsateResourceUtil.getResourceURI((IResource) f), true);
+
+			// Delete any existing error markers
+			IResource file = OsateResourceUtil.convertToIResource(res);
+			ParseErrorReporter errReporter = parseErrManager.getReporter(file);
+			((MarkerParseErrorReporter) errReporter).setContextResource(res);
+			errReporter.deleteMessages();
+			
 			Element target = (Element) res.getContents().get(0);
 			stats.process(target);
 			monitor.worked(1);

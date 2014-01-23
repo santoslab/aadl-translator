@@ -5,11 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
-
-import edu.ksu.cis.projects.mdcf.aadltranslator.preference.PreferenceConstants;
-
 public class WriteOutputFiles {
 
 	public static void writeFiles(HashMap<String, String> compsigs,

@@ -54,5 +54,11 @@
          </toolbar>
       </menuContribution>
    </extension>
+   <extension
+         id="TranslatorErrorMarker"
+         name="Translator Error Marker"
+         point="org.eclipse.core.resources.markers">
+         <super type="org.osate.aadl2.modelsupport.AadlTextMarker"/>
+   </extension>
    
 </plugin>
