@@ -27,6 +27,7 @@ import org.osate.aadl2.Element;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 
 import com.google.common.collect.ImmutableMap;
+import com.thoughtworks.xstream.XStream;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 
@@ -137,7 +138,8 @@ public class SampleTest {
 		}
 	}
 
-	private void runTest(IFile inputFile) {
+	private void runTest(String systemName) {
+		IFile inputFile = systemFiles.get(systemName);
 		stats = new Translator(new NullProgressMonitor());
 		for (String propSetName : propertyFileMap.keySet()) {
 			stats.addPropertySetName(propSetName);
@@ -158,7 +160,8 @@ public class SampleTest {
 
 	@Test
 	public void testPulseOxSystem() {
-		runTest(systemFiles.get("PulseOx_SmartAlarm_System"));
+		runTest("PulseOx_SmartAlarm_System");
+		XStream xs = null;
 		// TODO: Next step is to grab the model with stats.getSystemModel() and
 		// start comparing it to expected values.
 	}
