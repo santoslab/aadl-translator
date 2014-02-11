@@ -1,0 +1,56 @@
+compsig(model) ::=<<
+<mdcf.core.ctypes.AppModuleSignature>
+  $typeTasksAndPorts(model)$
+</mdcf.core.ctypes.AppModuleSignature>
+>>
+
+typeTasksAndPorts(model) ::=<<
+<type>$model.name$</type>
+<moduleTasks>
+  $model.tasks.values:{k |$task(k)$
+  }$</moduleTasks>
+<portSignatures>
+  $ model.ports.values:{k |$port(k)$
+  } $</portSignatures>
+>>
+
+port(port) ::=<<
+<entry>
+  $if(port.subscribe)$
+  <string>$port.name$In</string>
+  <mdcf.core.ctypes.PortSignature>
+    <portName>$port.name$In</portName>
+    <portDirection>SUBSCRIBE</portDirection>
+  $else$
+  <string>$port.name$Out</string>
+  <mdcf.core.ctypes.PortSignature>
+    <portName>$port.name$Out</portName>
+    <portDirection>PUBLISH</portDirection>
+  $endif$
+    <minPeriod>$port.minPeriod$</minPeriod>
+    <maxPeriod>$port.maxPeriod$</maxPeriod>
+    <portType>$port.type$</portType>
+  </mdcf.core.ctypes.PortSignature>
+</entry>
+>>
+
+task(task) ::=<<
+<mdcf.core.ctypes.TaskSignature>
+  $if(task.sporadic)$
+  <type>PORT_SPORADIC</type>
+  <trigPortName>$task.trigPortName$In</trigPortName>
+  <periodMs><!-- Placeholder value: Sporadic 
+  task's periods are derived from their 
+  triggering port --> -1</periodMs>
+  $else$
+  <type>PERIODIC</type>
+  <trigPortName><!-- Placeholder value: Periodic
+  tasks are triggered by time, not message
+  arrival --> Placeholder</trigPortName>
+  <periodMs>$task.period$</periodMs>
+  $endif$
+  <taskName>$task.name$</taskName>
+  <deadlineMs>$task.deadline$</deadlineMs>
+  <wcetMs>$task.wcet$</wcetMs>
+</mdcf.core.ctypes.TaskSignature>
+>>

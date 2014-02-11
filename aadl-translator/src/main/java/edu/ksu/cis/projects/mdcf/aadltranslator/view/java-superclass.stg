@@ -1,0 +1,177 @@
+class(model) ::=<<
+<packageAndImports(model)>
+<headerAndFields(model)>
+
+  <model.ports.values:{v |<portDeclarations(v)>}>
+  
+  <constructor(model)>
+  <initAndGetters(model)>
+  <subAndPubChannelAssignments(model)>
+  <abstractMethods(model)>
+  <tasks(model)>
+}
+>>
+
+tasks(model) ::=<<
+<model.tasks.keys:{k |<task(k, model.tasks.(k))>}>
+>>
+
+task(taskName, taskModel) ::=<<
+
+
+public class <taskName>Task implements Task {
+<[taskModel.incomingGlobals, taskModel.outgoingGlobals]:{vm | <globalDeclaration(vm.innerName, vm.type)>
+}>
+  @Override
+  public void run() {
+    <taskModel.incomingGlobals:{vm | <initGlobal(vm.innerName, vm.outerName)>
+    }>
+    MdcfMessage message = <taskModel.trigPortName>ReceiverPort.getReceiver().getLastMsg();
+    try {
+      <taskModel.trigPortType> <taskModel.trigPortLocalName>Data = <taskModel.trigPortName>ReceiverPort.getLastMsgContent();
+      <taskModel.trigPortLocalName>ListenerOnMessage(message, <taskModel.trigPortLocalName>Data);
+    } catch (MdcfDecodeMessageException e) {
+      System.err.println(getComponentTypeName() + ".<taskName>Task task: invalid message:" + message.getTextMsg());
+      e.printStackTrace();
+    }
+    <taskModel.outgoingGlobals:{vm | <updateGlobal(vm.innerName, vm.outerName)>
+    }>
+  }
+}
+>>
+
+initGlobal(innerName, outerName) ::=<<
+<innerName> = get<outerName>();
+>>
+
+updateGlobal(innerName, outerName) ::=<<
+set<outerName>(<innerName>);
+>>
+
+abstractMethods(model) ::=<<
+
+
+protected abstract void initComponent();
+  
+<model.receivePorts.keys:{k |<abstractListener(k, model.receivePorts.(k))>
+}>
+>>
+
+abstractListener(portName, portType) ::=<<
+protected abstract void <portName>ListenerOnMessage(MdcfMessage msg, <portType> <portName>Data);
+>>
+
+subAndPubChannelAssignments(model) ::=<<
+@Override
+public void processSubscriberChannelAssignment(SubChannelAssignmentMsg subAssign) {
+  <model.receivePorts.keys:{k |<subChannelAssignment(k)>
+  }>}
+
+@Override
+public void processPublisherChannelAssignment(PubChannelAssignmentMsg pubAssign) {
+  <model.sendPorts.keys:{k |<pubChannelAssignment(k)>
+  }>}
+>>
+
+pubChannelAssignment(exchName) ::=<<
+publisherChannelAssignmentHelper(pubAssign, this.<exchName>SenderPort);
+>>
+
+subChannelAssignment(exchName) ::=<<
+subscriberChannelAssignmentHelper(subAssign, this.<exchName>ReceiverPort);
+>>
+
+initAndGetters(model) ::=<<
+
+
+@Override
+public void init(){
+  initComponent();
+}
+
+@Override
+protected Map\<String, Task> getTaskInstanceMap() {
+  return this.taskInstanceMap;
+}
+
+@Override
+protected Map\<String, MdcfReceiverPort\<?>\> getReceiverPortMap(){
+  return this.receiverPortMap;
+}
+
+<model.globals.keys:{k |<globalGetter(k, model.globals.(k))>
+}><model.globals.keys:{k |<globalSetter(k, model.globals.(k))>
+}>
+>>
+
+globalGetter(name, type) ::=<<
+private <type> get<name>(){
+  return <name>;
+}
+
+>>
+
+globalSetter(name, type) ::=<<
+private void set<name>(<type> val){
+  <name> = val;
+}
+
+>>
+
+constructor(model) ::=<<
+public <model.name>SuperType(String GUID) {
+  super(GUID, "<model.name>");
+  taskInstanceMap = new HashMap\<>();
+  receiverPortMap = new HashMap\<>();
+  <model.tasks.keys:{k |<taskInstanceMapEntry(k)>
+  }><model.receivePorts.keys:{k |<receiverPortMapEntry(k)>
+  }>}
+>>
+
+receiverPortMapEntry(exchName) ::=<<
+  receiverPortMap.put(<exchName>ReceiverPort.getName(), <exchName>ReceiverPort);
+>>
+
+taskInstanceMapEntry(exchName) ::=<<
+taskInstanceMap.put(<exchName>ReceiverTask.class.getSimpleName(), new <exchName>ReceiverTask());
+>>
+
+portDeclarations(port) ::=<<
+<if(port.subscribe)>
+private MdcfReceiverPort\<<port.type>\> <port.name>ReceiverPort = new MdcfReceiverPort\<>("<port.name>In", <port.type>.class);<else>
+private MdcfSenderPort\<<port.type>\> <port.name>SenderPort = new MdcfSenderPort\<>("<port.name>Out", <port.type>.class);<endif> 
+>>
+
+headerAndFields(model) ::=<<
+<if(model.isDisplay)>
+public class <model.name>SuperType extends AppPanelComponent{
+<else>
+public class <model.name>PseudoDevice extends LogicComponent{
+<endif>
+  private HashMap\<String, Task> taskInstanceMap;
+  private HashMap\<String, MdcfReceiverPort\<?>\> receiverPortMap;
+<model.globals.keys:{k |<globalDeclaration(k, model.globals.(k))>
+}> >>
+
+globalDeclaration(name, type) ::=<<
+  private <type> <name>;
+>>
+
+packageAndImports(model) ::=<<
+package mdcf.app.<model.name>;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import mdcf.channelservice.common.MdcfDecodeMessageException;
+import mdcf.channelservice.common.MdcfReceiverPort;
+import mdcf.channelservice.common.MdcfSenderPort;
+import mdcf.core.ctypes.Task;
+<if(model.isDisplay)>
+import mdcf.core.ctypes.apppanel.AppPanelComponent;
+<else>
+import mdcf.core.ctypes.logic.LogicComponent;
+<endif>
+import mdcf.core.messagetypes.devicemgmt.PubChannelAssignmentMsg;
+import mdcf.core.messagetypes.devicemgmt.SubChannelAssignmentMsg;
+>>
