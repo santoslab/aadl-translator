@@ -1,0 +1,33 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AADL Translator
+Bundle-SymbolicName: aadl-translator;singleton:=true
+Bundle-Version: 0.1.0.qualifier
+Bundle-ClassPath: .,
+ lib/string-template.jar
+Bundle-Activator: edu.ksu.cis.projects.mdcf.aadltranslator.AadlTranslatorPlugin
+Bundle-Vendor: SAnToS Lab
+Bundle-Localization: plugin
+Export-Package: 
+ edu.ksu.cis.projects.mdcf.aadltranslator,
+ edu.ksu.cis.projects.mdcf.aadltranslator.exception,
+ edu.ksu.cis.projects.mdcf.aadltranslator.model,
+ edu.ksu.cis.projects.mdcf.aadltranslator.preference,
+ edu.ksu.cis.projects.mdcf.aadltranslator.view,
+ org.stringtemplate.v4,
+ org.stringtemplate.v4.compiler,
+ org.stringtemplate.v4.debug,
+ org.stringtemplate.v4.gui,
+ org.stringtemplate.v4.misc,
+ st4hidden.org.antlr.runtime,
+ st4hidden.org.antlr.runtime.misc,
+ st4hidden.org.antlr.runtime.tree,
+ st4hidden.org.antlr.stringtemplate.language
+Require-Bundle: org.osate.aadl2,
+ org.osate.xtext.aadl2.properties;bundle-version="1.0.0",
+ org.osate.xtext.aadl2;bundle-version="1.0.0",
+ org.osate.contribution.sei,
+ org.eclipse.ui.ide;bundle-version="3.9.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+
