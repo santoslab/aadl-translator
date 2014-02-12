@@ -1,7 +1,14 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.test;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -16,7 +23,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.ui.PlatformUI;
@@ -27,6 +36,8 @@ import org.osate.aadl2.Element;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Files;
+import com.google.common.io.LineProcessor;
 import com.thoughtworks.xstream.XStream;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
@@ -39,6 +50,7 @@ public class SampleTest {
 
 	ImmutableMap<String, String> supportingFileMap = getSupportingFiles();
 	ImmutableMap<String, String> propertyFileMap = getPropertyFiles();
+	private final boolean GENERATE_EXPECTED = false;
 
 	@Before
 	public void setUp() {
@@ -156,13 +168,63 @@ public class SampleTest {
 			target = (Element) res.getContents().get(0);
 			stats.process(target);
 		}
+		XStream xs = new XStream();
+
+		try {
+			testExpectedResult(systemName, xs.toXML(stats.getSystemModel()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	void testExpectedResult(final String name, final String content)
+			throws URISyntaxException, IOException, Exception {		
+
+		URL testDirUrl = Platform
+				.getBundle("edu.ksu.cis.projects.mdcf.aadl-translator-test")
+				.getEntry("src/test/resources/edu/ksu/cis/projects/mdcf/"
+						+ "aadltranslator/test/");
+		File testDir = new File(FileLocator.toFileURL(testDirUrl).getPath());
+
+		final File expected = new File(testDir, "expected/" + name + ".xml");
+		final File result = new File(testDir, "actual/" + name + ".xml");
+		if (GENERATE_EXPECTED) {
+			expected.getParentFile().mkdirs();
+			Files.write(content, expected, StandardCharsets.US_ASCII);
+		} else {
+			result.getParentFile().mkdirs();
+			Files.write(content, result, StandardCharsets.US_ASCII);
+			assertFilesEqual(expected, content);
+		}
+	}
+
+	void assertFilesEqual(final File expectedFile, final String resultString)
+			throws Exception {
+		final String expectedFileAsString = Files.readLines(expectedFile,
+				StandardCharsets.US_ASCII, new ReadFileIntoString());
+		assertEquals(expectedFileAsString, resultString);
 	}
 
 	@Test
 	public void testPulseOxSystem() {
 		runTest("PulseOx_SmartAlarm_System");
-		XStream xs = null;
-		// TODO: Next step is to grab the model with stats.getSystemModel() and
-		// start comparing it to expected values.
+	}
+
+	private class ReadFileIntoString implements LineProcessor<String> {
+		StringBuilder theFileAsAString = new StringBuilder();
+
+		@Override
+		public String getResult() {
+			return theFileAsAString.deleteCharAt(theFileAsAString.length() - 1)
+					.toString();
+		}
+
+		@Override
+		public boolean processLine(String line) throws IOException {
+			theFileAsAString.append(line);
+			theFileAsAString.append("\n");
+			return true;
+		}
+
 	}
 }
