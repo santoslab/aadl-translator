@@ -1,0 +1,24 @@
+package PulseOx_Interface
+public
+with PulseOx_SmartAlarm_Types;
+	device PulseOx
+	features
+		SpO2 : out event data port PulseOx_SmartAlarm_Types::SpO2;
+		PulseRate : out event data port PulseOx_SmartAlarm_Types::PulseRate;
+		SpO2_LowerLimit_Violated : out event data port PulseOx_SmartAlarm_Types::Notification;
+		PulseRate_LowerLimit_Violated : out event data port PulseOx_SmartAlarm_Types::Notification;
+		PulseRate_UpperLimit_Violated : out event data port PulseOx_SmartAlarm_Types::Notification;
+		ProbeOff_Alarm : out event data port PulseOx_SmartAlarm_Types::Notification;
+		MotionArtifact_Alarm : out event data port PulseOx_SmartAlarm_Types::Notification;
+		SpO2_LowerLimit_Out : out event data port PulseOx_SmartAlarm_Types::SpO2;
+		PulseRate_UpperLimit_Out : out event data port PulseOx_SmartAlarm_Types::PulseRate;
+		PulseRate_LowerLimit_Out : out event data port PulseOx_SmartAlarm_Types::PulseRate;
+		SpO2_LowerLimit_In : in event data port PulseOx_SmartAlarm_Types::SpO2;
+		PulseRate_UpperLimit_In : in event data port PulseOx_SmartAlarm_Types::PulseRate;
+		PulseRate_LowerLimit_In : in event data port PulseOx_SmartAlarm_Types::PulseRate;
+	end PulseOx;
+
+	device implementation PulseOx.imp
+	end PulseOx.imp;
+
+end PulseOx_Interface;

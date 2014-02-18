@@ -4,12 +4,12 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
@@ -35,7 +35,6 @@ import org.junit.Test;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 import com.google.common.io.LineProcessor;
 import com.thoughtworks.xstream.XStream;
@@ -44,21 +43,22 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 
 public class SampleTest {
 
-	private HashMap<String, IFile> systemFiles;
+	private HashMap<String, IFile> systemFiles = new HashMap<>();
 	private ResourceSet resourceSet;
 	private Translator stats;
 
-	ImmutableMap<String, String> supportingFileMap = getSupportingFiles();
-	ImmutableMap<String, String> propertyFileMap = getPropertyFiles();
+	HashSet<String> supportingFiles = new HashSet<>();
+	HashSet<String> propertyFiles = new HashSet<>();
 	private final boolean GENERATE_EXPECTED = false;
+	
+	private final String BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator-test";
+	private final String TEST_DIR = "src/test/resources/edu/ksu/cis/projects/mdcf/aadltranslator/test/";
 
 	@Before
 	public void setUp() {
 		IProject testProject = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject("TestProject");
 		resourceSet = OsateResourceUtil.createResourceSet();
-		systemFiles = new HashMap<>();
-		ImmutableMap<String, String> systemFileMap = getSystemFiles();
 		try {
 
 			IHandlerService handlerService = (IHandlerService) PlatformUI
@@ -91,10 +91,8 @@ public class SampleTest {
 			packagesFolder.create(true, true, null);
 			IFolder propertySetsFolder = testProject.getFolder("propertysets");
 			propertySetsFolder.create(true, true, null);
-			initFiles(propertySetsFolder, propertyFileMap);
-			initFiles(packagesFolder, systemFileMap);
-			initFiles(packagesFolder, supportingFileMap);
-			// May be optional?
+			initFiles(packagesFolder, propertySetsFolder);
+			
 			testProject.build(IncrementalProjectBuilder.FULL_BUILD, null);
 		} catch (CoreException | ExecutionException | NotDefinedException
 				| NotEnabledException | NotHandledException e) {
@@ -102,50 +100,42 @@ public class SampleTest {
 		}
 	}
 
-	private ImmutableMap<String, String> getSupportingFiles() {
-		return new ImmutableMap.Builder<String, String>()
-				.put("PulseOx_Interface",
-						"/Users/Sam/git/aadl-medical/pulseox-smartalarm/packages/PulseOx_Interface.aadl")
-				.put("PulseOx_SmartAlarm_Display",
-						"/Users/Sam/git/aadl-medical/pulseox-smartalarm/packages/PulseOx_SmartAlarm_Display.aadl")
-				.put("PulseOx_SmartAlarm_Logic",
-						"/Users/Sam/git/aadl-medical/pulseox-smartalarm/packages/PulseOx_SmartAlarm_Logic.aadl")
-				.put("PulseOx_SmartAlarm_Types",
-						"/Users/Sam/git/aadl-medical/pulseox-smartalarm/packages/PulseOx_SmartAlarm_Types.aadl")
-				.build();
-	}
-
-	private ImmutableMap<String, String> getPropertyFiles() {
-		return new ImmutableMap.Builder<String, String>()
-				.put("PulseOx_SmartAlarm_Properties",
-						"/Users/Sam/git/aadl-medical/pulseox-smartalarm/propertysets/PulseOx_SmartAlarm_Properties.aadl")
-				.put("MAP_Properties",
-						"/Users/Sam/git/aadl-medical/map-globals/propertysets/MAP_Properties.aadl")
-				.build();
-	}
-
-	private ImmutableMap<String, String> getSystemFiles() {
-		return new ImmutableMap.Builder<String, String>()
-				.put("PulseOx_SmartAlarm_System",
-						"/Users/Sam/git/aadl-medical/pulseox-smartalarm/packages/PulseOx_SmartAlarm_System.aadl")
-				.build();
-	}
-
-	private void initFiles(IFolder packagesFolder,
-			ImmutableMap<String, String> nameToFilePath) {
-		try {
-			for (String systemName : nameToFilePath.keySet()) {
-				systemFiles.put(systemName,
-						packagesFolder.getFile(systemName + ".aadl"));
-				systemFiles.get(systemName).create(
-						new FileInputStream(nameToFilePath.get(systemName)),
-						true, null);
-				resourceSet // May be optional?
-						.createResource(OsateResourceUtil
-								.getResourceURI((IResource) systemFiles
-										.get(systemName)));
+	private void initFiles(IFolder packagesFolder, IFolder propertySetsFolder) {
+			URL aadlDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(TEST_DIR + "aadl/");
+			URL aadlPropertysetsDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(TEST_DIR + "aadl/propertyset/");
+			URL aadlSystemDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(TEST_DIR + "aadl/system/");
+			File aadlDir = null;
+			File aadlPropertysetsDir = null;
+			File aadlSystemDir = null;
+			try {
+				aadlDir = new File(FileLocator.toFileURL(aadlDirUrl).getPath());
+				aadlPropertysetsDir = new File(FileLocator.toFileURL(aadlPropertysetsDirUrl).getPath());
+				aadlSystemDir = new File(FileLocator.toFileURL(aadlSystemDirUrl).getPath());
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (FileNotFoundException | CoreException e) {
+			initFiles(packagesFolder, propertySetsFolder, aadlDir, systemFiles, supportingFiles);
+			initFiles(packagesFolder, propertySetsFolder, aadlSystemDir, systemFiles, new HashSet<String>());
+			initFiles(packagesFolder, propertySetsFolder, aadlPropertysetsDir, systemFiles, propertyFiles);
+	}
+	
+	private void initFiles(IFolder packagesFolder, IFolder propertySetsFolder, File dir, HashMap<String, IFile> fileMap, HashSet<String> fileNameMap){
+		String fileName = null;
+		try {
+			for (File f : dir.listFiles()) {
+				if(f.isHidden() || f.isDirectory())
+					continue;
+				fileName = f.getName().substring(0, f.getName().length() - 5);
+				fileNameMap.add(fileName);
+				fileMap.put(fileName,
+						packagesFolder.getFile(fileName + ".aadl"));
+				fileMap.get(fileName).create(new FileInputStream(f), true,
+						null);
+				// May be optional?
+				resourceSet.createResource(OsateResourceUtil
+						.getResourceURI((IResource) fileMap.get(fileName)));
+			}
+		} catch (IOException | CoreException e) {
 			e.printStackTrace();
 		}
 	}
@@ -153,15 +143,17 @@ public class SampleTest {
 	private void runTest(String systemName) {
 		IFile inputFile = systemFiles.get(systemName);
 		stats = new Translator(new NullProgressMonitor());
-		for (String propSetName : propertyFileMap.keySet()) {
+// 		We need a custom error manager / reporter so that exceptions can be
+//		captured / checked as part of testing
+//		stats.setErrorManager(NullParseErrorReporter.prototype);
+		for (String propSetName : propertyFiles) {
 			stats.addPropertySetName(propSetName);
 		}
-		Resource res = resourceSet.getResource(
-				OsateResourceUtil.getResourceURI((IResource) inputFile), true);
+		Resource res = resourceSet.getResource(OsateResourceUtil.getResourceURI((IResource) inputFile), true);
 		Element target = (Element) res.getContents().get(0);
 		stats.process(target);
 
-		for (String supportingFileName : supportingFileMap.keySet()) {
+		for (String supportingFileName : supportingFiles) {
 			IFile supportingFile = systemFiles.get(supportingFileName);
 			res = resourceSet.getResource(OsateResourceUtil
 					.getResourceURI((IResource) supportingFile), true);
@@ -177,13 +169,10 @@ public class SampleTest {
 		}
 	}
 
-	void testExpectedResult(final String name, final String content)
-			throws URISyntaxException, IOException, Exception {		
+	private void testExpectedResult(final String name, final String content)
+			throws URISyntaxException, IOException, Exception {
 
-		URL testDirUrl = Platform
-				.getBundle("edu.ksu.cis.projects.mdcf.aadl-translator-test")
-				.getEntry("src/test/resources/edu/ksu/cis/projects/mdcf/"
-						+ "aadltranslator/test/");
+		URL testDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(TEST_DIR);
 		File testDir = new File(FileLocator.toFileURL(testDirUrl).getPath());
 
 		final File expected = new File(testDir, "expected/" + name + ".xml");
@@ -198,8 +187,8 @@ public class SampleTest {
 		}
 	}
 
-	void assertFilesEqual(final File expectedFile, final String resultString)
-			throws Exception {
+	private void assertFilesEqual(final File expectedFile,
+			final String resultString) throws Exception {
 		final String expectedFileAsString = Files.readLines(expectedFile,
 				StandardCharsets.US_ASCII, new ReadFileIntoString());
 		assertEquals(expectedFileAsString, resultString);

@@ -1,0 +1,232 @@
+package PulseOx_SmartAlarm_Logic
+public
+with MAP_Properties, PulseOx_SmartAlarm_Types;
+
+	process PulseOx_SmartAlarm_Process
+	features
+		SpO2 : in event data port PulseOx_SmartAlarm_Types::SpO2;
+		PulseRate : in event data port PulseOx_SmartAlarm_Types::PulseRate;
+		SpO2_LowerLimit_Violated : in event data port PulseOx_SmartAlarm_Types::Notification;
+		PulseRate_LowerLimit_Violated : in event data port PulseOx_SmartAlarm_Types::Notification;
+		PulseRate_UpperLimit_Violated : in event data port PulseOx_SmartAlarm_Types::Notification;
+		ProbeOff_Alarm : in event data port PulseOx_SmartAlarm_Types::Notification;
+		MotionArtifact_Alarm : in event data port PulseOx_SmartAlarm_Types::Notification;
+		SpO2_LowerLimit_Device_In : in event data port PulseOx_SmartAlarm_Types::SpO2;
+		SpO2_LowerLimit_Display_In : in event data port PulseOx_SmartAlarm_Types::SpO2;
+		PulseRate_UpperLimit_Device_In : in event data port PulseOx_SmartAlarm_Types::PulseRate;
+		PulseRate_LowerLimit_Device_In : in event data port PulseOx_SmartAlarm_Types::PulseRate;
+		PulseRate_UpperLimit_Display_In : in event data port PulseOx_SmartAlarm_Types::PulseRate;
+		PulseRate_LowerLimit_Display_In : in event data port PulseOx_SmartAlarm_Types::PulseRate;
+		SupplementalOxy_Enabled : in event data port PulseOx_SmartAlarm_Types::Notification;
+		SpO2LevelAdjustmentAmount : in event data port PulseOx_SmartAlarm_Types::SpO2;
+		RapidSpO2Decline_Enabled : in event data port PulseOx_SmartAlarm_Types::Notification;
+		SupplementalOxy_LowSpO2_Alarm : out event data port PulseOx_SmartAlarm_Types::Notification;
+		RapidSpO2Decline_Alarm : out event data port PulseOx_SmartAlarm_Types::Notification;
+		SustainedMotionArtifact_Alarm : out event data port PulseOx_SmartAlarm_Types::Notification;
+	properties
+		MAP_Properties::Component_Type => logic;
+	end PulseOx_SmartAlarm_Process;
+	
+	process implementation PulseOx_SmartAlarm_Process.imp
+	subcomponents
+		UpdateSpO2Thread : thread UpdateSpO2Thread.imp;
+		UpdatePulseRateThread : thread UpdatePulseRateThread.imp;
+		UpdateSpO2_LowerLimit_ViolatedThread : thread UpdateSpO2_LowerLimit_ViolatedThread.imp;
+		UpdatePulseRate_LowerLimit_ViolatedThread : thread UpdatePulseRate_LowerLimit_ViolatedThread.imp;
+		UpdatePulseRate_UpperLimit_ViolatedThread : thread UpdatePulseRate_UpperLimit_ViolatedThread.imp;
+		UpdateProbeOff_AlarmThread : thread UpdateProbeOff_AlarmThread.imp;
+		UpdateMotionArtifact_AlarmThread : thread UpdateMotionArtifact_AlarmThread.imp;
+		UpdateSpO2_LowerLimit_Device_InThread : thread UpdateSpO2_LowerLimit_Device_InThread.imp;
+		UpdateSpO2_LowerLimit_Display_InThread : thread UpdateSpO2_LowerLimit_Display_InThread.imp;
+		UpdatePulseRate_UpperLimit_Device_InThread : thread UpdatePulseRate_UpperLimit_Device_InThread.imp;
+		UpdatePulseRate_LowerLimit_Device_InThread : thread UpdatePulseRate_LowerLimit_Device_InThread.imp;
+		UpdatePulseRate_UpperLimit_Display_InThread : thread UpdatePulseRate_UpperLimit_Display_InThread.imp;
+		UpdatePulseRate_LowerLimit_Display_InThread : thread UpdatePulseRate_LowerLimit_Display_InThread.imp;
+		UpdateSupplementalOxy_EnabledThread : thread UpdateSupplementalOxy_EnabledThread.imp;
+		UpdateSpO2LevelAdjustmentAmountThread : thread UpdateSpO2LevelAdjustmentAmountThread.imp;
+		UpdateRapidSpO2Decline_EnabledThread : thread UpdateRapidSpO2Decline_EnabledThread.imp;
+		
+		SendSupplementalOxy_LowSpO2_AlarmThread : thread SendSupplementalOxy_LowSpO2_AlarmThread.imp;
+		SendRapidSpO2Decline_AlarmThread : thread SendRapidSpO2Decline_AlarmThread.imp;
+		SendSustainedMotionArtifact_AlarmThread : thread SendSustainedMotionArtifact_AlarmThread.imp;
+	connections
+		incoming_SpO2 : port SpO2 -> UpdateSpO2Thread.SpO2;
+		incoming_PulseRate : port PulseRate -> UpdatePulseRateThread.PulseRate;
+		incoming_SpO2_LowerLimit_Violated : port SpO2_LowerLimit_Violated -> UpdateSpO2_LowerLimit_ViolatedThread.SpO2_LowerLimit_Violated;
+		incoming_PulseRate_LowerLimit_Violated : port PulseRate_LowerLimit_Violated -> UpdatePulseRate_LowerLimit_ViolatedThread.PulseRate_LowerLimit_Violated;
+		incoming_PulseRate_UpperLimit_Violated : port PulseRate_UpperLimit_Violated -> UpdatePulseRate_UpperLimit_ViolatedThread.PulseRate_UpperLimit_Violated;
+		incoming_ProbeOff_Alarm : port ProbeOff_Alarm -> UpdateProbeOff_AlarmThread.ProbeOff_Alarm;
+		incoming_MotionArtifact_Alarm : port MotionArtifact_Alarm -> UpdateMotionArtifact_AlarmThread.MotionArtifact_Alarm;
+		incoming_SpO2_LowerLimit_Device_In : port SpO2_LowerLimit_Device_In -> UpdateSpO2_LowerLimit_Device_InThread.SpO2_LowerLimit_Device_In;
+		incoming_SpO2_LowerLimit_Display_In : port SpO2_LowerLimit_Display_In -> UpdateSpO2_LowerLimit_Display_InThread.SpO2_LowerLimit_Display_In;
+		incoming_PulseRate_UpperLimit_Device_In : port PulseRate_UpperLimit_Device_In -> UpdatePulseRate_UpperLimit_Device_InThread.PulseRate_UpperLimit_Device_In;
+		incoming_PulseRate_LowerLimit_Device_In : port PulseRate_LowerLimit_Device_In -> UpdatePulseRate_LowerLimit_Device_InThread.PulseRate_LowerLimit_Device_In;
+		incoming_PulseRate_UpperLimit_Display_In : port PulseRate_UpperLimit_Display_In -> UpdatePulseRate_UpperLimit_Display_InThread.PulseRate_UpperLimit_Display_In;
+		incoming_PulseRate_LowerLimit_Display_In : port PulseRate_LowerLimit_Display_In -> UpdatePulseRate_LowerLimit_Display_InThread.PulseRate_LowerLimit_Display_In;
+		incoming_SupplementalOxy_Enabled : port SupplementalOxy_Enabled -> UpdateSupplementalOxy_EnabledThread.SupplementalOxy_Enabled;
+		incoming_SpO2LevelAdjustmentAmount : port SpO2LevelAdjustmentAmount -> UpdateSpO2LevelAdjustmentAmountThread.SpO2LevelAdjustmentAmount;
+		incoming_RapidSpO2Decline_Enabled : port RapidSpO2Decline_Enabled -> UpdateRapidSpO2Decline_EnabledThread.RapidSpO2Decline_Enabled;
+		
+		outgoing_SupplementalOxy_LowSpO2_Alarm : port SendSupplementalOxy_LowSpO2_AlarmThread.SupplementalOxy_LowSpO2_Alarm -> SupplementalOxy_LowSpO2_Alarm;
+		outgoing_RapidSpO2Decline_Alarm : port SendRapidSpO2Decline_AlarmThread.RapidSpO2Decline_Alarm -> RapidSpO2Decline_Alarm;
+		outgoing_SustainedMotionArtifact_Alarm : port SendSustainedMotionArtifact_AlarmThread.SustainedMotionArtifact_Alarm -> SustainedMotionArtifact_Alarm; 
+	end PulseOx_SmartAlarm_Process.imp;
+	
+	thread UpdateSpO2Thread
+	features
+		SpO2 : in event data port PulseOx_SmartAlarm_Types::SpO2;
+	end UpdateSpO2Thread;
+
+	thread implementation UpdateSpO2Thread.imp
+	end UpdateSpO2Thread.imp;
+
+	thread UpdatePulseRateThread
+	features
+		PulseRate : in event data port PulseOx_SmartAlarm_Types::PulseRate;
+	end UpdatePulseRateThread;
+	
+	thread implementation UpdatePulseRateThread.imp
+	end UpdatePulseRateThread.imp;
+	
+	thread UpdateSpO2_LowerLimit_ViolatedThread
+	features
+		SpO2_LowerLimit_Violated : in event data port PulseOx_SmartAlarm_Types::Notification;
+	end UpdateSpO2_LowerLimit_ViolatedThread;
+
+	thread implementation UpdateSpO2_LowerLimit_ViolatedThread.imp
+	end UpdateSpO2_LowerLimit_ViolatedThread.imp;
+	
+	thread UpdatePulseRate_LowerLimit_ViolatedThread
+	features
+		PulseRate_LowerLimit_Violated : in event data port PulseOx_SmartAlarm_Types::Notification;
+	end UpdatePulseRate_LowerLimit_ViolatedThread;
+
+	thread implementation UpdatePulseRate_LowerLimit_ViolatedThread.imp
+	end UpdatePulseRate_LowerLimit_ViolatedThread.imp;
+	
+	thread UpdatePulseRate_UpperLimit_ViolatedThread
+	features
+		PulseRate_UpperLimit_Violated : in event data port PulseOx_SmartAlarm_Types::Notification;
+	end UpdatePulseRate_UpperLimit_ViolatedThread;
+
+	thread implementation UpdatePulseRate_UpperLimit_ViolatedThread.imp
+	end UpdatePulseRate_UpperLimit_ViolatedThread.imp;
+	
+	thread UpdateProbeOff_AlarmThread
+	features
+		ProbeOff_Alarm : in event data port PulseOx_SmartAlarm_Types::Notification;
+	end UpdateProbeOff_AlarmThread;
+
+	thread implementation UpdateProbeOff_AlarmThread.imp
+	end UpdateProbeOff_AlarmThread.imp;
+	
+	thread UpdateMotionArtifact_AlarmThread
+	features
+		MotionArtifact_Alarm : in event data port PulseOx_SmartAlarm_Types::Notification;
+	end UpdateMotionArtifact_AlarmThread;
+
+	thread implementation UpdateMotionArtifact_AlarmThread.imp
+	end UpdateMotionArtifact_AlarmThread.imp;
+
+	thread UpdateSpO2_LowerLimit_Device_InThread
+	features
+		SpO2_LowerLimit_Device_In : in event data port PulseOx_SmartAlarm_Types::SpO2;
+	end UpdateSpO2_LowerLimit_Device_InThread;
+
+	thread implementation UpdateSpO2_LowerLimit_Device_InThread.imp
+	end UpdateSpO2_LowerLimit_Device_InThread.imp;
+	
+	thread UpdateSpO2_LowerLimit_Display_InThread
+	features
+		SpO2_LowerLimit_Display_In : in event data port PulseOx_SmartAlarm_Types::SpO2;
+	end UpdateSpO2_LowerLimit_Display_InThread;
+
+	thread implementation UpdateSpO2_LowerLimit_Display_InThread.imp
+	end UpdateSpO2_LowerLimit_Display_InThread.imp;
+	
+	thread UpdatePulseRate_UpperLimit_Device_InThread
+	features
+		PulseRate_UpperLimit_Device_In : in event data port PulseOx_SmartAlarm_Types::PulseRate;
+	end UpdatePulseRate_UpperLimit_Device_InThread;
+
+	thread implementation UpdatePulseRate_UpperLimit_Device_InThread.imp
+	end UpdatePulseRate_UpperLimit_Device_InThread.imp;
+	
+	thread UpdatePulseRate_LowerLimit_Device_InThread
+	features
+		PulseRate_LowerLimit_Device_In : in event data port PulseOx_SmartAlarm_Types::PulseRate;
+	end UpdatePulseRate_LowerLimit_Device_InThread;
+
+	thread implementation UpdatePulseRate_LowerLimit_Device_InThread.imp
+	end UpdatePulseRate_LowerLimit_Device_InThread.imp;
+
+	thread UpdatePulseRate_UpperLimit_Display_InThread
+	features
+		PulseRate_UpperLimit_Display_In : in event data port PulseOx_SmartAlarm_Types::PulseRate;
+	end UpdatePulseRate_UpperLimit_Display_InThread;
+
+	thread implementation UpdatePulseRate_UpperLimit_Display_InThread.imp
+	end UpdatePulseRate_UpperLimit_Display_InThread.imp;
+	
+	thread UpdatePulseRate_LowerLimit_Display_InThread
+	features
+		PulseRate_LowerLimit_Display_In : in event data port PulseOx_SmartAlarm_Types::PulseRate;
+	end UpdatePulseRate_LowerLimit_Display_InThread;
+
+	thread implementation UpdatePulseRate_LowerLimit_Display_InThread.imp
+	end UpdatePulseRate_LowerLimit_Display_InThread.imp;
+	
+	thread UpdateSupplementalOxy_EnabledThread
+	features
+		SupplementalOxy_Enabled : in event data port PulseOx_SmartAlarm_Types::Notification;
+	end UpdateSupplementalOxy_EnabledThread;
+
+	thread implementation UpdateSupplementalOxy_EnabledThread.imp
+	end UpdateSupplementalOxy_EnabledThread.imp;
+
+	thread UpdateSpO2LevelAdjustmentAmountThread
+	features
+		SpO2LevelAdjustmentAmount : in event data port PulseOx_SmartAlarm_Types::SpO2;
+	end UpdateSpO2LevelAdjustmentAmountThread;
+
+	thread implementation UpdateSpO2LevelAdjustmentAmountThread.imp
+	end UpdateSpO2LevelAdjustmentAmountThread.imp;
+	
+	thread UpdateRapidSpO2Decline_EnabledThread
+	features
+		RapidSpO2Decline_Enabled : in event data port PulseOx_SmartAlarm_Types::Notification;
+	end UpdateRapidSpO2Decline_EnabledThread;
+
+	thread implementation UpdateRapidSpO2Decline_EnabledThread.imp
+	end UpdateRapidSpO2Decline_EnabledThread.imp;
+	
+	thread SendSupplementalOxy_LowSpO2_AlarmThread
+	features
+		SupplementalOxy_LowSpO2_Alarm : out event data port PulseOx_SmartAlarm_Types::Notification;
+	properties
+		Thread_Properties::Dispatch_Protocol => Periodic;
+	end SendSupplementalOxy_LowSpO2_AlarmThread;
+
+	thread implementation SendSupplementalOxy_LowSpO2_AlarmThread.imp
+	end SendSupplementalOxy_LowSpO2_AlarmThread.imp;
+	
+	thread SendRapidSpO2Decline_AlarmThread
+	features
+		RapidSpO2Decline_Alarm : out event data port PulseOx_SmartAlarm_Types::Notification;
+	properties
+		Thread_Properties::Dispatch_Protocol => Periodic;
+	end SendRapidSpO2Decline_AlarmThread;
+
+	thread implementation SendRapidSpO2Decline_AlarmThread.imp
+	end SendRapidSpO2Decline_AlarmThread.imp;
+	
+	thread SendSustainedMotionArtifact_AlarmThread
+	features
+		SustainedMotionArtifact_Alarm : out event data port PulseOx_SmartAlarm_Types::Notification;
+	properties
+		Thread_Properties::Dispatch_Protocol => Periodic;
+	end SendSustainedMotionArtifact_AlarmThread;
+
+	thread implementation SendSustainedMotionArtifact_AlarmThread.imp
+	end SendSustainedMotionArtifact_AlarmThread.imp;
+end PulseOx_SmartAlarm_Logic;
