@@ -34,6 +34,7 @@ import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
+import org.osate.aadl2.modelsupport.errorreporting.AbstractParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.MarkerParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
@@ -83,7 +84,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			try {
 				if (systemModel != null)
 					throw new NotImplementedException("Got a system called "
-							+ obj.getName() + " but I already have one called"
+							+ obj.getName() + " but I already have one called "
 							+ systemModel.getName());
 			} catch (NotImplementedException e) {
 				handleException(obj, e);
@@ -161,11 +162,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 							"Attempted to define a process that wasn't declared as a system component");
 				}
 
-				if (checkCustomProperty(obj, "Component_Type", "enum",
-						"Process Declaration").equalsIgnoreCase("logic")) {
+				if (checkCustomProperty(obj, "Component_Type", "enum", "Process Declaration") != null &&
+						checkCustomProperty(obj, "Component_Type", "enum","Process Declaration").equalsIgnoreCase("logic")) {
 					procModel.setDisplay(false);
-				} else if (checkCustomProperty(obj, "Component_Type", "enum",
-						"Process Declaration").equalsIgnoreCase("display")) {
+				} else if (checkCustomProperty(obj, "Component_Type", "enum", "Process Declaration") != null &&
+						checkCustomProperty(obj, "Component_Type", "enum", "Process Declaration").equalsIgnoreCase("display")) {
 					procModel.setDisplay(true);
 				} else {
 					throw new PropertyOutOfRangeException(

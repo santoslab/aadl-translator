@@ -136,7 +136,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				OsateCorePlugin.getDefault().getBundle());
 		final ParseErrorReporterManager parseErrManager = new ParseErrorReporterManager(
 				new MarkerParseErrorReporter.Factory(
-						"edu.ksu.cis.projects.mdcf.aadl-translator.TranslatorErrorMarker",
+//						"edu.ksu.cis.projects.mdcf.aadl-translator.TranslatorErrorMarker",
+						"aadl-translator.TranslatorErrorMarker",
 						parseErrorLoggerFactory));
 
 		stats.setErrorManager(parseErrManager);
