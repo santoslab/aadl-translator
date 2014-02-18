@@ -33,6 +33,8 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.osate.aadl2.Element;
+import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterFactory;
+import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 
 import com.google.common.io.Files;
@@ -40,6 +42,7 @@ import com.google.common.io.LineProcessor;
 import com.thoughtworks.xstream.XStream;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
+import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFactory;
 
 public class SampleTest {
 
@@ -50,7 +53,7 @@ public class SampleTest {
 	HashSet<String> supportingFiles = new HashSet<>();
 	HashSet<String> propertyFiles = new HashSet<>();
 	private final boolean GENERATE_EXPECTED = false;
-	
+
 	private final String BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator-test";
 	private final String TEST_DIR = "src/test/resources/edu/ksu/cis/projects/mdcf/aadltranslator/test/";
 
@@ -92,7 +95,7 @@ public class SampleTest {
 			IFolder propertySetsFolder = testProject.getFolder("propertysets");
 			propertySetsFolder.create(true, true, null);
 			initFiles(packagesFolder, propertySetsFolder);
-			
+
 			testProject.build(IncrementalProjectBuilder.FULL_BUILD, null);
 		} catch (CoreException | ExecutionException | NotDefinedException
 				| NotEnabledException | NotHandledException e) {
@@ -101,36 +104,49 @@ public class SampleTest {
 	}
 
 	private void initFiles(IFolder packagesFolder, IFolder propertySetsFolder) {
-			URL aadlDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(TEST_DIR + "aadl/");
-			URL aadlPropertysetsDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(TEST_DIR + "aadl/propertyset/");
-			URL aadlSystemDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(TEST_DIR + "aadl/system/");
-			File aadlDir = null;
-			File aadlPropertysetsDir = null;
-			File aadlSystemDir = null;
-			try {
-				aadlDir = new File(FileLocator.toFileURL(aadlDirUrl).getPath());
-				aadlPropertysetsDir = new File(FileLocator.toFileURL(aadlPropertysetsDirUrl).getPath());
-				aadlSystemDir = new File(FileLocator.toFileURL(aadlSystemDirUrl).getPath());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			initFiles(packagesFolder, propertySetsFolder, aadlDir, systemFiles, supportingFiles);
-			initFiles(packagesFolder, propertySetsFolder, aadlSystemDir, systemFiles, new HashSet<String>());
-			initFiles(packagesFolder, propertySetsFolder, aadlPropertysetsDir, systemFiles, propertyFiles);
+		URL aadlDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
+				TEST_DIR + "aadl/");
+		URL aadlPropertysetsDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
+				TEST_DIR + "aadl/propertyset/");
+		URL aadlSystemDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
+				TEST_DIR + "aadl/system/");
+		File aadlDir = null;
+		File aadlPropertysetsDir = null;
+		File aadlSystemDir = null;
+		try {
+			aadlDir = new File(FileLocator.toFileURL(aadlDirUrl).getPath());
+			aadlPropertysetsDir = new File(FileLocator.toFileURL(
+					aadlPropertysetsDirUrl).getPath());
+			aadlSystemDir = new File(FileLocator.toFileURL(aadlSystemDirUrl)
+					.getPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		initFiles(packagesFolder, propertySetsFolder, aadlDir, systemFiles,
+				supportingFiles);
+		// We don't actually maintain a set of system definitions, since
+		// they are each only used by a single test case, so we sort of
+		// kludge this in with an unused hashset...
+		initFiles(packagesFolder, propertySetsFolder, aadlSystemDir,
+				systemFiles, new HashSet<String>());
+		initFiles(packagesFolder, propertySetsFolder, aadlPropertysetsDir,
+				systemFiles, propertyFiles);
 	}
-	
-	private void initFiles(IFolder packagesFolder, IFolder propertySetsFolder, File dir, HashMap<String, IFile> fileMap, HashSet<String> fileNameMap){
+
+	private void initFiles(IFolder packagesFolder, IFolder propertySetsFolder,
+			File dir, HashMap<String, IFile> fileMap,
+			HashSet<String> fileNameMap) {
 		String fileName = null;
 		try {
 			for (File f : dir.listFiles()) {
-				if(f.isHidden() || f.isDirectory())
+				if (f.isHidden() || f.isDirectory())
 					continue;
 				fileName = f.getName().substring(0, f.getName().length() - 5);
 				fileNameMap.add(fileName);
 				fileMap.put(fileName,
 						packagesFolder.getFile(fileName + ".aadl"));
-				fileMap.get(fileName).create(new FileInputStream(f), true,
-						null);
+				fileMap.get(fileName)
+						.create(new FileInputStream(f), true, null);
 				// May be optional?
 				resourceSet.createResource(OsateResourceUtil
 						.getResourceURI((IResource) fileMap.get(fileName)));
@@ -140,36 +156,47 @@ public class SampleTest {
 		}
 	}
 
+	// TODO: Make propertyfiles and supportingfiles (and, potentially
+	// systemfiles) parameters, so that test methods just supply a (self-
+	// referential) set of files they want to use, instead of everything in the
+	// test directories 
 	private void runTest(String systemName) {
+		StringBuilder errorSB = new StringBuilder();
 		IFile inputFile = systemFiles.get(systemName);
 		stats = new Translator(new NullProgressMonitor());
-// 		We need a custom error manager / reporter so that exceptions can be
-//		captured / checked as part of testing
-//		stats.setErrorManager(NullParseErrorReporter.prototype);
+
+		ParseErrorReporterFactory parseErrorReporterFactory = TestParseErrorReporterFactory.INSTANCE;
+		ParseErrorReporterManager parseErrManager = new ParseErrorReporterManager(
+				parseErrorReporterFactory);
+
+		stats.setErrorManager(parseErrManager);
 		for (String propSetName : propertyFiles) {
 			stats.addPropertySetName(propSetName);
 		}
-		Resource res = resourceSet.getResource(OsateResourceUtil.getResourceURI((IResource) inputFile), true);
+		Resource res = resourceSet.getResource(
+				OsateResourceUtil.getResourceURI((IResource) inputFile), true);
 		Element target = (Element) res.getContents().get(0);
 		stats.process(target);
-
+		errorSB.append(parseErrManager.getReporter((IResource) inputFile).toString());
+		
 		for (String supportingFileName : supportingFiles) {
 			IFile supportingFile = systemFiles.get(supportingFileName);
 			res = resourceSet.getResource(OsateResourceUtil
 					.getResourceURI((IResource) supportingFile), true);
 			target = (Element) res.getContents().get(0);
 			stats.process(target);
+			errorSB.append(parseErrManager.getReporter((IResource) supportingFile).toString());
 		}
 		XStream xs = new XStream();
 
 		try {
-			testExpectedResult(systemName, xs.toXML(stats.getSystemModel()));
+			testExpectedResult(systemName, xs.toXML(stats.getSystemModel()), errorSB.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void testExpectedResult(final String name, final String content)
+	private void testExpectedResult(final String name, final String content, final String errors)
 			throws URISyntaxException, IOException, Exception {
 
 		URL testDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(TEST_DIR);
@@ -179,10 +206,10 @@ public class SampleTest {
 		final File result = new File(testDir, "actual/" + name + ".xml");
 		if (GENERATE_EXPECTED) {
 			expected.getParentFile().mkdirs();
-			Files.write(content, expected, StandardCharsets.US_ASCII);
+			Files.write(errors + content, expected, StandardCharsets.US_ASCII);
 		} else {
 			result.getParentFile().mkdirs();
-			Files.write(content, result, StandardCharsets.US_ASCII);
+			Files.write(errors + content, result, StandardCharsets.US_ASCII);
 			assertFilesEqual(expected, content);
 		}
 	}
@@ -214,6 +241,5 @@ public class SampleTest {
 			theFileAsAString.append("\n");
 			return true;
 		}
-
 	}
 }

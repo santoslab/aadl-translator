@@ -244,7 +244,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			INode node = NodeModelUtils.findActualNodeFor(obj);
 			IResource file = OsateResourceUtil.convertToIResource(obj.eResource());
 			ParseErrorReporter errReporter = errorManager.getReporter(file);
-			((MarkerParseErrorReporter) errReporter).setContextResource(obj.eResource());
+			if(errReporter instanceof MarkerParseErrorReporter)
+				((MarkerParseErrorReporter) errReporter).setContextResource(obj.eResource());
 			errReporter.error(obj.eResource().getURI().lastSegment(), node.getStartLine(), e.getMessage());
 			cancelTraversal();
 		}
