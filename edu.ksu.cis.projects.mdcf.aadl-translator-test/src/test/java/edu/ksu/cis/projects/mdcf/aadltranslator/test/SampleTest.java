@@ -30,7 +30,6 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.osate.aadl2.Element;
@@ -53,7 +52,7 @@ public class SampleTest {
 
 	HashSet<String> supportingFiles = new HashSet<>();
 	HashSet<String> propertyFiles = new HashSet<>();
-	private final boolean GENERATE_EXPECTED = true;
+	private final boolean GENERATE_EXPECTED = false;
 
 	private final String BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator-test";
 	private final String TEST_DIR = "src/test/resources/edu/ksu/cis/projects/mdcf/aadltranslator/test/";
@@ -232,7 +231,7 @@ public class SampleTest {
 		} else {
 			result.getParentFile().mkdirs();
 			Files.write(errors + content, result, StandardCharsets.US_ASCII);
-			assertFilesEqual(expected, content);
+			assertFilesEqual(expected, errors + content);
 		}
 	}
 
