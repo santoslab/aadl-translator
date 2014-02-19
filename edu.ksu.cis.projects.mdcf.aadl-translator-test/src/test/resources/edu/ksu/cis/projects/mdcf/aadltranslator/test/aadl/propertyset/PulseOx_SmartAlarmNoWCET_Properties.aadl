@@ -1,4 +1,4 @@
-property set PulseOx_SmartAlarm_Properties is
+property set PulseOx_SmartAlarmNoWCET_Properties is
 	Default_Thread_Time : constant Time => 1 sec;
 	
 	Default_Output_Rate : Time_Range => 100 ms .. 300 ms
@@ -11,4 +11,4 @@ property set PulseOx_SmartAlarm_Properties is
 		applies to (thread);
 	Default_Channel_Delay : Time => 100 ms
 		applies to (port connection);
-end PulseOx_SmartAlarm_Properties;
+end PulseOx_SmartAlarmNoWCET_Properties;

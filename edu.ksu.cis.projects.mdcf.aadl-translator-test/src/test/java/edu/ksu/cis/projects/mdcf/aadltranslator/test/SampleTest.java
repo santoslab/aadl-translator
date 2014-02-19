@@ -30,6 +30,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.osate.aadl2.Element;
@@ -52,14 +53,22 @@ public class SampleTest {
 
 	HashSet<String> supportingFiles = new HashSet<>();
 	HashSet<String> propertyFiles = new HashSet<>();
-	private final boolean GENERATE_EXPECTED = false;
+	private final boolean GENERATE_EXPECTED = true;
 
 	private final String BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator-test";
 	private final String TEST_DIR = "src/test/resources/edu/ksu/cis/projects/mdcf/aadltranslator/test/";
 
+	private IProject testProject = null;
+
+	/*
+	 * The test runner is designed to not recreate everything for every test,
+	 * but rather create things as needed. So if a test makes destructive
+	 * changes, just delete everything that gets changed, and they will be reset
+	 * to defaults on the next run.
+	 */
 	@Before
 	public void setUp() {
-		IProject testProject = ResourcesPlugin.getWorkspace().getRoot()
+		testProject = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject("TestProject");
 		resourceSet = OsateResourceUtil.createResourceSet();
 		try {
@@ -78,8 +87,10 @@ public class SampleTest {
 					.getProject("Plugin_Resources");
 
 			IProject[] referencedProjects = new IProject[] { pluginResources };
-			testProject.create(null);
-			testProject.open(null);
+			if (!testProject.isAccessible()) {
+				testProject.create(null);
+				testProject.open(null);
+			}
 
 			IProjectDescription prpd = pluginResources.getDescription();
 			prpd.setNatureIds(natureIDs);
@@ -91,12 +102,19 @@ public class SampleTest {
 			testProject.setDescription(testpd, null);
 
 			IFolder packagesFolder = testProject.getFolder("packages");
-			packagesFolder.create(true, true, null);
+			if (!packagesFolder.isAccessible()) {
+				packagesFolder.create(true, true, null);
+			}
+
 			IFolder propertySetsFolder = testProject.getFolder("propertysets");
-			propertySetsFolder.create(true, true, null);
+			if (!propertySetsFolder.isAccessible()) {
+				propertySetsFolder.create(true, true, null);
+			}
+
 			initFiles(packagesFolder, propertySetsFolder);
 
-			testProject.build(IncrementalProjectBuilder.FULL_BUILD, null);
+			testProject
+					.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
 		} catch (CoreException | ExecutionException | NotDefinedException
 				| NotEnabledException | NotHandledException e) {
 			e.printStackTrace();
@@ -145,22 +163,22 @@ public class SampleTest {
 				fileNameMap.add(fileName);
 				fileMap.put(fileName,
 						packagesFolder.getFile(fileName + ".aadl"));
-				fileMap.get(fileName)
-						.create(new FileInputStream(f), true, null);
-				// May be optional?
-				resourceSet.createResource(OsateResourceUtil
-						.getResourceURI((IResource) fileMap.get(fileName)));
+				if (!packagesFolder.getFile(fileName + ".aadl").exists()) {
+					fileMap.get(fileName).create(new FileInputStream(f), true,
+							null);
+				}
+				resourceSet.getResource(OsateResourceUtil
+						.getResourceURI((IResource) fileMap.get(fileName)),
+						true);
 			}
 		} catch (IOException | CoreException e) {
 			e.printStackTrace();
 		}
 	}
 
-	// TODO: Make propertyfiles and supportingfiles (and, potentially
-	// systemfiles) parameters, so that test methods just supply a (self-
-	// referential) set of files they want to use, instead of everything in the
-	// test directories 
-	private void runTest(String systemName) {
+	private void runTest(final String testName, final String systemName,
+			final HashSet<String> usedPropertyFiles,
+			final HashSet<String> usedSupportingFiles) {
 		StringBuilder errorSB = new StringBuilder();
 		IFile inputFile = systemFiles.get(systemName);
 		stats = new Translator(new NullProgressMonitor());
@@ -170,40 +188,44 @@ public class SampleTest {
 				parseErrorReporterFactory);
 
 		stats.setErrorManager(parseErrManager);
-		for (String propSetName : propertyFiles) {
+		for (String propSetName : usedPropertyFiles) {
 			stats.addPropertySetName(propSetName);
 		}
 		Resource res = resourceSet.getResource(
 				OsateResourceUtil.getResourceURI((IResource) inputFile), true);
 		Element target = (Element) res.getContents().get(0);
 		stats.process(target);
-		errorSB.append(parseErrManager.getReporter((IResource) inputFile).toString());
-		
-		for (String supportingFileName : supportingFiles) {
+		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
+				.toString());
+
+		for (String supportingFileName : usedSupportingFiles) {
 			IFile supportingFile = systemFiles.get(supportingFileName);
 			res = resourceSet.getResource(OsateResourceUtil
 					.getResourceURI((IResource) supportingFile), true);
 			target = (Element) res.getContents().get(0);
 			stats.process(target);
-			errorSB.append(parseErrManager.getReporter((IResource) supportingFile).toString());
+			errorSB.append(parseErrManager.getReporter(
+					(IResource) supportingFile).toString());
 		}
 		XStream xs = new XStream();
 
 		try {
-			testExpectedResult(systemName, xs.toXML(stats.getSystemModel()), errorSB.toString());
+			testExpectedResult(testName, systemName,
+					xs.toXML(stats.getSystemModel()), errorSB.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void testExpectedResult(final String name, final String content, final String errors)
+	private void testExpectedResult(final String testName,
+			final String systemName, final String content, final String errors)
 			throws URISyntaxException, IOException, Exception {
 
 		URL testDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(TEST_DIR);
 		File testDir = new File(FileLocator.toFileURL(testDirUrl).getPath());
 
-		final File expected = new File(testDir, "expected/" + name + ".xml");
-		final File result = new File(testDir, "actual/" + name + ".xml");
+		final File expected = new File(testDir, "expected/" + testName + ".xml");
+		final File result = new File(testDir, "actual/" + testName + ".xml");
 		if (GENERATE_EXPECTED) {
 			expected.getParentFile().mkdirs();
 			Files.write(errors + content, expected, StandardCharsets.US_ASCII);
@@ -223,7 +245,20 @@ public class SampleTest {
 
 	@Test
 	public void testPulseOxSystem() {
-		runTest("PulseOx_SmartAlarm_System");
+		HashSet<String> usedProperties = new HashSet<>();
+		usedProperties.add("MAP_Properties");
+		usedProperties.add("PulseOx_SmartAlarm_Properties");
+		runTest("PulseOx", "PulseOx_SmartAlarm_System", usedProperties,
+				supportingFiles);
+	}
+
+	@Test
+	public void testNoWCET() {
+		HashSet<String> usedProperties = new HashSet<>();
+		usedProperties.add("MAP_Properties");
+		usedProperties.add("PulseOx_SmartAlarmNoWCET_Properties");
+		runTest("PulseOxNoWCET", "PulseOx_SmartAlarm_System", usedProperties,
+				supportingFiles);
 	}
 
 	private class ReadFileIntoString implements LineProcessor<String> {
