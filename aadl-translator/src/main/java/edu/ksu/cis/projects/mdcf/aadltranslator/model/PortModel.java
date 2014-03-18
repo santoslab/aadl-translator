@@ -1,8 +1,11 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 public class PortModel {
+	private enum PortCategory {EVENT, DATA, EVENTDATA};
+	
 	private String name;
 	private boolean subscribe;
+	private PortCategory category;
 	private String type;
 	private int minPeriod;
 	private int maxPeriod;
@@ -15,6 +18,26 @@ public class PortModel {
 		return subscribe;
 	}
 	
+	public boolean isData() {
+		return category == PortCategory.DATA;
+	}
+	
+	public boolean isEventData() {
+		return category == PortCategory.EVENTDATA;
+	}
+
+	public void setEvent() {
+		this.category = PortCategory.EVENT;
+	}
+
+	public void setData() {
+		this.category = PortCategory.DATA;
+	}
+
+	public void setEventData() {
+		this.category = PortCategory.EVENTDATA;
+	}
+
 	public String getType() {
 		return type;
 	}

@@ -8,6 +8,7 @@ class(model) ::=<<
   <initAndGetters(model)>
   <subAndPubChannelAssignments(model)>
   <abstractMethods(model)>
+  <concreteMethods(model)>
   <tasks(model)>
 }
 >>
@@ -53,12 +54,23 @@ abstractMethods(model) ::=<<
 
 protected abstract void initComponent();
   
-<model.receivePorts.keys:{k |<abstractListener(k, model.receivePorts.(k))>
+<model.receiveEventDataPorts.keys:{k |<abstractListener(k, model.receiveEventDataPorts.(k).type)>
 }>
 >>
 
 abstractListener(portName, portType) ::=<<
 protected abstract void <portName>ListenerOnMessage(MdcfMessage msg, <portType> <portName>Data);
+>>
+
+concreteMethods(model) ::=<<
+<model.receiveDataPorts.keys:{k |<concreteListener(k, model.receiveDataPorts.(k).type)>
+}>
+>>
+
+concreteListener(portName, portType) ::=<<
+private void <portName>ListenerOnMessage(MdcfMessage msg, <portType> <portName>Data){
+	this.<portName>Data = <portName>Data; 
+}
 >>
 
 subAndPubChannelAssignments(model) ::=<<
@@ -99,19 +111,18 @@ protected Map\<String, MdcfReceiverPort\<?>\> getReceiverPortMap(){
   return this.receiverPortMap;
 }
 
-<model.globals.keys:{k |<globalGetter(k, model.globals.(k))>
-}><model.globals.keys:{k |<globalSetter(k, model.globals.(k))>
+<model.receiveDataPorts.keys:{k |<getter(k, model.receiveDataPorts.(k).type)>
 }>
 >>
 
-globalGetter(name, type) ::=<<
-private <type> get<name>(){
-  return <name>;
+getter(name, type) ::=<<
+protected <type> get<name>Data(){
+  return <name>Data;
 }
 
 >>
 
-globalSetter(name, type) ::=<<
+setter(name, type) ::=<<
 private void set<name>(<type> val){
   <name> = val;
 }
@@ -150,11 +161,11 @@ public class <model.name>PseudoDevice extends LogicComponent{
 <endif>
   private HashMap\<String, Task> taskInstanceMap;
   private HashMap\<String, MdcfReceiverPort\<?>\> receiverPortMap;
-<model.globals.keys:{k |<globalDeclaration(k, model.globals.(k))>
+<model.receiveDataPorts.keys:{k |<globalDeclaration(k, model.receiveDataPorts.(k).type)>
 }> >>
 
 globalDeclaration(name, type) ::=<<
-  private <type> <name>;
+  private <type> <name>Data;
 >>
 
 packageAndImports(model) ::=<<

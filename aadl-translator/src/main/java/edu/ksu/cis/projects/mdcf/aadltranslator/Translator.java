@@ -12,6 +12,7 @@ import org.osate.aadl2.AccessConnection;
 import org.osate.aadl2.CallSpecification;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.DataAccess;
+import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DeviceSubcomponent;
 import org.osate.aadl2.DeviceType;
@@ -34,7 +35,6 @@ import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
-import org.osate.aadl2.modelsupport.errorreporting.AbstractParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.MarkerParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
@@ -162,11 +162,17 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 							"Attempted to define a process that wasn't declared as a system component");
 				}
 
-				if (checkCustomProperty(obj, "Component_Type", "enum", "Process Declaration") != null &&
-						checkCustomProperty(obj, "Component_Type", "enum","Process Declaration").equalsIgnoreCase("logic")) {
+				if (checkCustomProperty(obj, "Component_Type", "enum",
+						"Process Declaration") != null
+						&& checkCustomProperty(obj, "Component_Type", "enum",
+								"Process Declaration")
+								.equalsIgnoreCase("logic")) {
 					procModel.setDisplay(false);
-				} else if (checkCustomProperty(obj, "Component_Type", "enum", "Process Declaration") != null &&
-						checkCustomProperty(obj, "Component_Type", "enum", "Process Declaration").equalsIgnoreCase("display")) {
+				} else if (checkCustomProperty(obj, "Component_Type", "enum",
+						"Process Declaration") != null
+						&& checkCustomProperty(obj, "Component_Type", "enum",
+								"Process Declaration").equalsIgnoreCase(
+								"display")) {
 					procModel.setDisplay(true);
 				} else {
 					throw new PropertyOutOfRangeException(
@@ -191,62 +197,75 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		private void handlePort(Port obj) {
 			if (lastElemProcessed == ElementType.PROCESS) {
-				if (obj.getCategory() == PortCategory.EVENT_DATA) {
-					String typeName = null, minPeriod = null, maxPeriod = null;
-					Property prop;
-					try {
+				String typeName = null, minPeriod = null, maxPeriod = null;
+				Property prop;
+				try {
+					
+					if(obj.getCategory() == PortCategory.EVENT_DATA){
 						prop = GetProperties.lookupPropertyDefinition(
-								((EventDataPort) obj)
-										.getDataFeatureClassifier(),
+								((EventDataPort) obj).getDataFeatureClassifier(),
 								DataModel._NAME, DataModel.Data_Representation);
-						try {
-							typeName = getJavaType(PropertyUtils
-									.getEnumLiteral(obj, prop).getName());
-						} catch (PropertyNotPresentException e) {
-							throw new MissingRequiredPropertyException(
-									"Missing the required data representation");
-						}
-
-						minPeriod = checkCustomProperty(obj,
-								"Default_Output_Rate", "range_min", "Port");
-						maxPeriod = checkCustomProperty(obj,
-								"Default_Output_Rate", "range_max", "Port");
-
-						if (minPeriod == null || maxPeriod == null)
-							throw new MissingRequiredPropertyException(
-									"Missing the required output rate specification.");
-
-						PortModel pm = new PortModel();
-						pm.setName(obj.getName());
-						pm.setType(typeName);
-						pm.setMinPeriod(Integer.valueOf(minPeriod));
-						pm.setMaxPeriod(Integer.valueOf(maxPeriod));
-						if (obj.getDirection() == DirectionType.IN) {
-							pm.setSubscribe(true);
-						} else if (obj.getDirection() == DirectionType.OUT) {
-							pm.setSubscribe(false);
-						} else {
-							throw new NotImplementedException("Port "
-									+ obj.getName() + " is neither in nor out");
-						}
-						procModel.addPort(pm);
-					} catch (NotImplementedException
-							| MissingRequiredPropertyException
-							| DuplicateElementException e) {
-						handleException(obj, e);
-						return;
+					} else if (obj.getCategory() == PortCategory.DATA){
+						prop = GetProperties.lookupPropertyDefinition(
+								((DataPort) obj).getDataFeatureClassifier(),
+								DataModel._NAME, DataModel.Data_Representation);
+					} else {
+						throw new NotImplementedException("Ports must be either eventdata or data");
 					}
+					try {
+						typeName = getJavaType(PropertyUtils.getEnumLiteral(
+								obj, prop).getName());
+					} catch (PropertyNotPresentException e) {
+						throw new MissingRequiredPropertyException(
+								"Missing the required data representation");
+					}
+
+					minPeriod = checkCustomProperty(obj, "Default_Output_Rate",
+							"range_min", "Port");
+					maxPeriod = checkCustomProperty(obj, "Default_Output_Rate",
+							"range_max", "Port");
+
+					if (minPeriod == null || maxPeriod == null)
+						throw new MissingRequiredPropertyException(
+								"Missing the required output rate specification.");
+
+					PortModel pm = new PortModel();
+					pm.setName(obj.getName());
+					pm.setType(typeName);
+					pm.setMinPeriod(Integer.valueOf(minPeriod));
+					pm.setMaxPeriod(Integer.valueOf(maxPeriod));
+					if (obj.getDirection() == DirectionType.IN) {
+						pm.setSubscribe(true);
+					} else if (obj.getDirection() == DirectionType.OUT) {
+						pm.setSubscribe(false);
+					} else {
+						throw new NotImplementedException("Ports must be either in nor out");
+					}
+					if(obj.getCategory() == PortCategory.EVENT_DATA){
+						pm.setEventData();
+					} else if(obj.getCategory() == PortCategory.DATA){
+						pm.setData();
+					} // PortCategory.EVENT case handled above
+					procModel.addPort(pm);
+				} catch (NotImplementedException
+						| MissingRequiredPropertyException
+						| DuplicateElementException e) {
+					handleException(obj, e);
+					return;
 				}
 			}
 		}
 
 		private void handleException(Element obj, Exception e) {
 			INode node = NodeModelUtils.findActualNodeFor(obj);
-			IResource file = OsateResourceUtil.convertToIResource(obj.eResource());
+			IResource file = OsateResourceUtil.convertToIResource(obj
+					.eResource());
 			ParseErrorReporter errReporter = errorManager.getReporter(file);
-			if(errReporter instanceof MarkerParseErrorReporter)
-				((MarkerParseErrorReporter) errReporter).setContextResource(obj.eResource());
-			errReporter.error(obj.eResource().getURI().lastSegment(), node.getStartLine(), e.getMessage());
+			if (errReporter instanceof MarkerParseErrorReporter)
+				((MarkerParseErrorReporter) errReporter).setContextResource(obj
+						.eResource());
+			errReporter.error(obj.eResource().getURI().lastSegment(),
+					node.getStartLine(), e.getMessage());
 			cancelTraversal();
 		}
 
@@ -443,6 +462,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				// NumberValue nv =
 				// (NumberValue)PropertyUtils.getSimplePropertyValue(obj, prop);
 				// nv.getUnit()
+				int six = 7;
+
+				if (GetProperties.findUnitLiteral(prop, "ms") == null)
+					six = 8;
 
 				return getStringFromScaledNumber(
 						PropertyUtils.getScaledNumberValue(obj, prop,

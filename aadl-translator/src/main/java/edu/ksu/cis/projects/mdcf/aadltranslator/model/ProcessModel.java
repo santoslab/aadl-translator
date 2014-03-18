@@ -68,8 +68,12 @@ public class ProcessModel implements IComponentModel{
 		return ports;
 	}
 	
-	public Map<String, PortModel> getReceivePorts() {
-		return Maps.filterValues(ports, receivePortFilter);
+	public Map<String, PortModel> getReceiveEventDataPorts() {
+		return Maps.filterValues(ports, receiveEventDataPortFilter);
+	}
+	
+	public Map<String, PortModel> getReceiveDataPorts() {
+		return Maps.filterValues(ports, receiveDataPortFilter);
 	}
 	
 	public Map<String, PortModel> getSendPorts() {
@@ -143,9 +147,15 @@ public class ProcessModel implements IComponentModel{
 		methods.get(methodName).setRetType(returnType);
 	}
 	
-	Predicate<PortModel> receivePortFilter = new Predicate<PortModel>() {
+	Predicate<PortModel> receiveEventDataPortFilter = new Predicate<PortModel>() {
 		public boolean apply(PortModel pm) {
-			return pm.isSubscribe();
+			return pm.isSubscribe() && pm.isEventData();
+		}
+	};
+	
+	Predicate<PortModel> receiveDataPortFilter = new Predicate<PortModel>() {
+		public boolean apply(PortModel pm) {
+			return pm.isSubscribe() && pm.isData();
 		}
 	};
 	
