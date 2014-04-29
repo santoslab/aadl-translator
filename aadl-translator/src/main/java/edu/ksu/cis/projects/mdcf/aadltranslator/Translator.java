@@ -4,12 +4,10 @@ import java.util.ArrayList;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AccessConnection;
-import org.osate.aadl2.CallSpecification;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataPort;
@@ -28,9 +26,7 @@ import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertySet;
-import org.osate.aadl2.SubprogramCall;
 import org.osate.aadl2.SubprogramCallSequence;
-import org.osate.aadl2.SubprogramImplementation;
 import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
@@ -348,9 +344,9 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		@Override
 		public String caseSubprogramCallSequence(SubprogramCallSequence obj) {
-			handleCallSequence(
-					((ThreadImplementation) obj.getOwner()).getTypeName(),
-					obj.getOwnedCallSpecifications());
+//			handleCallSequence(
+//					((ThreadImplementation) obj.getOwner()).getTypeName(),
+//					obj.getOwnedCallSpecifications());
 			return NOT_DONE;
 		}
 
@@ -500,19 +496,19 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						+ " ms, which cannot be converted to an integer");
 		}
 
-		private void handleCallSequence(String taskName,
-				EList<CallSpecification> calls) {
-			TaskModel task = procModel.getTask(taskName);
-			SubprogramCall call;
-			SubprogramImplementation subProgramImpl;
-			for (CallSpecification callSpec : calls) {
-				call = (SubprogramCall) callSpec;
-				subProgramImpl = (SubprogramImplementation) call
-						.getCalledSubprogram();
-				task.addCalledMethod(call.getName(),
-						subProgramImpl.getTypeName());
-			}
-		}
+//		private void handleCallSequence(String taskName,
+//				EList<CallSpecification> calls) {
+//			TaskModel task = procModel.getTask(taskName);
+//			SubprogramCall call;
+//			SubprogramImplementation subProgramImpl;
+//			for (CallSpecification callSpec : calls) {
+//				call = (SubprogramCall) callSpec;
+//				subProgramImpl = (SubprogramImplementation) call
+//						.getCalledSubprogram();
+//				task.addCalledMethod(call.getName(),
+//						subProgramImpl.getTypeName());
+//			}
+//		}
 
 		private void handleProcessPortConnection(PortConnection obj) {
 			String taskName, localName, portName, portType;

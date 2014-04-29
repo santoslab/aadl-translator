@@ -121,11 +121,12 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			}
 			AadlPackage pack = (AadlPackage) target;
 			PublicPackageSection sect = pack.getPublicSection();
-			Classifier ownedClassifier = sect.getOwnedClassifiers().get(0);
-			if ((ownedClassifier instanceof org.osate.aadl2.System)) {
-				fileList.addFirst(f);
-			} else {
-				fileList.addLast(f);
+			for(Classifier ownedClassifier : sect.getOwnedClassifiers()){
+				if ((ownedClassifier instanceof org.osate.aadl2.SystemType)) {
+					fileList.addFirst(f);
+				} else {
+					fileList.addLast(f);
+				}
 			}
 		}
 
