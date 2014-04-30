@@ -4,7 +4,7 @@ Bundle-Name: Aadl-translator-test
 Bundle-SymbolicName: edu.ksu.cis.projects.mdcf.aadl-translator-test
 Bundle-Version: 0.1.0.qualifier
 Bundle-Vendor: SAnToS Lab @ K-State
-Fragment-Host: aadl-translator;bundle-version="[0.1.0,2.0.0)"
+Fragment-Host: edu.ksu.cis.projects.mdcf.aadl-translator;bundle-version="[0.1.0,2.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.ui.workbench,
  org.junit,

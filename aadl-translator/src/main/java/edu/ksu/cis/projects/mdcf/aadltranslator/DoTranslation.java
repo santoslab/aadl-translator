@@ -3,7 +3,6 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -100,9 +99,10 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		ResourceSet rs = OsateResourceUtil.createResourceSet();
 		HashSet<IFile> files = TraverseWorkspace
 				.getAadlandInstanceFilesInWorkspace();
-		LinkedList<IFile> fileList = new LinkedList<>();
 
 		monitor.beginTask("Translating AADL to Java / MIDAS", files.size() + 1);
+
+		IFile systemFile = null;
 
 		Translator stats = new Translator(monitor);
 		HashSet<IFile> usedFiles = this.getUsedFiles();
@@ -121,39 +121,54 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			}
 			AadlPackage pack = (AadlPackage) target;
 			PublicPackageSection sect = pack.getPublicSection();
-			for(Classifier ownedClassifier : sect.getOwnedClassifiers()){
+			for (Classifier ownedClassifier : sect.getOwnedClassifiers()) {
 				if ((ownedClassifier instanceof org.osate.aadl2.SystemType)) {
-					fileList.addFirst(f);
-				} else {
-					fileList.addLast(f);
+					systemFile = f;
+					usedFiles.remove(f);
+					break;
 				}
 			}
 		}
 
 		// The ParseErrorReporter provided by the OSATE model support is nearly
 		// perfect here, we only change the marker id (much of the code is
-		// directly lifted from elsewhere in the OSATE codebase 
+		// directly lifted from elsewhere in the OSATE codebase
 		final ParseErrorReporterFactory parseErrorLoggerFactory = new LogParseErrorReporter.Factory(
 				OsateCorePlugin.getDefault().getBundle());
 		final ParseErrorReporterManager parseErrManager = new ParseErrorReporterManager(
 				new MarkerParseErrorReporter.Factory(
-//						"edu.ksu.cis.projects.mdcf.aadl-translator.TranslatorErrorMarker",
-						"aadl-translator.TranslatorErrorMarker",
+						"edu.ksu.cis.projects.mdcf.aadl-translator.TranslatorErrorMarker",
+						// "aadl-translator.TranslatorErrorMarker",
 						parseErrorLoggerFactory));
 
 		stats.setErrorManager(parseErrManager);
-		// Now we process all the files, with the system first.
-		for (IFile f : fileList) {
-			Resource res = rs.getResource(
+
+		// Process the system first...
+		Resource res = rs.getResource(
+				OsateResourceUtil.getResourceURI((IResource) systemFile), true);
+
+		// Delete any existing error markers in the system file
+		IResource file = OsateResourceUtil.convertToIResource(res);
+		ParseErrorReporter errReporter = parseErrManager.getReporter(file);
+		((MarkerParseErrorReporter) errReporter).setContextResource(res);
+		errReporter.deleteMessages();
+
+		Element target = (Element) res.getContents().get(0);
+		stats.process(target);
+		monitor.worked(1);
+
+		// Now process all the other files
+		for (IFile f : usedFiles) {
+			res = rs.getResource(
 					OsateResourceUtil.getResourceURI((IResource) f), true);
 
-			// Delete any existing error markers
-			IResource file = OsateResourceUtil.convertToIResource(res);
-			ParseErrorReporter errReporter = parseErrManager.getReporter(file);
+			// Delete any existing error markers in this file
+			file = OsateResourceUtil.convertToIResource(res);
+			errReporter = parseErrManager.getReporter(file);
 			((MarkerParseErrorReporter) errReporter).setContextResource(res);
 			errReporter.deleteMessages();
-			
-			Element target = (Element) res.getContents().get(0);
+
+			target = (Element) res.getContents().get(0);
 			stats.process(target);
 			monitor.worked(1);
 		}
@@ -169,9 +184,11 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		IPreferencesService service = Platform.getPreferencesService();
 		boolean generateShells = service.getBoolean(
 				"edu.ksu.cis.projects.mdcf.aadl-translator",
+				// "aadl-translator",
 				PreferenceConstants.P_USERSHELLS, true, null);
 		String appDevDirectory = service.getString(
 				"edu.ksu.cis.projects.mdcf.aadl-translator",
+				// "aadl-translator",
 				PreferenceConstants.P_APPDEVPATH, null, null);
 
 		midas_compsigSTG.delimiterStartChar = '$';
@@ -196,8 +213,10 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		appSpecContents = midas_appspecSTG.getInstanceOf("appspec")
 				.add("system", stats.getSystemModel()).render();
 
-		WriteOutputFiles.writeFiles(compsigs, javaClasses, appName,
-				appSpecContents, appDevDirectory);
+		if (stats.notCancelled()) {
+			WriteOutputFiles.writeFiles(compsigs, javaClasses, appName,
+					appSpecContents, appDevDirectory);
+		}
 
 		monitor.worked(1);
 

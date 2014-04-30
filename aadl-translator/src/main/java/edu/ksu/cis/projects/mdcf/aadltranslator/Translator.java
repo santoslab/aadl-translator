@@ -458,11 +458,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				// NumberValue nv =
 				// (NumberValue)PropertyUtils.getSimplePropertyValue(obj, prop);
 				// nv.getUnit()
-				int six = 7;
-
-				if (GetProperties.findUnitLiteral(prop, "ms") == null)
-					six = 8;
-
+				
 				return getStringFromScaledNumber(
 						PropertyUtils.getScaledNumberValue(obj, prop,
 								GetProperties.findUnitLiteral(prop, "ms")),

@@ -46,7 +46,7 @@ import com.thoughtworks.xstream.XStream;
 import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFactory;
 
-public class SampleTest {
+public class PulseOxSmartAlarmTests {
 
 	private static HashMap<String, IFile> systemFiles = new HashMap<>();
 	private static ResourceSet resourceSet;
