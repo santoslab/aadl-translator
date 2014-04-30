@@ -230,6 +230,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -246,6 +247,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -259,6 +261,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>false</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -275,6 +278,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -288,6 +292,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>false</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -301,6 +306,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>false</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -314,6 +320,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>false</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -327,6 +334,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>false</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -343,6 +351,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -359,6 +368,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -375,6 +385,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -391,6 +402,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -407,6 +419,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -423,6 +436,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -439,6 +453,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -455,6 +470,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -468,6 +484,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>false</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -484,6 +501,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -500,6 +518,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -507,16 +526,25 @@
         </tasks>
         <globals/>
         <methods/>
-        <receiveEventDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$1">
+        <receivePortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$1">
+          <outer-class reference="../.."/>
+        </receivePortFilter>
+        <receiveEventDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$2">
           <outer-class reference="../.."/>
         </receiveEventDataPortFilter>
-        <receiveDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$2">
+        <receiveEventPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$3">
+          <outer-class reference="../.."/>
+        </receiveEventPortFilter>
+        <receiveDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$4">
           <outer-class reference="../.."/>
         </receiveDataPortFilter>
-        <sendPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$3">
+        <sendPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$5">
           <outer-class reference="../.."/>
         </sendPortFilter>
-        <sporadicTaskFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$4">
+        <periodicTaskFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$6">
+          <outer-class reference="../.."/>
+        </periodicTaskFilter>
+        <sporadicTaskFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$7">
           <outer-class reference="../.."/>
         </sporadicTaskFilter>
       </edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
@@ -750,6 +778,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -763,6 +792,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>false</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -779,6 +809,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -792,6 +823,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>false</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -808,6 +840,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -824,6 +857,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -840,6 +874,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -856,6 +891,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -872,6 +908,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -888,6 +925,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -904,6 +942,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -920,6 +959,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -936,6 +976,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -952,6 +993,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -968,6 +1010,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -984,6 +1027,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1000,6 +1044,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1013,6 +1058,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>false</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1029,6 +1075,7 @@
               <period>1000</period>
               <deadline>1000</deadline>
               <sporadic>true</sporadic>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1036,16 +1083,25 @@
         </tasks>
         <globals/>
         <methods/>
-        <receiveEventDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$1">
+        <receivePortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$1">
+          <outer-class reference="../.."/>
+        </receivePortFilter>
+        <receiveEventDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$2">
           <outer-class reference="../.."/>
         </receiveEventDataPortFilter>
-        <receiveDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$2">
+        <receiveEventPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$3">
+          <outer-class reference="../.."/>
+        </receiveEventPortFilter>
+        <receiveDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$4">
           <outer-class reference="../.."/>
         </receiveDataPortFilter>
-        <sendPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$3">
+        <sendPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$5">
           <outer-class reference="../.."/>
         </sendPortFilter>
-        <sporadicTaskFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$4">
+        <periodicTaskFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$6">
+          <outer-class reference="../.."/>
+        </periodicTaskFilter>
+        <sporadicTaskFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$7">
           <outer-class reference="../.."/>
         </sporadicTaskFilter>
       </edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>

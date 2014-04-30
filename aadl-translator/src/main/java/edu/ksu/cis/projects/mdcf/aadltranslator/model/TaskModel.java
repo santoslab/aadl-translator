@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 
 public class TaskModel {
-	
+
 	/**
 	 * The name of this task
 	 */
@@ -31,17 +31,17 @@ public class TaskModel {
 	 * This is a list of globals read by this task.
 	 */
 	private ArrayList<VariableModel> incomingGlobals;
-	
+
 	/**
 	 * This is a list of globals written by this task.
 	 */
 	private ArrayList<VariableModel> outgoingGlobals;
-	
+
 	/**
 	 * This task's period in milliseconds
 	 */
 	private int period;
-	
+
 	/**
 	 * This task's deadline in milliseconds
 	 */
@@ -51,39 +51,37 @@ public class TaskModel {
 	 * The type of this task's trigger -- periodic, sporadic, etc.
 	 */
 	private boolean sporadic;
-	
-	public boolean isSporadic() {
-		return sporadic;
-	}
 
-	public void setSporadic(boolean sporadic) {
-		this.sporadic = sporadic;
-	}
+	/**
+	 * Whether or not this task is triggered by an event (ie, a message without
+	 * a payload)
+	 */
+	private boolean eventTriggered;
 
 	/**
 	 * This task's worst case execution time
 	 */
 	private int wcet;
 
-//	/**
-//	 * The names of called methods mapped to the variables that make up the
-//	 * parameter list
-//	 */
-//	private HashMap<String, ArrayList<String>> methodParameters;
-//	
-//	/**
-//	 * This maps the task's name for a method to its real name
-//	 */
-//	private HashMap<String, String> methodNames;
-//	
+	// /**
+	// * The names of called methods mapped to the variables that make up the
+	// * parameter list
+	// */
+	// private HashMap<String, ArrayList<String>> methodParameters;
+	//
+	// /**
+	// * This maps the task's name for a method to its real name
+	// */
+	// private HashMap<String, String> methodNames;
+	//
 	private ArrayList<CallModel> callSequence;
 
 	public TaskModel(String name) {
 		incomingGlobals = new ArrayList<>();
 		outgoingGlobals = new ArrayList<>();
 		callSequence = new ArrayList<>();
-//		methodParameters = new HashMap<>();
-//		methodNames = new HashMap<>();
+		// methodParameters = new HashMap<>();
+		// methodNames = new HashMap<>();
 		trigPortName = null;
 		this.name = name;
 	}
@@ -93,11 +91,12 @@ public class TaskModel {
 	}
 
 	public void setTrigPortInfo(String portName, String portType,
-			String localName) throws NotImplementedException {
+			String localName, boolean isEventTriggered) throws NotImplementedException {
 		if (this.trigPortName == null) {
 			trigPortName = portName;
 			trigPortType = portType;
 			trigPortLocalName = localName;
+			eventTriggered = isEventTriggered;
 		} else {
 			throw new NotImplementedException("The task" + name
 					+ " with triggering port " + this.trigPortName
@@ -114,31 +113,34 @@ public class TaskModel {
 	}
 
 	public void addCalledMethod(String internalName, String externalName) {
-		//TODO: Handle pre-existing method
-//		methodParameters.put(internalName, new ArrayList<String>());
-//		methodNames.put(internalName, externalName);
+		// TODO: Handle pre-existing method
+		// methodParameters.put(internalName, new ArrayList<String>());
+		// methodNames.put(internalName, externalName);
 		callSequence.add(new CallModel(internalName, externalName));
 	}
-	
+
 	/**
 	 * This gets the name of a method from a task's local name for it
-	 * @param internalName The task's name for a method
+	 * 
+	 * @param internalName
+	 *            The task's name for a method
 	 * @return The method's actual name
 	 */
 	public String getMethodProcessName(String internalName) {
-		for(CallModel call : callSequence){
-			if(call.getInternalName().equals(internalName)){
+		for (CallModel call : callSequence) {
+			if (call.getInternalName().equals(internalName)) {
 				return call.getExternalName();
 			}
 		}
 		return null;
 	}
-	
-	public void addParameterToCalledMethod(String internalName, String formal, String actual){
-		//TODO: Handle wrong method name
-//		methodParameters.get(methodName).add(parameter);
-		for(CallModel call : callSequence){
-			if(call.getInternalName().equals(internalName)){
+
+	public void addParameterToCalledMethod(String internalName, String formal,
+			String actual) {
+		// TODO: Handle wrong method name
+		// methodParameters.get(methodName).add(parameter);
+		for (CallModel call : callSequence) {
+			if (call.getInternalName().equals(internalName)) {
 				call.addParam(formal, actual);
 			}
 		}
@@ -196,11 +198,28 @@ public class TaskModel {
 		this.wcet = wcet;
 	}
 
-	public void addReturnToCalledMethod(String internalName, String methodName,	String taskName) {
-		
+	public void addReturnToCalledMethod(String internalName, String methodName,
+			String taskName) {
+
 	}
 
-//	public HashMap<String, ArrayList<String>> getMethodParameters() {
-//		return methodParameters;
-//	}
+	public boolean isEventTriggered() {
+		return eventTriggered;
+	}
+
+	public void setEventTriggered(boolean eventTriggered) {
+		this.eventTriggered = eventTriggered;
+	}
+
+	public boolean isSporadic() {
+		return sporadic;
+	}
+
+	public void setSporadic(boolean sporadic) {
+		this.sporadic = sporadic;
+	}
+
+	// public HashMap<String, ArrayList<String>> getMethodParameters() {
+	// return methodParameters;
+	// }
 }

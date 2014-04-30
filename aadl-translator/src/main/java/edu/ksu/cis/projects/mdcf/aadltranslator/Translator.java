@@ -194,23 +194,27 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		private void handlePort(Port obj) {
 			if (lastElemProcessed == ElementType.PROCESS) {
 				String typeName = null, minPeriod = null, maxPeriod = null;
-				Property prop;
+				Property typeNameProp = null;
 				try {
 					
 					if(obj.getCategory() == PortCategory.EVENT_DATA){
-						prop = GetProperties.lookupPropertyDefinition(
+						typeNameProp = GetProperties.lookupPropertyDefinition(
 								((EventDataPort) obj).getDataFeatureClassifier(),
 								DataModel._NAME, DataModel.Data_Representation);
 					} else if (obj.getCategory() == PortCategory.DATA){
-						prop = GetProperties.lookupPropertyDefinition(
+						typeNameProp = GetProperties.lookupPropertyDefinition(
 								((DataPort) obj).getDataFeatureClassifier(),
 								DataModel._NAME, DataModel.Data_Representation);
-					} else {
-						throw new NotImplementedException("Ports must be either eventdata or data");
+					} else if (obj.getCategory() == PortCategory.EVENT){
+						// Do nothing, we have an event port
 					}
 					try {
-						typeName = getJavaType(PropertyUtils.getEnumLiteral(
-								obj, prop).getName());
+						if(typeNameProp != null) {
+							typeName = getJavaType(PropertyUtils.getEnumLiteral(
+									obj, typeNameProp).getName());
+						} else {
+							typeName = getJavaType(null);
+						}
 					} catch (PropertyNotPresentException e) {
 						throw new MissingRequiredPropertyException(
 								"Missing the required data representation");
@@ -241,7 +245,9 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						pm.setEventData();
 					} else if(obj.getCategory() == PortCategory.DATA){
 						pm.setData();
-					} // PortCategory.EVENT case handled above
+					} else if(obj.getCategory() == PortCategory.EVENT){
+						pm.setEvent();
+					}
 					procModel.addPort(pm);
 				} catch (NotImplementedException
 						| MissingRequiredPropertyException
@@ -276,7 +282,9 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 *             Thrown if there's no java equivalent of the supplied type
 		 */
 		private String getJavaType(String name) throws NotImplementedException {
-			if (name.equals("Integer") || name.equals("Double")
+			if (name == null){
+				return "Object";
+			} else if (name.equals("Integer") || name.equals("Double")
 					|| name.equals("Boolean")) {
 				return name;
 			} else {
@@ -519,18 +527,21 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				task = procModel.getTask(taskName);
 			} else {
 				// From process to thread
+				boolean eventTriggered;
 				taskName = ((ThreadType) obj.getAllDestination().getOwner())
 						.getName();
 				localName = obj.getAllDestination().getName();
 				portName = obj.getAllSource().getName();
-				portType = procModel.getPortByName(portName).getType();
 				task = procModel.getTask(taskName);
+				eventTriggered = procModel.getPortByName(portName).isEvent();
+				portType = procModel.getPortByName(portName).getType();
 				try {
-					task.setTrigPortInfo(portName, portType, localName);
+					task.setTrigPortInfo(portName, portType, localName, eventTriggered);
 				} catch (NotImplementedException e) {
 					handleException(obj, e);
 					return;
 				}
+			
 			}
 		}
 

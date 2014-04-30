@@ -14,14 +14,28 @@ public class <model.name> extends <model.name>SuperType {
     // TODO Fill in custom initialization code here
   }
   <model.sporadicTasks.values:{v |<userImplOnMessageStub(v)>
+  }>  
+  <model.periodicTasks.keys:{k |<userImplStub(k)>
   }>}
+>>
+
+userImplStub(taskName) ::=<<
+
+
+@Override
+protected void <taskName>Method(){
+  // TODO: Fill in custom periodic code here
+}
 >>
 
 userImplOnMessageStub(taskModel) ::=<<
 
-
 @Override
+<if(!taskModel.eventTriggered)>
 protected void <taskModel.trigPortName>ListenerOnMessage(MdcfMessage msg, <taskModel.trigPortType> <taskModel.trigPortName>Data) {
+<else>
+protected void <taskModel.trigPortName>ListenerOnMessage(MdcfMessage msg) {
+<endif>
   // TODO Fill in custom listener code here
 }
 >>

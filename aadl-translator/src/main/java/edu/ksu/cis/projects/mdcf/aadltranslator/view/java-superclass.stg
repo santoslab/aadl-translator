@@ -14,10 +14,11 @@ class(model) ::=<<
 >>
 
 tasks(model) ::=<<
-<model.tasks.keys:{k |<task(k, model.tasks.(k))>}>
+<model.sporadicTasks.keys:{k |<sporadicTask(k, model.sporadicTasks.(k))>}>
+<model.periodicTasks.keys:{k |<periodicTask(k, model.periodicTasks.(k))>}>
 >>
 
-task(taskName, taskModel) ::=<<
+sporadicTask(taskName, taskModel) ::=<<
 
 
 public class <taskName>Task implements Task {
@@ -29,12 +30,33 @@ public class <taskName>Task implements Task {
     }>
     MdcfMessage message = <taskModel.trigPortName>ReceiverPort.getReceiver().getLastMsg();
     try {
-      <taskModel.trigPortType> <taskModel.trigPortLocalName>Data = <taskModel.trigPortName>ReceiverPort.getLastMsgContent();
-      <taskModel.trigPortLocalName>ListenerOnMessage(message, <taskModel.trigPortLocalName>Data);
+      <if(!taskModel.eventTriggered)>
+        <taskModel.trigPortType> <taskModel.trigPortLocalName>Data = <taskModel.trigPortName>ReceiverPort.getLastMsgContent();
+        <taskModel.trigPortLocalName>ListenerOnMessage(message, <taskModel.trigPortLocalName>Data);
+      <else>
+        <taskModel.trigPortLocalName>ListenerOnMessage(message);
+      <endif>
     } catch (MdcfDecodeMessageException e) {
       System.err.println(getComponentTypeName() + ".<taskName>Task task: invalid message:" + message.getTextMsg());
       e.printStackTrace();
     }
+    <taskModel.outgoingGlobals:{vm | <updateGlobal(vm.innerName, vm.outerName)>
+    }>
+  }
+}
+>>
+
+periodicTask(taskName, taskModel) ::=<<
+
+
+public class <taskName>Task implements Task {
+<[taskModel.incomingGlobals, taskModel.outgoingGlobals]:{vm | <globalDeclaration(vm.innerName, vm.type)>
+}>
+  @Override
+  public void run() {
+    <taskModel.incomingGlobals:{vm | <initGlobal(vm.innerName, vm.outerName)>
+    }>
+      <taskName>Method();
     <taskModel.outgoingGlobals:{vm | <updateGlobal(vm.innerName, vm.outerName)>
     }>
   }
@@ -54,12 +76,24 @@ abstractMethods(model) ::=<<
 
 protected abstract void initComponent();
   
-<model.receiveEventDataPorts.keys:{k |<abstractListener(k, model.receiveEventDataPorts.(k).type)>
+<model.receiveEventDataPorts.keys:{k |<abstractTypedListener(k, model.receiveEventDataPorts.(k).type)>
+}>
+<model.receiveEventPorts.keys:{k |<abstractUntypedListener(k, model.receiveEventPorts.(k).type)>
+}>
+<model.periodicTasks.keys:{k |<abstractPeriodicTask(k)>
 }>
 >>
 
-abstractListener(portName, portType) ::=<<
+abstractPeriodicTask(taskName) ::=<<
+protected abstract void <taskName>Method();
+>>
+
+abstractTypedListener(portName, portType) ::=<<
 protected abstract void <portName>ListenerOnMessage(MdcfMessage msg, <portType> <portName>Data);
+>>
+
+abstractUntypedListener(portName, portType) ::=<<
+protected abstract void <portName>ListenerOnMessage(MdcfMessage msg);
 >>
 
 concreteMethods(model) ::=<<
@@ -144,7 +178,7 @@ receiverPortMapEntry(exchName) ::=<<
 >>
 
 taskInstanceMapEntry(exchName) ::=<<
-taskInstanceMap.put(<exchName>ReceiverTask.class.getSimpleName(), new <exchName>ReceiverTask());
+taskInstanceMap.put(<exchName>Task.class.getSimpleName(), new <exchName>Task());
 >>
 
 portDeclarations(port) ::=<<

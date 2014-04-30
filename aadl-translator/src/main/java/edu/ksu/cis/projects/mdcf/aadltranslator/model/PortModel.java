@@ -25,6 +25,10 @@ public class PortModel {
 	public boolean isEventData() {
 		return category == PortCategory.EVENTDATA;
 	}
+	
+	public boolean isEvent() {
+		return category == PortCategory.EVENT;
+	}
 
 	public void setEvent() {
 		this.category = PortCategory.EVENT;

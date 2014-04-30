@@ -68,8 +68,16 @@ public class ProcessModel implements IComponentModel{
 		return ports;
 	}
 	
+	public Map<String, PortModel> getReceivePorts() {
+		return Maps.filterValues(ports, receivePortFilter);
+	}
+	
 	public Map<String, PortModel> getReceiveEventDataPorts() {
 		return Maps.filterValues(ports, receiveEventDataPortFilter);
+	}
+	
+	public Map<String, PortModel> getReceiveEventPorts() {
+		return Maps.filterValues(ports, receiveEventPortFilter);
 	}
 	
 	public Map<String, PortModel> getReceiveDataPorts() {
@@ -86,6 +94,10 @@ public class ProcessModel implements IComponentModel{
 	
 	public Map<String, TaskModel> getSporadicTasks() {
 		return Maps.filterValues(tasks, sporadicTaskFilter);
+	}
+	
+	public Map<String, TaskModel> getPeriodicTasks() {
+		return Maps.filterValues(tasks, periodicTaskFilter);
 	}
 
 	public HashMap<String, String> getGlobals() {
@@ -147,9 +159,22 @@ public class ProcessModel implements IComponentModel{
 		methods.get(methodName).setRetType(returnType);
 	}
 	
+	//TODO: These predicates should probably be externalized
+	Predicate<PortModel> receivePortFilter = new Predicate<PortModel>() {
+		public boolean apply(PortModel pm) {
+			return pm.isSubscribe();
+		}
+	};
+	
 	Predicate<PortModel> receiveEventDataPortFilter = new Predicate<PortModel>() {
 		public boolean apply(PortModel pm) {
 			return pm.isSubscribe() && pm.isEventData();
+		}
+	};
+	
+	Predicate<PortModel> receiveEventPortFilter = new Predicate<PortModel>() {
+		public boolean apply(PortModel pm) {
+			return pm.isSubscribe() && pm.isEvent();
 		}
 	};
 	
@@ -162,6 +187,12 @@ public class ProcessModel implements IComponentModel{
 	Predicate<PortModel> sendPortFilter = new Predicate<PortModel>() {
 		public boolean apply(PortModel pm) {
 			return !pm.isSubscribe();
+		}
+	};
+	
+	Predicate<TaskModel> periodicTaskFilter = new Predicate<TaskModel>() {
+		public boolean apply(TaskModel tm) {
+			return !tm.isSporadic();
 		}
 	};
 	
