@@ -1,4 +1,4 @@
-Error at PulseOx_SmartAlarm_Logic.aadl:75: Thread WCET must either be set with Default_Thread_WCET (at package level) or with Timing_Properties::Compute_Execution_Time (on individual thread)
+Error at PulseOx_SmartAlarm_Logic.aadl:75: Thread period must either be set with Default_Thread_Period (at package level) or with Timing_Properties::Period (on individual thread)
 <edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel>
   <name>PulseOx_SmartAlarmSystem</name>
   <logicComponents>

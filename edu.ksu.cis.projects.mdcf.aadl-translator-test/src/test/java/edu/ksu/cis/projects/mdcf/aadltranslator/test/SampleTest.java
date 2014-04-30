@@ -30,7 +30,9 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterFactory;
@@ -46,18 +48,22 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFact
 
 public class SampleTest {
 
-	private HashMap<String, IFile> systemFiles = new HashMap<>();
-	private ResourceSet resourceSet;
+	private static HashMap<String, IFile> systemFiles = new HashMap<>();
+	private static ResourceSet resourceSet;
 	private Translator stats;
 
-	HashSet<String> supportingFiles = new HashSet<>();
-	HashSet<String> propertyFiles = new HashSet<>();
+	// This may need to turn into a map from system name -> the set of
+	// supporting files
+	private static HashSet<String> supportingFiles = new HashSet<>();
+	private static HashSet<String> propertyFiles = new HashSet<>();
 	private final boolean GENERATE_EXPECTED = false;
 
-	private final String BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator-test";
-	private final String TEST_DIR = "src/test/resources/edu/ksu/cis/projects/mdcf/aadltranslator/test/";
+	private final static String BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator-test";
+	private final static String TEST_DIR = "src/test/resources/edu/ksu/cis/projects/mdcf/aadltranslator/test/";
 
-	private IProject testProject = null;
+	private static IProject testProject = null;
+
+	private HashSet<String> usedProperties;
 
 	/*
 	 * The test runner is designed to not recreate everything for every test,
@@ -65,8 +71,8 @@ public class SampleTest {
 	 * changes, just delete everything that gets changed, and they will be reset
 	 * to defaults on the next run.
 	 */
-	@Before
-	public void setUp() {
+	@BeforeClass
+	public static void initialize() {
 		testProject = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject("TestProject");
 		resourceSet = OsateResourceUtil.createResourceSet();
@@ -120,7 +126,19 @@ public class SampleTest {
 		}
 	}
 
-	private void initFiles(IFolder packagesFolder, IFolder propertySetsFolder) {
+	@Before
+	public void setUp() {
+		usedProperties = new HashSet<>();
+		usedProperties.add("MAP_Properties");
+	}
+
+	@After
+	public void tearDown() {
+		usedProperties.clear();
+	}
+
+	private static void initFiles(IFolder packagesFolder,
+			IFolder propertySetsFolder) {
 		URL aadlDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
 				TEST_DIR + "aadl/");
 		URL aadlPropertysetsDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
@@ -150,9 +168,9 @@ public class SampleTest {
 				systemFiles, propertyFiles);
 	}
 
-	private void initFiles(IFolder packagesFolder, IFolder propertySetsFolder,
-			File dir, HashMap<String, IFile> fileMap,
-			HashSet<String> fileNameMap) {
+	private static void initFiles(IFolder packagesFolder,
+			IFolder propertySetsFolder, File dir,
+			HashMap<String, IFile> fileMap, HashSet<String> fileNameMap) {
 		String fileName = null;
 		try {
 			for (File f : dir.listFiles()) {
@@ -166,18 +184,15 @@ public class SampleTest {
 					fileMap.get(fileName).create(new FileInputStream(f), true,
 							null);
 				}
-				resourceSet.getResource(OsateResourceUtil
-						.getResourceURI((IResource) fileMap.get(fileName)),
-						true);
+				resourceSet.createResource(OsateResourceUtil
+						.getResourceURI((IResource) fileMap.get(fileName)));
 			}
 		} catch (IOException | CoreException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void runTest(final String testName, final String systemName,
-			final HashSet<String> usedPropertyFiles,
-			final HashSet<String> usedSupportingFiles) {
+	private void runTest(final String testName, final String systemName) {
 		StringBuilder errorSB = new StringBuilder();
 		IFile inputFile = systemFiles.get(systemName);
 		stats = new Translator(new NullProgressMonitor());
@@ -187,7 +202,7 @@ public class SampleTest {
 				parseErrorReporterFactory);
 
 		stats.setErrorManager(parseErrManager);
-		for (String propSetName : usedPropertyFiles) {
+		for (String propSetName : usedProperties) {
 			stats.addPropertySetName(propSetName);
 		}
 		Resource res = resourceSet.getResource(
@@ -197,7 +212,7 @@ public class SampleTest {
 		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
 				.toString());
 
-		for (String supportingFileName : usedSupportingFiles) {
+		for (String supportingFileName : supportingFiles) {
 			IFile supportingFile = systemFiles.get(supportingFileName);
 			res = resourceSet.getResource(OsateResourceUtil
 					.getResourceURI((IResource) supportingFile), true);
@@ -244,20 +259,44 @@ public class SampleTest {
 
 	@Test
 	public void testPulseOxSystem() {
-		HashSet<String> usedProperties = new HashSet<>();
-		usedProperties.add("MAP_Properties");
 		usedProperties.add("PulseOx_SmartAlarm_Properties");
-		runTest("PulseOx", "PulseOx_SmartAlarm_System", usedProperties,
-				supportingFiles);
+		runTest("PulseOx", "PulseOx_SmartAlarm_System");
+	}
+
+	@Test
+	public void testNoChannelDelay() {
+		usedProperties.add("PulseOx_SmartAlarmNoChannelDelay_Properties");
+		runTest("PulseOxNoChannelDelay", "PulseOx_SmartAlarm_System");
+	}
+
+	@Test
+	public void testNoOutputRate() {
+		usedProperties.add("PulseOx_SmartAlarmNoOutputRate_Properties");
+		runTest("PulseOxNoOutputRate", "PulseOx_SmartAlarm_System");
+	}
+
+	@Test
+	public void testNoThreadDeadline() {
+		usedProperties.add("PulseOx_SmartAlarmNoThreadDeadline_Properties");
+		runTest("PulseOxNoThreadDeadline", "PulseOx_SmartAlarm_System");
+	}
+
+	@Test
+	public void testNoThreadDispatch() {
+		usedProperties.add("PulseOx_SmartAlarmNoThreadDispatch_Properties");
+		runTest("PulseOxNoThreadDispatch", "PulseOx_SmartAlarm_System");
+	}
+
+	@Test
+	public void testNoThreadPeriod() {
+		usedProperties.add("PulseOx_SmartAlarmNoThreadPeriod_Properties");
+		runTest("PulseOxNoThreadPeriod", "PulseOx_SmartAlarm_System");
 	}
 
 	@Test
 	public void testNoWCET() {
-		HashSet<String> usedProperties = new HashSet<>();
-		usedProperties.add("MAP_Properties");
 		usedProperties.add("PulseOx_SmartAlarmNoWCET_Properties");
-		runTest("PulseOxNoWCET", "PulseOx_SmartAlarm_System", usedProperties,
-				supportingFiles);
+		runTest("PulseOxNoWCET", "PulseOx_SmartAlarm_System");
 	}
 
 	private class ReadFileIntoString implements LineProcessor<String> {

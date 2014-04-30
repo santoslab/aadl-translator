@@ -1,0 +1,75 @@
+Error at PulseOx_SmartAlarm_System.aadl:14: Missing required property 'Default_Channel_Delay'
+<edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel>
+  <name>PulseOx_SmartAlarmSystem</name>
+  <logicComponents>
+    <entry>
+      <string>appDisplay</string>
+      <edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
+        <name>PulseOx_SmartAlarm_Display_Process</name>
+        <display>false</display>
+        <ports/>
+        <tasks/>
+        <globals/>
+        <methods/>
+        <receiveEventDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$1">
+          <outer-class reference="../.."/>
+        </receiveEventDataPortFilter>
+        <receiveDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$2">
+          <outer-class reference="../.."/>
+        </receiveDataPortFilter>
+        <sendPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$3">
+          <outer-class reference="../.."/>
+        </sendPortFilter>
+        <sporadicTaskFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$4">
+          <outer-class reference="../.."/>
+        </sporadicTaskFilter>
+      </edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
+    </entry>
+    <entry>
+      <string>appLogic</string>
+      <edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
+        <name>PulseOx_SmartAlarm_Process</name>
+        <display>false</display>
+        <ports/>
+        <tasks/>
+        <globals/>
+        <methods/>
+        <receiveEventDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$1">
+          <outer-class reference="../.."/>
+        </receiveEventDataPortFilter>
+        <receiveDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$2">
+          <outer-class reference="../.."/>
+        </receiveDataPortFilter>
+        <sendPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$3">
+          <outer-class reference="../.."/>
+        </sendPortFilter>
+        <sporadicTaskFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$4">
+          <outer-class reference="../.."/>
+        </sporadicTaskFilter>
+      </edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
+    </entry>
+  </logicComponents>
+  <devices>
+    <entry>
+      <string>pulseOx</string>
+      <edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel>
+        <name>PulseOx</name>
+      </edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel>
+    </entry>
+  </devices>
+  <channels/>
+  <typeToComponent>
+    <entry>
+      <string>PulseOx_SmartAlarm_Process</string>
+      <edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel reference="../../../logicComponents/entry[2]/edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel"/>
+    </entry>
+    <entry>
+      <string>PulseOx_SmartAlarm_Display_Process</string>
+      <edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel reference="../../../logicComponents/entry/edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel"/>
+    </entry>
+    <entry>
+      <string>PulseOx</string>
+      <edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel reference="../../../devices/entry/edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel"/>
+    </entry>
+  </typeToComponent>
+</edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel>
