@@ -24,10 +24,10 @@
 		</dependency>
 	</dependencies>
 	<modules>
-		<module>../aadl-translator</module>
-		<module>../edu.ksu.cis.projects.mdcf.aadl-feature</module>
-		<module>../edu.ksu.cis.projects.mdcf.aadl-translator-test</module>
-		<module>../edu.ksu.cis.projects.mdcf.aadl-updatesite</module>
+		<module>aadl-translator</module>
+		<module>edu.ksu.cis.projects.mdcf.aadl-feature</module>
+		<module>edu.ksu.cis.projects.mdcf.aadl-translator-test</module>
+		<module>edu.ksu.cis.projects.mdcf.aadl-updatesite</module>
 	</modules>
 	<repositories>
 		<repository>

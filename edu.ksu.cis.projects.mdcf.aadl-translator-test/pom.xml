@@ -4,7 +4,7 @@
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<relativePath>../edu.ksu.cis.projects.mdcf.aadl-translator-build</relativePath>
+		<relativePath>..</relativePath>
 		<groupId>edu.ksu.cis.projects.mdcf</groupId>
 		<artifactId>aadl-translator</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
