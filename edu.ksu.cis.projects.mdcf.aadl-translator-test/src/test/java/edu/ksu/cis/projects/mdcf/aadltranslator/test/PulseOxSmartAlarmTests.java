@@ -38,6 +38,7 @@ import org.osate.aadl2.Element;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterFactory;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
+import org.osgi.framework.BundleException;
 
 import com.google.common.io.Files;
 import com.google.common.io.LineProcessor;
@@ -49,7 +50,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFact
 public class PulseOxSmartAlarmTests {
 
 	private static HashMap<String, IFile> systemFiles = new HashMap<>();
-	private static ResourceSet resourceSet;
+	private static ResourceSet resourceSet = null;
 	private Translator stats;
 
 	// This may need to turn into a map from system name -> the set of
@@ -65,17 +66,10 @@ public class PulseOxSmartAlarmTests {
 
 	private HashSet<String> usedProperties;
 
-	/*
-	 * The test runner is designed to not recreate everything for every test,
-	 * but rather create things as needed. So if a test makes destructive
-	 * changes, just delete everything that gets changed, and they will be reset
-	 * to defaults on the next run.
-	 */
 	@BeforeClass
 	public static void initialize() {
 		testProject = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject("TestProject");
-		resourceSet = OsateResourceUtil.createResourceSet();
 		try {
 
 			IHandlerService handlerService = (IHandlerService) PlatformUI
@@ -90,7 +84,7 @@ public class PulseOxSmartAlarmTests {
 
 			IProject pluginResources = ResourcesPlugin.getWorkspace().getRoot()
 					.getProject("Plugin_Resources");
-
+			
 			IProject[] referencedProjects = new IProject[] { pluginResources };
 			if (!testProject.isAccessible()) {
 				testProject.create(null);
@@ -116,8 +110,11 @@ public class PulseOxSmartAlarmTests {
 				propertySetsFolder.create(true, true, null);
 			}
 
+			resourceSet = OsateResourceUtil.createResourceSet();
+			
 			initFiles(packagesFolder, propertySetsFolder);
-
+			
+			resourceSet = OsateResourceUtil.createResourceSet();
 			testProject
 					.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
 		} catch (CoreException | ExecutionException | NotDefinedException
