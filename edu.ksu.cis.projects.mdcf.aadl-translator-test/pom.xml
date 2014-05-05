@@ -20,58 +20,13 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<version>${tycho.version}</version>
 				<configuration>
-					<testSuite>edu.ksu.cis.projects.mdcf.aadl-translator-test</testSuite> 
+					<testSuite>edu.ksu.cis.projects.mdcf.aadl-translator-test</testSuite>
 					<testClass>edu.ksu.cis.projects.mdcf.aadltranslator.test.PulseOxSmartAlarmTests</testClass>
 					<useUIHarness>true</useUIHarness>
 					<argLine>-XstartOnFirstThread</argLine>
-					<product>org.osate.branding.osate2</product>
-					<dependencies>
-						<dependency>
-							<groupId>org.osate</groupId>
-							<type>eclipse-plugin</type>
-							<artifactId>org.osate.aadl2</artifactId>
-							<version>${osate.version}</version>
-						</dependency>
-						<dependency>
-							<groupId>org.osate</groupId>
-							<type>eclipse-plugin</type>
-							<artifactId>org.osate.xtext.aadl2.properties.ui</artifactId>
-							<version>${osate.version}</version>
-						</dependency>
-						<dependency>
-							<groupId>org.eclipse</groupId>
-							<type>eclipse-plugin</type>
-							<artifactId>org.eclipse.equinox.ds</artifactId>
-							<version>0.0.0</version>
-						</dependency>
-						<dependency>
-							<groupId>org.osate</groupId>
-							<type>eclipse-plugin</type>
-							<artifactId>org.osate.xtext.aadl2.properties</artifactId>
-							<version>${osate.version}</version>
-						</dependency>
-						<dependency>
-							<groupId>org.osate</groupId>
-							<type>eclipse-plugin</type>
-							<artifactId>org.osate.aadl2.modelsupport</artifactId>
-							<version>${osate.version}</version>
-						</dependency>
-						<dependency>
-							<groupId>org.osate</groupId>
-							<type>eclipse-plugin</type>
-							<artifactId>org.osate.xtext.aadl2.errormodel.ui</artifactId>
-							<version>${osate.version}</version>
-						</dependency>
-						<dependency>
-							<groupId>org.osate</groupId>
-							<type>eclipse-plugin</type>
-							<artifactId>org.osate.xtext.aadl2.ui</artifactId>
-							<version>${osate.version}</version>
-						</dependency>
-					</dependencies>
 				</configuration>
 			</plugin>
-			<!-- plugin>
+			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
 				<version>${tycho.version}</version>
@@ -80,133 +35,13 @@
 						<extraRequirements>
 							<requirement>
 								<type>eclipse-plugin</type>
-								<id>edu.ksu.cis.projects.mdcf.aadl-translator</id>
-								<versionRange>${aadl-translator.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.aadl2</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.aadl2.edit</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.aadl2.errormodel.analysis</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.aadl2.instantiation</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.aadl2.model.editor</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.analysis.architecture</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.analysis.flows</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.annexsupport</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.branding</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.contribution.sei</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.help</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.pluginsupport</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.reporter</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.ui</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.wizards</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.workspace</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.xtext.aadl2</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.xtext.aadl2.errormodel</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.xtext.aadl2.errormodel.ui</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
 								<id>org.osate.xtext.aadl2.ui</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.xtext.aadl2.properties</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.xtext.aadl2.properties.ui</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.xtext.aadl2.properties</id>
-								<versionRange>${osate.version}</versionRange>
-							</requirement>
-							<requirement>
-								<type>eclipse-plugin</type>
-								<id>org.osate.aadl2.modelsupport</id>
 								<versionRange>${osate.version}</versionRange>
 							</requirement>
 						</extraRequirements>
 					</dependency-resolution>
 				</configuration>
-			</plugin -->
+			</plugin>
 		</plugins>
 	</build>
 </project>

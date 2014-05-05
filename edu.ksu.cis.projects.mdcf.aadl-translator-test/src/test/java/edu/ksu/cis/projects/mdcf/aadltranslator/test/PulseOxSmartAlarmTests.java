@@ -38,7 +38,6 @@ import org.osate.aadl2.Element;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterFactory;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
-import org.osgi.framework.BundleException;
 
 import com.google.common.io.Files;
 import com.google.common.io.LineProcessor;
