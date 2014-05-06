@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<psf version="2.0">
+<provider id="org.eclipse.egit.core.GitProvider">
+<project reference="1.0,git@github.com:santoslab/aadl-translator.git,master,edu.ksu.cis.projects.mdcf.aadl-feature"/>
+<project reference="1.0,git@github.com:santoslab/aadl-translator.git,master,aadl-translator"/>
+<project reference="1.0,git@github.com:santoslab/aadl-translator.git,master,edu.ksu.cis.projects.mdcf.aadl-translator-test"/>
+<project reference="1.0,git@github.com:santoslab/aadl-translator.git,master,edu.ksu.cis.projects.mdcf.aadl-updatesite"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.aadl2"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.aadl2.edit"/>
+<project reference="1.0,https://github.com/osate/ErrorModelV2.git,master,org.osate.aadl2.errormodel.analysis"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.instantiation"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.aadl2.metamodel"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.aadl2.model.editor"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.aadl2.modelsupport"/>
+<project reference="1.0,https://github.com/osate/osate2-plugins.git,master,org.osate.analysis.architecture"/>
+<project reference="1.0,https://github.com/osate/osate2-plugins.git,master,org.osate.analysis.flows"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.annexsupport"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.branding"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.build.main"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.build.product"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.build.target"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.contribution.sei"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.core"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.core.feature"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.core.source.feature"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.help"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.pluginsupport"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.reporter"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.ui"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.wizards"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.workspace"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.xtext.aadl2"/>
+<project reference="1.0,https://github.com/osate/ErrorModelV2.git,master,org.osate.xtext.aadl2.errormodel"/>
+<project reference="1.0,https://github.com/osate/ErrorModelV2.git,master,org.osate.xtext.aadl2.errormodel.feature"/>
+<project reference="1.0,https://github.com/osate/ErrorModelV2.git,master,org.osate.xtext.aadl2.errormodel.ui"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.xtext.aadl2.properties"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.xtext.aadl2.properties.ui"/>
+<project reference="1.0,https://github.com/osate/osate2-core.git,master,org.osate.xtext.aadl2.ui"/>
+</provider>
+</psf>
