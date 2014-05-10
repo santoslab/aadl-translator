@@ -23,7 +23,7 @@
 					<testSuite>edu.ksu.cis.projects.mdcf.aadl-translator-test</testSuite>
 					<testClass>edu.ksu.cis.projects.mdcf.aadltranslator.test.PulseOxSmartAlarmTests</testClass>
 					<useUIHarness>true</useUIHarness>
-					<argLine>-XstartOnFirstThread</argLine>
+					<!-- argLine>-XstartOnFirstThread</argLine -->
 				</configuration>
 			</plugin>
 			<plugin>
