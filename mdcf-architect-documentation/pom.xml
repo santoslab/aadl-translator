@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<relativePath>..</relativePath>
+		<groupId>edu.ksu.cis.projects.mdcf</groupId>
+		<artifactId>aadl-translator</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<groupId>edu.ksu.cis.projects.mdcf</groupId>
+	<artifactId>edu.ksu.cis.projects.mdcf.mdcf-architect-documentation</artifactId>
+	<version>0.1.0-SNAPSHOT</version>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.tomdz.maven</groupId>
+				<artifactId>sphinx-maven-plugin</artifactId>
+				<version>1.0.1</version>
+				<configuration>
+					<outputDirectory>${project.build.directory}/docs</outputDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

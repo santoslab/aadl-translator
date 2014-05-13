@@ -28,6 +28,7 @@
 		<module>edu.ksu.cis.projects.mdcf.aadl-feature</module>
 		<module>edu.ksu.cis.projects.mdcf.aadl-translator-test</module>
 		<module>edu.ksu.cis.projects.mdcf.aadl-updatesite</module>
+		<module>mdcf-architect-documentation</module>
 	</modules>
 	<repositories>
 		<repository>
