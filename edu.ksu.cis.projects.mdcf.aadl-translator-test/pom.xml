@@ -20,7 +20,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<sureFireArgLine></sureFireArgLine>
+				<sureFireArgLine>-XX:MaxPermSize=256M</sureFireArgLine>
 			</properties>
 		</profile>
 		<profile>
@@ -31,7 +31,7 @@
 				</os>
 			</activation>
 			<properties>
-				<sureFireArgLine>-XstartOnFirstThread</sureFireArgLine>
+				<sureFireArgLine>-XstartOnFirstThread -XX:MaxPermSize=256M</sureFireArgLine>
 			</properties>
 		</profile>
 	</profiles>
@@ -45,7 +45,7 @@
 					<testSuite>edu.ksu.cis.projects.mdcf.aadl-translator-test</testSuite>
 					<testClass>edu.ksu.cis.projects.mdcf.aadltranslator.test.PulseOxSmartAlarmTests</testClass>
 					<useUIHarness>true</useUIHarness>
-					<argLine>${sureFireArgLine}</argLine>
+					<argLine>${sureFireArgLine} ${tycho.testArgLine}</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
