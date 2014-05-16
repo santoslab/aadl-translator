@@ -29,7 +29,7 @@ import os
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.mathjax',
+    'sphinx.ext.mathjax', 'sphinx.ext.extlinks'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -69,7 +69,7 @@ release = '0.1'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+exclude_patterns = ['_build', 'util/*']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -258,3 +258,5 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+extlinks = {'nsfgrant': ('http://www.nsf.gov/awardsearch/showAward?AWD_ID=%s', '') }
