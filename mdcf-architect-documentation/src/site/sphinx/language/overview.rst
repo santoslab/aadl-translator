@@ -46,37 +46,61 @@ At a high level, MAP apps are defined by systems, which contain device and proce
 AADL Properties
 ***************
 
-Real-time and quality of service parameters are defined using AADL's property mechanisms.
+AADL properties, which are used to configure real-time and quality-of-service parameters, can either be set as defaults for an entire app, or used as single-component overrides.  The table below lists the properties used in the MDCF Architect.
 
 .. list-table:: 
-	:widths: 15 15 8 8 54
+	:widths: 8 11 11 8 8 54
 	:header-rows: 1
+	:stub-columns: 1
 
-	* - Default Name
+	* - Construct
+	  - Default Name
 	  - Override Name
 	  - Type
 	  - Example
 	  - Explanation
-	* - Default_Thread_Period
+	* - Thread
+	  - Default_Thread_Period
 	  - Timing_Properties::Period
 	  - Time
 	  - 50 ms
 	  - Periodic tasks will be dispatched to run once per period.
-	* - Default_Thread_Deadline
+	* - Thread
+	  - Default_Thread_Deadline
 	  - Timing_Properties::Deadline
 	  - Time
 	  - 50 ms
 	  - A task will be scheduled such that it has time to complete before its deadline.
-	* - Default_Thread_WCET
+	* - Thread
+	  - Default_Thread_WCET
 	  - Timing_Properties::Compute_Execution_Time
 	  - Time
 	  - 5 ms
 	  - A task's worst case execution time is the most time it will take to complete after dispatch.
-	* - Default_Thread_Dispatch
+	* - Thread
+	  - Default_Thread_Dispatch
 	  - Thread_Properties::Dispatch_Protocol
 	  - Sporadic or Periodic
 	  - Periodic
 	  - Periodic tasks are dispatched once per period, while sporadic tasks are dispatched when a message arrives on their associated port.
+	* - Port
+	  - Default_Output_Rate
+	  - MAP_Properties::Output_Rate
+	  - Time range
+	  - 100 ms \.. 300 ms
+	  - Ports must specify the most and least frequently that they will broadcast a message.
+	* - Port Connection
+	  - Default_Channel_Delay
+	  - MAP_Properties::Channel_Delay
+	  - Time
+	  - 100 ms
+	  - Specifies the maximum time that the message can spend on the network.
+	* - Process
+	  - N/A
+	  - MAP_Properties::Component_Type
+	  - Logic or Display
+	  - Display
+	  - Processes are either for logic or display components.
 
 ***********
 Example App
