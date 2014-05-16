@@ -22,6 +22,7 @@ Contents
 --------
 
 .. toctree::
+	:titlesonly:
 	:maxdepth: 2
 
 	setup.rst
@@ -29,7 +30,7 @@ Contents
 	tools/translator.rst
 
 
-.. admonition:: Acknowledgement
+.. admonition:: Acknowledgements
    
 	The development of the |MDCF Architect| is supported in part by the US National Science Foundation (NSF) :nsfgrant:`OCI-1239543 <1239543>` award, the NSF US Food and Drug Administration Scholar-in-Residence Program :nsfgrant:`OCI-1355778 <1355778>` and the National Institutes of Health / NIBIB Quantum Program.
     
