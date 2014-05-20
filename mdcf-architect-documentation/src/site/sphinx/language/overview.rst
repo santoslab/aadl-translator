@@ -102,6 +102,12 @@ AADL properties, which are used to configure real-time and quality-of-service pa
 	  - Display
 	  - Processes are either for logic or display components.
 
+**********
+Data Types
+**********
+
+AADL supports data type modeling, and the MDCF architect uses these data types for its analysis and code-generation tasks. Data types are currently specified only by their representation: Boolean, Float or Integer.
+
 ***********
 Example App
 ***********
@@ -111,6 +117,22 @@ Example App
 	:align: center
 
 In this language walkthrough, we'll be building a very simple "Pulse Oximetry Display" app. A high-level, information-flow centric view of this app is shown above.  This app's job is to take information from a pulse oximeter device and display it on the MAP display. It does not have many advanced features (eg, alarms, device control, complex logic, etc.) but it allows us to illustrate the various features of the MDCF architect.
+
+Properties
+==========
+
+The following properties are used in our example app:
+
+.. literalinclude:: snippets/default_properties.aadl
+   :language: aadl
+   :linenos:
+
+And we use the following data type definition:
+
+.. literalinclude:: snippets/data_type.aadl
+   :language: aadl
+   :linenos:
+
 
 ********
 Contents

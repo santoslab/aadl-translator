@@ -8,7 +8,7 @@ If you just want to use the translator, you just need to install it into osate 2
 This project is also publicly available under the [EPL](http://www.eclipse.org/legal/epl-v10.html).
 
 ## Building with Maven
-After cloning, the translator can be built by the command "mvn install"  Note that the build process requires [Maven](http://maven.apache.org/) (version 3.0+) and [Java](http://www.java.com/en/) (version 1.7+)
+After cloning, the translator can be built by the command "mvn install"  Note that the build process requires [Maven](http://maven.apache.org/) (version 3.0+) and [Java](http://www.java.com/en/) (version 1.7+). If you also wish to build the documentation, you'll need [Pygments](http://pygments.org/).
 
 ## Building with Eclipse
 In order to use eclipse you'll need to first download and prepare eclipse (steps adapted from the [OSATE 2 wiki](https://wiki.sei.cmu.edu/aadl/index.php/Getting_Osate_2_sources)):

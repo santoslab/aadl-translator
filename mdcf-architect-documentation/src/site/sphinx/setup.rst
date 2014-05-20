@@ -1,5 +1,6 @@
 .. include:: util/substitution.rst
 
+###############################
 Installing the |MDCF Architect|
 ###############################
 
