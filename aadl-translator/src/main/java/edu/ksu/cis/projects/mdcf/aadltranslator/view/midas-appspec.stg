@@ -12,16 +12,16 @@ appName(system) ::=<<
 
 components(system) ::=<<
 <components>
-  #system.logicComponents.keys:{k |#virtualComponent(k, system.logicComponents.(k))#
+  #system.logicAndDevices.keys:{k |#virtualComponent(k, system.logicAndDevices.(k))#
   }#
 </components>
 >>
 
-virtualComponent(name, process) ::=<<
+virtualComponent(name, component) ::=<<
 <mdcf.core.app.VirtualComponent>
   <name>#name#</name>
-  <type>#process.name#</type>
-  #if(process.display)#
+  <type>#component.name#</type>
+  #if(component.display)#
   <role>AppPanel</role>
   #else#
   <role>Logic</role>

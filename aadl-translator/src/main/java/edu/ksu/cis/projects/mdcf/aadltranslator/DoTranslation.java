@@ -43,7 +43,7 @@ import org.osate.core.OsateCorePlugin;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.preference.PreferenceConstants;
 
 public final class DoTranslation implements IHandler, IRunnableWithProgress {
@@ -174,18 +174,18 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		midas_appspecSTG.delimiterStopChar = '#';
 		
 		// Give the model to the string templates
-		for (ProcessModel pm : stats.getSystemModel().getLogicComponents()
+		for (ComponentModel cm : stats.getSystemModel().getLogicAndDevices()
 				.values()) {
-			javaClasses.put(pm.getName() + "SuperType", java_superclassSTG
-					.getInstanceOf("class").add("model", pm).render());
-			if (generateShells) {
+			javaClasses.put(cm.getName() + "SuperType", java_superclassSTG
+					.getInstanceOf("class").add("model", cm).render());
+			if (generateShells && !cm.isPseudoDevice()) {
 				javaClasses.put(
-						pm.getName(),
+						cm.getName(),
 						java_userimplSTG.getInstanceOf("userimpl")
-								.add("model", pm).render());
+								.add("model", cm).render());
 			}
-			compsigs.put(pm.getName(), midas_compsigSTG
-					.getInstanceOf("compsig").add("model", pm).render());
+			compsigs.put(cm.getName(), midas_compsigSTG
+					.getInstanceOf("compsig").add("model", cm).render());
 		}
 
 		appName = stats.getSystemModel().getName();

@@ -188,10 +188,12 @@ private MdcfSenderPort\<<port.type>\> <port.name>SenderPort = new MdcfSenderPort
 >>
 
 headerAndFields(model) ::=<<
-<if(model.isDisplay)>
+<if(model.display)>
 public class <model.name>SuperType extends AppPanelComponent{
-<else>
+<elseif(model.pseudoDevice)>
 public class <model.name>PseudoDevice extends LogicComponent{
+<else>
+public class <model.name>SuperType extends LogicComponent{
 <endif>
   private HashMap\<String, Task> taskInstanceMap;
   private HashMap\<String, MdcfReceiverPort\<?>\> receiverPortMap;
@@ -212,7 +214,7 @@ import mdcf.channelservice.common.MdcfDecodeMessageException;
 import mdcf.channelservice.common.MdcfReceiverPort;
 import mdcf.channelservice.common.MdcfSenderPort;
 import mdcf.core.ctypes.Task;
-<if(model.isDisplay)>
+<if(model.display)>
 import mdcf.core.ctypes.apppanel.AppPanelComponent;
 <else>
 import mdcf.core.ctypes.logic.LogicComponent;

@@ -1,35 +1,11 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 import java.util.HashMap;
-import java.util.Map;
-
-import com.google.common.base.Predicate;
-import com.google.common.collect.Maps;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentKind;
 
-public class ProcessModel implements IComponentModel{
-
-	/**
-	 * The name of this process -- note that this is a type name, rather than
-	 * an instance name (since there could be several instances of this
-	 * process, all named different things)
-	 */
-	private String name;
-	
-	private boolean display;
-
-//	// port name -> port type
-//	private HashMap<String, String> receivePorts;
-//
-//	// port name -> port type
-//	private HashMap<String, String> sendPorts;
-	
-	// port name -> port model
-	private HashMap<String, PortModel> ports;
-
-	// task name -> task model
-	private HashMap<String, TaskModel> tasks;
+public class ProcessModel extends ComponentModel{
 	
 	// variable name -> type
 	private HashMap<String, String> globals;
@@ -38,66 +14,9 @@ public class ProcessModel implements IComponentModel{
 	private HashMap<String, MethodModel> methods;
 
 	public ProcessModel() {
-//		receivePorts = new HashMap<>();
-//		sendPorts = new HashMap<>();
-		ports = new HashMap<>();
-		tasks = new HashMap<>();
+		super();
 		methods = new HashMap<>();
 		globals = new HashMap<>();
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void addPort(PortModel pm) throws DuplicateElementException {
-		if(ports.containsKey(pm.getName()))
-			throw new DuplicateElementException("Ports cannot share names");
-		ports.put(pm.getName(), pm);
-	}
-	
-	public PortModel getPortByName(String portName){
-		return ports.get(portName);
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public Map<String, PortModel> getPorts() {
-		return ports;
-	}
-	
-	public Map<String, PortModel> getReceivePorts() {
-		return Maps.filterValues(ports, receivePortFilter);
-	}
-	
-	public Map<String, PortModel> getReceiveEventDataPorts() {
-		return Maps.filterValues(ports, receiveEventDataPortFilter);
-	}
-	
-	public Map<String, PortModel> getReceiveEventPorts() {
-		return Maps.filterValues(ports, receiveEventPortFilter);
-	}
-	
-	public Map<String, PortModel> getReceiveDataPorts() {
-		return Maps.filterValues(ports, receiveDataPortFilter);
-	}
-	
-	public Map<String, PortModel> getSendPorts() {
-		return Maps.filterValues(ports, sendPortFilter);
-	}
-
-	public HashMap<String, TaskModel> getTasks() {
-		return tasks;
-	}
-	
-	public Map<String, TaskModel> getSporadicTasks() {
-		return Maps.filterValues(tasks, sporadicTaskFilter);
-	}
-	
-	public Map<String, TaskModel> getPeriodicTasks() {
-		return Maps.filterValues(tasks, periodicTaskFilter);
 	}
 
 	public HashMap<String, String> getGlobals() {
@@ -112,27 +31,16 @@ public class ProcessModel implements IComponentModel{
 	public String getGlobalType(String name){
 		return globals.get(name);
 	}
-	
-	public TaskModel getTask(String name){
-		return tasks.get(name);
-	}
-	
-	public boolean isDisplay(){
-		return display;
-	}
 
 	public void setDisplay(boolean display) {
-		this.display = display;
+		if(display)
+			this.kind = ComponentKind.DISPLAY;
+		else
+			this.kind = ComponentKind.LOGIC;
 	}
 
 	public TaskModel getLastThread(){
 		return tasks.get(tasks.size() - 1);
-	}
-	
-	public void addTask(String name) throws DuplicateElementException {
-		if(tasks.containsKey(name))
-			throw new DuplicateElementException("Tasks cannot have the same name");
-		tasks.put(name, new TaskModel(name));
 	}
 	
 	public void addGlobal(String name, String type) {
@@ -158,47 +66,4 @@ public class ProcessModel implements IComponentModel{
 			methods.put(methodName, new MethodModel(methodName));
 		methods.get(methodName).setRetType(returnType);
 	}
-	
-	//TODO: These predicates should probably be externalized
-	Predicate<PortModel> receivePortFilter = new Predicate<PortModel>() {
-		public boolean apply(PortModel pm) {
-			return pm.isSubscribe();
-		}
-	};
-	
-	Predicate<PortModel> receiveEventDataPortFilter = new Predicate<PortModel>() {
-		public boolean apply(PortModel pm) {
-			return pm.isSubscribe() && pm.isEventData();
-		}
-	};
-	
-	Predicate<PortModel> receiveEventPortFilter = new Predicate<PortModel>() {
-		public boolean apply(PortModel pm) {
-			return pm.isSubscribe() && pm.isEvent();
-		}
-	};
-	
-	Predicate<PortModel> receiveDataPortFilter = new Predicate<PortModel>() {
-		public boolean apply(PortModel pm) {
-			return pm.isSubscribe() && pm.isData();
-		}
-	};
-	
-	Predicate<PortModel> sendPortFilter = new Predicate<PortModel>() {
-		public boolean apply(PortModel pm) {
-			return !pm.isSubscribe();
-		}
-	};
-	
-	Predicate<TaskModel> periodicTaskFilter = new Predicate<TaskModel>() {
-		public boolean apply(TaskModel tm) {
-			return !tm.isSporadic();
-		}
-	};
-	
-	Predicate<TaskModel> sporadicTaskFilter = new Predicate<TaskModel>() {
-		public boolean apply(TaskModel tm) {
-			return tm.isSporadic();
-		}
-	};
 }

@@ -1,8 +1,8 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 public class ConnectionModel {
-	private IComponentModel publisher;
-	private IComponentModel subscriber;
+	private ComponentModel publisher;
+	private ComponentModel subscriber;
 	
 	private boolean devicePublished;
 	private boolean deviceSubscribed;
@@ -29,11 +29,11 @@ public class ConnectionModel {
 	
 	private int channelDelay;
 	
-	public void setPublisher(IComponentModel publisher) {
+	public void setPublisher(ComponentModel publisher) {
 		this.publisher = publisher;
 	}
 
-	public void setSubscriber(IComponentModel subscriber) {
+	public void setSubscriber(ComponentModel subscriber) {
 		this.subscriber = subscriber;
 	}
 
@@ -69,11 +69,11 @@ public class ConnectionModel {
 		this.deviceSubscribed = deviceSubscribed;
 	}
 
-	public IComponentModel getPublisher() {
+	public ComponentModel getPublisher() {
 		return publisher;
 	}
 
-	public IComponentModel getSubscriber() {
+	public ComponentModel getSubscriber() {
 		return subscriber;
 	}
 

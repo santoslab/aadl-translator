@@ -1,17 +1,10 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
-public class DeviceModel implements IComponentModel {
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentKind;
 
-	/**
-	 * The type name of this device
-	 */
-	private String name;
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
+public class DeviceModel extends ComponentModel {
+	public DeviceModel(){
+		super();
+		kind = ComponentKind.PSEUDODEVICE;
 	}
 }

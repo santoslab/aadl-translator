@@ -6,64 +6,21 @@ Error at PulseOx_SmartAlarm_Logic.aadl:7: Missing the required output rate speci
       <string>appDisplay</string>
       <edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
         <name>PulseOx_SmartAlarm_Display_Process</name>
-        <display>false</display>
         <ports/>
         <tasks/>
         <globals/>
         <methods/>
-        <receivePortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$1">
-          <outer-class reference="../.."/>
-        </receivePortFilter>
-        <receiveEventDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$2">
-          <outer-class reference="../.."/>
-        </receiveEventDataPortFilter>
-        <receiveEventPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$3">
-          <outer-class reference="../.."/>
-        </receiveEventPortFilter>
-        <receiveDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$4">
-          <outer-class reference="../.."/>
-        </receiveDataPortFilter>
-        <sendPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$5">
-          <outer-class reference="../.."/>
-        </sendPortFilter>
-        <periodicTaskFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$6">
-          <outer-class reference="../.."/>
-        </periodicTaskFilter>
-        <sporadicTaskFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$7">
-          <outer-class reference="../.."/>
-        </sporadicTaskFilter>
       </edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
     </entry>
     <entry>
       <string>appLogic</string>
       <edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
         <name>PulseOx_SmartAlarm_Process</name>
-        <display>false</display>
         <ports/>
         <tasks/>
+        <kind>LOGIC</kind>
         <globals/>
         <methods/>
-        <receivePortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$1">
-          <outer-class reference="../.."/>
-        </receivePortFilter>
-        <receiveEventDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$2">
-          <outer-class reference="../.."/>
-        </receiveEventDataPortFilter>
-        <receiveEventPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$3">
-          <outer-class reference="../.."/>
-        </receiveEventPortFilter>
-        <receiveDataPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$4">
-          <outer-class reference="../.."/>
-        </receiveDataPortFilter>
-        <sendPortFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$5">
-          <outer-class reference="../.."/>
-        </sendPortFilter>
-        <periodicTaskFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$6">
-          <outer-class reference="../.."/>
-        </periodicTaskFilter>
-        <sporadicTaskFilter class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel$7">
-          <outer-class reference="../.."/>
-        </sporadicTaskFilter>
       </edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
     </entry>
   </logicComponents>
@@ -72,6 +29,9 @@ Error at PulseOx_SmartAlarm_Logic.aadl:7: Missing the required output rate speci
       <string>pulseOx</string>
       <edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel>
         <name>PulseOx</name>
+        <ports/>
+        <tasks/>
+        <kind>PSEUDODEVICE</kind>
       </edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel>
     </entry>
   </devices>
