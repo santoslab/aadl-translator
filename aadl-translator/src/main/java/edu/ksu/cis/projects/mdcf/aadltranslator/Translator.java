@@ -132,6 +132,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		public String caseDeviceSubcomponent(DeviceSubcomponent obj) {
 			DeviceModel dm = new DeviceModel();
 			dm.setName(obj.getComponentType().getName());
+			dm.setSystemName(systemModel.getName());
 			try {
 				systemModel.addDevice(obj.getName(), dm);
 			} catch (DuplicateElementException e) {
@@ -145,6 +146,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		public String caseProcessSubcomponent(ProcessSubcomponent obj) {
 			ProcessModel pm = new ProcessModel();
 			pm.setName(obj.getComponentType().getName());
+			pm.setSystemName(systemModel.getName());
 			try {
 				systemModel.addProcess(obj.getName(), pm);
 			} catch (DuplicateElementException e) {
@@ -401,20 +403,21 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		private void handleImplicitTask(Port obj) {
 			TaskModel tm;
 			String taskName = obj.getName() + "Task";
+			DeviceModel dm = (DeviceModel) componentModel;
 			// Default values; period is set to -1 since these tasks are all
 			// sporadic
 			// TODO: Read these from plugin preferences?
 			int period = -1, deadline = 50, wcet = 5;
 			try {
-				componentModel.addTask(taskName);
-				tm = componentModel.getTask(taskName);
+				dm.addTask(taskName);
+				tm = dm.getTask(taskName);
 				tm.setSporadic(true);
 				tm.setPeriod(period);
 				tm.setDeadline(deadline);
 				tm.setWcet(wcet);
-				tm.setTrigPortInfo(obj.getName(),
-						componentModel.getPortByName(obj.getName()).getType(),
-						obj.getName(), true);
+				tm.setTrigPortInfo(dm.getInPortNames().get(obj.getName()),
+						dm.getPortByName(obj.getName()).getType(),
+						obj.getName(), false);
 			} catch (DuplicateElementException | NotImplementedException e) {
 				handleException(obj, e);
 				return;
@@ -432,6 +435,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			in_pm.setCategory(out_pm.getCategory());
 			try {
 				componentModel.addPort(in_pm);
+				((DeviceModel)componentModel).addOutPortName(in_pm.getName(), out_pm.getName());
 			} catch (DuplicateElementException e) {
 				handleException(obj, e);
 				return;

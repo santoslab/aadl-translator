@@ -176,8 +176,13 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		// Give the model to the string templates
 		for (ComponentModel cm : stats.getSystemModel().getLogicAndDevices()
 				.values()) {
-			javaClasses.put(cm.getName() + "SuperType", java_superclassSTG
+			if(!cm.isPseudoDevice()){
+				javaClasses.put(cm.getName() + "SuperType", java_superclassSTG
 					.getInstanceOf("class").add("model", cm).render());
+			} else {
+				javaClasses.put(cm.getName() + "PseudoDevice", java_superclassSTG
+						.getInstanceOf("class").add("model", cm).render());	
+			}
 			if (generateShells && !cm.isPseudoDevice()) {
 				javaClasses.put(
 						cm.getName(),

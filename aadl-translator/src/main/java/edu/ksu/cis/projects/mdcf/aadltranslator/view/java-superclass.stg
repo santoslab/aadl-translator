@@ -33,17 +33,17 @@ public class <taskName>Task implements Task {
     <taskModel.incomingGlobals:{vm | <initGlobal(vm.innerName, vm.outerName)>
     }>
     MdcfMessage message = <taskModel.trigPortName>ReceiverPort.getReceiver().getLastMsg();
-    try {
-      <if(!taskModel.eventTriggered)>
+    <if(!taskModel.eventTriggered)>
+      try {
         <taskModel.trigPortType> <taskModel.trigPortLocalName>Data = <taskModel.trigPortName>ReceiverPort.getLastMsgContent();
-        <taskModel.trigPortLocalName>ListenerOnMessage(message, <taskModel.trigPortLocalName>Data);
-      <else>
-        <taskModel.trigPortLocalName>ListenerOnMessage(message);
-      <endif>
-    } catch (MdcfDecodeMessageException e) {
-      System.err.println(getComponentTypeName() + ".<taskName>Task task: invalid message:" + message.getTextMsg());
-      e.printStackTrace();
-    }
+        <taskModel.trigPortName>ListenerOnMessage(message, <taskModel.trigPortLocalName>Data);
+      } catch (MdcfDecodeMessageException e) {
+        System.err.println(getComponentTypeName() + ".<taskName>Task task: invalid message:" + message.getTextMsg());
+        e.printStackTrace();
+      }
+    <else>
+      <taskModel.trigPortName>ListenerOnMessage(message);
+    <endif>
     <taskModel.outgoingGlobals:{vm | <updateGlobal(vm.innerName, vm.outerName)>
     }>
   }
@@ -82,15 +82,15 @@ private void initComponent(){
   // Do nothing, pseudodevices require no initialization
 }
 
-<model.receiveEventDataPorts.keys:{k |<forwardListener(k, model.receiveEventDataPorts.(k).type)>
+<model.receiveEventDataPorts.keys:{k |<forwardListener(k, model.receiveEventDataPorts.(k).type, model.outPortNames.(k))>
 }>
-<model.receiveEventPorts.keys:{k |<forwardListener(k, model.receiveEventPorts.(k).type)>
+<model.receiveEventPorts.keys:{k |<forwardListener(k, model.receiveEventPorts.(k).type, model.outPortNames.(k))>
 }>
 >>
 
-forwardListener(portName, portType) ::=<<
+forwardListener(portName, portType, otherName) ::=<<
 private void <portName>ListenerOnMessage(MdcfMessage msg, <portType> <portName>Data){
-  <portName>SenderPort.send(<portName>Data);
+  <otherName>SenderPort.send(<portName>Data);
 }
 >>
 
@@ -187,7 +187,11 @@ private void set<name>(<type> val){
 >>
 
 constructor(model) ::=<<
+<if(model.pseudoDevice)>
+public <model.name>PseudoDevice(String GUID) {
+<else>
 public <model.name>SuperType(String GUID) {
+<endif>
   super(GUID, "<model.name>");
   taskInstanceMap = new HashMap\<>();
   receiverPortMap = new HashMap\<>();
@@ -212,11 +216,11 @@ private MdcfSenderPort\<<port.type>\> <port.name>SenderPort = new MdcfSenderPort
 
 headerAndFields(model) ::=<<
 <if(model.display)>
-public class <model.name>SuperType extends AppPanelComponent{
+public abstract class <model.name>SuperType extends AppPanelComponent{
 <elseif(model.pseudoDevice)>
 public class <model.name>PseudoDevice extends LogicComponent{
 <else>
-public class <model.name>SuperType extends LogicComponent{
+public abstract class <model.name>SuperType extends LogicComponent{
 <endif>
   private HashMap\<String, Task> taskInstanceMap;
   private HashMap\<String, MdcfReceiverPort\<?>\> receiverPortMap;
@@ -228,12 +232,13 @@ globalDeclaration(name, type) ::=<<
 >>
 
 packageAndImports(model) ::=<<
-package mdcf.app.<model.name>;
+package mdcf.app.<model.systemName>;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import mdcf.channelservice.common.MdcfDecodeMessageException;
+import mdcf.channelservice.common.MdcfMessage;
 import mdcf.channelservice.common.MdcfReceiverPort;
 import mdcf.channelservice.common.MdcfSenderPort;
 import mdcf.core.ctypes.Task;

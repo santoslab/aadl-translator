@@ -14,6 +14,11 @@ public class ComponentModel {
 	 * The type name of this component
 	 */
 	protected String name;
+
+	/**
+	 * The name of the system this component is used in
+	 */
+	protected String systemName;
 	
 	// port name -> port model
 	protected HashMap<String, PortModel> ports;
@@ -27,7 +32,7 @@ public class ComponentModel {
 		ports = new HashMap<>();
 		tasks = new HashMap<>();
 	}
-	
+
 	public void addTask(String name) throws DuplicateElementException {
 		if(tasks.containsKey(name))
 			throw new DuplicateElementException("Tasks cannot have the same name");
@@ -102,5 +107,13 @@ public class ComponentModel {
 	
 	public Map<String, PortModel> getSendPorts() {
 		return Maps.filterValues(ports, ModelUtil.sendPortFilter);
+	}
+	
+	public String getSystemName() {
+		return systemName;
+	}
+
+	public void setSystemName(String systemName) {
+		this.systemName = systemName;
 	}
 }

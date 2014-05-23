@@ -6,6 +6,7 @@ Error at PulseOx_SmartAlarm_Logic.aadl:7: Missing the required output rate speci
       <string>appDisplay</string>
       <edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
         <name>PulseOx_SmartAlarm_Display_Process</name>
+        <systemName>PulseOx_SmartAlarmSystem</systemName>
         <ports/>
         <tasks/>
         <globals/>
@@ -16,6 +17,7 @@ Error at PulseOx_SmartAlarm_Logic.aadl:7: Missing the required output rate speci
       <string>appLogic</string>
       <edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
         <name>PulseOx_SmartAlarm_Process</name>
+        <systemName>PulseOx_SmartAlarmSystem</systemName>
         <ports/>
         <tasks/>
         <kind>LOGIC</kind>
@@ -29,9 +31,17 @@ Error at PulseOx_SmartAlarm_Logic.aadl:7: Missing the required output rate speci
       <string>pulseOx</string>
       <edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel>
         <name>PulseOx</name>
+        <systemName>PulseOx_SmartAlarmSystem</systemName>
         <ports/>
         <tasks/>
         <kind>PSEUDODEVICE</kind>
+        <inToOutPortNames serialization="custom">
+          <unserializable-parents/>
+          <com.google.common.collect.HashBiMap>
+            <default/>
+            <int>0</int>
+          </com.google.common.collect.HashBiMap>
+        </inToOutPortNames>
       </edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel>
     </entry>
   </devices>

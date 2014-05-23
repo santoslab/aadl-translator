@@ -21,6 +21,9 @@ public class WriteOutputFiles {
 		if(appDevDirectory.charAt(appDevDirectory.length() - 1) != '/')
 			appDevDirectory += "/";
 		
+		// Create the package structure
+		appDevDirectory += appName + "/mdcf/app/"; 
+		
 		File cfgDir = new File(appDevDirectory + appName + "/appcfg");
 		File compDir = new File(appDevDirectory + appName + "/appcomp");
 

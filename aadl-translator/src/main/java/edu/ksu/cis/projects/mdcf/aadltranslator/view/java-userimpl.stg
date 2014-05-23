@@ -1,5 +1,5 @@
 userimpl(model) ::=<<
-package mdcf.app.<model.name>;
+package mdcf.app.<model.systemName>;
 
 import mdcf.channelservice.common.MdcfMessage;
 

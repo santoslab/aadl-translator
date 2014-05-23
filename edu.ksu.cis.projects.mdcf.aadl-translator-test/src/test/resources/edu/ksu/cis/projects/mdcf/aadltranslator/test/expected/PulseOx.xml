@@ -5,6 +5,7 @@
       <string>appDisplay</string>
       <edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
         <name>PulseOx_SmartAlarm_Display_Process</name>
+        <systemName>PulseOx_SmartAlarmSystem</systemName>
         <ports>
           <entry>
             <string>SpO2_LowerLimit_In</string>
@@ -532,6 +533,7 @@
       <string>appLogic</string>
       <edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
         <name>PulseOx_SmartAlarm_Process</name>
+        <systemName>PulseOx_SmartAlarmSystem</systemName>
         <ports>
           <entry>
             <string>SustainedMotionArtifact_Alarm</string>
@@ -1070,6 +1072,7 @@
       <string>pulseOx</string>
       <edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel>
         <name>PulseOx</name>
+        <systemName>PulseOx_SmartAlarmSystem</systemName>
         <ports>
           <entry>
             <string>RawPulseRate_UpperLimit_Violated</string>
@@ -1363,7 +1366,7 @@
             <string>PulseRate_UpperLimit_ViolatedTask</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
               <name>PulseRate_UpperLimit_ViolatedTask</name>
-              <trigPortName>PulseRate_UpperLimit_Violated</trigPortName>
+              <trigPortName>RawPulseRate_UpperLimit_Violated</trigPortName>
               <trigPortType>Boolean</trigPortType>
               <trigPortLocalName>PulseRate_UpperLimit_Violated</trigPortLocalName>
               <incomingGlobals/>
@@ -1371,7 +1374,7 @@
               <period>-1</period>
               <deadline>50</deadline>
               <sporadic>true</sporadic>
-              <eventTriggered>true</eventTriggered>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1380,7 +1383,7 @@
             <string>PulseRateTask</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
               <name>PulseRateTask</name>
-              <trigPortName>PulseRate</trigPortName>
+              <trigPortName>RawPulseRate</trigPortName>
               <trigPortType>Integer</trigPortType>
               <trigPortLocalName>PulseRate</trigPortLocalName>
               <incomingGlobals/>
@@ -1388,7 +1391,7 @@
               <period>-1</period>
               <deadline>50</deadline>
               <sporadic>true</sporadic>
-              <eventTriggered>true</eventTriggered>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1397,7 +1400,7 @@
             <string>PulseRate_UpperLimit_OutTask</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
               <name>PulseRate_UpperLimit_OutTask</name>
-              <trigPortName>PulseRate_UpperLimit_Out</trigPortName>
+              <trigPortName>RawPulseRate_UpperLimit_Out</trigPortName>
               <trigPortType>Integer</trigPortType>
               <trigPortLocalName>PulseRate_UpperLimit_Out</trigPortLocalName>
               <incomingGlobals/>
@@ -1405,7 +1408,7 @@
               <period>-1</period>
               <deadline>50</deadline>
               <sporadic>true</sporadic>
-              <eventTriggered>true</eventTriggered>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1414,7 +1417,7 @@
             <string>SpO2_LowerLimit_ViolatedTask</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
               <name>SpO2_LowerLimit_ViolatedTask</name>
-              <trigPortName>SpO2_LowerLimit_Violated</trigPortName>
+              <trigPortName>RawSpO2_LowerLimit_Violated</trigPortName>
               <trigPortType>Boolean</trigPortType>
               <trigPortLocalName>SpO2_LowerLimit_Violated</trigPortLocalName>
               <incomingGlobals/>
@@ -1422,7 +1425,7 @@
               <period>-1</period>
               <deadline>50</deadline>
               <sporadic>true</sporadic>
-              <eventTriggered>true</eventTriggered>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1431,7 +1434,7 @@
             <string>PulseRate_UpperLimit_InTask</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
               <name>PulseRate_UpperLimit_InTask</name>
-              <trigPortName>PulseRate_UpperLimit_In</trigPortName>
+              <trigPortName>RawPulseRate_UpperLimit_In</trigPortName>
               <trigPortType>Integer</trigPortType>
               <trigPortLocalName>PulseRate_UpperLimit_In</trigPortLocalName>
               <incomingGlobals/>
@@ -1439,7 +1442,7 @@
               <period>-1</period>
               <deadline>50</deadline>
               <sporadic>true</sporadic>
-              <eventTriggered>true</eventTriggered>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1448,7 +1451,7 @@
             <string>PulseRate_LowerLimit_InTask</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
               <name>PulseRate_LowerLimit_InTask</name>
-              <trigPortName>PulseRate_LowerLimit_In</trigPortName>
+              <trigPortName>RawPulseRate_LowerLimit_In</trigPortName>
               <trigPortType>Integer</trigPortType>
               <trigPortLocalName>PulseRate_LowerLimit_In</trigPortLocalName>
               <incomingGlobals/>
@@ -1456,7 +1459,7 @@
               <period>-1</period>
               <deadline>50</deadline>
               <sporadic>true</sporadic>
-              <eventTriggered>true</eventTriggered>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1465,7 +1468,7 @@
             <string>SpO2_LowerLimit_OutTask</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
               <name>SpO2_LowerLimit_OutTask</name>
-              <trigPortName>SpO2_LowerLimit_Out</trigPortName>
+              <trigPortName>RawSpO2_LowerLimit_Out</trigPortName>
               <trigPortType>Integer</trigPortType>
               <trigPortLocalName>SpO2_LowerLimit_Out</trigPortLocalName>
               <incomingGlobals/>
@@ -1473,7 +1476,7 @@
               <period>-1</period>
               <deadline>50</deadline>
               <sporadic>true</sporadic>
-              <eventTriggered>true</eventTriggered>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1482,7 +1485,7 @@
             <string>PulseRate_LowerLimit_ViolatedTask</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
               <name>PulseRate_LowerLimit_ViolatedTask</name>
-              <trigPortName>PulseRate_LowerLimit_Violated</trigPortName>
+              <trigPortName>RawPulseRate_LowerLimit_Violated</trigPortName>
               <trigPortType>Boolean</trigPortType>
               <trigPortLocalName>PulseRate_LowerLimit_Violated</trigPortLocalName>
               <incomingGlobals/>
@@ -1490,7 +1493,7 @@
               <period>-1</period>
               <deadline>50</deadline>
               <sporadic>true</sporadic>
-              <eventTriggered>true</eventTriggered>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1499,7 +1502,7 @@
             <string>SpO2Task</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
               <name>SpO2Task</name>
-              <trigPortName>SpO2</trigPortName>
+              <trigPortName>RawSpO2</trigPortName>
               <trigPortType>Integer</trigPortType>
               <trigPortLocalName>SpO2</trigPortLocalName>
               <incomingGlobals/>
@@ -1507,7 +1510,7 @@
               <period>-1</period>
               <deadline>50</deadline>
               <sporadic>true</sporadic>
-              <eventTriggered>true</eventTriggered>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1516,7 +1519,7 @@
             <string>PulseRate_LowerLimit_OutTask</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
               <name>PulseRate_LowerLimit_OutTask</name>
-              <trigPortName>PulseRate_LowerLimit_Out</trigPortName>
+              <trigPortName>RawPulseRate_LowerLimit_Out</trigPortName>
               <trigPortType>Integer</trigPortType>
               <trigPortLocalName>PulseRate_LowerLimit_Out</trigPortLocalName>
               <incomingGlobals/>
@@ -1524,7 +1527,7 @@
               <period>-1</period>
               <deadline>50</deadline>
               <sporadic>true</sporadic>
-              <eventTriggered>true</eventTriggered>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1533,7 +1536,7 @@
             <string>SpO2_LowerLimit_InTask</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
               <name>SpO2_LowerLimit_InTask</name>
-              <trigPortName>SpO2_LowerLimit_In</trigPortName>
+              <trigPortName>RawSpO2_LowerLimit_In</trigPortName>
               <trigPortType>Integer</trigPortType>
               <trigPortLocalName>SpO2_LowerLimit_In</trigPortLocalName>
               <incomingGlobals/>
@@ -1541,7 +1544,7 @@
               <period>-1</period>
               <deadline>50</deadline>
               <sporadic>true</sporadic>
-              <eventTriggered>true</eventTriggered>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1550,7 +1553,7 @@
             <string>MotionArtifact_AlarmTask</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
               <name>MotionArtifact_AlarmTask</name>
-              <trigPortName>MotionArtifact_Alarm</trigPortName>
+              <trigPortName>RawMotionArtifact_Alarm</trigPortName>
               <trigPortType>Boolean</trigPortType>
               <trigPortLocalName>MotionArtifact_Alarm</trigPortLocalName>
               <incomingGlobals/>
@@ -1558,7 +1561,7 @@
               <period>-1</period>
               <deadline>50</deadline>
               <sporadic>true</sporadic>
-              <eventTriggered>true</eventTriggered>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
@@ -1567,7 +1570,7 @@
             <string>ProbeOff_AlarmTask</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
               <name>ProbeOff_AlarmTask</name>
-              <trigPortName>ProbeOff_Alarm</trigPortName>
+              <trigPortName>RawProbeOff_Alarm</trigPortName>
               <trigPortType>Boolean</trigPortType>
               <trigPortLocalName>ProbeOff_Alarm</trigPortLocalName>
               <incomingGlobals/>
@@ -1575,13 +1578,46 @@
               <period>-1</period>
               <deadline>50</deadline>
               <sporadic>true</sporadic>
-              <eventTriggered>true</eventTriggered>
+              <eventTriggered>false</eventTriggered>
               <wcet>5</wcet>
               <callSequence/>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel>
           </entry>
         </tasks>
         <kind>PSEUDODEVICE</kind>
+        <inToOutPortNames serialization="custom">
+          <unserializable-parents/>
+          <com.google.common.collect.HashBiMap>
+            <default/>
+            <int>13</int>
+            <string>RawPulseRate_UpperLimit_Violated</string>
+            <string>PulseRate_UpperLimit_Violated</string>
+            <string>RawPulseRate_LowerLimit_Out</string>
+            <string>PulseRate_LowerLimit_Out</string>
+            <string>RawPulseRate_LowerLimit_In</string>
+            <string>PulseRate_LowerLimit_In</string>
+            <string>RawPulseRate_UpperLimit_In</string>
+            <string>PulseRate_UpperLimit_In</string>
+            <string>RawSpO2_LowerLimit_Out</string>
+            <string>SpO2_LowerLimit_Out</string>
+            <string>RawMotionArtifact_Alarm</string>
+            <string>MotionArtifact_Alarm</string>
+            <string>RawPulseRate_UpperLimit_Out</string>
+            <string>PulseRate_UpperLimit_Out</string>
+            <string>RawSpO2_LowerLimit_In</string>
+            <string>SpO2_LowerLimit_In</string>
+            <string>RawPulseRate</string>
+            <string>PulseRate</string>
+            <string>RawSpO2</string>
+            <string>SpO2</string>
+            <string>RawProbeOff_Alarm</string>
+            <string>ProbeOff_Alarm</string>
+            <string>RawPulseRate_LowerLimit_Violated</string>
+            <string>PulseRate_LowerLimit_Violated</string>
+            <string>RawSpO2_LowerLimit_Violated</string>
+            <string>SpO2_LowerLimit_Violated</string>
+          </com.google.common.collect.HashBiMap>
+        </inToOutPortNames>
       </edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel>
     </entry>
   </devices>
