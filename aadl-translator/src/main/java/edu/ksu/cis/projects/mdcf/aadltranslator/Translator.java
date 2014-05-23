@@ -217,8 +217,9 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			if (lastElemProcessed == ElementType.PROCESS) {
 				handlePort(obj);
 			} else if (lastElemProcessed == ElementType.DEVICE) {
-				handlePort(obj);
-				handleImplicitTask(obj);
+				handlePort(obj); // Explicit "out" port
+				handleImplicitPort(obj); // Implicit "in" port from device
+				handleImplicitTask(obj); // Implicit task to handle incoming data
 			}
 			return NOT_DONE;
 		}
@@ -402,6 +403,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			String taskName = obj.getName() + "Task";
 			// Default values; period is set to -1 since these tasks are all
 			// sporadic
+			// TODO: Read these from plugin preferences?
 			int period = -1, deadline = 50, wcet = 5;
 			try {
 				componentModel.addTask(taskName);
@@ -414,6 +416,23 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						componentModel.getPortByName(obj.getName()).getType(),
 						obj.getName(), true);
 			} catch (DuplicateElementException | NotImplementedException e) {
+				handleException(obj, e);
+				return;
+			}
+		}
+
+		private void handleImplicitPort(Port obj) {
+			PortModel in_pm = new PortModel();
+			PortModel out_pm = componentModel.getPortByName(obj.getName());
+			in_pm.setName("Raw" + out_pm.getName());
+			in_pm.setType(out_pm.getType());
+			in_pm.setMinPeriod(out_pm.getMinPeriod());
+			in_pm.setMaxPeriod(out_pm.getMaxPeriod());
+			in_pm.setSubscribe(!out_pm.isSubscribe());
+			in_pm.setCategory(out_pm.getCategory());
+			try {
+				componentModel.addPort(in_pm);
+			} catch (DuplicateElementException e) {
 				handleException(obj, e);
 				return;
 			}
@@ -681,7 +700,6 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			connModel.setSubPortName(subPortName);
 			connModel.setChannelDelay(Integer.valueOf(channelDelay));
 			systemModel.addConnection(connModel);
-
 		}
 
 		private void handleSubprogramDataConnection(AccessConnection obj) {

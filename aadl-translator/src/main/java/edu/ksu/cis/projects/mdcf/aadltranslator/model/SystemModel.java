@@ -83,9 +83,13 @@ public class SystemModel {
 		}
 		return ret;
 	}
-
+	
 	public ArrayList<ConnectionModel> getChannels() {
 		return channels;
+	}
+
+	public void setChannels(ArrayList<ConnectionModel> channels) {
+		this.channels = channels;
 	}
 
 	public boolean hasProcessType(String typeName) {

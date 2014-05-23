@@ -7,7 +7,11 @@ class(model) ::=<<
   <constructor(model)>
   <initAndGetters(model)>
   <subAndPubChannelAssignments(model)>
-  <abstractMethods(model)>
+  <if(model.pseudoDevice)>
+    <forwardMethods(model)>
+  <else>
+    <abstractMethods(model)>
+  <endif>
   <concreteMethods(model)>
   <tasks(model)>
 }
@@ -69,6 +73,25 @@ initGlobal(innerName, outerName) ::=<<
 
 updateGlobal(innerName, outerName) ::=<<
 set<outerName>(<innerName>);
+>>
+
+forwardMethods(model) ::=<<
+
+
+private void initComponent(){
+  // Do nothing, pseudodevices require no initialization
+}
+
+<model.receiveEventDataPorts.keys:{k |<forwardListener(k, model.receiveEventDataPorts.(k).type)>
+}>
+<model.receiveEventPorts.keys:{k |<forwardListener(k, model.receiveEventPorts.(k).type)>
+}>
+>>
+
+forwardListener(portName, portType) ::=<<
+private void <portName>ListenerOnMessage(MdcfMessage msg, <portType> <portName>Data){
+  <portName>SenderPort.send(<portName>Data);
+}
 >>
 
 abstractMethods(model) ::=<<

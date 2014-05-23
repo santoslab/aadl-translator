@@ -73,4 +73,12 @@ public class PortModel {
 	public void setMaxPeriod(int maxPeriod) {
 		this.maxPeriod = maxPeriod;
 	}
+
+	public PortCategory getCategory() {
+		return category;
+	}
+
+	public void setCategory(PortCategory category) {
+		this.category = category;
+	}
 }

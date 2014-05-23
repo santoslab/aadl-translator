@@ -1072,6 +1072,171 @@
         <name>PulseOx</name>
         <ports>
           <entry>
+            <string>RawPulseRate_UpperLimit_Violated</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>RawPulseRate_UpperLimit_Violated</name>
+              <subscribe>true</subscribe>
+              <category>EVENTDATA</category>
+              <type>Boolean</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
+            <string>RawPulseRate_LowerLimit_Out</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>RawPulseRate_LowerLimit_Out</name>
+              <subscribe>true</subscribe>
+              <category>EVENTDATA</category>
+              <type>Integer</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
+            <string>RawSpO2_LowerLimit_Out</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>RawSpO2_LowerLimit_Out</name>
+              <subscribe>true</subscribe>
+              <category>EVENTDATA</category>
+              <type>Integer</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
+            <string>PulseRate_UpperLimit_In</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>PulseRate_UpperLimit_In</name>
+              <subscribe>true</subscribe>
+              <category>EVENTDATA</category>
+              <type>Integer</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
+            <string>RawMotionArtifact_Alarm</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>RawMotionArtifact_Alarm</name>
+              <subscribe>true</subscribe>
+              <category>EVENTDATA</category>
+              <type>Boolean</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
+            <string>ProbeOff_Alarm</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>ProbeOff_Alarm</name>
+              <subscribe>false</subscribe>
+              <category>EVENTDATA</category>
+              <type>Boolean</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
+            <string>RawPulseRate_UpperLimit_Out</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>RawPulseRate_UpperLimit_Out</name>
+              <subscribe>true</subscribe>
+              <category>EVENTDATA</category>
+              <type>Integer</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
+            <string>RawSpO2_LowerLimit_In</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>RawSpO2_LowerLimit_In</name>
+              <subscribe>false</subscribe>
+              <category>EVENTDATA</category>
+              <type>Integer</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
+            <string>RawPulseRate</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>RawPulseRate</name>
+              <subscribe>true</subscribe>
+              <category>EVENTDATA</category>
+              <type>Integer</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
+            <string>RawSpO2</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>RawSpO2</name>
+              <subscribe>true</subscribe>
+              <category>EVENTDATA</category>
+              <type>Integer</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
+            <string>SpO2</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>SpO2</name>
+              <subscribe>false</subscribe>
+              <category>EVENTDATA</category>
+              <type>Integer</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
+            <string>SpO2_LowerLimit_Out</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>SpO2_LowerLimit_Out</name>
+              <subscribe>false</subscribe>
+              <category>EVENTDATA</category>
+              <type>Integer</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
+            <string>RawPulseRate_LowerLimit_Violated</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>RawPulseRate_LowerLimit_Violated</name>
+              <subscribe>true</subscribe>
+              <category>EVENTDATA</category>
+              <type>Boolean</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
+            <string>PulseRate_UpperLimit_Out</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>PulseRate_UpperLimit_Out</name>
+              <subscribe>false</subscribe>
+              <category>EVENTDATA</category>
+              <type>Integer</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
+            <string>RawSpO2_LowerLimit_Violated</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>RawSpO2_LowerLimit_Violated</name>
+              <subscribe>true</subscribe>
+              <category>EVENTDATA</category>
+              <type>Boolean</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
             <string>SpO2_LowerLimit_In</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
               <name>SpO2_LowerLimit_In</name>
@@ -1094,6 +1259,17 @@
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
           </entry>
           <entry>
+            <string>RawPulseRate_LowerLimit_In</string>
+            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+              <name>RawPulseRate_LowerLimit_In</name>
+              <subscribe>false</subscribe>
+              <category>EVENTDATA</category>
+              <type>Integer</type>
+              <minPeriod>100</minPeriod>
+              <maxPeriod>300</maxPeriod>
+            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
+          </entry>
+          <entry>
             <string>PulseRate_LowerLimit_Out</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
               <name>PulseRate_LowerLimit_Out</name>
@@ -1105,23 +1281,12 @@
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
           </entry>
           <entry>
-            <string>PulseRate_UpperLimit_In</string>
+            <string>RawPulseRate_UpperLimit_In</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
-              <name>PulseRate_UpperLimit_In</name>
-              <subscribe>true</subscribe>
-              <category>EVENTDATA</category>
-              <type>Integer</type>
-              <minPeriod>100</minPeriod>
-              <maxPeriod>300</maxPeriod>
-            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
-          </entry>
-          <entry>
-            <string>ProbeOff_Alarm</string>
-            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
-              <name>ProbeOff_Alarm</name>
+              <name>RawPulseRate_UpperLimit_In</name>
               <subscribe>false</subscribe>
               <category>EVENTDATA</category>
-              <type>Boolean</type>
+              <type>Integer</type>
               <minPeriod>100</minPeriod>
               <maxPeriod>300</maxPeriod>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
@@ -1160,34 +1325,12 @@
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
           </entry>
           <entry>
-            <string>SpO2</string>
+            <string>RawProbeOff_Alarm</string>
             <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
-              <name>SpO2</name>
-              <subscribe>false</subscribe>
+              <name>RawProbeOff_Alarm</name>
+              <subscribe>true</subscribe>
               <category>EVENTDATA</category>
-              <type>Integer</type>
-              <minPeriod>100</minPeriod>
-              <maxPeriod>300</maxPeriod>
-            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
-          </entry>
-          <entry>
-            <string>SpO2_LowerLimit_Out</string>
-            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
-              <name>SpO2_LowerLimit_Out</name>
-              <subscribe>false</subscribe>
-              <category>EVENTDATA</category>
-              <type>Integer</type>
-              <minPeriod>100</minPeriod>
-              <maxPeriod>300</maxPeriod>
-            </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
-          </entry>
-          <entry>
-            <string>PulseRate_UpperLimit_Out</string>
-            <edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
-              <name>PulseRate_UpperLimit_Out</name>
-              <subscribe>false</subscribe>
-              <category>EVENTDATA</category>
-              <type>Integer</type>
+              <type>Boolean</type>
               <minPeriod>100</minPeriod>
               <maxPeriod>300</maxPeriod>
             </edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel>
