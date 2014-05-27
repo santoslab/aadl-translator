@@ -60,53 +60,69 @@ AADL properties, which are used to configure real-time and quality-of-service pa
 	  - Example
 	  - Explanation
 	* - Thread
-	  - Default_Thread_Period
-	  - Timing_Properties::Period
+	  - Default\_ Thread_Period
+	  - Timing_Properties:: Period
 	  - Time
 	  - 50 ms
 	  - Periodic tasks will be dispatched to run once per period.
 	* - Thread
-	  - Default_Thread_Deadline
-	  - Timing_Properties::Deadline
+	  - Default\_ Thread_Deadline
+	  - Timing_Properties:: Deadline
 	  - Time
 	  - 50 ms
 	  - A task will be scheduled such that it has time to complete before its deadline.
 	* - Thread
-	  - Default_Thread_WCET
-	  - Timing_Properties::Compute_Execution_Time
+	  - Default\_ Thread_WCET
+	  - Timing_Properties:: Compute_Execution_Time
 	  - Time
 	  - 5 ms
 	  - A task's worst case execution time is the most time it will take to complete after dispatch.
 	* - Thread
-	  - Default_Thread_Dispatch
-	  - Thread_Properties::Dispatch_Protocol
+	  - Default\_ Thread_Dispatch
+	  - Thread_Properties:: Dispatch_Protocol
 	  - Sporadic or Periodic
 	  - Periodic
 	  - Periodic tasks are dispatched once per period, while sporadic tasks are dispatched when a message arrives on their associated port.
 	* - Port
-	  - Default_Output_Rate
-	  - MAP_Properties::Output_Rate
+	  - Default\_ Output_Rate
+	  - MAP_Properties:: Output_Rate
 	  - Time range
 	  - 100 ms \.. 300 ms
 	  - Ports must specify the most and least frequently that they will broadcast a message.
 	* - Port Connection
-	  - Default_Channel_Delay
-	  - MAP_Properties::Channel_Delay
+	  - Default\_ Channel_Delay
+	  - MAP_Properties:: Channel_Delay
 	  - Time
 	  - 100 ms
 	  - Specifies the maximum time that the message can spend on the network.
 	* - Process
 	  - N/A
-	  - MAP_Properties::Component_Type
+	  - MAP_Properties:: Component_Type
 	  - Logic or Display
 	  - Display
 	  - Processes are either for logic or display components.
+
+Example Property Set
+====================
+
+The following default property values are used in our example app:
+
+.. literalinclude:: snippets/default_properties.aadl
+   :language: aadl
 
 **********
 Data Types
 **********
 
 AADL supports data type modeling, and the MDCF architect uses these data types for its analysis and code-generation tasks. Data types are currently specified only by their representation: Boolean, Float or Integer.
+
+Example Data Type
+=================
+
+And we use the following data type definition:
+
+.. literalinclude:: snippets/data_type.aadl
+   :language: aadl
 
 ***********
 Example App
@@ -116,30 +132,13 @@ Example App
 	:alt: A high level view of a very simple app
 	:align: center
 
-In this language walkthrough, we'll be building a very simple "Pulse Oximetry Display" app. A high-level, information-flow centric view of this app is shown above.  This app's job is to take information from a pulse oximeter device and display it on the MAP display. It does not have many advanced features (eg, alarms, device control, complex logic, etc.) but it allows us to illustrate the various features of the MDCF architect.
-
-Properties
-==========
-
-The following properties are used in our example app:
-
-.. literalinclude:: snippets/default_properties.aadl
-   :language: aadl
-   :linenos:
-
-And we use the following data type definition:
-
-.. literalinclude:: snippets/data_type.aadl
-   :language: aadl
-   :linenos:
-
-
-********
-Contents
-********
+In this language walkthrough, we'll use the a very simple "Pulse Oximetry Display" app as a running example. A high-level, information-flow centric view of this app is shown above.  This app's job is to take information from a pulse oximeter device and display it on the MAP display. It does not have many advanced features (eg, alarms, device control, complex logic, etc.) but it allows us to illustrate the various features of the MDCF architect.
 
 .. toctree::
-   system
-   device
-   process
-   thread
+	:hidden:
+	
+	system
+	device
+	process
+	thread
+	port

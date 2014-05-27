@@ -23,6 +23,7 @@ Contents
 
 .. toctree::
 	:titlesonly:
+	:includehidden:
 	:maxdepth: 2
 
 	setup.rst

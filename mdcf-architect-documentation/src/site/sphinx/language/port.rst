@@ -2,5 +2,5 @@
 .. _aadl-thread-component:
 
 ######################
-The *Thread* Component
+The *Port* Subcomponent
 ######################

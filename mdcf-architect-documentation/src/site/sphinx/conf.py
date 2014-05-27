@@ -261,7 +261,8 @@ texinfo_documents = [
 
 extlinks = {'nsfgrant': ('http://www.nsf.gov/awardsearch/showAward?AWD_ID=%s', '') }
 
-#def setup(sphinx):
-#	sys.path.insert(0, os.path.abspath('.'))
-#	from AADLLexer import AADLLexer
-#	sphinx.add_lexer("aadl", AADLLexer())
+def setup(sphinx):
+	sys.path.insert(0, os.path.abspath('.'))
+	sys.path.insert(0, os.path.abspath('./mdcf-architect-documentation/src/site/sphinx'))
+	from AADLLexer import AADLLexer
+	sphinx.add_lexer("aadl", AADLLexer())

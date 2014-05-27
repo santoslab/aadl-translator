@@ -21,15 +21,16 @@ class AADLLexer(RegexLexer):
     iden_rex = r'[a-zA-Z_][a-zA-Z0-9_\.]*'
     class_iden_rex = r'(' + iden_rex + r')(::)('+ iden_rex + r')'
     definition_rex = r'(' + iden_rex + r')' +  r'(\s*:\s*)\b'
-    keyword_rex = r'(port|connection|process|thread|data)'
+    keyword_rex = r'(device|system|port|connection|process|thread|data)'
     
     with_tuple = (r'(with)(\s+)', bygroups(Keyword.Namespace, Text), 'with-list')
     text_tuple = (r'[^\S\n]+', Text)
     terminator_tuple = (r'(;)(\s+)', bygroups(Punctuation, Whitespace), '#pop')
     
     tokens = {
-         'package': [
+         'packageOrSystem': [
              text_tuple,
+             (r'(implementation)(\s+)(' + iden_rex + r')', bygroups(Name.Class, Whitespace, Name.Class), '#pop'),
              (iden_rex, Name.Class, '#pop'),
          ],
         'with-list' : [
@@ -106,7 +107,7 @@ class AADLLexer(RegexLexer):
         'root': [
             (r'(\n\s*|\t)', Whitespace),
             (r'--.*?$', Comment.Single),
-            (r'(package)(\s+)', bygroups(Keyword.Namespace, Text), 'package'),
+            (r'(package)(\s+)', bygroups(Keyword.Namespace, Text), 'packageOrSystem'),
             (r'(public|private)', Keyword.Namespace),
             with_tuple,
             (keyword_rex + r'(\s+)', bygroups(Keyword.Type, Text), 'package-declaration'),
