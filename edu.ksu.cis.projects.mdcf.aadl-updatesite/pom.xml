@@ -13,4 +13,46 @@
 	<artifactId>edu.ksu.cis.projects.mdcf.aadl-updatesite</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>eclipse-update-site</packaging>
+	<build>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh-external</artifactId>
+				<version>1.0-beta-5</version>
+			</extension>
+		</extensions>
+	</build>
+	<profiles>
+		<profile>
+			<id>uploadRepo</id>
+			<properties>
+				<scp.url>scpexe://cislinux.cis.ksu.edu/research/plgroup/web/santoslab.org/pub/mdcf-architect/</scp.url>
+				<scp.dir>research/plgroup/web/santoslab.org/pub/mdcf-architect/</scp.dir>
+				<repo.path>${project.build.directory}/site/</repo.path>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>wagon-maven-plugin</artifactId>
+						<version>1.0-beta-5</version>
+						<executions>
+							<execution>
+								<id>upload-repo</id>
+								<phase>install</phase>
+								<goals>
+									<goal>upload</goal>
+								</goals>
+								<configuration>
+									<fromDir>${repo.path}</fromDir>
+									<url>${scp.url}</url>
+									<serverId>sftp-repository</serverId>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
