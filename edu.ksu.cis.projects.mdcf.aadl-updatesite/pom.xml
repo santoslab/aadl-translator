@@ -26,8 +26,7 @@
 		<profile>
 			<id>uploadRepo</id>
 			<properties>
-				<scp.url>scpexe://cislinux.cis.ksu.edu/research/plgroup/web/santoslab.org/pub/mdcf-architect/</scp.url>
-				<scp.dir>research/plgroup/web/santoslab.org/pub/mdcf-architect/</scp.dir>
+				<scp.repourl>scpexe://cislinux.cis.ksu.edu/research/plgroup/web/santoslab.org/pub/mdcf-architect/updatesite/</scp.repourl>
 				<repo.path>${project.build.directory}/site/</repo.path>
 			</properties>
 			<build>
@@ -38,14 +37,14 @@
 						<version>1.0-beta-5</version>
 						<executions>
 							<execution>
-								<id>upload-repo</id>
+								<id>upload</id>
 								<phase>install</phase>
 								<goals>
 									<goal>upload</goal>
 								</goals>
 								<configuration>
 									<fromDir>${repo.path}</fromDir>
-									<url>${scp.url}</url>
+									<url>${scp.repourl}</url>
 									<serverId>sftp-repository</serverId>
 								</configuration>
 							</execution>
