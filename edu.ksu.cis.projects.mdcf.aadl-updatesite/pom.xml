@@ -24,7 +24,7 @@
 	</build>
 	<profiles>
 		<profile>
-			<id>uploadRepo</id>
+			<id>uploadToSite</id>
 			<properties>
 				<scp.repourl>scpexe://cislinux.cis.ksu.edu/research/plgroup/web/santoslab.org/pub/mdcf-architect/updatesite/</scp.repourl>
 				<repo.path>${project.build.directory}/site/</repo.path>

@@ -262,9 +262,7 @@ texinfo_documents = [
 extlinks = {'nsfgrant': ('http://www.nsf.gov/awardsearch/showAward?AWD_ID=%s', '') }
 
 def setup(sphinx):
-	# We have to insert both paths here since Sphinx can be called either locally, using "make html" or by maven at the top level.
 	sys.path.insert(0, os.path.abspath('./util'))
-	sys.path.insert(0, os.path.abspath('./mdcf-architect-documentation/src/site/sphinx/util'))
 	from AADLLexer import AADLLexer
 	from AADLDomain import myDomain
 	sphinx.add_lexer("aadl", AADLLexer())
