@@ -29,7 +29,7 @@ import os
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.mathjax', 'sphinx.ext.extlinks'
+    'sphinx.ext.extlinks',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -262,7 +262,10 @@ texinfo_documents = [
 extlinks = {'nsfgrant': ('http://www.nsf.gov/awardsearch/showAward?AWD_ID=%s', '') }
 
 def setup(sphinx):
-	sys.path.insert(0, os.path.abspath('.'))
-	sys.path.insert(0, os.path.abspath('./mdcf-architect-documentation/src/site/sphinx'))
+	# We have to insert both paths here since Sphinx can be called either locally, using "make html" or by maven at the top level.
+	sys.path.insert(0, os.path.abspath('./util'))
+	sys.path.insert(0, os.path.abspath('./mdcf-architect-documentation/src/site/sphinx/util'))
 	from AADLLexer import AADLLexer
+	from AADLDomain import myDomain
 	sphinx.add_lexer("aadl", AADLLexer())
+	sphinx.add_domain(myDomain)

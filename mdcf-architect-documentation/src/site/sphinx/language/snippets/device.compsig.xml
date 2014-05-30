@@ -1,0 +1,37 @@
+<mdcf.core.ctypes.AppModuleSignature>
+  <type>ICEpoInterface</type>
+  <moduleTasks>
+    <mdcf.core.ctypes.TaskSignature>
+      <type>PORT_SPORADIC</type>
+      <trigPortName>RawSpO2In</trigPortName>
+      <periodMs><!-- Placeholder value: Sporadic 
+      task's periods are derived from their 
+      triggering port --> -1</periodMs>
+      <taskName>SpO2Task</taskName>
+      <deadlineMs>50</deadlineMs>
+      <wcetMs>5</wcetMs>
+    </mdcf.core.ctypes.TaskSignature>
+  </moduleTasks>
+  <portSignatures>
+    <entry>
+      <string>RawSpO2In</string>
+      <mdcf.core.ctypes.PortSignature>
+        <portName>RawSpO2In</portName>
+        <portDirection>SUBSCRIBE</portDirection>
+        <minPeriod>100</minPeriod>
+        <maxPeriod>300</maxPeriod>
+        <portType>Integer</portType>
+      </mdcf.core.ctypes.PortSignature>
+    </entry>
+    <entry>
+      <string>SpO2Out</string>
+      <mdcf.core.ctypes.PortSignature>
+        <portName>SpO2Out</portName>
+        <portDirection>PUBLISH</portDirection>
+        <minPeriod>100</minPeriod>
+        <maxPeriod>300</maxPeriod>
+        <portType>Integer</portType>
+      </mdcf.core.ctypes.PortSignature>
+    </entry>
+  </portSignatures>
+</mdcf.core.ctypes.AppModuleSignature>
