@@ -13,7 +13,6 @@ Export-Package:
  edu.ksu.cis.projects.mdcf.aadltranslator.exception,
  edu.ksu.cis.projects.mdcf.aadltranslator.model,
  edu.ksu.cis.projects.mdcf.aadltranslator.preference,
- edu.ksu.cis.projects.mdcf.aadltranslator.view,
  org.stringtemplate.v4,
  org.stringtemplate.v4.compiler,
  org.stringtemplate.v4.debug,

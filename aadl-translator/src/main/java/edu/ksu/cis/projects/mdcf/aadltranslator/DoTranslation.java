@@ -49,13 +49,13 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.preference.PreferenceConstants;
 public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 	private final STGroup java_superclassSTG = new STGroupFile(
-			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/java-superclass.stg");
+			"src/main/resources/templates/java-superclass.stg");
 	private final STGroup java_userimplSTG = new STGroupFile(
-			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/java-userimpl.stg");
+			"src/main/resources/templates/java-userimpl.stg");
 	private final STGroup midas_compsigSTG = new STGroupFile(
-			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/midas-compsig.stg");
+			"src/main/resources/templates/midas-compsig.stg");
 	private final STGroup midas_appspecSTG = new STGroupFile(
-			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/midas-appspec.stg");
+			"src/main/resources/templates/midas-appspec.stg");
 	private ExecutionEvent triggeringEvent;
 
 	public HashSet<IFile> getUsedFiles() {
