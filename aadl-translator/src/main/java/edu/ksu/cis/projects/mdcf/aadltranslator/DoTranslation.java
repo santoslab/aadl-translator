@@ -180,7 +180,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				javaClasses.put(cm.getName() + "SuperType", java_superclassSTG
 					.getInstanceOf("class").add("model", cm).render());
 			} else {
-				javaClasses.put(cm.getName() + "PseudoDevice", java_superclassSTG
+				javaClasses.put(cm.getName(), java_superclassSTG
 						.getInstanceOf("class").add("model", cm).render());	
 			}
 			if (generateShells && !cm.isPseudoDevice()) {
