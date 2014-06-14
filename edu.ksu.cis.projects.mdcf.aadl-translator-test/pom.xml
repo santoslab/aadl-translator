@@ -43,7 +43,7 @@
 				<version>${tycho.version}</version>
 				<configuration>
 					<testSuite>edu.ksu.cis.projects.mdcf.aadl-translator-test</testSuite>
-					<testClass>edu.ksu.cis.projects.mdcf.aadltranslator.test.PulseOxSmartAlarmTests</testClass>
+					<testClass>edu.ksu.cis.projects.mdcf.aadltranslator.test.PulseOxForwardingTests</testClass>
 					<useUIHarness>true</useUIHarness>
 					<argLine>${sureFireArgLine} ${tycho.testArgLine}</argLine>
 				</configuration>

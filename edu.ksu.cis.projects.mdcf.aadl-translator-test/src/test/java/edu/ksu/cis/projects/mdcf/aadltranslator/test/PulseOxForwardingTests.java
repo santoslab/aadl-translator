@@ -46,7 +46,7 @@ import com.thoughtworks.xstream.XStream;
 import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFactory;
 
-public class PulseOxSmartAlarmTests {
+public class PulseOxForwardingTests {
 
 	private static HashMap<String, IFile> systemFiles = new HashMap<>();
 	private static ResourceSet resourceSet = null;
@@ -63,7 +63,7 @@ public class PulseOxSmartAlarmTests {
 
 	private static IProject testProject = null;
 
-	private HashSet<String> usedProperties;
+	private HashSet<String> usedProperties = new HashSet<>();
 
 	@BeforeClass
 	public static void initialize() {
@@ -124,7 +124,6 @@ public class PulseOxSmartAlarmTests {
 
 	@Before
 	public void setUp() {
-		usedProperties = new HashSet<>();
 		usedProperties.add("MAP_Properties");
 	}
 
@@ -255,44 +254,44 @@ public class PulseOxSmartAlarmTests {
 
 	@Test
 	public void testPulseOxSystem() {
-		usedProperties.add("PulseOx_SmartAlarm_Properties");
-		runTest("PulseOx", "PulseOx_SmartAlarm_System");
+		usedProperties.add("PulseOx_Forwarding_Properties");
+		runTest("PulseOx", "PulseOx_Forwarding_System");
 	}
 
 	@Test
 	public void testNoChannelDelay() {
-		usedProperties.add("PulseOx_SmartAlarmNoChannelDelay_Properties");
-		runTest("PulseOxNoChannelDelay", "PulseOx_SmartAlarm_System");
+		usedProperties.add("PulseOx_ForwardingNoChannelDelay_Properties");
+		runTest("PulseOxNoChannelDelay", "PulseOx_Forwarding_System");
 	}
 
 	@Test
 	public void testNoOutputRate() {
-		usedProperties.add("PulseOx_SmartAlarmNoOutputRate_Properties");
-		runTest("PulseOxNoOutputRate", "PulseOx_SmartAlarm_System");
+		usedProperties.add("PulseOx_ForwardingNoOutputRate_Properties");
+		runTest("PulseOxNoOutputRate", "PulseOx_Forwarding_System");
 	}
 
 	@Test
 	public void testNoThreadDeadline() {
-		usedProperties.add("PulseOx_SmartAlarmNoThreadDeadline_Properties");
-		runTest("PulseOxNoThreadDeadline", "PulseOx_SmartAlarm_System");
+		usedProperties.add("PulseOx_ForwardingNoThreadDeadline_Properties");
+		runTest("PulseOxNoThreadDeadline", "PulseOx_Forwarding_System");
 	}
 
 	@Test
 	public void testNoThreadDispatch() {
-		usedProperties.add("PulseOx_SmartAlarmNoThreadDispatch_Properties");
-		runTest("PulseOxNoThreadDispatch", "PulseOx_SmartAlarm_System");
+		usedProperties.add("PulseOx_ForwardingNoThreadDispatch_Properties");
+		runTest("PulseOxNoThreadDispatch", "PulseOx_Forwarding_System");
 	}
 
 	@Test
 	public void testNoThreadPeriod() {
-		usedProperties.add("PulseOx_SmartAlarmNoThreadPeriod_Properties");
-		runTest("PulseOxNoThreadPeriod", "PulseOx_SmartAlarm_System");
+		usedProperties.add("PulseOx_ForwardingNoThreadPeriod_Properties");
+		runTest("PulseOxNoThreadPeriod", "PulseOx_Forwarding_System");
 	}
 
 	@Test
 	public void testNoWCET() {
-		usedProperties.add("PulseOx_SmartAlarmNoWCET_Properties");
-		runTest("PulseOxNoWCET", "PulseOx_SmartAlarm_System");
+		usedProperties.add("PulseOx_ForwardingNoWCET_Properties");
+		runTest("PulseOxNoWCET", "PulseOx_Forwarding_System");
 	}
 
 	private class ReadFileIntoString implements LineProcessor<String> {
