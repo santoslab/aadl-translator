@@ -1,0 +1,96 @@
+Error at PulseOx_Forwarding_Duplicate_System.aadl:27: Got a system called Duplicate_System but I already have one called PulseOx_Forwarding_Duplicate_System
+<edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel>
+  <name>PulseOx_Forwarding_Duplicate_System</name>
+  <logicComponents>
+    <entry>
+      <string>appDisplay</string>
+      <edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
+        <name>PulseOx_Display_Process</name>
+        <systemName>PulseOx_Forwarding_Duplicate_System</systemName>
+        <ports/>
+        <tasks/>
+        <globals/>
+        <methods/>
+      </edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
+    </entry>
+    <entry>
+      <string>appLogic</string>
+      <edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
+        <name>PulseOx_Logic_Process</name>
+        <systemName>PulseOx_Forwarding_Duplicate_System</systemName>
+        <ports/>
+        <tasks/>
+        <globals/>
+        <methods/>
+      </edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel>
+    </entry>
+  </logicComponents>
+  <devices>
+    <entry>
+      <string>pulseOx</string>
+      <edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel>
+        <name>ICEpoInterface</name>
+        <systemName>PulseOx_Forwarding_Duplicate_System</systemName>
+        <ports/>
+        <tasks/>
+        <kind>PSEUDODEVICE</kind>
+        <inToOutPortNames serialization="custom">
+          <unserializable-parents/>
+          <com.google.common.collect.HashBiMap>
+            <default/>
+            <int>0</int>
+          </com.google.common.collect.HashBiMap>
+        </inToOutPortNames>
+      </edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel>
+    </entry>
+  </devices>
+  <channels>
+    <edu.ksu.cis.projects.mdcf.aadltranslator.model.ConnectionModel>
+      <publisher class="edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel" reference="../../../devices/entry/edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel"/>
+      <subscriber class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel" reference="../../../logicComponents/entry[2]/edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel"/>
+      <devicePublished>true</devicePublished>
+      <deviceSubscribed>false</deviceSubscribed>
+      <pubName>pulseOx</pubName>
+      <subName>appLogic</subName>
+      <pubPortName>SpO2</pubPortName>
+      <subPortName>SpO2</subPortName>
+      <channelDelay>100</channelDelay>
+    </edu.ksu.cis.projects.mdcf.aadltranslator.model.ConnectionModel>
+    <edu.ksu.cis.projects.mdcf.aadltranslator.model.ConnectionModel>
+      <publisher class="edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel" reference="../../../devices/entry/edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel"/>
+      <subscriber class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel" reference="../../../logicComponents/entry/edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel"/>
+      <devicePublished>true</devicePublished>
+      <deviceSubscribed>false</deviceSubscribed>
+      <pubName>pulseOx</pubName>
+      <subName>appDisplay</subName>
+      <pubPortName>SpO2</pubPortName>
+      <subPortName>SpO2</subPortName>
+      <channelDelay>100</channelDelay>
+    </edu.ksu.cis.projects.mdcf.aadltranslator.model.ConnectionModel>
+    <edu.ksu.cis.projects.mdcf.aadltranslator.model.ConnectionModel>
+      <publisher class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel" reference="../../../logicComponents/entry[2]/edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel"/>
+      <subscriber class="edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel" reference="../../../logicComponents/entry/edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel"/>
+      <devicePublished>false</devicePublished>
+      <deviceSubscribed>false</deviceSubscribed>
+      <pubName>appLogic</pubName>
+      <subName>appDisplay</subName>
+      <pubPortName>DerivedAlarm</pubPortName>
+      <subPortName>DerivedAlarm</subPortName>
+      <channelDelay>100</channelDelay>
+    </edu.ksu.cis.projects.mdcf.aadltranslator.model.ConnectionModel>
+  </channels>
+  <typeToComponent>
+    <entry>
+      <string>ICEpoInterface</string>
+      <edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel reference="../../../devices/entry/edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel"/>
+    </entry>
+    <entry>
+      <string>PulseOx_Logic_Process</string>
+      <edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel reference="../../../logicComponents/entry[2]/edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel"/>
+    </entry>
+    <entry>
+      <string>PulseOx_Display_Process</string>
+      <edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel reference="../../../logicComponents/entry/edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel"/>
+    </entry>
+  </typeToComponent>
+</edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel>

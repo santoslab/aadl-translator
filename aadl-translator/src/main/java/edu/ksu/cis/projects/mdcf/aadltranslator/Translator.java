@@ -116,17 +116,17 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			return NOT_DONE;
 		}
 
-		@Override
-		public String casePropertySet(PropertySet obj) {
-			propertySetNames.add(obj.getName());
-			return NOT_DONE;
-		}
-
-		@Override
-		public String casePackageSection(PackageSection obj) {
-			processEList(obj.getOwnedClassifiers());
-			return DONE;
-		}
+//		@Override
+//		public String casePropertySet(PropertySet obj) {
+//			propertySetNames.add(obj.getName());
+//			return NOT_DONE;
+//		}
+//
+//		@Override
+//		public String casePackageSection(PackageSection obj) {
+//			processEList(obj.getOwnedClassifiers());
+//			return DONE;
+//		}
 
 		@Override
 		public String caseDeviceSubcomponent(DeviceSubcomponent obj) {
@@ -328,41 +328,41 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 		}
 
-		@Override
-		public String caseDataSubcomponent(DataSubcomponent obj) {
-			ProcessModel pm = null;
-			if (lastElemProcessed == ElementType.PROCESS) {
-				Property prop = GetProperties.lookupPropertyDefinition(
-						obj.getDataSubcomponentType(), DataModel._NAME,
-						DataModel.Data_Representation);
-				String typeName = null;
-				try {
-					if (componentModel instanceof ProcessModel)
-						pm = (ProcessModel) componentModel;
-					else
-						throw new NotImplementedException(
-								"Data subcomponents aren't supported for non-process subcomponent "
-										+ componentModel.getName());
-					typeName = getJavaType(PropertyUtils.getEnumLiteral(obj,
-							prop).getName());
-				} catch (NotImplementedException e) {
-					handleException(obj, e);
-					return DONE;
-				}
-				pm.addGlobal(obj.getName(), typeName);
-			}
-			return NOT_DONE;
-		}
+//		@Override
+//		public String caseDataSubcomponent(DataSubcomponent obj) {
+//			ProcessModel pm = null;
+//			if (lastElemProcessed == ElementType.PROCESS) {
+//				Property prop = GetProperties.lookupPropertyDefinition(
+//						obj.getDataSubcomponentType(), DataModel._NAME,
+//						DataModel.Data_Representation);
+//				String typeName = null;
+//				try {
+//					if (componentModel instanceof ProcessModel)
+//						pm = (ProcessModel) componentModel;
+//					else
+//						throw new NotImplementedException(
+//								"Data subcomponents aren't supported for non-process subcomponent "
+//										+ componentModel.getName());
+//					typeName = getJavaType(PropertyUtils.getEnumLiteral(obj,
+//							prop).getName());
+//				} catch (NotImplementedException e) {
+//					handleException(obj, e);
+//					return DONE;
+//				}
+//				pm.addGlobal(obj.getName(), typeName);
+//			}
+//			return NOT_DONE;
+//		}
 
-		@Override
-		public String caseAccessConnection(AccessConnection obj) {
-			if (lastElemProcessed == ElementType.PROCESS) {
-				handleProcessDataConnection(obj);
-			} else if (lastElemProcessed == ElementType.THREAD) {
-				handleSubprogramDataConnection(obj);
-			}
-			return NOT_DONE;
-		}
+//		@Override
+//		public String caseAccessConnection(AccessConnection obj) {
+//			if (lastElemProcessed == ElementType.PROCESS) {
+//				handleProcessDataConnection(obj);
+//			} else if (lastElemProcessed == ElementType.THREAD) {
+//				handleSubprogramDataConnection(obj);
+//			}
+//			return NOT_DONE;
+//		}
 
 		@Override
 		public String caseAadlPackage(AadlPackage obj) {
@@ -646,7 +646,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			ConnectionModel connModel = new ConnectionModel();
 			String channelDelay = null;
 			try {
-				if (obj.getAllSource().getOwner() instanceof DeviceType) {
+				if ((obj.getAllSource().getOwner() instanceof DeviceType) && (obj.getAllDestination().getOwner() instanceof ProcessType)) {
 					// From device to process
 					pubTypeName = ((DeviceType) obj.getAllSource().getOwner())
 							.getName();
@@ -656,7 +656,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					subModel = systemModel.getProcessByType(subTypeName);
 					connModel.setDevicePublished(true);
 					connModel.setDeviceSubscribed(false);
-				} else if (obj.getAllDestination().getOwner() instanceof DeviceType) {
+				} else if ((obj.getAllSource().getOwner() instanceof ProcessType)  && (obj.getAllDestination().getOwner() instanceof DeviceType)) {
 					// From process to device
 					pubTypeName = ((ProcessType) obj.getAllSource().getOwner())
 							.getName();
@@ -706,130 +706,130 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			systemModel.addConnection(connModel);
 		}
 
-		private void handleSubprogramDataConnection(AccessConnection obj) {
-			// TODO: This method currently creates methods as necessary --
-			// instead, they should be declared at the process level and
-			// initialized ahead of time
-			String parentName, internalName, formalParam, actualParam;
-			TaskModel task;
-			ProcessModel pm;
-			try {
-				if (componentModel instanceof ProcessModel)
-					pm = (ProcessModel) componentModel;
-				else
-					throw new NotImplementedException(
-							"Attempted to add subprogram data connection to unsupported component "
-									+ componentModel.getName());
-			} catch (NotImplementedException e) {
-				handleException(obj, e);
-				return;
-			}
-			if (obj.getAllSource().getOwner() instanceof ThreadType) {
-				// A passed parameter: From thread to method
-				formalParam = obj.getAllDestination().getName();
-				actualParam = obj.getAllSource().getName();
-				internalName = obj.getAllDestinationContext().getName();
-				parentName = ((ThreadType) obj.getAllSource().getOwner())
-						.getName();
-				task = componentModel.getTask(parentName);
-				String paramType = null;
-				String methodName = task.getMethodProcessName(internalName);
-				for (DataAccess data : ((SubprogramType) obj
-						.getAllDestination().getOwner()).getOwnedDataAccesses()) {
-					if (data.getName().equals(formalParam)) {
-						try {
-							if (componentModel instanceof ProcessModel)
-								pm = (ProcessModel) componentModel;
-							else
-								throw new NotImplementedException(
-										"Attempted to add subprogram data connection to unsupported component "
-												+ componentModel.getName());
-							Property prop = GetProperties
-									.lookupPropertyDefinition(
-											data.getDataFeatureClassifier(),
-											DataModel._NAME,
-											DataModel.Data_Representation);
-							paramType = getJavaType(PropertyUtils
-									.getEnumLiteral(data, prop).getName());
-							pm.addParameterToMethod(methodName, formalParam,
-									paramType);
-						} catch (NotImplementedException
-								| DuplicateElementException e) {
-							handleException(obj, e);
-							return;
-						}
-					}
-				}
-				task.addParameterToCalledMethod(internalName, formalParam,
-						actualParam);
-			} else {
-				// A returned value: From method to thread
-				parentName = ((ThreadType) obj.getAllDestination().getOwner())
-						.getName();
-				task = componentModel.getTask(parentName);
-				internalName = obj.getAllSourceContext().getName();
-				String methodName = task.getMethodProcessName(internalName);
-				String returnType = null;
-				formalParam = obj.getAllSource().getName();
-				for (DataAccess data : ((SubprogramType) obj.getAllSource()
-						.getOwner()).getOwnedDataAccesses()) {
-					if (data.getName().equals(formalParam)) {
-						try {
-							Property prop = GetProperties
-									.lookupPropertyDefinition(
-											data.getDataFeatureClassifier(),
-											DataModel._NAME,
-											DataModel.Data_Representation);
-							returnType = getJavaType(PropertyUtils
-									.getEnumLiteral(data, prop).getName());
-						} catch (NotImplementedException e) {
-							handleException(obj, e);
-							return;
-						}
-					}
-				}
-				pm.addReturnToMethod(methodName, returnType);
-			}
-		}
-
-		private void handleProcessDataConnection(AccessConnection obj) {
-			String parentName;
-			TaskModel task;
-			VariableModel vm = new VariableModel();
-			String srcName = obj.getAllSource().getName();
-			String dstName = obj.getAllDestination().getName();
-			ProcessModel pm;
-			try {
-				if (componentModel instanceof ProcessModel)
-					pm = (ProcessModel) componentModel;
-				else
-					throw new NotImplementedException(
-							"Attempted to add process data connection to unsupported component "
-									+ componentModel.getName());
-			} catch (NotImplementedException e) {
-				handleException(obj, e);
-				return;
-			}
-			if (obj.getAllSource().getOwner() instanceof ThreadType) {
-				// From thread to process
-				parentName = ((ThreadType) obj.getAllSource().getOwner())
-						.getName();
-				task = pm.getTask(parentName);
-				vm.setOuterName(dstName);
-				vm.setInnerName(srcName);
-				vm.setType(pm.getGlobalType(dstName));
-				task.addOutGlobal(vm);
-			} else {
-				// From process to thread
-				parentName = ((ThreadType) obj.getAllDestination().getOwner())
-						.getName();
-				task = pm.getTask(parentName);
-				vm.setOuterName(srcName);
-				vm.setInnerName(dstName);
-				vm.setType(pm.getGlobalType(srcName));
-				task.addIncGlobal(vm);
-			}
-		}
+//		private void handleSubprogramDataConnection(AccessConnection obj) {
+//			// TODO: This method currently creates methods as necessary --
+//			// instead, they should be declared at the process level and
+//			// initialized ahead of time
+//			String parentName, internalName, formalParam, actualParam;
+//			TaskModel task;
+//			ProcessModel pm;
+//			try {
+//				if (componentModel instanceof ProcessModel)
+//					pm = (ProcessModel) componentModel;
+//				else
+//					throw new NotImplementedException(
+//							"Attempted to add subprogram data connection to unsupported component "
+//									+ componentModel.getName());
+//			} catch (NotImplementedException e) {
+//				handleException(obj, e);
+//				return;
+//			}
+//			if (obj.getAllSource().getOwner() instanceof ThreadType) {
+//				// A passed parameter: From thread to method
+//				formalParam = obj.getAllDestination().getName();
+//				actualParam = obj.getAllSource().getName();
+//				internalName = obj.getAllDestinationContext().getName();
+//				parentName = ((ThreadType) obj.getAllSource().getOwner())
+//						.getName();
+//				task = componentModel.getTask(parentName);
+//				String paramType = null;
+//				String methodName = task.getMethodProcessName(internalName);
+//				for (DataAccess data : ((SubprogramType) obj
+//						.getAllDestination().getOwner()).getOwnedDataAccesses()) {
+//					if (data.getName().equals(formalParam)) {
+//						try {
+//							if (componentModel instanceof ProcessModel)
+//								pm = (ProcessModel) componentModel;
+//							else
+//								throw new NotImplementedException(
+//										"Attempted to add subprogram data connection to unsupported component "
+//												+ componentModel.getName());
+//							Property prop = GetProperties
+//									.lookupPropertyDefinition(
+//											data.getDataFeatureClassifier(),
+//											DataModel._NAME,
+//											DataModel.Data_Representation);
+//							paramType = getJavaType(PropertyUtils
+//									.getEnumLiteral(data, prop).getName());
+//							pm.addParameterToMethod(methodName, formalParam,
+//									paramType);
+//						} catch (NotImplementedException
+//								| DuplicateElementException e) {
+//							handleException(obj, e);
+//							return;
+//						}
+//					}
+//				}
+//				task.addParameterToCalledMethod(internalName, formalParam,
+//						actualParam);
+//			} else {
+//				// A returned value: From method to thread
+//				parentName = ((ThreadType) obj.getAllDestination().getOwner())
+//						.getName();
+//				task = componentModel.getTask(parentName);
+//				internalName = obj.getAllSourceContext().getName();
+//				String methodName = task.getMethodProcessName(internalName);
+//				String returnType = null;
+//				formalParam = obj.getAllSource().getName();
+//				for (DataAccess data : ((SubprogramType) obj.getAllSource()
+//						.getOwner()).getOwnedDataAccesses()) {
+//					if (data.getName().equals(formalParam)) {
+//						try {
+//							Property prop = GetProperties
+//									.lookupPropertyDefinition(
+//											data.getDataFeatureClassifier(),
+//											DataModel._NAME,
+//											DataModel.Data_Representation);
+//							returnType = getJavaType(PropertyUtils
+//									.getEnumLiteral(data, prop).getName());
+//						} catch (NotImplementedException e) {
+//							handleException(obj, e);
+//							return;
+//						}
+//					}
+//				}
+//				pm.addReturnToMethod(methodName, returnType);
+//			}
+//		}
+//
+//		private void handleProcessDataConnection(AccessConnection obj) {
+//			String parentName;
+//			TaskModel task;
+//			VariableModel vm = new VariableModel();
+//			String srcName = obj.getAllSource().getName();
+//			String dstName = obj.getAllDestination().getName();
+//			ProcessModel pm;
+//			try {
+//				if (componentModel instanceof ProcessModel)
+//					pm = (ProcessModel) componentModel;
+//				else
+//					throw new NotImplementedException(
+//							"Attempted to add process data connection to unsupported component "
+//									+ componentModel.getName());
+//			} catch (NotImplementedException e) {
+//				handleException(obj, e);
+//				return;
+//			}
+//			if (obj.getAllSource().getOwner() instanceof ThreadType) {
+//				// From thread to process
+//				parentName = ((ThreadType) obj.getAllSource().getOwner())
+//						.getName();
+//				task = pm.getTask(parentName);
+//				vm.setOuterName(dstName);
+//				vm.setInnerName(srcName);
+//				vm.setType(pm.getGlobalType(dstName));
+//				task.addOutGlobal(vm);
+//			} else {
+//				// From process to thread
+//				parentName = ((ThreadType) obj.getAllDestination().getOwner())
+//						.getName();
+//				task = pm.getTask(parentName);
+//				vm.setOuterName(srcName);
+//				vm.setInnerName(dstName);
+//				vm.setType(pm.getGlobalType(srcName));
+//				task.addIncGlobal(vm);
+//			}
+//		}
 
 		@Override
 		public String casePortConnection(PortConnection obj) {

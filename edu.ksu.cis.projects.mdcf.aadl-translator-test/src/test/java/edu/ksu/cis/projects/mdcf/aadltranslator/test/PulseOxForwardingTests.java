@@ -56,6 +56,7 @@ public class PulseOxForwardingTests {
 	// supporting files
 	private static HashSet<String> supportingFiles = new HashSet<>();
 	private static HashSet<String> propertyFiles = new HashSet<>();
+	private static HashSet<String> deviceFiles = new HashSet<>();
 	private final boolean GENERATE_EXPECTED = false;
 
 	private final static String BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator-test";
@@ -63,6 +64,7 @@ public class PulseOxForwardingTests {
 
 	private static IProject testProject = null;
 
+	private HashSet<String> usedDevices = new HashSet<>();
 	private HashSet<String> usedProperties = new HashSet<>();
 
 	@BeforeClass
@@ -130,6 +132,7 @@ public class PulseOxForwardingTests {
 	@After
 	public void tearDown() {
 		usedProperties.clear();
+		usedDevices.clear();
 	}
 
 	private static void initFiles(IFolder packagesFolder,
@@ -140,14 +143,19 @@ public class PulseOxForwardingTests {
 				TEST_DIR + "aadl/propertyset/");
 		URL aadlSystemDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
 				TEST_DIR + "aadl/system/");
+		URL aadlDeviceDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
+				TEST_DIR + "aadl/device/");
 		File aadlDir = null;
 		File aadlPropertysetsDir = null;
 		File aadlSystemDir = null;
+		File aadlDeviceDir = null;
 		try {
 			aadlDir = new File(FileLocator.toFileURL(aadlDirUrl).getPath());
 			aadlPropertysetsDir = new File(FileLocator.toFileURL(
 					aadlPropertysetsDirUrl).getPath());
 			aadlSystemDir = new File(FileLocator.toFileURL(aadlSystemDirUrl)
+					.getPath());
+			aadlDeviceDir = new File(FileLocator.toFileURL(aadlDeviceDirUrl)
 					.getPath());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -159,6 +167,8 @@ public class PulseOxForwardingTests {
 		// kludge this in with an unused hashset...
 		initFiles(packagesFolder, propertySetsFolder, aadlSystemDir,
 				systemFiles, new HashSet<String>());
+		initFiles(packagesFolder, propertySetsFolder, aadlDeviceDir,
+				systemFiles, deviceFiles);
 		initFiles(packagesFolder, propertySetsFolder, aadlPropertysetsDir,
 				systemFiles, propertyFiles);
 	}
@@ -207,6 +217,8 @@ public class PulseOxForwardingTests {
 		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
 				.toString());
 
+		supportingFiles.addAll(usedDevices);
+		
 		for (String supportingFileName : supportingFiles) {
 			IFile supportingFile = systemFiles.get(supportingFileName);
 			res = resourceSet.getResource(OsateResourceUtil
@@ -216,6 +228,9 @@ public class PulseOxForwardingTests {
 			errorSB.append(parseErrManager.getReporter(
 					(IResource) supportingFile).toString());
 		}
+		
+		supportingFiles.removeAll(usedDevices);
+		
 		XStream xs = new XStream();
 
 		try {
@@ -292,6 +307,31 @@ public class PulseOxForwardingTests {
 	public void testNoWCET() {
 		usedProperties.add("PulseOx_ForwardingNoWCET_Properties");
 		runTest("PulseOxNoWCET", "PulseOx_Forwarding_System");
+	}
+
+	@Test
+	public void testDuplicateSystem() {
+		usedProperties.add("PulseOx_Forwarding_Properties");
+		runTest("PulseOxDuplicateSystem", "PulseOx_Forwarding_Duplicate_System");
+	}
+
+	@Test
+	public void testIntegerOverflow() {
+		usedProperties.add("PulseOx_ForwardingIntegerOverflow_Properties");
+		runTest("PulseOxIntegerOverflow", "PulseOx_Forwarding_System");
+	}
+
+	@Test
+	public void testBidirectionalPort() {
+		usedProperties.add("PulseOx_Forwarding_Properties");
+		runTest("PulseOxBidirectionalPortConnection", "PulseOx_Forwarding_Bidirectional_System");
+	}
+
+	@Test
+	public void testDevToDevConnection() {
+		usedProperties.add("PulseOx_Forwarding_Properties");
+		usedDevices.add("PulseOx_UseSpO2_Interface");
+		runTest("PulseOxDevToDevConnection", "PulseOx_Forwarding_DevToDev_System");
 	}
 
 	private class ReadFileIntoString implements LineProcessor<String> {

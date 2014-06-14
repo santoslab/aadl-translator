@@ -1,0 +1,12 @@
+package PulseOx_UseSpO2_Interface
+public
+with PulseOx_Forwarding_Types;
+	device ICEpoUseInterface
+	features
+		SpO2 : out event data port PulseOx_Forwarding_Types::SpO2;
+	end ICEpoUseInterface;
+
+	device implementation ICEpoUseInterface.imp
+	end ICEpoUseInterface.imp;
+
+end PulseOx_UseSpO2_Interface;
