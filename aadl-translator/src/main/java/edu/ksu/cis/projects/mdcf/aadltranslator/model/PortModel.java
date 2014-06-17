@@ -1,8 +1,8 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
-public class PortModel {
-	private enum PortCategory {EVENT, DATA, EVENTDATA};
-	
+import org.osate.aadl2.PortCategory;
+
+public class PortModel {	
 	private String name;
 	private boolean subscribe;
 	private PortCategory category;
@@ -23,7 +23,7 @@ public class PortModel {
 	}
 	
 	public boolean isEventData() {
-		return category == PortCategory.EVENTDATA;
+		return category == PortCategory.EVENT_DATA;
 	}
 	
 	public boolean isEvent() {
@@ -39,7 +39,7 @@ public class PortModel {
 	}
 
 	public void setEventData() {
-		this.category = PortCategory.EVENTDATA;
+		this.category = PortCategory.EVENT_DATA;
 	}
 
 	public String getType() {

@@ -1,13 +1,9 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.test;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -30,42 +26,51 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterFactory;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 
-import com.google.common.io.Files;
-import com.google.common.io.LineProcessor;
 import com.thoughtworks.xstream.XStream;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFactory;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 
-public class PulseOxForwardingTests {
-
-	private static HashMap<String, IFile> systemFiles = new HashMap<>();
-	private static ResourceSet resourceSet = null;
-	private Translator stats;
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+	DeviceModelTests.class,
+	ControllerErrorTests.class,
+	ProcessModelTests.class
+})
+public class AllTests {
+	public static HashMap<String, IFile> systemFiles = new HashMap<>();
+	public static ResourceSet resourceSet = null;
+	public static Translator stats;
 
 	// This may need to turn into a map from system name -> the set of
 	// supporting files
-	private static HashSet<String> supportingFiles = new HashSet<>();
-	private static HashSet<String> propertyFiles = new HashSet<>();
-	private static HashSet<String> deviceFiles = new HashSet<>();
-	private final boolean GENERATE_EXPECTED = false;
+	public static HashSet<String> supportingFiles = new HashSet<>();
+	public static HashSet<String> propertyFiles = new HashSet<>();
+	public static HashSet<String> deviceFiles = new HashSet<>();
+	public final boolean GENERATE_EXPECTED = false;
 
-	private final static String BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator-test";
-	private final static String TEST_DIR = "src/test/resources/edu/ksu/cis/projects/mdcf/aadltranslator/test/";
+	public final static String BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator-test";
+	public final static String TEST_DIR = "src/test/resources/edu/ksu/cis/projects/mdcf/aadltranslator/test/";
 
-	private static IProject testProject = null;
-
-	private HashSet<String> usedDevices = new HashSet<>();
-	private HashSet<String> usedProperties = new HashSet<>();
+	public static IProject testProject = null;
+	
+	public static HashSet<String> usedDevices = new HashSet<>();
+	public static HashSet<String> usedProperties = new HashSet<>();
+	public static XStream xs = new XStream();
+	public static ParseErrorReporterFactory parseErrorReporterFactory = TestParseErrorReporterFactory.INSTANCE;
+	public static ParseErrorReporterManager parseErrManager;
+	
+	public static boolean initComplete = false;
+	public static StringBuilder errorSB = new StringBuilder();
 
 	@BeforeClass
 	public static void initialize() {
@@ -115,26 +120,15 @@ public class PulseOxForwardingTests {
 			
 			initFiles(packagesFolder, propertySetsFolder);
 			
-			resourceSet = OsateResourceUtil.createResourceSet();
 			testProject
 					.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
 		} catch (CoreException | ExecutionException | NotDefinedException
 				| NotEnabledException | NotHandledException e) {
 			e.printStackTrace();
 		}
+		initComplete = true;
 	}
-
-	@Before
-	public void setUp() {
-		usedProperties.add("MAP_Properties");
-	}
-
-	@After
-	public void tearDown() {
-		usedProperties.clear();
-		usedDevices.clear();
-	}
-
+	
 	private static void initFiles(IFolder packagesFolder,
 			IFolder propertySetsFolder) {
 		URL aadlDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
@@ -196,15 +190,12 @@ public class PulseOxForwardingTests {
 			e.printStackTrace();
 		}
 	}
-
-	private void runTest(final String testName, final String systemName) {
-		StringBuilder errorSB = new StringBuilder();
+	
+	public static SystemModel runTest(final String testName, final String systemName) {
 		IFile inputFile = systemFiles.get(systemName);
 		stats = new Translator(new NullProgressMonitor());
 
-		ParseErrorReporterFactory parseErrorReporterFactory = TestParseErrorReporterFactory.INSTANCE;
-		ParseErrorReporterManager parseErrManager = new ParseErrorReporterManager(
-				parseErrorReporterFactory);
+		parseErrManager = new ParseErrorReporterManager(parseErrorReporterFactory);
 
 		stats.setErrorManager(parseErrManager);
 		for (String propSetName : usedProperties) {
@@ -230,124 +221,7 @@ public class PulseOxForwardingTests {
 		}
 		
 		supportingFiles.removeAll(usedDevices);
-		
-		XStream xs = new XStream();
 
-		try {
-			testExpectedResult(testName, systemName,
-					xs.toXML(stats.getSystemModel()), errorSB.toString());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void testExpectedResult(final String testName,
-			final String systemName, final String content, final String errors)
-			throws URISyntaxException, IOException, Exception {
-
-		URL testDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(TEST_DIR);
-		File testDir = new File(FileLocator.toFileURL(testDirUrl).getPath());
-
-		final File expected = new File(testDir, "expected/" + testName + ".xml");
-		final File result = new File(testDir, "actual/" + testName + ".xml");
-		if (GENERATE_EXPECTED) {
-			expected.getParentFile().mkdirs();
-			Files.write(errors + content, expected, StandardCharsets.US_ASCII);
-		} else {
-			result.getParentFile().mkdirs();
-			Files.write(errors + content, result, StandardCharsets.US_ASCII);
-			assertFilesEqual(expected, errors + content);
-		}
-	}
-
-	private void assertFilesEqual(final File expectedFile,
-			final String resultString) throws Exception {
-		final String expectedFileAsString = Files.readLines(expectedFile,
-				StandardCharsets.US_ASCII, new ReadFileIntoString());
-		assertEquals(expectedFileAsString, resultString);
-	}
-
-	@Test
-	public void testPulseOxSystem() {
-		usedProperties.add("PulseOx_Forwarding_Properties");
-		runTest("PulseOx", "PulseOx_Forwarding_System");
-	}
-
-	@Test
-	public void testNoChannelDelay() {
-		usedProperties.add("PulseOx_ForwardingNoChannelDelay_Properties");
-		runTest("PulseOxNoChannelDelay", "PulseOx_Forwarding_System");
-	}
-
-	@Test
-	public void testNoOutputRate() {
-		usedProperties.add("PulseOx_ForwardingNoOutputRate_Properties");
-		runTest("PulseOxNoOutputRate", "PulseOx_Forwarding_System");
-	}
-
-	@Test
-	public void testNoThreadDeadline() {
-		usedProperties.add("PulseOx_ForwardingNoThreadDeadline_Properties");
-		runTest("PulseOxNoThreadDeadline", "PulseOx_Forwarding_System");
-	}
-
-	@Test
-	public void testNoThreadDispatch() {
-		usedProperties.add("PulseOx_ForwardingNoThreadDispatch_Properties");
-		runTest("PulseOxNoThreadDispatch", "PulseOx_Forwarding_System");
-	}
-
-	@Test
-	public void testNoThreadPeriod() {
-		usedProperties.add("PulseOx_ForwardingNoThreadPeriod_Properties");
-		runTest("PulseOxNoThreadPeriod", "PulseOx_Forwarding_System");
-	}
-
-	@Test
-	public void testNoWCET() {
-		usedProperties.add("PulseOx_ForwardingNoWCET_Properties");
-		runTest("PulseOxNoWCET", "PulseOx_Forwarding_System");
-	}
-
-	@Test
-	public void testDuplicateSystem() {
-		usedProperties.add("PulseOx_Forwarding_Properties");
-		runTest("PulseOxDuplicateSystem", "PulseOx_Forwarding_Duplicate_System");
-	}
-
-	@Test
-	public void testIntegerOverflow() {
-		usedProperties.add("PulseOx_ForwardingIntegerOverflow_Properties");
-		runTest("PulseOxIntegerOverflow", "PulseOx_Forwarding_System");
-	}
-
-	@Test
-	public void testBidirectionalPort() {
-		usedProperties.add("PulseOx_Forwarding_Properties");
-		runTest("PulseOxBidirectionalPortConnection", "PulseOx_Forwarding_Bidirectional_System");
-	}
-
-	@Test
-	public void testDevToDevConnection() {
-		usedProperties.add("PulseOx_Forwarding_Properties");
-		usedDevices.add("PulseOx_UseSpO2_Interface");
-		runTest("PulseOxDevToDevConnection", "PulseOx_Forwarding_DevToDev_System");
-	}
-
-	private class ReadFileIntoString implements LineProcessor<String> {
-		StringBuilder theFileAsAString = new StringBuilder();
-
-		@Override
-		public String getResult() {
-			return theFileAsAString.deleteCharAt(theFileAsAString.length() - 1)
-					.toString();
-		}
-
-		@Override
-		public boolean processLine(String line) throws IOException {
-			theFileAsAString.append(line);
-			theFileAsAString.append("\n");
-			return true;
-		}
+		return stats.getSystemModel();
 	}
 }
