@@ -34,17 +34,22 @@ import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterFactory;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 
-import com.thoughtworks.xstream.XStream;
-
 import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFactory;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+	// Model Tests
+	SystemModelTests.class,
 	DeviceModelTests.class,
+	ProcessModelTests.class,
+	TaskModelTests.class,
+	PortModelTests.class,
+	ConnectionModelTests.class,
+
+	// Error-handling tests
 	ControllerErrorTests.class,
-	ProcessModelTests.class
 })
 public class AllTests {
 	public static HashMap<String, IFile> systemFiles = new HashMap<>();
@@ -65,7 +70,6 @@ public class AllTests {
 	
 	public static HashSet<String> usedDevices = new HashSet<>();
 	public static HashSet<String> usedProperties = new HashSet<>();
-	public static XStream xs = new XStream();
 	public static ParseErrorReporterFactory parseErrorReporterFactory = TestParseErrorReporterFactory.INSTANCE;
 	public static ParseErrorReporterManager parseErrManager;
 	

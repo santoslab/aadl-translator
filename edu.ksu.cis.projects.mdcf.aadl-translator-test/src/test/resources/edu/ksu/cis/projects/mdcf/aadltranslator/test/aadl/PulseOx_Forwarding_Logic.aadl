@@ -5,7 +5,8 @@ with PulseOx_Forwarding_Types, MAP_Properties;
 	process PulseOx_Logic_Process
 	features
 		SpO2 : in data port PulseOx_Forwarding_Types::SpO2;
-		DerivedAlarm : out event port;
+		DerivedAlarm : out event port
+		{MAP_Properties::Output_Rate => 200 ms .. 400 ms};
 	properties
 		MAP_Properties::Component_Type => logic;
 	end PulseOx_Logic_Process;

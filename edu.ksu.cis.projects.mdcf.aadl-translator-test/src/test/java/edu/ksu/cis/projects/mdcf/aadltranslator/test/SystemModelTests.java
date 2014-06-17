@@ -9,12 +9,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 
-public class DeviceModelTests {
-
-	private static DeviceModel deviceModel;
+public class SystemModelTests {
+	private static SystemModel systemModel;
 
 	@BeforeClass
 	public static void initialize() {
@@ -22,8 +20,7 @@ public class DeviceModelTests {
 			AllTests.initialize();
 		usedProperties.add("MAP_Properties");
 		usedProperties.add("PulseOx_Forwarding_Properties");
-		SystemModel systemModel = AllTests.runTest("PulseOx", "PulseOx_Forwarding_System");
-		deviceModel = systemModel.getDeviceByType("ICEpoInterface");
+		systemModel = AllTests.runTest("PulseOx", "PulseOx_Forwarding_System");
 	}
 
 	@AfterClass
@@ -32,19 +29,25 @@ public class DeviceModelTests {
 	}
 
 	@Test
-	public void testDeviceExists() {
-		assertNotNull(deviceModel);
-	}
-
-	@Test
-	public void testDeviceSendPortExists() {
-		assertEquals(1, deviceModel.getSendPorts().size());
-		assertNotNull(deviceModel.getSendPorts().get("SpO2"));
+	public void testSystemExists() {
+		assertNotNull(systemModel);
 	}
 	
 	@Test
-	public void testImplicitTasks() {
-		assertEquals(1, deviceModel.getTasks().size());
-		assertNotNull(deviceModel.getTasks().get("SpO2Task"));
+	public void testSystemLogicComponents() {
+		assertEquals(2, systemModel.getLogicComponents().size());
+		assertNotNull(systemModel.getProcessByType("PulseOx_Logic_Process"));
+		assertNotNull(systemModel.getProcessByType("PulseOx_Display_Process"));
+	}
+	
+	@Test
+	public void testSystemDeviceComponents() {
+		assertEquals(3, systemModel.getLogicAndDevices().size());
+		assertNotNull(systemModel.getDeviceByType("ICEpoInterface"));
+	}
+	
+	@Test
+	public void testSystemName() { 
+		assertEquals("PulseOx_Forwarding_System", systemModel.getName());
 	}
 }

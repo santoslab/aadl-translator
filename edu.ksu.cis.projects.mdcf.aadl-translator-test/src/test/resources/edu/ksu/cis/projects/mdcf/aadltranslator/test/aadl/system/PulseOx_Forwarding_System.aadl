@@ -1,6 +1,6 @@
 package PulseOx_Forwarding_System
 public
-with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display, PulseOx_Forwarding_Properties;
+with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display, PulseOx_Forwarding_Properties, MAP_Properties;
 
 	system PulseOx_Forwarding_System
 	end PulseOx_Forwarding_System;
@@ -18,7 +18,8 @@ with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display, Pu
 		spo2_to_logic : port pulseOx.SpO2 -> appLogic.SpO2;
 		
 		-- From device to display
-		spo2_to_display : port pulseOx.SpO2 -> appDisplay.SpO2;
+		spo2_to_display : port pulseOx.SpO2 -> appDisplay.SpO2
+		{MAP_Properties::Channel_Delay => 150 ms;};
 		
 		-- From logic to display
 		alarm_to_display : port appLogic.DerivedAlarm -> appDisplay.DerivedAlarm;
