@@ -16,8 +16,6 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 
 public class ProcessModelTests {
 	private static ProcessModel processModel;
-
-	//TODO: Add PseudoDevice process tests
 	
 	@BeforeClass
 	public static void initialize() {

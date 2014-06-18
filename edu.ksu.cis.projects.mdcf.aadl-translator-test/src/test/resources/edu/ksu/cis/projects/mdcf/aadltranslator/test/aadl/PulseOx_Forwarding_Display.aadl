@@ -30,6 +30,10 @@ with PulseOx_Forwarding_Types, MAP_Properties;
 	thread HandleAlarmThread
 	features
 		Alarm : in event port;
+	properties
+		Timing_Properties::Deadline => 75 ms;
+		Timing_Properties::Period => 95 ms;
+		Timing_Properties::Compute_Execution_Time => 7 ms;
 	end HandleAlarmThread;
 	
 	thread implementation HandleAlarmThread.imp
