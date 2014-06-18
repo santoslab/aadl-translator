@@ -77,7 +77,7 @@ public class TaskModelTests {
 	public void testDefaultPeriod() {
 		assertEquals(50, CheckSpO2Thread.getPeriod());
 		assertEquals(50, UpdateSpO2Thread.getPeriod());
-		assertEquals(50, PseudoDevThread.getPeriod());
+		assertEquals(-1, PseudoDevThread.getPeriod());
 	}
 
 	@Test
