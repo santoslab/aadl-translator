@@ -1,0 +1,87 @@
+------------------------------------------------------------------------------+
+-- PulseOx.aadl - Corresponding AADL model of the Nonin PulseOx DML model in
+--   project mdcf.dms.examplev2.product.
+--
+-- Author: Stephen C. Barrett (scbarrett@ksu.edu)
+--         Department of Computing & Information Sciences
+--               
+-- Licensed Material - Property of Kansas State University.               
+------------------------------------------------------------------------------+
+-- Model attempts to uses the exchanges defined in PulseOx_Exchange, which
+--   are, in turn built out of the lower level DML and MDCF communications.
+------------------------------------------------------------------------------+
+
+
+package PulseOx
+public
+  with Base_Types;
+  with MDCF_Data_Props;
+  with PulseOx_Exchange; 
+  with PulseRate_Channel; 
+
+------------------------------------------------------------------------------+
+-- The entire medical device unit.
+------------------------------------------------------------------------------+
+system NoninPulseOx
+-- Unit's interface. Perhaps a feature group of all VMD interfaces?
+end NoninPulseOx;
+
+system implementation NoninPulseOx.impl
+subcomponents
+  -- The unit's VMDs...
+  pulseox: device PulseOxVmd;
+
+properties
+--   The unit's static attributes...
+  MDCF_Data_Props::IEEE11073_MDC_ATTR_SYS_TYPE => "Nonin PO";
+  
+  MDCF_Data_Props::ICE_ManufacturerModel => [
+  	MDC_ATTR_ID_MODEL => [
+  	  manufacturer => "Nonin";
+  	  model_number => "Onyx II X5551122";
+  	];
+  	credentials => ("cert1", "cert2");
+  ];
+end NoninPulseOx.impl;
+
+
+------------------------------------------------------------------------------+
+-- First and only of unit's vmds.
+------------------------------------------------------------------------------+
+abstract PulseOxVmd  -- Most probably a device, but make abstract just in case.
+features
+  -- The unit's payload-exchange "bundles" as channel groups or otherwise.
+  
+  -- Unit status is not part of any channel -- get exchange of status.
+  status_get: feature group PulseOx_Exchange::status_get;
+  
+  -- Flatten metrics bundle of spO2 channel -- get or periodic exchange of spO2.
+  spo2_get: feature group PulseOx_Exchange::spo2_get;
+  spo2_periodic: feature group PulseOx_Exchange::spo2_periodic;
+  
+  -- Flatten metrics bundle of pulse channel -- get or periodic exchange of pulse.
+  pulse_get: feature group PulseOx_Exchange::pulse_get;
+  pulse_periodic: feature group PulseOx_Exchange::pulse_periodic;
+  
+  -- Preserve metrics bundle of pulserate channel.
+  pulse_channel: feature group PulseRate_Channel::pulserate_channel;
+  -- Since the ports cannot be accessed with AADL this construct is useless.
+      
+flows
+  status_flow: flow source status_get.send;
+end PulseOxVmd;
+
+
+abstract implementation PulseOxVmd.impl  -- Implement an abstract component?
+connections
+  -- Demonstrates access to inner exchange members.
+  cst: port status_get.recv -> status_get.send;
+  csp: port spo2_get.recv -> spo2_get.send;
+  
+  -- AADL syntax supports no more than one level of indirection...
+  cpu: port pulse_get.recv -> pulse_get.send;
+  --   ...ports at lower levels cannot be accessed. See PulseRate_Channel.aadl.  
+--cpc: port pulse_channel.metrics.pulse_get.recv -> pulse_channel.metrics.pulse_get.send;
+end PulseOxVmd.impl;
+
+end PulseOx;

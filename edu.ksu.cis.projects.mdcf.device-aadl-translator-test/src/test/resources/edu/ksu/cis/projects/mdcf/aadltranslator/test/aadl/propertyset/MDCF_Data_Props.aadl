@@ -1,0 +1,67 @@
+------------------------------------------------------------------------------+
+-- MDCF_Data_Props.aadl - Various enumerations & data types used by MDCF 
+--  apps, devices & exchanges.
+--
+-- Author: Stephen C. Barrett (scbarrett@ksu.edu)
+--         Department of Computing & Information Sciences
+--               
+-- Licensed Material - Property of Kansas State University.               
+------------------------------------------------------------------------------+
+
+
+-- Can these instead be defined with the data modeling annex? Then this 
+--   property set would become a package.
+
+
+property set MDCF_Data_Props is
+
+-- Use simple attribute definition...
+IEEE11073_MDC_ATTR_SYS_TYPE: aadlstring applies to (system);
+  
+-- ...or adhere more closely to MDCF type system.  
+IEEE11073_OID_TYPE: type aadlstring;
+IEEE11073_MDC_ATTR_SYS_TYPE_alt: MDCF_Data_Props::IEEE11073_OID_TYPE 
+    applies to (system);
+
+
+-- Attribute inner type defined on the fly...
+ICE_Security_Certificate: type aadlstring;
+  
+ICE_ManufacturerModel: record (
+  MDC_ATTR_ID_MODEL: record (
+    manufacturer: aadlstring;
+    model_number: aadlstring;
+  );
+  credentials: list of aadlstring;  -- Closest AADL thing to a map.
+) applies to (system);
+
+
+-- ...or defined to preserve MDCF hierarchy.
+IEEE11073_SystemModel: type record (
+  manufacturer: aadlstring;
+  model_number: aadlstring;
+);
+
+ICE_ManufacturerModel_alt: record (
+  MDC_ATTR_ID_MODEL: MDCF_Data_Props::IEEE11073_SystemModel;
+  credentials: list of MDCF_Data_Props::ICE_Security_Certificate;
+) applies to (system);
+  
+  
+MDC_ATTR_ID_PARAM_GRP: aadlstring applies to (all);  --(data, feature group);
+MDC_ATTR_ID_PHYSIO: aadlstring applies to (data);
+MDC_ATTR_UNIT_CODE: aadlstring applies to (data);
+
+ICE_Request: aadlboolean applies to (data);
+
+
+-- Make enumerated values from a type definition...
+access_literals: type enumeration (ICE_Security_Access_Read, ICE_Security_Access_Write,
+    ICE_Security_Access_Read_Write, ICE_Security_Access_Action); 
+
+access_val: MDCF_Data_Props::access_literals applies to (data); 
+
+-- ...or do in one step, skipping type definition.
+state_val: inherit enumeration (Ok, NotOk) applies to (data);
+    
+end MDCF_Data_Props;

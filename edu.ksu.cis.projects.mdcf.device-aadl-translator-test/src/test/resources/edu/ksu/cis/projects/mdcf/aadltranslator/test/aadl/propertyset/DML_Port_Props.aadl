@@ -1,0 +1,30 @@
+------------------------------------------------------------------------------+
+-- DML_Port_Props.aadl - Properties and measure units for use by the ports of
+--   the DML_Comms exchanges.
+--
+-- Author: Stephen C. Barrett (scbarrett@ksu.edu)
+--         Department of Computing & Information Sciences
+--               
+-- Licensed Material - Property of Kansas State University.               
+------------------------------------------------------------------------------+
+-- Properties extracted from exchanges found in mdcf.dms.examplev2.scheme.
+------------------------------------------------------------------------------+
+
+
+property set DML_Port_Props is
+  with Timing_Properties;
+
+Access_Exchange_Security: type enumeration (ICE_Security_Access_Read, 
+    ICE_Security_Access_Write, ICE_Security_Access_Read_Write,
+    ICE_Security_Access_Action);  
+  
+exchange_access: DML_Port_Props::Access_Exchange_Security
+    applies to (port);  -- Applicable to all exchanges.
+separation_interval:  aadlinteger
+    applies to (port);  -- Applicable to sporadic exchanges.
+separation_interval_range: range of aadlinteger
+    applies to (port);  -- Applicable to periodic, get, set & action exchanges.
+service_time_range: range of aadlinteger
+   applies to (port);  -- Applicable to get, set & action exchanges.
+     
+end DML_Port_Props;

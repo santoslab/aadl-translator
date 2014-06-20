@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Device-Aadl-translator-test
+Bundle-SymbolicName: edu.ksu.cis.projects.mdcf.device-aadl-translator-test
+Bundle-Version: 0.1.0.qualifier
+Bundle-Vendor: SAnToS Lab @ K-State
+Fragment-Host: edu.ksu.cis.projects.mdcf.aadl-translator;bundle-version="[0.1.0,2.0.0)"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: org.eclipse.ui.workbench,
+ org.junit,
+ org.eclipse.core.runtime.compatibility;bundle-version="3.2.200"
+Bundle-ClassPath: .,
+ lib/xstream-1.4.7.jar,
+ lib/kxml2-min-2.3.0.jar
+Import-Package: org.osate.aadl2.modelsupport.errorreporting

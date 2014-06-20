@@ -1,0 +1,107 @@
+------------------------------------------------------------------------------+
+-- DML_Comms.aadl - ICE communication patterns. Based on descriptions and
+--   properties of DML exchanges found in project mdcf.dms.examplev2.scheme.
+--
+-- Author: Stephen C. Barrett (scbarrett@ksu.edu)
+--         Department of Computing & Information Sciences
+--               
+-- Licensed Material - Property of Kansas State University.               
+------------------------------------------------------------------------------+
+-- Pattern data types parameterized to be resolved at specialization time. The
+--   arbitrary, default property values may also be overridden at that time. 
+------------------------------------------------------------------------------+
+
+
+------------------------------------------------------------------------------+
+-- DML exchanges possibly map to MDCF communication patterns like this:
+-- DML      -> MDCF
+-- periodic -> pub-sub (regular output by server; no acknowledgment)
+-- sporadic -> pub-sub (occasional or rare output by server; no acknowledgment)
+-- get      -> req-resp (client asks for output; server supplies it)
+-- set      -> send-recv (provider supplies output; client acknowledges it)
+-- action   -> init-exec (client request action; server acknowledges & executes)
+------------------------------------------------------------------------------+
+  
+  
+package DML_Comms
+public
+  with Base_Types, Data_Model;
+  with DML_Port_Props; 
+ 
+------------------------------------------------------------------------------+
+-- Periodic Exchange
+------------------------------------------------------------------------------+
+feature group dml_periodic  -- Server (device) initiated broadcast of value
+prototypes                  --   at a known rate.
+  the_out_data: data;
+features
+  send: out event data port the_out_data {	
+  	DML_Port_Props::exchange_access => ICE_Security_Access_Read;
+    DML_Port_Props::separation_interval_range => 105 .. 110;
+  };
+end dml_periodic;
+
+
+------------------------------------------------------------------------------+
+-- Sporadic Exchange  
+------------------------------------------------------------------------------+
+feature group dml_sporadic  -- Server (device) initiated broadcast of value
+prototypes                   --   as needed.
+  the_out_data: data;
+features
+  send: out event data port the_out_data {  
+    DML_Port_Props::exchange_access => ICE_Security_Access_Read;
+    DML_Port_Props::separation_interval => 100;  -- Inverse of frequency?
+  };
+end dml_sporadic;
+
+
+------------------------------------------------------------------------------+
+-- Get Exchange
+------------------------------------------------------------------------------+
+feature group dml_get  -- Client (App) initiated fetch of a value.
+prototypes
+  the_in_data: data;  -- Fetch initiation
+  the_out_data: data;  -- Fetched value
+features
+  recv: in event data port the_in_data {
+  	DML_Port_Props::exchange_access => ICE_Security_Access_Write;  -- What is the viewpoint?
+  };
+  send: out event data port the_out_data {	
+  	DML_Port_Props::exchange_access => ICE_Security_Access_Read;  -- What is the viewpoint?
+    DML_Port_Props::separation_interval_range => 5 .. 50;  -- Comments from Andrew?
+    DML_Port_Props::service_time_range => 0 .. 50;  -- Comments from Andrew?
+  };
+end dml_get;
+
+
+------------------------------------------------------------------------------+
+-- Set Exchange
+------------------------------------------------------------------------------+
+feature group dml_set  -- Client (app) initiated store of a value.
+prototypes
+  the_in_data: data;  -- Store initiation, and store value
+features
+  recv: in event data port the_in_data {
+    DML_Port_Props::exchange_access => ICE_Security_Access_Write;  -- What is the viewpoint?
+    DML_Port_Props::separation_interval_range => 5 .. 50;  -- Comments from Andrew?
+    DML_Port_Props::service_time_range => 0 .. 50;  -- Comments from Andrew?
+  };
+end dml_set;
+
+
+------------------------------------------------------------------------------+
+-- Action Exchange
+------------------------------------------------------------------------------+
+feature group dml_action  -- Client (app) initiated action by server (device).
+prototypes
+  the_in_data: data;  -- Store initiation, and store value
+features
+  recv: in event data port the_in_data {
+    DML_Port_Props::exchange_access => ICE_Security_Access_Write;  -- What is the viewpoint?
+    DML_Port_Props::separation_interval_range => 5 .. 50;  -- Comments from Andrew?
+    DML_Port_Props::service_time_range => 0 .. 50;  -- Comments from Andrew?
+  };
+end dml_action;
+  
+end DML_Comms;

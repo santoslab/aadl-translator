@@ -1,0 +1,32 @@
+------------------------------------------------------------------------------+
+-- MDCF_Port_Props.aadl - Properties and measure units for use by the ports of
+--   the MDCF_Comms communication patterns.
+--
+-- Author: Stephen C. Barrett (scbarrett@ksu.edu)
+--         Department of Computing & Information Sciences
+--               
+-- Licensed Material - Property of Kansas State University.               
+------------------------------------------------------------------------------+
+-- Properties extracted from exchanges found in MDD4MS document.
+------------------------------------------------------------------------------+
+
+
+property set MDCF_Port_Props is
+  with Timing_Properties;
+
+mdcf_lifetime: Time applies to (port);
+  
+period: type aadlinteger 0 ps .. Max_Time units Time_Units;  -- From AADL_Project
+mdcf_latency: MDCF_Port_Props::period applies to (port, connection, flow);
+mdcf_latency_okay: MDCF_Port_Props::period applies to (port, connection, flow);
+mdcf_latency_worst: MDCF_Port_Props::period applies to (port, connection, flow);
+  
+mdcf_timeout: MDCF_Port_Props::period applies to (port, connection, flow);
+
+freq_units: type units (hz, khz => hz * 1000, mhz => hz * 1000000, ghz => hz * 1000000000);
+max_freq: constant MDCF_Port_Props::freq => 100 ghz;
+freq: type aadlinteger 0 hz .. MDCF_Port_Props::max_freq units MDCF_Port_Props::freq_units;
+mdcf_frequency: MDCF_Port_Props::freq applies to (port); 
+mdcf_freq_max: MDCF_Port_Props::freq applies to (port); 
+  
+end MDCF_Port_Props;

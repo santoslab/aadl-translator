@@ -1,0 +1,120 @@
+------------------------------------------------------------------------------+
+-- MDCF_Comms.aadl - ISDAT communication patterns based on descriptions and
+--   properties contained in the MDD4MS document.
+--
+-- Author: Stephen C. Barrett (scbarrett@ksu.edu)
+--         Department of Computing & Information Sciences
+--               
+-- Licensed Material - Property of Kansas State University.               
+------------------------------------------------------------------------------+
+-- Arbitrary, default property values may be overridden. 
+------------------------------------------------------------------------------+
+
+
+------------------------------------------------------------------------------+
+-- DML exchanges possibly map to MDCF communication patterns like this:
+-- DML      -> MDCF
+-- periodic -> pub-sub (regular output by server; no acknowledgment)
+-- sporadic -> pub-sub (occasional or rare output by server; no acknowledgment)
+-- get      -> req-resp (client asks for output; server supplies it)
+-- set      -> send-recv (provider supplies output; client acknowledges it)
+-- action   -> init-exec (client request action; server acknowledges & executes)
+------------------------------------------------------------------------------+
+
+package MDCF_Comms
+public
+  with Base_Types, Data_Model;
+  with MDCF_Data_Props, MDCF_Port_Props; 
+
+------------------------------------------------------------------------------+
+-- Publisher-Subscriber
+------------------------------------------------------------------------------+
+feature group mdcf_pub_sub  -- Construct "bundle" from in & out event data ports.
+prototypes
+  the_in_data: data;  -- Subscription request.
+  the_out_data: data;  -- Publisher’s data type is a sub-type of subscriber’s.
+features
+  request: in event data port the_in_data {  -- Make a specific type of request.
+    MDCF_Port_Props::mdcf_frequency => 100 mhz;
+    MDCF_Port_Props::mdcf_timeout => 50 ns;
+    MDCF_Port_Props::mdcf_lifetime => 10 ns;
+  };
+  respond: out event data port the_out_data {   
+    MDCF_Port_Props::mdcf_frequency => 100 mhz;
+    MDCF_Port_Props::mdcf_timeout => 50 ns;
+    MDCF_Port_Props::mdcf_lifetime => 10 ns;
+  };
+  -- Remote service requests of Raise_Error(err_id) on constraint violation?
+end mdcf_pub_sub;
+
+
+------------------------------------------------------------------------------+
+-- Request-Responder explores 3 different ways to build a communication pattern.
+------------------------------------------------------------------------------+
+feature group mdcf_req_res1  -- Construct "bundle" from in & out event data ports.
+prototypes
+  the_in_data: data;  -- Responder’s data type doesn't need to resemble requestor’s.
+  the_out_data: data;
+features
+  request: in event data port the_in_data {  -- Make a specific type of request.
+    MDCF_Port_Props::mdcf_latency_okay => 40 ns;
+    MDCF_Port_Props::mdcf_latency_worst => 50 ns;
+    MDCF_Port_Props::mdcf_freq_max => 100 mhz;
+    MDCF_Port_Props::mdcf_lifetime => 10 ns;
+  };
+  respond: out event data port the_out_data {	
+    MDCF_Port_Props::mdcf_latency_okay => 40 ns;
+    MDCF_Port_Props::mdcf_latency_worst => 50 ns;
+    MDCF_Port_Props::mdcf_freq_max => 100 mhz;
+    MDCF_Port_Props::mdcf_lifetime => 10 ns;
+  };
+  -- Remote service requests of Raise_Error(err_id) on constraint violation?
+end mdcf_req_res1;
+
+
+feature group mdcf_req_res2  -- Construct "bundle" from in event port & out event data port. 
+prototypes
+  the_out_data: data;  -- Request is only an event.
+features
+  request:  -- Initiated by Send_Output local service...
+  in event port {  -- Trigger the only possible type of request.
+    MDCF_Port_Props::mdcf_latency_okay => 40 ns;
+    MDCF_Port_Props::mdcf_latency_worst => 50 ns;
+    MDCF_Port_Props::mdcf_freq_max => 100 mhz;
+    MDCF_Port_Props::mdcf_lifetime => 10 ns;
+  };
+  respond:  -- Initiated by Receive_Input local service...
+  out event data port the_out_data {	
+    MDCF_Port_Props::mdcf_latency_okay => 40 ns;
+    MDCF_Port_Props::mdcf_latency_worst => 50 ns;
+    MDCF_Port_Props::mdcf_freq_max => 100 mhz;
+    MDCF_Port_Props::mdcf_lifetime => 10 ns;
+  };
+  -- Remote service requests of Raise_Error(err_id) on constraint violation?
+end mdcf_req_res2;
+
+
+feature group mdcf_req_res3  -- Construct "bundle" from 1 in out event data port.
+prototypes
+  the_in_out_data: data;  -- Responder’s data type is a sub-type of requestor’s.
+features
+  req_res: in out event data port the_in_out_data {  -- Make a specific type of request.
+    MDCF_Port_Props::mdcf_latency_okay => 40 ns;  -- in and out
+    MDCF_Port_Props::mdcf_latency_worst => 50 ns;  -- in and out
+    MDCF_Port_Props::mdcf_freq_max => 100 mhz;  -- in
+    MDCF_Port_Props::mdcf_lifetime => 10 ns;    -- out
+  };
+  -- Remote service requests of Raise_Error(err_id) on constraint violation?
+end mdcf_req_res3;
+
+
+------------------------------------------------------------------------------+
+-- Sender-Receiver
+------------------------------------------------------------------------------+
+
+
+------------------------------------------------------------------------------+
+-- Initiator-Executor
+------------------------------------------------------------------------------+
+
+end MDCF_Comms;
