@@ -91,7 +91,8 @@ public class TaskModel {
 	}
 
 	public void setTrigPortInfo(String portName, String portType,
-			String localName, boolean isEventTriggered) throws NotImplementedException {
+			String localName, boolean isEventTriggered)
+			throws NotImplementedException {
 		if (this.trigPortName == null) {
 			trigPortName = portName;
 			trigPortType = portType;
@@ -198,10 +199,12 @@ public class TaskModel {
 		this.wcet = wcet;
 	}
 
+	/*-
 	public void addReturnToCalledMethod(String internalName, String methodName,
 			String taskName) {
 
 	}
+	 */
 
 	public boolean isEventTriggered() {
 		return eventTriggered;
@@ -219,7 +222,9 @@ public class TaskModel {
 		this.sporadic = sporadic;
 	}
 
-	// public HashMap<String, ArrayList<String>> getMethodParameters() {
-	// return methodParameters;
-	// }
+	/*-
+	 public HashMap<String, ArrayList<String>> getMethodParameters() {
+		return methodParameters;
+	}
+	 */
 }

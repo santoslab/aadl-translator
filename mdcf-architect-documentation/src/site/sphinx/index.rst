@@ -29,7 +29,6 @@ Contents
 	:includehidden:
 	:maxdepth: 2
 
-	setup.rst
 	language/overview.rst
 	tools/translator.rst
 
@@ -42,4 +41,4 @@ Contents
 
 .. admonition:: License
 
-	This work is licensed under the `Eclipse Public License <http://www.eclipse.org/legal/epl-v10.html>`_.
+	This work is licensed under the |EPL|.

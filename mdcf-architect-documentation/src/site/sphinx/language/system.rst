@@ -13,15 +13,16 @@ Properties and Contained Elements
 
 .. construct:: system 
 	  
-	  AADL System constructs are empty; the app layout is described in the :construct:`System Implementation<systemimplementation>`
+	AADL System constructs are empty; the app layout is described in the :construct:`System Implementation<systemimplementation>`
 	  
 .. construct:: system implementation
 
-   :subcomponents: Either :construct:`device` or :construct:`process` elements.
+	AADL System Implementations describe the elements that compose an app -- the devices that generate physiological signals, the software components that process or format the signals, and the connections between them.
 
-   :connections: A list of :construct:`port connections<portconnection>` between the various elements.  Note that device-device connections are not allowed.
-
-   AADL System Implementations describe the elements that compose an app -- the devices that generate physiological signals, the software components that process or format the signals, and the connections between them.
+	:contained-element subcomponents: Either :construct:`device` or :construct:`process` elements.
+	:contained-element connections: A list of :construct:`port connections<portconnection>` between the various elements.  Note that device-device connections are not allowed.
+	:kind subcomponents: :construct:`device` or :construct:`process`
+	:kind connections: :construct:`port connection<portconnection>`
    
 *******
 Example

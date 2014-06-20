@@ -6,10 +6,13 @@
 *Properties* and *Data* Types
 #############################
 
+Two AADL elements -- *properties* and *data* are used throughout the app.
 
 **********
 Properties
 **********
+
+The MDCF Architect uses a number of properties to configure the real-time (RT) and Quality of Service (QoS) and a small number of other settings.  Most of these properties can be set either as app-wide defaults using the ``default name`` and all can be specified on a per-element basis using the ``override name`` (which will override the default value, if present).
 
 Thread Properties
 =================
@@ -18,7 +21,7 @@ Thread Properties
 
 	|prop period|
 	
-   :default name: Default_Thread_Period
+   :default: Default_Thread_Period
    :override: Timing_Properties::Period
    :type: Time
    :context: :construct:`thread`
@@ -117,6 +120,8 @@ Example Property Set
 **********
 Data Types
 **********
+
+The MDCF Architect enables developers to name data types and set their data representation.
 
 .. construct:: data
 

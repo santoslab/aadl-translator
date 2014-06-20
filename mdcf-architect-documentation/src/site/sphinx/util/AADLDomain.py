@@ -299,7 +299,7 @@ myDomain = custom_domain('AADLDomain',
                 indextemplate = "pair: %s; AADL Property",
                 fields = [
                     Field('default',
-                        label = "Default NameQ",
+                        label = "Default Name",
                         names = ['default'],
                         has_arg = False,
                     ),

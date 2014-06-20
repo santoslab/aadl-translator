@@ -8,6 +8,10 @@
 
 .. |SEHC14 publication| replace:: `SEHC14 publication <http://samprocter.com/wp-content/uploads/2014/05/sehc14-aadl-for-map-apps.pdf>`__
 
+.. |EPL| replace:: `Eclipse Public License <http://www.eclipse.org/legal/epl-v10.html>`__
+
+.. |gear icon| image:: images/cog_go.png
+
 .. |AADL book| replace:: `AADL book <http://books.google.com/books/about/Model_Based_Engineering_with_AADL.html?id=T_nOltBoX64C>`__
 
 .. |prop period| replace:: The task's period. Ignored for sporadic tasks.

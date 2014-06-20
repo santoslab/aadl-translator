@@ -14,10 +14,11 @@ Properties and Contained Elements
 *********************************
 
 .. construct:: device 
-	  
-	:features: A list of :construct:`port` elements.
-       
+	
 	The external features the app will use of this device.
+	
+	:contained-element features: The ports this device exposes.
+	:kind features: :construct:`port`
 	  
 .. construct:: device implementation
 	

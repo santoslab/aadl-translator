@@ -188,7 +188,7 @@ private void set<name>(<type> val){
 
 constructor(model) ::=<<
 <if(model.pseudoDevice)>
-public <model.name>PseudoDevice(String GUID) {
+public <model.name>(String GUID) {
 <else>
 public <model.name>SuperType(String GUID) {
 <endif>
@@ -218,7 +218,7 @@ headerAndFields(model) ::=<<
 <if(model.display)>
 public abstract class <model.name>SuperType extends AppPanelComponent{
 <elseif(model.pseudoDevice)>
-public class <model.name>PseudoDevice extends LogicComponent{
+public class <model.name> extends LogicComponent{
 <else>
 public abstract class <model.name>SuperType extends LogicComponent{
 <endif>
