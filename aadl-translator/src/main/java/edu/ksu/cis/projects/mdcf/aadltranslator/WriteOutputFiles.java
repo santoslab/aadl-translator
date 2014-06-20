@@ -57,4 +57,41 @@ public class WriteOutputFiles {
 			e.printStackTrace();
 		}
 	}
+	
+
+	public static void writeDeviceFiles(
+			String superType,
+			String userAPI,
+			String compsigs, String devName,
+			String devDirectory) {
+		
+		if (devDirectory == null){
+			System.err.println("Error: Dev Directory not set");
+			return;
+		}
+		
+		// Make sure we have a trailing slash
+		if(devDirectory.charAt(devDirectory.length() - 1) != '/')
+			devDirectory += "/";
+		
+		// Create the package structure
+		devDirectory += devName + "/mdcf/device/"; 
+		
+		File dir = new File(devDirectory + devName);
+
+		FileWriter fw = null;
+
+		try {
+			// TODO: Handle failure / permission problems
+			dir.mkdirs();		
+			
+			fw = new FileWriter(devDirectory + devName + "/" + devName
+					+ ".compsig.xml");
+			fw.write(compsigs);
+			fw.close();
+		} catch (IOException e) {
+			// TODO: handle this
+			e.printStackTrace();
+		}
+	}
 }

@@ -1,0 +1,102 @@
+compsig(DEVICE_TYPE, RECV_PORTS, SEND_PORTS) ::= <<
+<mdcf.core.ctypes.ComponentSignature>
+	<type>$DEVICE_TYPE$</type>
+	<portSignatures>
+	$RECV_PORTS; separator="\n"$
+	$SEND_PORTS; separator="\n"$
+    </portSignatures>
+  <shareable>false</shareable>
+</mdcf.core.ctypes.ComponentSignature>
+>>
+
+get_send_port(SEND_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME) ::= <<
+    <entry>
+      <string>$SEND_PORT_NAME$</string>
+      <mdcf.core.ctypes.PortSignature>
+        <portName>$SEND_PORT_NAME$</portName>
+        <minPeriod>$MIN_SEPARATION_TIME$</minPeriod>
+        <maxPeriod>$MAX_SEPARATION_TIME$</maxPeriod>
+        <portDirection>PUBLISH</portDirection>
+        <portType>Request</portType>
+      </mdcf.core.ctypes.PortSignature>
+    </entry>
+ >>
+ 
+ get_recv_port(RECEIVE_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME, RECEIVE_MESSAGE_TYPE) ::= <<
+    <entry>
+      <string>$RECEIVE_PORT_NAME$</string>
+      <mdcf.core.ctypes.PortSignature>
+        <portName>$RECEIVE_PORT_NAME$</portName>
+        <minPeriod>$MIN_SEPARATION_TIME$</minPeriod>
+        <maxPeriod>$MAX_SEPARATION_TIME$</maxPeriod>
+        <portDirection>SUBSCRIBE</portDirection>
+        <portType>$RECV_MESSAGE_TYPE$</portType>
+      </mdcf.core.ctypes.PortSignature>
+    </entry>
+ >>
+ 
+ set_send_port(SEND_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME, SEND_MESSAGE_TYPE) ::= <<
+    <entry>
+      <string>$SEND_PORT_NAME$</string>
+      <mdcf.core.ctypes.PortSignature>
+        <portName>$SEND_PORT_NAME$</portName>
+        <minPeriod>$MIN_SEPARATION_TIME$</minPeriod>
+        <maxPeriod>$MAX_SEPARATION_TIME$</maxPeriod>
+        <portDirection>PUBLISH</portDirection>
+        <portType>$SEND_MESSAGE_TYPE$</portType>
+      </mdcf.core.ctypes.PortSignature>
+    </entry>
+ >>
+ 
+ set_recv_port(RECEIVE_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME) ::= <<
+    <entry>
+      <string>$RECEIVE_PORT_NAME$</string>
+      <mdcf.core.ctypes.PortSignature>
+        <portName>$RECEIVE_PORT_NAME$</portName>
+        <minPeriod>$MIN_SEPARATION_TIME$</minPeriod>
+        <maxPeriod>$MAX_SEPARATION_TIME$</maxPeriod>
+        <portDirection>SUBSCRIBE</portDirection>
+        <portType>Acknowledgment</portType>
+      </mdcf.core.ctypes.PortSignature>
+    </entry>
+ >>
+ 
+ action_send_port(SEND_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME) ::= <<
+    <entry>
+      <string>$SEND_PORT_NAME$</string>
+      <mdcf.core.ctypes.PortSignature>
+        <portName>$SEND_PORT_NAME$</portName>
+        <minPeriod>$MIN_SEPARATION_TIME$</minPeriod>
+        <maxPeriod>$MAX_SEPARATION_TIME$</maxPeriod>
+        <portDirection>PUBLISH</portDirection>
+        <portType>ActionRequest</portType>
+      </mdcf.core.ctypes.PortSignature>
+    </entry>
+ >>
+ 
+ action_recv_port(RECEIVE_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME) ::= <<
+    <entry>
+      <string>$RECEIVE_PORT_NAME$</string>
+      <mdcf.core.ctypes.PortSignature>
+        <portName>$RECEIVE_PORT_NAME$</portName>
+        <minPeriod>$MIN_SEPARATION_TIME$</minPeriod>
+        <maxPeriod>$MAX_SEPARATION_TIME$</maxPeriod>
+        <portDirection>SUBSCRIBE</portDirection>
+        <portType>ActionResult</portType>
+      </mdcf.core.ctypes.PortSignature>
+    </entry>
+ >>
+ 
+ send_provider_initiated_port(SEND_PORT_NAME, SEND_MESSAGE_TYPE) ::= <<
+    <entry>
+      <string>$SEND_PORT_NAME$</string>
+      <mdcf.core.ctypes.PortSignature>
+        <portName>$SEND_PORT_NAME$</portName>
+        <minPeriod>$MIN_SEPARATION_TIME$</minPeriod>
+        <maxPeriod>$MAX_SEPARATION_TIME$</maxPeriod>
+        <portDirection>PUBLISH</portDirection>
+        <portType>$SEND_MESSAGE_TYPE$</portType>
+      </mdcf.core.ctypes.PortSignature>
+    </entry>
+ >>
+

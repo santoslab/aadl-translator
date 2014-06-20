@@ -1,0 +1,85 @@
+userimpl(model) ::=<<
+package mdcf.device.<model.name>;
+
+public class <model.name> extends <model.name>SuperType {
+
+	// FIXME: this should be defined elsewhere.
+	private final static String authenticationParameter = "SSL";
+	
+	protected <model.name>(){
+		this(false);
+	}
+
+	protected <model.name>(boolean useCommunicationSecurityFeature) {
+		super(useCommunicationSecurityFeature ? generateUUID(
+				authenticationParameter, "") : generateUUID(
+						null,
+						<model.name>SuperType.IEEE11073_MDC_ATTR_SYS_TYPE
+						+ System.currentTimeMillis()),
+						<model.name>SuperType.IEEE11073_MDC_ATTR_SYS_TYPE,
+						useCommunicationSecurityFeature);
+		this.setSecurityParams(useCommunicationSecurityFeature ? authenticationParameter
+				: null);
+	}
+
+	@Override
+	protected void init() {
+		
+	}
+
+	@Override
+	protected void start_publish() {
+
+	}
+
+	@Override
+	protected void stop_publish() {
+	
+	}
+	
+	//Collection of Get Exchange APIs
+	<getAPIs(model)>
+	
+	//Collection of Set Exchange APIs
+	<setAPIs(model)>
+	
+	//Collection of Action Exchange APIs
+	<actionAPIs(model)>
+	
+>>
+
+getAPIs(model) ::=<<
+<model.getExchangeModels.values:{exchangeModel | <getAPI(exchangeModel.SendMessageType, exchangeModel.ParamterName, exchangeModel.MessageTypeDefault)>}
+>>
+
+setAPIs(model) ::=<<
+<model.setExchangeModels.values:{exchangeModel | <setAPI(exchangeModel.SendMessageType, exchangeModel.ParamterName)>}
+>>
+
+actionAPIs(model) ::=<<
+<model.actionExchangeModels.values:{exchangeModel | <actionAPI(exchangeModel.actionName)>}
+>>
+
+getAPI(Type, ParameterName, TypeDefault) ::=<<
+	@Override
+	protected <Type> get<ParameterName>() {
+		// TODO Auto-generated method stub
+		return <TypeDefault>;
+	}
+>>	
+
+setAPI(Type, ParameterName) ::=<<
+	@Override
+	protected void set<ParameterName>(<Type> value) {
+		// TODO Auto-generated method stub
+		return;
+	}
+>>
+
+actionAPI(ActionName) ::=<<	
+	@Override
+	protected boolean action<ActionName>() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+>>

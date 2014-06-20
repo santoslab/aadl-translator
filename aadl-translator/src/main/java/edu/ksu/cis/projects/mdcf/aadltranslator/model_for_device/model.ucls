@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class-diagram version="1.1.6" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
+  associations="true" dependencies="false" nesting-relationships="true">  
+  <class id="1" language="java" name="edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.PortInfoModel" 
+    project="edu.ksu.cis.projects.mdcf.aadl-translator" 
+    file="/edu.ksu.cis.projects.mdcf.aadl-translator/src/main/java/edu/ksu/cis/projects/mdcf/aadltranslator/model_for_device/PortInfoModel.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1083" y="1175"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="2" language="java" name="edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.GetExchangeModel" 
+    project="edu.ksu.cis.projects.mdcf.aadl-translator" 
+    file="/edu.ksu.cis.projects.mdcf.aadl-translator/src/main/java/edu/ksu/cis/projects/mdcf/aadltranslator/model_for_device/GetExchangeModel.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="871" y="938"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="3" language="java" name="edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.SetExchangeModel" 
+    project="edu.ksu.cis.projects.mdcf.aadl-translator" 
+    file="/edu.ksu.cis.projects.mdcf.aadl-translator/src/main/java/edu/ksu/cis/projects/mdcf/aadltranslator/model_for_device/SetExchangeModel.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="539" y="938"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="4" language="java" name="edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.ExchangeModel" 
+    project="edu.ksu.cis.projects.mdcf.aadl-translator" 
+    file="/edu.ksu.cis.projects.mdcf.aadl-translator/src/main/java/edu/ksu/cis/projects/mdcf/aadltranslator/model_for_device/ExchangeModel.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1041" y="728"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="5" language="java" 
+    name="edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.ExchangeModel.ExchangeKind" 
+    project="edu.ksu.cis.projects.mdcf.aadl-translator" 
+    file="/edu.ksu.cis.projects.mdcf.aadl-translator/src/main/java/edu/ksu/cis/projects/mdcf/aadltranslator/model_for_device/ExchangeModel.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="543" y="728"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="6" language="java" name="edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.ModelUtil" 
+    project="edu.ksu.cis.projects.mdcf.aadl-translator" 
+    file="/edu.ksu.cis.projects.mdcf.aadl-translator/src/main/java/edu/ksu/cis/projects/mdcf/aadltranslator/model_for_device/ModelUtil.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="234" y="455"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="7" language="java" name="edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel" 
+    project="edu.ksu.cis.projects.mdcf.aadl-translator" 
+    file="/edu.ksu.cis.projects.mdcf.aadl-translator/src/main/java/edu/ksu/cis/projects/mdcf/aadltranslator/model_for_device/DeviceComponentModel.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1048" y="482"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="8" language="java" name="edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.PortProperty" 
+    project="edu.ksu.cis.projects.mdcf.aadl-translator" 
+    file="/edu.ksu.cis.projects.mdcf.aadl-translator/src/main/java/edu/ksu/cis/projects/mdcf/aadltranslator/model_for_device/PortProperty.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="766" y="1385"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="9" language="java" name="edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.SporadicExchangeModel" 
+    project="edu.ksu.cis.projects.mdcf.aadl-translator" 
+    file="/edu.ksu.cis.projects.mdcf.aadl-translator/src/main/java/edu/ksu/cis/projects/mdcf/aadltranslator/model_for_device/SporadicExchangeModel.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1565" y="920"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="10" language="java" 
+    name="edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.GetExchangeModel.OutPortProperty" 
+    project="edu.ksu.cis.projects.mdcf.aadl-translator" 
+    file="/edu.ksu.cis.projects.mdcf.aadl-translator/src/main/java/edu/ksu/cis/projects/mdcf/aadltranslator/model_for_device/GetExchangeModel.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="766" y="1112"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </enumeration>  
+  <enumeration id="11" language="java" 
+    name="edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.GetExchangeModel.InPortProperty" 
+    project="edu.ksu.cis.projects.mdcf.aadl-translator" 
+    file="/edu.ksu.cis.projects.mdcf.aadl-translator/src/main/java/edu/ksu/cis/projects/mdcf/aadltranslator/model_for_device/GetExchangeModel.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="473" y="1220"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </enumeration>  
+  <enumeration id="12" language="java" 
+    name="edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.PortInfoModel.PortDirection" 
+    project="edu.ksu.cis.projects.mdcf.aadl-translator" 
+    file="/edu.ksu.cis.projects.mdcf.aadl-translator/src/main/java/edu/ksu/cis/projects/mdcf/aadltranslator/model_for_device/PortInfoModel.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1083" y="1376"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="13" language="java" name="edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.PeriodicExchangeModel" 
+    project="edu.ksu.cis.projects.mdcf.aadl-translator" 
+    file="/edu.ksu.cis.projects.mdcf.aadl-translator/src/main/java/edu/ksu/cis/projects/mdcf/aadltranslator/model_for_device/PeriodicExchangeModel.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1925" y="920"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="14" language="java" name="edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.ActionExchangeModel" 
+    project="edu.ksu.cis.projects.mdcf.aadl-translator" 
+    file="/edu.ksu.cis.projects.mdcf.aadl-translator/src/main/java/edu/ksu/cis/projects/mdcf/aadltranslator/model_for_device/ActionExchangeModel.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1210" y="938"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <association id="15">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="16" name="exchangeModels"/>      
+      <multiplicity id="17" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="18">    
+    <end type="SOURCE" refId="14"/>    
+    <end type="TARGET" refId="4"/>  
+  </generalization>  
+  <nesting id="19">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="12"/>  
+  </nesting>  
+  <generalization id="20">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="4"/>  
+  </generalization>  
+  <nesting id="21">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="10"/>  
+  </nesting>  
+  <generalization id="22">    
+    <end type="SOURCE" refId="13"/>    
+    <end type="TARGET" refId="4"/>  
+  </generalization>  
+  <nesting id="23">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="11"/>  
+  </nesting>  
+  <generalization id="24">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="4"/>  
+  </generalization>  
+  <association id="25">    
+    <end type="SOURCE" refId="13" navigable="false">      
+      <attribute id="26" name="outPortInfo"/>      
+      <multiplicity id="27" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="28">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="29" name="inOut"/>      
+      <multiplicity id="30" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="31">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="32" name="portProperty"/>      
+      <multiplicity id="33" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="8" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <nesting id="34">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="5"/>  
+  </nesting>  
+  <generalization id="35">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="4"/>  
+  </generalization>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    accessors="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true" static="true"/>    
+    <operations public="true" package="true" protected="true" private="true" static="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>
