@@ -1,0 +1,39 @@
+property set PulseOx_Forwarding_Error_Properties is
+with EMV2, MAP_Error_Properties;
+
+	-- See http://www.ncbi.nlm.nih.gov/pubmed/8457044
+	PulseOximeterFailure : constant EMV2::DistributionSpecification => [ProbabilityValue => 0.025; Distribution => Fixed;];
+	PulseOximiterFailDetectablyHigh : constant aadlreal => 0.375;
+	PulseOximiterFailDetectablyLow : constant aadlreal => 0.125;
+	PulseOximiterFailUndetectablyHigh : constant aadlreal => 0.375;
+	PulseOximiterFailUndetectablyLow : constant aadlreal => 0.125;
+
+	AL1 : MAP_Error_Properties::Accident_Level => [
+		Level => 1;
+	] applies to (all);
+	
+	A1 : constant MAP_Error_Properties::Accident => [
+		Number => 1;
+		Description => "Patient is killed or seriously injured.";
+		Level => PulseOx_Forwarding_Error_Properties::AL1;
+	];
+	
+	H1 : constant MAP_Error_Properties::Hazard => [
+		Number => 1;
+		Description => "Incorrect information is sent to the display.";
+		Accident => PulseOx_Forwarding_Error_Properties::A1;
+	];
+	
+	C1 : constant MAP_Error_Properties::Constraint => [
+		Number => 1;
+		Description => "The app must inform the display of the status of the patient's vital signs.";
+		Hazard => PulseOx_Forwarding_Error_Properties::H1;
+	];
+	
+	C2 : constant MAP_Error_Properties::Constraint => [
+		Number => 3;
+		Description => "The app must inform the display of the pump command status.";
+		Hazard => PulseOx_Forwarding_Error_Properties::H1;
+	];
+	
+end PulseOx_Forwarding_Error_Properties;

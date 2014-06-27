@@ -1,4 +1,4 @@
-package edu.ksu.cis.projects.mdcf.aadltranslator.test;
+package edu.ksu.cis.projects.mdcf.aadltranslator.test.arch;
 
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.initComplete;
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.usedProperties;
@@ -15,6 +15,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
 public class TaskModelTests {
 
@@ -27,7 +28,7 @@ public class TaskModelTests {
 			AllTests.initialize();
 		usedProperties.add("MAP_Properties");
 		usedProperties.add("PulseOx_Forwarding_Properties");
-		SystemModel systemModel = AllTests.runTest("PulseOx",
+		SystemModel systemModel = AllTests.runArchTransTest("PulseOx",
 				"PulseOx_Forwarding_System");
 		ProcessModel logicProcess = systemModel
 				.getProcessByType("PulseOx_Logic_Process");

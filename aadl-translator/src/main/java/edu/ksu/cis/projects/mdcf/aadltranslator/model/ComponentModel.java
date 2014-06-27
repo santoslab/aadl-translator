@@ -1,6 +1,7 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
@@ -28,11 +29,26 @@ public class ComponentModel {
 	
 	protected ComponentKind kind;
 	
+	protected HashSet<PropagationModel> propagations;
+	protected HashSet<ErrorFlowModel> errorFlows;
+	
 	public ComponentModel(){
 		ports = new HashMap<>();
 		tasks = new HashMap<>();
 	}
-
+	
+	public void addPropagation(PropagationModel propagation) throws DuplicateElementException {
+		if(propagations.contains(propagation))
+			throw new DuplicateElementException("Component model propagations must be unique");
+		propagations.add(propagation);
+	}
+	
+	public void addErrorFlow(ErrorFlowModel errorFlow) throws DuplicateElementException {
+		if(errorFlows.contains(errorFlow))
+			throw new DuplicateElementException("Error flows propagations must be unique");
+		errorFlows.add(errorFlow);
+	}
+	
 	public void addTask(String name) throws DuplicateElementException {
 		if(tasks.containsKey(name))
 			throw new DuplicateElementException("Tasks cannot have the same name");

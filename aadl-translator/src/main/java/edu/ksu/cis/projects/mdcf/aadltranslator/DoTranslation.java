@@ -309,7 +309,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
+		// TODO: Figure out how to check for enablement
 		return true;
 	}
 

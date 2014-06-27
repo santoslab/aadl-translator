@@ -1,6 +1,8 @@
 package PulseOx_Forwarding_System
 public
-with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display, PulseOx_Forwarding_Properties, MAP_Properties;
+with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display, 
+	PulseOx_Forwarding_Properties, MAP_Properties, MAP_Error_Properties,
+	PulseOx_Forwarding_Errors;
 
 	system PulseOx_Forwarding_System
 	end PulseOx_Forwarding_System;
@@ -23,5 +25,21 @@ with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display, Pu
 		
 		-- From logic to display
 		alarm_to_display : port appLogic.DerivedAlarm -> appDisplay.DerivedAlarm;
+	annex EMV2 {**
+		use types PulseOx_Forwarding_Errors;
+		connection error
+			spo2_high_err: error source spo2_to_logic;
+		end connection;
+		properties
+		MAP_Error_Properties::Occurrence => [
+			Kind => Providing;
+			Hazard => PulseOx_Forwarding_Error_Properties::H1;
+			ViolatedConstraint => PulseOx_Forwarding_Error_Properties::C1;
+			Description => "Wrong values (Undetected)";
+			Cause => "Incorrect values are gathered from the physiological sensors";
+			Compensation => "???";
+			Impact => reference(SpO2ValueHigh);
+		] applies to spo2_high_err;
+	**};
 	end PulseOx_Forwarding_System.imp;
 end PulseOx_Forwarding_System;

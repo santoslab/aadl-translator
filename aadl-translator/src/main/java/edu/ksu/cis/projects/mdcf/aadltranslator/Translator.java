@@ -453,8 +453,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						"Default_Thread_Deadline", "Timing_Properties",
 						"Deadline", "int");
 				String wcet = handleOverridableProperty(obj,
-						"Default_Thread_WCET", "Timing_Properties",
-						"Compute_Execution_Time", "int");
+						"Default_Thread_WCET", "MAP_Properties",
+						"Worst_Case_Execution_Time", "int");
 				if (trigType == null)
 					throw new MissingRequiredPropertyException(
 							"Thread dispatch type must either be set with Default_Thread_Dispatch (at package level) or with Thread_Properties::Dispatch_Protocol (on individual thread)");

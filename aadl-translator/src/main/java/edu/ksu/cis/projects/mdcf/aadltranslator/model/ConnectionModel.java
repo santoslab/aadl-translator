@@ -1,8 +1,17 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
+import java.util.HashMap;
+
+import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
+
 public class ConnectionModel {
 	private ComponentModel publisher;
 	private ComponentModel subscriber;
+	
+	/**
+	 * Maps a connection error name to its associated occurrence
+	 */
+	private HashMap<String, OccurrenceModel> occurrenceMap = new HashMap<>();
 	
 	private boolean devicePublished;
 	private boolean deviceSubscribed;
@@ -99,5 +108,21 @@ public class ConnectionModel {
 
 	public void setChannelDelay(int channelDelay) {
 		this.channelDelay = channelDelay;
+	}
+	
+	public HashMap<String, OccurrenceModel> getOccurrences() {
+		return occurrenceMap;
+	}
+	
+	public void addOccurrence(String connErrName, OccurrenceModel occurrence) throws DuplicateElementException {
+		if(!occurrenceMap.containsKey(occurrence)){
+			occurrenceMap.put(connErrName, occurrence);
+	 	} else {
+	 		throw new DuplicateElementException("Each connection error must have exactly one occurrence");
+	 	}
+	}
+	
+	public OccurrenceModel getOccurrence(String connErrName) {
+		return occurrenceMap.get(connErrName);
 	}
 }

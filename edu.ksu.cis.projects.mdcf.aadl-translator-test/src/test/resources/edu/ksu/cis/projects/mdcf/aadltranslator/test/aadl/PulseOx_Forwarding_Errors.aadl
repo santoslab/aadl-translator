@@ -1,0 +1,14 @@
+package PulseOx_Forwarding_Errors
+public
+with MAP_Errors, PulseOx_Forwarding_Error_Properties, MAP_Error_Properties;
+
+annex EMV2
+{**
+	error types
+	SpO2ValueHigh : type extends MAP_Errors::WrongPhysioDataError;
+	
+	MissedAlarm : type extends MAP_Errors::WrongInfoDisplayedError;
+	end types;
+**};
+
+end PulseOx_Forwarding_Errors;

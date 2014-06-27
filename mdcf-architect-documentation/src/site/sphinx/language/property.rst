@@ -42,7 +42,7 @@ Thread Properties
 	|prop wcet|
 	
    :default name: Default_Thread_WCET
-   :override: Timing_Properties::Compute_Execution_Time
+   :override: MAP_Properties::Worst_Case_Execution_Time
    :type: Time
    :context: :construct:`thread`
    :example: ``5 ms``  

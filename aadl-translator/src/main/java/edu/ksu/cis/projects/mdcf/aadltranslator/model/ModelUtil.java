@@ -4,6 +4,11 @@ import com.google.common.base.Predicate;
 
 public class ModelUtil {
 	public static enum ComponentKind {PSEUDODEVICE, DISPLAY, LOGIC};
+	public static enum Keyword {NOTPROVIDING, PROVIDING, EARLY, LATE, APPLIEDTOOLONG, STOPPEDTOOSOON,
+		VALUELOW, VALUEHIGH, PARAMSMISSING, PARAMSWRONG, PARAMSOUTOFORDER};
+		
+	public final static PropagationModel FLOW_SOURCE = new PropagationModel(false, null, null);
+	public final static PropagationModel FLOW_SINK = new PropagationModel(true, null, null);
 	
 	public final static Predicate<PortModel> receivePortFilter = new Predicate<PortModel>() {
 		public boolean apply(PortModel pm) {

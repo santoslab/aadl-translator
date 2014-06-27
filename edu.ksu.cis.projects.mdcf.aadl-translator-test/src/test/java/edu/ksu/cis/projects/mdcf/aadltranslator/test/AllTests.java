@@ -37,6 +37,15 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFactory;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ConnectionModelTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ControllerErrorTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.DeviceModelTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.PortModelTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ProcessModelTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.SystemModelTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.TaskModelTests;
+
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ConnectionModelHazardTests;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
@@ -48,6 +57,9 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 	PortModelTests.class,
 	ConnectionModelTests.class,
 
+	// Hazard Model Tests
+	ConnectionModelHazardTests.class,
+	
 	// Error-handling tests
 	ControllerErrorTests.class,
 })
@@ -195,7 +207,7 @@ public class AllTests {
 		}
 	}
 	
-	public static SystemModel runTest(final String testName, final String systemName) {
+	public static SystemModel runArchTransTest(final String testName, final String systemName) {
 		IFile inputFile = systemFiles.get(systemName);
 		stats = new Translator(new NullProgressMonitor());
 

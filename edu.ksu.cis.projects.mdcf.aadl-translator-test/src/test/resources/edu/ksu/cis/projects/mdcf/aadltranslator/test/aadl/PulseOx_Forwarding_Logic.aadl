@@ -6,9 +6,18 @@ with PulseOx_Forwarding_Types, MAP_Properties;
 	features
 		SpO2 : in data port PulseOx_Forwarding_Types::SpO2;
 		DerivedAlarm : out event port
-		{MAP_Properties::Output_Rate => 200 ms .. 400 ms};
+		{MAP_Properties::Output_Rate => 200 ms .. 400 ms;};
 	properties
 		MAP_Properties::Component_Type => logic;
+	annex EMV2 {** 
+ 		use types PulseOx_Forwarding_Errors;
+		error propagations
+			SpO2 : in propagation {SpO2ValueHigh};
+			DerivedAlarm : out propagation {MissedAlarm};
+			flows
+				HighSpO2LeadsToOD : error path SpO2{SpO2ValueHigh} -> DerivedAlarm{MissedAlarm};
+		end propagations;
+	**};
 	end PulseOx_Logic_Process;
 
 	process implementation PulseOx_Logic_Process.imp

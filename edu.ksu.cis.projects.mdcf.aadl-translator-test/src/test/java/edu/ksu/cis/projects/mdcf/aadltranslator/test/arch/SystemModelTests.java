@@ -1,4 +1,4 @@
-package edu.ksu.cis.projects.mdcf.aadltranslator.test;
+package edu.ksu.cis.projects.mdcf.aadltranslator.test.arch;
 
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.initComplete;
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.usedProperties;
@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
 public class SystemModelTests {
 	private static SystemModel systemModel;
@@ -20,7 +21,7 @@ public class SystemModelTests {
 			AllTests.initialize();
 		usedProperties.add("MAP_Properties");
 		usedProperties.add("PulseOx_Forwarding_Properties");
-		systemModel = AllTests.runTest("PulseOx", "PulseOx_Forwarding_System");
+		systemModel = AllTests.runArchTransTest("PulseOx", "PulseOx_Forwarding_System");
 	}
 
 	@AfterClass

@@ -8,6 +8,14 @@ with PulseOx_Forwarding_Types, MAP_Properties;
 		DerivedAlarm : in event port;
 	properties
 		MAP_Properties::Component_Type => display;
+	annex EMV2 {** 
+ 		use types PulseOx_Forwarding_Errors;
+		error propagations
+			DerivedAlarm : in propagation {MissedAlarm};
+			flows
+				AlarmOmission : error sink DerivedAlarm {MissedAlarm};	
+		end propagations;
+	**};
 	end PulseOx_Display_Process;
 
 	process implementation PulseOx_Display_Process.imp
@@ -33,7 +41,7 @@ with PulseOx_Forwarding_Types, MAP_Properties;
 	properties
 		Timing_Properties::Deadline => 75 ms;
 		Timing_Properties::Period => 95 ms;
-		Timing_Properties::Compute_Execution_Time => 7 ms;
+		MAP_Properties::Worst_Case_Execution_Time => 7 ms;
 	end HandleAlarmThread;
 	
 	thread implementation HandleAlarmThread.imp

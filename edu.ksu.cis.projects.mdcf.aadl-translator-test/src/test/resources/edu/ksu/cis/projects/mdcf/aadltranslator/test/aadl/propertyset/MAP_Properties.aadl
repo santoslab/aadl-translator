@@ -3,5 +3,6 @@ property set MAP_Properties is
 	Component_Type_Type : type enumeration (logic, display);
 	Component_Type : MAP_Properties::Component_Type_Type applies to (process); 
 	Output_Rate : Time_Range applies to (port);
-	Channel_Delay : Time applies to (port connection)
+	Channel_Delay : Time applies to (port connection);
+	Worst_Case_Execution_Time : Time applies to (thread);
 end MAP_Properties;
