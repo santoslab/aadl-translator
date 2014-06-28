@@ -31,7 +31,7 @@ virtualComponent(name, component) ::=<<
 
 channels(system) ::=<<
 <channels>
-  #system.channels:{c |#channel(c)#
+  #system.channels.values:{c |#channel(c)#
   }#
 </channels>
 >>

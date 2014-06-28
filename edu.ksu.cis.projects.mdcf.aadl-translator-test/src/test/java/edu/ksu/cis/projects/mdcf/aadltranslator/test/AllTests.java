@@ -29,11 +29,19 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.AnnexLibrary;
+import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.Element;
+import org.osate.aadl2.PropertySet;
+import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterFactory;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
+import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.ErrorTranslator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFactory;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
@@ -44,25 +52,22 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.PortModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ProcessModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.SystemModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.TaskModelTests;
-
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ConnectionModelHazardTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesTests;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-	// Model Tests
-	SystemModelTests.class,
-	DeviceModelTests.class,
-	ProcessModelTests.class,
-	TaskModelTests.class,
-	PortModelTests.class,
-	ConnectionModelTests.class,
+		// Model Tests
+		SystemModelTests.class, DeviceModelTests.class,
+		ProcessModelTests.class, TaskModelTests.class, PortModelTests.class,
+		ConnectionModelTests.class,
 
-	// Hazard Model Tests
-	ConnectionModelHazardTests.class,
-	
-	// Error-handling tests
-	ControllerErrorTests.class,
-})
+		// Hazard Model Tests
+//		ConnectionModelHazardTests.class,
+//		HazardPreliminariesTests.class,
+
+		// Error-handling tests
+		ControllerErrorTests.class, })
 public class AllTests {
 	public static HashMap<String, IFile> systemFiles = new HashMap<>();
 	public static ResourceSet resourceSet = null;
@@ -79,12 +84,12 @@ public class AllTests {
 	public final static String TEST_DIR = "src/test/resources/edu/ksu/cis/projects/mdcf/aadltranslator/test/";
 
 	public static IProject testProject = null;
-	
+
 	public static HashSet<String> usedDevices = new HashSet<>();
 	public static HashSet<String> usedProperties = new HashSet<>();
 	public static ParseErrorReporterFactory parseErrorReporterFactory = TestParseErrorReporterFactory.INSTANCE;
 	public static ParseErrorReporterManager parseErrManager;
-	
+
 	public static boolean initComplete = false;
 	public static StringBuilder errorSB = new StringBuilder();
 
@@ -106,7 +111,7 @@ public class AllTests {
 
 			IProject pluginResources = ResourcesPlugin.getWorkspace().getRoot()
 					.getProject("Plugin_Resources");
-			
+
 			IProject[] referencedProjects = new IProject[] { pluginResources };
 			if (!testProject.isAccessible()) {
 				testProject.create(null);
@@ -133,9 +138,9 @@ public class AllTests {
 			}
 
 			resourceSet = OsateResourceUtil.createResourceSet();
-			
+
 			initFiles(packagesFolder, propertySetsFolder);
-			
+
 			testProject
 					.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
 		} catch (CoreException | ExecutionException | NotDefinedException
@@ -144,7 +149,7 @@ public class AllTests {
 		}
 		initComplete = true;
 	}
-	
+
 	private static void initFiles(IFolder packagesFolder,
 			IFolder propertySetsFolder) {
 		URL aadlDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
@@ -206,12 +211,14 @@ public class AllTests {
 			e.printStackTrace();
 		}
 	}
-	
-	public static SystemModel runArchTransTest(final String testName, final String systemName) {
+
+	public static SystemModel runArchTransTest(final String testName,
+			final String systemName) {
 		IFile inputFile = systemFiles.get(systemName);
 		stats = new Translator(new NullProgressMonitor());
 
-		parseErrManager = new ParseErrorReporterManager(parseErrorReporterFactory);
+		parseErrManager = new ParseErrorReporterManager(
+				parseErrorReporterFactory);
 
 		stats.setErrorManager(parseErrManager);
 		for (String propSetName : usedProperties) {
@@ -225,6 +232,9 @@ public class AllTests {
 				.toString());
 
 		supportingFiles.addAll(usedDevices);
+//		supportingFiles.addAll(propertyFiles);
+
+//		ErrorTranslator hazardAnalysis = new ErrorTranslator();
 		
 		for (String supportingFileName : supportingFiles) {
 			IFile supportingFile = systemFiles.get(supportingFileName);
@@ -234,9 +244,29 @@ public class AllTests {
 			stats.process(target);
 			errorSB.append(parseErrManager.getReporter(
 					(IResource) supportingFile).toString());
+//			if(target instanceof PropertySet)
+//				continue;
+//			AadlPackage pack = (AadlPackage) target;
+//			PublicPackageSection sect = pack.getPublicSection();
+//			if (sect.getOwnedAnnexLibraries().size() > 0
+//					&& sect.getOwnedAnnexLibraries().get(0).getName()
+//							.equals("EMV2")) {
+//				AnnexLibrary annexLibrary = sect.getOwnedAnnexLibraries()
+//						.get(0);
+//				DefaultAnnexLibrary defaultAnnexLibrary = (DefaultAnnexLibrary) annexLibrary;
+//				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary
+//						.getParsedAnnexLibrary();
+//				HashSet<ErrorType> errors = new HashSet<ErrorType>(
+//						emImpl.getTypes());
+//				hazardAnalysis.setErrorTypes(errors);
+//			}
 		}
-		
+
+//		supportingFiles.removeAll(propertyFiles);
 		supportingFiles.removeAll(usedDevices);
+//
+//		hazardAnalysis.setSystemModel(stats.getSystemModel());
+//		hazardAnalysis.parseOccurrences(stats.getSystemImplementation());
 
 		return stats.getSystemModel();
 	}

@@ -1,7 +1,6 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -15,16 +14,17 @@ import org.osate.aadl2.DeviceType;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.EventDataPort;
+import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortCategory;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.Property;
-import org.osate.aadl2.PropertyAssociation;
-import org.osate.aadl2.PropertyExpression;
-import org.osate.aadl2.PropertyValue;
+import org.osate.aadl2.PropertyConstant;
+import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.RecordValue;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.SubprogramType;
@@ -32,7 +32,6 @@ import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
-import org.osate.aadl2.impl.RecordValueImpl;
 import org.osate.aadl2.modelsupport.errorreporting.MarkerParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
@@ -41,21 +40,22 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.properties.PropertyNotPresentException;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.contribution.sei.names.DataModel;
-import org.osate.xtext.aadl2.errormodel.errorModel.ConnectionErrorSource;
-import org.osate.xtext.aadl2.errormodel.util.EMV2Util;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.DoTranslation.Mode;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.CoreException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.MissingRequiredPropertyException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.PropertyOutOfRangeException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.UseBeforeDeclarationException;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.AccidentLevelModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.AccidentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ConnectionModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ConstraintModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.HazardModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
@@ -69,7 +69,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	private SystemModel systemModel = null;
 	private ArrayList<String> propertySetNames = new ArrayList<>();
 	private ParseErrorReporterManager errorManager;
-	private Mode MODE;
+	public SystemImplementation sysImpl;
 
 	public class TranslatorSwitch extends Aadl2Switch<String> {
 		/**
@@ -77,7 +77,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 */
 		private ComponentModel componentModel = null;
 		private ElementType lastElemProcessed = ElementType.NONE;
-		
+
 		@Override
 		public String caseSystem(org.osate.aadl2.System obj) {
 			try {
@@ -96,24 +96,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		@Override
-		public String casePropertyValue(PropertyValue obj){
+		public String caseSystemImplementation(SystemImplementation obj) {
+			sysImpl = obj;
 			return NOT_DONE;
 		}
-		
-		@Override
-		public String caseSystemImplementation(SystemImplementation obj){
-			HashSet<ConnectionErrorSource> connErrors = new HashSet<>(EMV2Util.getAllConnectionErrorSources(obj));
-			for(ConnectionErrorSource connError : connErrors){
-				for(PropertyAssociation pa : EMV2Util.getOwnEMV2Subclause(connError.getContainingClassifier()).getProperties()){
-					RecordValueImpl rv = ((RecordValueImpl)pa.getOwnedValues().get(0).getOwnedValue());
-					String connErrorName = connError.getName();
-					String propName = rv.getOwnedFieldValues().get(3).getProperty().getName();
-					String propVal = ((StringLiteral) rv.getOwnedFieldValues().get(3).getValue()).getValue();
-				}
-			}
-			return NOT_DONE;
-		}
-		
+
 		@Override
 		public String caseThreadSubcomponent(ThreadSubcomponent obj) {
 			try {
@@ -201,6 +188,78 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		@Override
+		public String casePropertyConstant(PropertyConstant obj) {
+			try {
+				if(obj.getPropertyType().getName() == null) {
+					return NOT_DONE;
+				} else if (obj.getPropertyType().getName().equals("Accident_Level")) {
+					RecordValue rv = (RecordValue) obj.getConstantValue();
+					IntegerLiteral il = ((IntegerLiteral) PropertyUtils
+							.getRecordFieldValue(rv, "Level"));
+					if (il.getValue() > Integer.MAX_VALUE) {
+						throw new PropertyOutOfRangeException(
+								"Accident levels must be less than 2,147,483,647");
+					}
+					AccidentLevelModel alm = new AccidentLevelModel();
+					alm.setNumber((int) il.getValue());
+					alm.setName(obj.getName());
+					systemModel.addAccidentLevel(alm);
+				} else if (obj.getPropertyType().getName().equals("Accident")) {
+					RecordValue rv = (RecordValue) obj.getConstantValue();
+					IntegerLiteral il = (IntegerLiteral) PropertyUtils.getRecordFieldValue(rv, "Number");
+					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
+					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Level");
+					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
+					if (il.getValue() > Integer.MAX_VALUE) {
+						throw new PropertyOutOfRangeException(
+								"Accident numbers must be less than 2,147,483,647");
+					} 
+					AccidentModel am = new AccidentModel();
+					am.setNumber((int) il.getValue());
+					am.setName(obj.getName());
+					am.setDescription(sl.getValue());
+					am.setParent(systemModel.getAccidentLevelByName(pc.getName()));
+					systemModel.addAccident(am);
+				} else if (obj.getPropertyType().getName().equals("Hazard")) {
+					RecordValue rv = (RecordValue) obj.getConstantValue();
+					IntegerLiteral il = (IntegerLiteral) PropertyUtils.getRecordFieldValue(rv, "Number");
+					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
+					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Accident");
+					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
+					if (il.getValue() > Integer.MAX_VALUE) {
+						throw new PropertyOutOfRangeException(
+								"Hazard numbers must be less than 2,147,483,647");
+					} 
+					HazardModel hm = new HazardModel();
+					hm.setNumber((int) il.getValue());
+					hm.setName(obj.getName());
+					hm.setDescription(sl.getValue());
+					hm.setParent(systemModel.getAccidentByName(pc.getName()));
+					systemModel.addHazard(hm);
+				} else if (obj.getPropertyType().getName().equals("Constraint")) {
+					RecordValue rv = (RecordValue) obj.getConstantValue();
+					IntegerLiteral il = (IntegerLiteral) PropertyUtils.getRecordFieldValue(rv, "Number");
+					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
+					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Hazard");
+					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
+					if (il.getValue() > Integer.MAX_VALUE) {
+						throw new PropertyOutOfRangeException(
+								"Constraint numbers must be less than 2,147,483,647");
+					} 
+					ConstraintModel cm = new ConstraintModel();
+					cm.setNumber((int) il.getValue());
+					cm.setName(obj.getName());
+					cm.setDescription(sl.getValue());
+					cm.setParent(systemModel.getHazardByName(pc.getName()));
+					systemModel.addConstraint(cm);
+				}
+			} catch (PropertyOutOfRangeException | DuplicateElementException e) {
+				handleException(obj, e);
+			}
+			return NOT_DONE;
+		}
+
+		@Override
 		public String caseProcessType(ProcessType obj) {
 			ProcessModel pm;
 			try {
@@ -212,10 +271,13 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					throw new UseBeforeDeclarationException(
 							"Attempted to define a process that wasn't declared as a system component");
 				}
-				String componentType = checkCustomProperty(obj, "Component_Type", "enum");
-				if (componentType != null && componentType.equalsIgnoreCase("logic")) {
+				String componentType = checkCustomProperty(obj,
+						"Component_Type", "enum");
+				if (componentType != null
+						&& componentType.equalsIgnoreCase("logic")) {
 					pm.setDisplay(false);
-				} else if (componentType != null && componentType.equalsIgnoreCase("display")) {
+				} else if (componentType != null
+						&& componentType.equalsIgnoreCase("display")) {
 					pm.setDisplay(true);
 				} else {
 					throw new PropertyOutOfRangeException(
@@ -391,6 +453,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		@Override
 		public String caseAadlPackage(AadlPackage obj) {
 			processEList(obj.getOwnedPublicSection().getChildren());
+			return DONE;
+		}
+
+		@Override
+		public String casePropertySet(PropertySet obj) {
+			processEList(obj.getOwnedPropertyConstants());
 			return DONE;
 		}
 
@@ -594,11 +662,6 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						PropertyUtils.getScaledRangeMaximum(obj, prop,
 								GetProperties.findUnitLiteral(prop, "ms")),
 						obj, prop);
-			} else if (propType.equals("occurrence")){
-				PropertyExpression record = PropertyUtils.getSimplePropertyValue(obj, prop);
-				RecordValue recordValue = (RecordValue) record;
-				PropertyExpression recordFieldValue = PropertyUtils.getRecordFieldValue(recordValue, "Description");
-				return null;
 			} else {
 				System.err
 						.println("HandlePropertyValue called with garbage propType: "
@@ -740,7 +803,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			connModel.setPubPortName(pubPortName);
 			connModel.setSubPortName(subPortName);
 			connModel.setChannelDelay(Integer.valueOf(channelDelay));
-			systemModel.addConnection(connModel);
+			connModel.setName(obj.getName());
+			systemModel.addConnection(obj.getName(), connModel);
 		}
 
 		/*-
@@ -901,5 +965,9 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 	public void addPropertySetName(String propSetName) {
 		propertySetNames.add(propSetName);
+	}
+
+	public SystemImplementation getSystemImplementation() {
+		return sysImpl;
 	}
 }

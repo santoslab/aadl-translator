@@ -125,34 +125,32 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	public void doTranslation(IProgressMonitor monitor, Mode mode) {
 		// 1) Initialize the progress monitor and translator
 		ResourceSet rs = initProgressMonitor(monitor);
-		Translator arch = new Translator(monitor);
-		ErrorTranslator errorTranslator = null;
+		Translator archTranslator = new Translator(monitor);
 
 		// 2) Get the list of files used in the model we're translating
 		HashSet<IFile> usedFiles = this.getUsedFiles();
 
 		// 3) Identify which file contains the AADL system
-		IFile systemFile = getSystemFile(rs, arch, usedFiles);
+		IFile systemFile = getSystemFile(rs, archTranslator, usedFiles);
 
 		// 4) Initialize the error reporter
-		ParseErrorReporterManager parseErrManager = initErrManager(arch);
+		ParseErrorReporterManager parseErrManager = initErrManager(archTranslator);
 
 		// 5) Build the in-memory system model
-		processFiles(monitor, rs, arch, usedFiles, systemFile, parseErrManager);
+		processFiles(monitor, rs, archTranslator, usedFiles, systemFile, parseErrManager);
 
 		// 5.1) If selected, build the in-memory hazard analysis model
 		if (mode == Mode.HAZARD_ANALYSIS) {
-			errorTranslator = new ErrorTranslator(monitor,
-					arch.getSystemModel());
+			ErrorTranslator hazardAnalysis = new ErrorTranslator();
 			HashSet<ErrorType> errors = getErrorTypes(rs, usedFiles);
-			errorTranslator.setErrorTypes(errors);
-			for (IFile f : usedFiles) {
-				processFile(monitor, rs, errorTranslator, f, parseErrManager);
-			}
+			
+			hazardAnalysis.setErrorTypes(errors);
+			hazardAnalysis.setSystemModel(archTranslator.getSystemModel());
+			hazardAnalysis.parseOccurrences(archTranslator.getSystemImplementation());
 		}
 
 		// 6) Write the generated files
-		writeOutput(arch);
+		writeOutput(archTranslator);
 
 		// 7) Shut down the progress monitor
 		wrapUpProgressMonitor(monitor);
@@ -238,6 +236,9 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		// Process the system first...
 		processFile(monitor, rs, stats, systemFile, parseErrManager);
 
+		// Remove the system from the used files so we don't double-translate it
+		usedFiles.remove(systemFile);
+		
 		// Now process all the other files
 		for (IFile f : usedFiles) {
 			processFile(monitor, rs, stats, f, parseErrManager);
@@ -286,9 +287,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	 * @param stats
 	 *            The translator implementation
 	 * @param usedFiles
-	 *            The set of files used in the architecture description. Note
-	 *            that this parameter is modified (to not include the AADL file
-	 *            containing the system) by this method.
+	 *            The set of files used in the architecture description.
 	 * @return The file containing the AADL system.
 	 */
 	private IFile getSystemFile(ResourceSet rs, Translator stats,

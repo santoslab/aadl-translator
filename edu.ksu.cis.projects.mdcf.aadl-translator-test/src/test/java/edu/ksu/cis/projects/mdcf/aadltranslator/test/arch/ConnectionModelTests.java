@@ -10,19 +10,27 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
 public class ConnectionModelTests {
 	private static SystemModel systemModel;
-
+	private static ConnectionModel devToProcessConn;
+	private static ConnectionModel processToProcessConn;
+	private static ConnectionModel specialConn;
+	
 	@BeforeClass
 	public static void initialize() {
 		if(!initComplete)
 			AllTests.initialize();
 		usedProperties.add("MAP_Properties");
+		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		usedProperties.add("PulseOx_Forwarding_Properties");
 		systemModel = AllTests.runArchTransTest("PulseOx", "PulseOx_Forwarding_System");
+		devToProcessConn = systemModel.getChannelByName("spo2_to_logic");
+		processToProcessConn = systemModel.getChannelByName("alarm_to_display");
+		specialConn = systemModel.getChannelByName("spo2_to_display");
 	}
 
 	@AfterClass
@@ -37,33 +45,33 @@ public class ConnectionModelTests {
 	
 	@Test
 	public void testDefaultPortConnectionChannelDelay() {
-		assertEquals(100, systemModel.getChannels().get(0).getChannelDelay());
+		assertEquals(100, devToProcessConn.getChannelDelay());
 	}
 	
 	@Test
 	public void testOverridePortConnectionChannelDelay() {
-		assertEquals(150, systemModel.getChannels().get(1).getChannelDelay());
+		assertEquals(150, specialConn.getChannelDelay());
 	}
 	
 	@Test
 	public void testPortConnectionPublisherInfo() {
-		assertEquals(systemModel.getDeviceByType("ICEpoInterface"), systemModel.getChannels().get(0).getPublisher());
-		assertEquals("pulseOx", systemModel.getChannels().get(0).getPubName());
-		assertEquals("SpO2", systemModel.getChannels().get(0).getPubPortName());
+		assertEquals(systemModel.getDeviceByType("ICEpoInterface"), devToProcessConn.getPublisher());
+		assertEquals("pulseOx", devToProcessConn.getPubName());
+		assertEquals("SpO2", devToProcessConn.getPubPortName());
 	}
 	
 	@Test
 	public void testPortConnectionSubscriberInfo() {
-		assertEquals(systemModel.getChannels().get(0).getSubscriber(), systemModel.getProcessByType("PulseOx_Logic_Process"));
-		assertEquals(systemModel.getChannels().get(0).getSubName(), "appLogic");
-		assertEquals(systemModel.getChannels().get(0).getSubPortName(), "SpO2");
+		assertEquals(devToProcessConn.getSubscriber(), systemModel.getProcessByType("PulseOx_Logic_Process"));
+		assertEquals(devToProcessConn.getSubName(), "appLogic");
+		assertEquals(devToProcessConn.getSubPortName(), "SpO2");
 	}
 	
 	@Test
 	public void testPortConnectionDirections() {
-		assertTrue(systemModel.getChannels().get(0).isDevicePublished());
-		assertFalse(systemModel.getChannels().get(0).isDeviceSubscribed());
-		assertFalse(systemModel.getChannels().get(2).isDevicePublished());
-		assertFalse(systemModel.getChannels().get(2).isDeviceSubscribed());
+		assertTrue(devToProcessConn.isDevicePublished());
+		assertFalse(devToProcessConn.isDeviceSubscribed());
+		assertFalse(processToProcessConn.isDevicePublished());
+		assertFalse(processToProcessConn.isDeviceSubscribed());
 	}
 }

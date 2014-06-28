@@ -1,8 +1,6 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
-import java.util.HashMap;
-
-import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
+import java.util.HashSet;
 
 public class ConnectionModel {
 	private ComponentModel publisher;
@@ -11,10 +9,15 @@ public class ConnectionModel {
 	/**
 	 * Maps a connection error name to its associated occurrence
 	 */
-	private HashMap<String, OccurrenceModel> occurrenceMap = new HashMap<>();
+	private HashSet<OccurrenceModel> occurrences = new HashSet<>();
 	
 	private boolean devicePublished;
 	private boolean deviceSubscribed;
+	
+	/**
+	 * The name the app developer uses to refer to this channel
+	 */
+	private String name;
 	
 	/**
 	 * The name the app developer uses to refer to the publishing component
@@ -110,19 +113,19 @@ public class ConnectionModel {
 		this.channelDelay = channelDelay;
 	}
 	
-	public HashMap<String, OccurrenceModel> getOccurrences() {
-		return occurrenceMap;
+	public HashSet<OccurrenceModel> getOccurrences() {
+		return occurrences;
 	}
 	
-	public void addOccurrence(String connErrName, OccurrenceModel occurrence) throws DuplicateElementException {
-		if(!occurrenceMap.containsKey(occurrence)){
-			occurrenceMap.put(connErrName, occurrence);
-	 	} else {
-	 		throw new DuplicateElementException("Each connection error must have exactly one occurrence");
-	 	}
+	public void addOccurrence(OccurrenceModel occurrence) {
+		occurrences.add(occurrence); 	
 	}
-	
-	public OccurrenceModel getOccurrence(String connErrName) {
-		return occurrenceMap.get(connErrName);
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }

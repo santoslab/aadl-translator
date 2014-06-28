@@ -23,6 +23,7 @@ public class ProcessModelTests {
 		if(!initComplete)
 			AllTests.initialize();
 		usedProperties.add("MAP_Properties");
+		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		usedProperties.add("PulseOx_Forwarding_Properties");
 		SystemModel systemModel = AllTests.runArchTransTest("PulseOx", "PulseOx_Forwarding_System");
 		processModel = systemModel.getProcessByType("PulseOx_Logic_Process");

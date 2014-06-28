@@ -34,6 +34,7 @@ public class ControllerErrorTests {
 	@Test
 	public void testNoChannelDelay() {
 		usedProperties.add("PulseOx_ForwardingNoChannelDelay_Properties");
+		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		runArchTransTest("PulseOxNoChannelDelay", "PulseOx_Forwarding_System");
 		assertEquals(
 				"Error at PulseOx_Forwarding_System.aadl:20: Missing required property 'Default_Channel_Delay'",
@@ -43,6 +44,7 @@ public class ControllerErrorTests {
 	@Test
 	public void testNoOutputRate() {
 		usedProperties.add("PulseOx_ForwardingNoOutputRate_Properties");
+		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		runArchTransTest("PulseOxNoOutputRate", "PulseOx_Forwarding_System");
 		assertEquals(
 				"Error at PulseOx_Forwarding_Logic.aadl:7: Missing the required output rate specification.",
@@ -52,6 +54,7 @@ public class ControllerErrorTests {
 	@Test
 	public void testNoThreadDeadline() {
 		usedProperties.add("PulseOx_ForwardingNoThreadDeadline_Properties");
+		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		runArchTransTest("PulseOxNoThreadDeadline", "PulseOx_Forwarding_System");
 		assertEquals(
 				"Error at PulseOx_Forwarding_Logic.aadl:30: Thread deadline must either be set with Default_Thread_Deadline (at package level) or with Timing_Properties::Deadline (on individual thread)",
@@ -61,6 +64,7 @@ public class ControllerErrorTests {
 	@Test
 	public void testNoThreadDispatch() {
 		usedProperties.add("PulseOx_ForwardingNoThreadDispatch_Properties");
+		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		runArchTransTest("PulseOxNoThreadDispatch", "PulseOx_Forwarding_System");
 		assertEquals(
 				"Error at PulseOx_Forwarding_Display.aadl:30: Thread dispatch type must either be set with Default_Thread_Dispatch (at package level) or with Thread_Properties::Dispatch_Protocol (on individual thread)",
@@ -70,6 +74,7 @@ public class ControllerErrorTests {
 	@Test
 	public void testNoThreadPeriod() {
 		usedProperties.add("PulseOx_ForwardingNoThreadPeriod_Properties");
+		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		runArchTransTest("PulseOxNoThreadPeriod", "PulseOx_Forwarding_System");
 		assertEquals(
 				"Error at PulseOx_Forwarding_Logic.aadl:30: Thread period must either be set with Default_Thread_Period (at package level) or with Timing_Properties::Period (on individual thread)",
@@ -79,6 +84,7 @@ public class ControllerErrorTests {
 	@Test
 	public void testNoWCET() {
 		usedProperties.add("PulseOx_ForwardingNoWCET_Properties");
+		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		runArchTransTest("PulseOxNoWCET", "PulseOx_Forwarding_System");
 		assertEquals(
 				"Error at PulseOx_Forwarding_Logic.aadl:30: Thread WCET must either be set with Default_Thread_WCET (at package level) or with Timing_Properties::Compute_Execution_Time (on individual thread)",
@@ -88,6 +94,7 @@ public class ControllerErrorTests {
 	@Test
 	public void testDuplicateSystem() {
 		usedProperties.add("PulseOx_Forwarding_Properties");
+		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		runArchTransTest("PulseOxDuplicateSystem", "PulseOx_Forwarding_Duplicate_System");
 		assertEquals(
 				"Error at PulseOx_Forwarding_Duplicate_System.aadl:27: Got a system called Duplicate_System but I already have one called PulseOx_Forwarding_Duplicate_System",
@@ -97,6 +104,7 @@ public class ControllerErrorTests {
 	@Test
 	public void testIntegerOverflow() {
 		usedProperties.add("PulseOx_ForwardingIntegerOverflow_Properties");
+		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		runArchTransTest("PulseOxIntegerOverflow", "PulseOx_Forwarding_System");
 		assertEquals(
 				"Error at PulseOx_Forwarding_Logic.aadl:30: Property Default_Thread_Period on element CheckSpO2Thread converts to 2.5E9 ms, which cannot be converted to an integer\n"
@@ -108,6 +116,7 @@ public class ControllerErrorTests {
 	@Test
 	public void testBidirectionalPort() {
 		usedProperties.add("PulseOx_Forwarding_Properties");
+		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		runArchTransTest("PulseOxBidirectionalPortConnection",
 				"PulseOx_Forwarding_Bidirectional_System");
 		assertEquals(
@@ -118,6 +127,7 @@ public class ControllerErrorTests {
 	@Test
 	public void testDevToDevConnection() {
 		usedProperties.add("PulseOx_Forwarding_Properties");
+		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		usedDevices.add("PulseOx_UseSpO2_Interface");
 		runArchTransTest("PulseOxDevToDevConnection",
 				"PulseOx_Forwarding_DevToDev_System");

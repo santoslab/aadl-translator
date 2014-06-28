@@ -1,8 +1,10 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 
@@ -10,16 +12,66 @@ public class SystemModel {
 	private String name;
 	private HashMap<String, ProcessModel> logicComponents;
 	private HashMap<String, DeviceModel> devices;
-	private ArrayList<ConnectionModel> channels;
+	private HashMap<String, ConnectionModel> channels;
 
 	// Type name -> Process Model
 	private HashMap<String, ComponentModel> typeToComponent;
+	
+	// Element name -> Element model
+	private HashMap<String, StpaPreliminaryModel> stpaPreliminaries; 
 
 	public SystemModel() {
 		logicComponents = new HashMap<>();
 		typeToComponent = new HashMap<>();
-		channels = new ArrayList<>();
+		channels = new HashMap<>();
 		devices = new HashMap<>();
+		stpaPreliminaries = new HashMap<>();
+	}
+	
+	public void addAccidentLevel(AccidentLevelModel alm) throws DuplicateElementException {
+		addStpaPreliminary(alm);
+	}
+	
+	public void addAccident(AccidentModel am) throws DuplicateElementException {
+		addStpaPreliminary(am);
+	}
+
+	public void addHazard(HazardModel hm) throws DuplicateElementException{
+		addStpaPreliminary(hm);
+	}
+
+	public void addConstraint(ConstraintModel cm) throws DuplicateElementException{
+		addStpaPreliminary(cm);
+	}
+	
+	public AccidentLevelModel getAccidentLevelByName(String name){
+		return (AccidentLevelModel) getStpaPreliminary(name);
+	}
+	
+	public Map<String, StpaPreliminaryModel> getAccidentLevels() {
+		return Maps.filterValues(stpaPreliminaries, ModelUtil.accidentLevelFilter);
+	}
+	
+	public AccidentModel getAccidentByName(String name){
+		return (AccidentModel) getStpaPreliminary(name);
+	}
+	
+	public HazardModel getHazardByName(String name){
+		return (HazardModel) getStpaPreliminary(name);
+	}
+	
+	public ConstraintModel getConstraintByName(String name){
+		return (ConstraintModel) getStpaPreliminary(name);
+	}
+	
+	private StpaPreliminaryModel getStpaPreliminary(String name){
+		return stpaPreliminaries.get(name);
+	}
+	
+	private void addStpaPreliminary(StpaPreliminaryModel prelim) throws DuplicateElementException {
+		if(stpaPreliminaries.containsKey(prelim.getName()))
+			throw new DuplicateElementException("STPA Preliminaries cannot share names or be redefined");
+		stpaPreliminaries.put(prelim.getName(), prelim);
 	}
 
 	public ProcessModel getProcessByType(String processTypeName) {
@@ -36,6 +88,10 @@ public class SystemModel {
 			return null;
 	}
 
+	public ConnectionModel getChannelByName(String connectionName) {
+		return channels.get(connectionName);
+	}
+	
 	public void addProcess(String instanceName, ProcessModel pm)
 			throws DuplicateElementException {
 		if (logicComponents.containsKey(instanceName))
@@ -53,8 +109,8 @@ public class SystemModel {
 		typeToComponent.put(dm.getName(), dm);
 	}
 
-	public void addConnection(ConnectionModel cm) {
-		channels.add(cm);
+	public void addConnection(String name, ConnectionModel cm) {
+		channels.put(name, cm);
 	}
 
 	public String getName() {
@@ -84,12 +140,8 @@ public class SystemModel {
 		return ret;
 	}
 	
-	public ArrayList<ConnectionModel> getChannels() {
+	public HashMap<String, ConnectionModel> getChannels() {
 		return channels;
-	}
-
-	public void setChannels(ArrayList<ConnectionModel> channels) {
-		this.channels = channels;
 	}
 
 	public boolean hasProcessType(String typeName) {

@@ -8,9 +8,9 @@ with EMV2, MAP_Error_Properties;
 	PulseOximiterFailUndetectablyHigh : constant aadlreal => 0.375;
 	PulseOximiterFailUndetectablyLow : constant aadlreal => 0.125;
 
-	AL1 : MAP_Error_Properties::Accident_Level => [
+	AL1 : constant MAP_Error_Properties::Accident_Level => [
 		Level => 1;
-	] applies to (all);
+	];
 	
 	A1 : constant MAP_Error_Properties::Accident => [
 		Number => 1;
@@ -27,12 +27,6 @@ with EMV2, MAP_Error_Properties;
 	C1 : constant MAP_Error_Properties::Constraint => [
 		Number => 1;
 		Description => "The app must inform the display of the status of the patient's vital signs.";
-		Hazard => PulseOx_Forwarding_Error_Properties::H1;
-	];
-	
-	C2 : constant MAP_Error_Properties::Constraint => [
-		Number => 3;
-		Description => "The app must inform the display of the pump command status.";
 		Hazard => PulseOx_Forwarding_Error_Properties::H1;
 	];
 	

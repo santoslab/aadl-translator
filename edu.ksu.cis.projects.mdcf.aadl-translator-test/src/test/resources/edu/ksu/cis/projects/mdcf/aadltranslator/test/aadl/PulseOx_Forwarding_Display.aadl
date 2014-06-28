@@ -1,6 +1,6 @@
 package PulseOx_Forwarding_Display
 public
-with PulseOx_Forwarding_Types, MAP_Properties;
+with PulseOx_Forwarding_Types, MAP_Properties, PulseOx_Forwarding_Errors;
 
 	process PulseOx_Display_Process
 	features

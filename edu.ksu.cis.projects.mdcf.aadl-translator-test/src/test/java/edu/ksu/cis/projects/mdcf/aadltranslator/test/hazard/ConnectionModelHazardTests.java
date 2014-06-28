@@ -21,9 +21,10 @@ public class ConnectionModelHazardTests {
 		if(!initComplete)
 			AllTests.initialize();
 		usedProperties.add("MAP_Properties");
+		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		usedProperties.add("PulseOx_Forwarding_Properties");
 		SystemModel systemModel = AllTests.runArchTransTest("PulseOx", "PulseOx_Forwarding_System");
-		occurrence = systemModel.getChannels().get(0).getOccurrence("testConnErr");
+		occurrence = systemModel.getChannelByName("spo2_to_logic").getOccurrences().iterator().next();
 	}
 
 	@AfterClass
@@ -33,6 +34,6 @@ public class ConnectionModelHazardTests {
 	
 	@Test
 	public void testOccurrenceExist(){
-//		assertNotNull(occurrence);
+		assertNotNull(occurrence);
 	}
 }
