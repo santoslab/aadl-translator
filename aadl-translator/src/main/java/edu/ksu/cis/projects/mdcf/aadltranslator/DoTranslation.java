@@ -27,7 +27,9 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.Classifier;
+import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
@@ -36,10 +38,15 @@ import org.osate.aadl2.modelsupport.errorreporting.MarkerParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterFactory;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
+import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitchWithProgress;
 import org.osate.aadl2.modelsupport.modeltraversal.TraverseWorkspace;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.core.OsateCorePlugin;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorModelLibrary;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
+import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
+import org.osate.xtext.aadl2.errormodel.services.ErrorModelGrammarAccess.ErrorModelLibraryElements;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
@@ -47,6 +54,10 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.preference.PreferenceConstants;
 
 public final class DoTranslation implements IHandler, IRunnableWithProgress {
+
+	public static enum Mode {
+		APP_ARCH, HAZARD_ANALYSIS
+	};
 
 	private final STGroup java_superclassSTG = new STGroupFile(
 			"src/main/resources/templates/java-superclass.stg");
@@ -57,6 +68,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	private final STGroup midas_appspecSTG = new STGroupFile(
 			"src/main/resources/templates/midas-appspec.stg");
 	private ExecutionEvent triggeringEvent;
+	private final String TRANSLATE_ARCH_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate";
+	private final String TRANSLATE_HAZARDS_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate-hazards";
 
 	public HashSet<IFile> getUsedFiles() {
 		IncludesCalculator ic = new IncludesCalculator(
@@ -109,25 +122,37 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		return file;
 	}
 
-	public void doTranslation(IProgressMonitor monitor) {
+	public void doTranslation(IProgressMonitor monitor, Mode mode) {
 		// 1) Initialize the progress monitor and translator
 		ResourceSet rs = initProgressMonitor(monitor);
-		Translator stats = new Translator(monitor);
-		
+		Translator arch = new Translator(monitor);
+		ErrorTranslator errorTranslator = null;
+
 		// 2) Get the list of files used in the model we're translating
 		HashSet<IFile> usedFiles = this.getUsedFiles();
 
 		// 3) Identify which file contains the AADL system
-		IFile systemFile = getSystemFile(rs, stats, usedFiles);
-		
+		IFile systemFile = getSystemFile(rs, arch, usedFiles);
+
 		// 4) Initialize the error reporter
-		ParseErrorReporterManager parseErrManager = initErrManager(stats);
-		
+		ParseErrorReporterManager parseErrManager = initErrManager(arch);
+
 		// 5) Build the in-memory system model
-		processFiles(monitor, rs, stats, usedFiles, systemFile, parseErrManager);
-		
+		processFiles(monitor, rs, arch, usedFiles, systemFile, parseErrManager);
+
+		// 5.1) If selected, build the in-memory hazard analysis model
+		if (mode == Mode.HAZARD_ANALYSIS) {
+			errorTranslator = new ErrorTranslator(monitor,
+					arch.getSystemModel());
+			HashSet<ErrorType> errors = getErrorTypes(rs, usedFiles);
+			errorTranslator.setErrorTypes(errors);
+			for (IFile f : usedFiles) {
+				processFile(monitor, rs, errorTranslator, f, parseErrManager);
+			}
+		}
+
 		// 6) Write the generated files
-		writeOutput(stats);
+		writeOutput(arch);
 
 		// 7) Shut down the progress monitor
 		wrapUpProgressMonitor(monitor);
@@ -158,7 +183,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		String appName;
 		String appSpecContents;
 		IPreferencesService service = Platform.getPreferencesService();
-		
+
 		// Get user preferences
 		boolean generateShells = service.getBoolean(
 				"edu.ksu.cis.projects.mdcf.aadl-translator",
@@ -172,16 +197,18 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		midas_compsigSTG.delimiterStopChar = '$';
 		midas_appspecSTG.delimiterStartChar = '#';
 		midas_appspecSTG.delimiterStopChar = '#';
-		
+
 		// Give the model to the string templates
 		for (ComponentModel cm : stats.getSystemModel().getLogicAndDevices()
 				.values()) {
-			if(!cm.isPseudoDevice()){
+			if (!cm.isPseudoDevice()) {
 				javaClasses.put(cm.getName() + "SuperType", java_superclassSTG
-					.getInstanceOf("class").add("model", cm).render());
+						.getInstanceOf("class").add("model", cm).render());
 			} else {
-				javaClasses.put(cm.getName(), java_superclassSTG
-						.getInstanceOf("class").add("model", cm).render());	
+				javaClasses.put(
+						cm.getName(),
+						java_superclassSTG.getInstanceOf("class")
+								.add("model", cm).render());
 			}
 			if (generateShells && !cm.isPseudoDevice()) {
 				javaClasses.put(
@@ -205,8 +232,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	}
 
 	private void processFiles(IProgressMonitor monitor, ResourceSet rs,
-			Translator stats, HashSet<IFile> usedFiles, IFile systemFile,
-			ParseErrorReporterManager parseErrManager) {
+			AadlProcessingSwitchWithProgress stats, HashSet<IFile> usedFiles,
+			IFile systemFile, ParseErrorReporterManager parseErrManager) {
 
 		// Process the system first...
 		processFile(monitor, rs, stats, systemFile, parseErrManager);
@@ -218,10 +245,11 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	}
 
 	private void processFile(IProgressMonitor monitor, ResourceSet rs,
-			Translator stats, IFile systemFile,
+			AadlProcessingSwitchWithProgress stats, IFile currentFile,
 			ParseErrorReporterManager parseErrManager) {
-		Resource res = rs.getResource(
-				OsateResourceUtil.getResourceURI((IResource) systemFile), true);
+		Resource res = rs
+				.getResource(OsateResourceUtil
+						.getResourceURI((IResource) currentFile), true);
 
 		// Delete any existing error markers in the system file
 		IResource file = OsateResourceUtil.convertToIResource(res);
@@ -280,14 +308,35 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			AadlPackage pack = (AadlPackage) target;
 			PublicPackageSection sect = pack.getPublicSection();
 			for (Classifier ownedClassifier : sect.getOwnedClassifiers()) {
-				if ((ownedClassifier instanceof org.osate.aadl2.SystemType)) {
-					systemFile = f;
-					usedFiles.remove(f);
-					break;
+				if (ownedClassifier instanceof org.osate.aadl2.SystemType) {
+					return f;
 				}
 			}
 		}
 		return systemFile;
+	}
+
+	private HashSet<ErrorType> getErrorTypes(ResourceSet rs,
+			HashSet<IFile> usedFiles) {
+		for (IFile f : usedFiles) {
+			Resource res = rs.getResource(
+					OsateResourceUtil.getResourceURI((IResource) f), true);
+			Element target = (Element) res.getContents().get(0);
+			if ((target instanceof PropertySet)) {
+				continue;
+			}
+			AadlPackage pack = (AadlPackage) target;
+			PublicPackageSection sect = pack.getPublicSection();
+			if (sect.getOwnedAnnexLibraries().size() > 0
+					&& sect.getOwnedAnnexLibraries().get(0).getName()
+							.equals("EMV2")) {
+				AnnexLibrary annexLibrary = sect.getOwnedAnnexLibraries().get(0);
+				DefaultAnnexLibrary defaultAnnexLibrary = (DefaultAnnexLibrary) annexLibrary;
+				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary.getParsedAnnexLibrary();
+				return new HashSet<ErrorType>(emImpl.getTypes());
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -332,7 +381,17 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	@Override
 	public void run(IProgressMonitor monitor) throws InvocationTargetException,
 			InterruptedException {
-		doTranslation(monitor);
+		String commandId = triggeringEvent.getCommand().getId();
+		Mode mode;
+		if (commandId.equals(TRANSLATE_ARCH_COMMAND_ID)) {
+			mode = Mode.APP_ARCH;
+		} else if (commandId.equals(TRANSLATE_HAZARDS_COMMAND_ID)) {
+			mode = Mode.HAZARD_ANALYSIS;
+		} else {
+			System.err.println("Bad command received, id was " + commandId);
+			return;
+		}
+		doTranslation(monitor, mode);
 	}
 
 	public void setTriggeringEvent(ExecutionEvent event) {

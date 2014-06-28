@@ -29,6 +29,10 @@
             id="edu.ksu.cis.projects.mdcf.aadl-translator.TraslateAADLToDeviceMDCF"
             name="Translate Device AADL to Device MDCF Command">
       </command>
+      <command
+            id="edu.ksu.cis.projects.mdcf.aadl-translator.translate-hazards"
+            name="Translate Hazards">
+      </command>
    </extension>
    <extension
          id=".translate"
@@ -41,6 +45,10 @@
       <handler
             class="DeviceAADLToJavaTranslation"
             commandId="edu.ksu.cis.projects.mdcf.aadl-translator.TraslateAADLToDeviceMDCF">
+      </handler>
+      <handler
+            class="edu.ksu.cis.projects.mdcf.aadltranslator.DoTranslation"
+            commandId="edu.ksu.cis.projects.mdcf.aadl-translator.translate-hazards">
       </handler>
    </extension>
    <extension
@@ -64,6 +72,13 @@
                   icon="src/main/resources/icons/deviceaadltojava.png"
                   label="Translate Device AADL to MDCF Java"
                   mnemonic="&amp;t"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ksu.cis.projects.mdcf.aadl-translator.translate-hazards"
+                  icon="src/main/resources/icons/cog_error.png"
+                  label="Translate Hazards"
+                  mnemonic="&amp;h"
                   style="push">
             </command>
          </toolbar>

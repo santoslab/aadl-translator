@@ -1,6 +1,7 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -21,10 +22,17 @@ import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.Property;
+import org.osate.aadl2.PropertyAssociation;
+import org.osate.aadl2.PropertyExpression;
+import org.osate.aadl2.PropertyValue;
+import org.osate.aadl2.RecordValue;
+import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.SubprogramType;
+import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
+import org.osate.aadl2.impl.RecordValueImpl;
 import org.osate.aadl2.modelsupport.errorreporting.MarkerParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
@@ -33,9 +41,12 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.properties.PropertyNotPresentException;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.contribution.sei.names.DataModel;
+import org.osate.xtext.aadl2.errormodel.errorModel.ConnectionErrorSource;
+import org.osate.xtext.aadl2.errormodel.util.EMV2Util;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.DoTranslation.Mode;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.CoreException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.MissingRequiredPropertyException;
@@ -58,6 +69,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	private SystemModel systemModel = null;
 	private ArrayList<String> propertySetNames = new ArrayList<>();
 	private ParseErrorReporterManager errorManager;
+	private Mode MODE;
 
 	public class TranslatorSwitch extends Aadl2Switch<String> {
 		/**
@@ -65,10 +77,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 */
 		private ComponentModel componentModel = null;
 		private ElementType lastElemProcessed = ElementType.NONE;
-
-		private String DONE = "Done";
-		private String NOT_DONE = null;
-
+		
 		@Override
 		public String caseSystem(org.osate.aadl2.System obj) {
 			try {
@@ -86,6 +95,25 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			return NOT_DONE;
 		}
 
+		@Override
+		public String casePropertyValue(PropertyValue obj){
+			return NOT_DONE;
+		}
+		
+		@Override
+		public String caseSystemImplementation(SystemImplementation obj){
+			HashSet<ConnectionErrorSource> connErrors = new HashSet<>(EMV2Util.getAllConnectionErrorSources(obj));
+			for(ConnectionErrorSource connError : connErrors){
+				for(PropertyAssociation pa : EMV2Util.getOwnEMV2Subclause(connError.getContainingClassifier()).getProperties()){
+					RecordValueImpl rv = ((RecordValueImpl)pa.getOwnedValues().get(0).getOwnedValue());
+					String connErrorName = connError.getName();
+					String propName = rv.getOwnedFieldValues().get(3).getProperty().getName();
+					String propVal = ((StringLiteral) rv.getOwnedFieldValues().get(3).getValue()).getValue();
+				}
+			}
+			return NOT_DONE;
+		}
+		
 		@Override
 		public String caseThreadSubcomponent(ThreadSubcomponent obj) {
 			try {
@@ -566,6 +594,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						PropertyUtils.getScaledRangeMaximum(obj, prop,
 								GetProperties.findUnitLiteral(prop, "ms")),
 						obj, prop);
+			} else if (propType.equals("occurrence")){
+				PropertyExpression record = PropertyUtils.getSimplePropertyValue(obj, prop);
+				RecordValue recordValue = (RecordValue) record;
+				PropertyExpression recordFieldValue = PropertyUtils.getRecordFieldValue(recordValue, "Description");
+				return null;
 			} else {
 				System.err
 						.println("HandlePropertyValue called with garbage propType: "
@@ -851,7 +884,6 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 	public Translator(final IProgressMonitor monitor) {
 		super(monitor, PROCESS_PRE_ORDER_ALL);
-
 	}
 
 	@Override
