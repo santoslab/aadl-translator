@@ -299,9 +299,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				handlePort(obj);
 			} else if (lastElemProcessed == ElementType.DEVICE) {
 				handlePort(obj); // Explicit "out" port
-				handleImplicitPort(obj); // Implicit "in" port from device
-				handleImplicitTask(obj); // Implicit task to handle incoming
-											// data
+				if(!cancelled()){
+					handleImplicitPort(obj); // Implicit "in" port from device
+					handleImplicitTask(obj); // Implicit task to handle incoming
+												// data
+				}
 			}
 			return NOT_DONE;
 		}

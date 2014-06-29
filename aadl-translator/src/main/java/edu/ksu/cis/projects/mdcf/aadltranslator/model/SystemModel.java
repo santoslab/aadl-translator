@@ -52,6 +52,18 @@ public class SystemModel {
 		return Maps.filterValues(stpaPreliminaries, ModelUtil.accidentLevelFilter);
 	}
 	
+	public Map<String, StpaPreliminaryModel> getAccidents() {
+		return Maps.filterValues(stpaPreliminaries, ModelUtil.accidentFilter);
+	}
+	
+	public Map<String, StpaPreliminaryModel> getHazards() {
+		return Maps.filterValues(stpaPreliminaries, ModelUtil.hazardFilter);
+	}
+	
+	public Map<String, StpaPreliminaryModel> getConstraints() {
+		return Maps.filterValues(stpaPreliminaries, ModelUtil.constraintFilter);
+	}
+	
 	public AccidentModel getAccidentByName(String name){
 		return (AccidentModel) getStpaPreliminary(name);
 	}

@@ -58,20 +58,23 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesT
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 		// Model Tests
-		SystemModelTests.class, DeviceModelTests.class,
-		ProcessModelTests.class, TaskModelTests.class, PortModelTests.class,
+		SystemModelTests.class,
+		DeviceModelTests.class,
+		ProcessModelTests.class,
+		TaskModelTests.class,
+		PortModelTests.class,
 		ConnectionModelTests.class,
 
 		// Hazard Model Tests
-//		ConnectionModelHazardTests.class,
-//		HazardPreliminariesTests.class,
+		ConnectionModelHazardTests.class,
+		HazardPreliminariesTests.class,
 
 		// Error-handling tests
 		ControllerErrorTests.class, })
 public class AllTests {
 	public static HashMap<String, IFile> systemFiles = new HashMap<>();
 	public static ResourceSet resourceSet = null;
-	public static Translator stats;
+//	private static Translator stats;
 
 	// This may need to turn into a map from system name -> the set of
 	// supporting files
@@ -215,7 +218,7 @@ public class AllTests {
 	public static SystemModel runArchTransTest(final String testName,
 			final String systemName) {
 		IFile inputFile = systemFiles.get(systemName);
-		stats = new Translator(new NullProgressMonitor());
+		Translator stats = new Translator(new NullProgressMonitor());
 
 		parseErrManager = new ParseErrorReporterManager(
 				parseErrorReporterFactory);
@@ -232,9 +235,6 @@ public class AllTests {
 				.toString());
 
 		supportingFiles.addAll(usedDevices);
-//		supportingFiles.addAll(propertyFiles);
-
-//		ErrorTranslator hazardAnalysis = new ErrorTranslator();
 		
 		for (String supportingFileName : supportingFiles) {
 			IFile supportingFile = systemFiles.get(supportingFileName);
@@ -244,29 +244,68 @@ public class AllTests {
 			stats.process(target);
 			errorSB.append(parseErrManager.getReporter(
 					(IResource) supportingFile).toString());
-//			if(target instanceof PropertySet)
-//				continue;
-//			AadlPackage pack = (AadlPackage) target;
-//			PublicPackageSection sect = pack.getPublicSection();
-//			if (sect.getOwnedAnnexLibraries().size() > 0
-//					&& sect.getOwnedAnnexLibraries().get(0).getName()
-//							.equals("EMV2")) {
-//				AnnexLibrary annexLibrary = sect.getOwnedAnnexLibraries()
-//						.get(0);
-//				DefaultAnnexLibrary defaultAnnexLibrary = (DefaultAnnexLibrary) annexLibrary;
-//				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary
-//						.getParsedAnnexLibrary();
-//				HashSet<ErrorType> errors = new HashSet<ErrorType>(
-//						emImpl.getTypes());
-//				hazardAnalysis.setErrorTypes(errors);
-//			}
 		}
 
-//		supportingFiles.removeAll(propertyFiles);
 		supportingFiles.removeAll(usedDevices);
-//
-//		hazardAnalysis.setSystemModel(stats.getSystemModel());
-//		hazardAnalysis.parseOccurrences(stats.getSystemImplementation());
+
+		return stats.getSystemModel();
+	}
+	
+	public static SystemModel runHazardTransTest(final String testName,
+			final String systemName) {
+		IFile inputFile = systemFiles.get(systemName);
+		Translator stats = new Translator(new NullProgressMonitor());
+
+		parseErrManager = new ParseErrorReporterManager(
+				parseErrorReporterFactory);
+
+		stats.setErrorManager(parseErrManager);
+		for (String propSetName : usedProperties) {
+			stats.addPropertySetName(propSetName);
+		}
+		Resource res = resourceSet.getResource(
+				OsateResourceUtil.getResourceURI((IResource) inputFile), true);
+		Element target = (Element) res.getContents().get(0);
+		stats.process(target);
+		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
+				.toString());
+
+		supportingFiles.addAll(usedDevices);
+		supportingFiles.add("PulseOx_Forwarding_Error_Properties");
+
+		ErrorTranslator hazardAnalysis = new ErrorTranslator();
+		
+		for (String supportingFileName : supportingFiles) {
+			IFile supportingFile = systemFiles.get(supportingFileName);
+			res = resourceSet.getResource(OsateResourceUtil
+					.getResourceURI((IResource) supportingFile), true);
+			target = (Element) res.getContents().get(0);
+			stats.process(target);
+			errorSB.append(parseErrManager.getReporter(
+					(IResource) supportingFile).toString());
+			if(target instanceof PropertySet)
+				continue;
+			AadlPackage pack = (AadlPackage) target;
+			PublicPackageSection sect = pack.getPublicSection();
+			if (sect.getOwnedAnnexLibraries().size() > 0
+					&& sect.getOwnedAnnexLibraries().get(0).getName()
+							.equals("EMV2")) {
+				AnnexLibrary annexLibrary = sect.getOwnedAnnexLibraries()
+						.get(0);
+				DefaultAnnexLibrary defaultAnnexLibrary = (DefaultAnnexLibrary) annexLibrary;
+				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary
+						.getParsedAnnexLibrary();
+				HashSet<ErrorType> errors = new HashSet<ErrorType>(
+						emImpl.getTypes());
+				hazardAnalysis.setErrorTypes(errors);
+			}
+		}
+
+		supportingFiles.remove("PulseOx_Forwarding_Error_Properties");
+		supportingFiles.removeAll(usedDevices);
+
+		hazardAnalysis.setSystemModel(stats.getSystemModel());
+		hazardAnalysis.parseOccurrences(stats.getSystemImplementation());
 
 		return stats.getSystemModel();
 	}

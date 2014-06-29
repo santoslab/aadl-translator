@@ -75,12 +75,15 @@ public final class ErrorTranslator {
 
 					// Description
 					desc = ((StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description")).getValue();
+					desc = desc.substring(1, desc.length() - 1);
 					
 					// Cause
 					cause = ((StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Cause")).getValue();
+					cause = cause.substring(1, cause.length() - 1);
 					
 					// Compensation
 					compensation = ((StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Compensation")).getValue();
+					compensation = compensation.substring(1, compensation.length() - 1);
 					
 					// Impact
 					ReferenceValue reva = (ReferenceValue) PropertyUtils.getRecordFieldValue(rv, "Impact");

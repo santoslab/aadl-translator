@@ -63,4 +63,22 @@ public class ModelUtil {
 			return prelim instanceof AccidentLevelModel;
 		}
 	};
+
+	public final static Predicate<StpaPreliminaryModel> accidentFilter = new Predicate<StpaPreliminaryModel>() {
+		public boolean apply(StpaPreliminaryModel prelim) {
+			return prelim instanceof AccidentModel;
+		}
+	};
+
+	public final static Predicate<StpaPreliminaryModel> hazardFilter = new Predicate<StpaPreliminaryModel>() {
+		public boolean apply(StpaPreliminaryModel prelim) {
+			return prelim instanceof HazardModel;
+		}
+	};
+
+	public final static Predicate<StpaPreliminaryModel> constraintFilter = new Predicate<StpaPreliminaryModel>() {
+		public boolean apply(StpaPreliminaryModel prelim) {
+			return prelim instanceof ConstraintModel;
+		}
+	};
 }
