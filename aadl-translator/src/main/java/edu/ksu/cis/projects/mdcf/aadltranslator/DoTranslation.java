@@ -43,14 +43,13 @@ import org.osate.aadl2.modelsupport.modeltraversal.TraverseWorkspace;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.core.OsateCorePlugin;
-import org.osate.xtext.aadl2.errormodel.errorModel.ErrorModelLibrary;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
-import org.osate.xtext.aadl2.errormodel.services.ErrorModelGrammarAccess.ErrorModelLibraryElements;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.preference.PreferenceConstants;
 
 public final class DoTranslation implements IHandler, IRunnableWithProgress {
@@ -67,6 +66,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			"src/main/resources/templates/midas-compsig.stg");
 	private final STGroup midas_appspecSTG = new STGroupFile(
 			"src/main/resources/templates/midas-appspec.stg");
+	private final STGroup stpa_markdownSTG = new STGroupFile(
+			"src/main/resources/templates/stpa-markdown.stg");
 	private ExecutionEvent triggeringEvent;
 	private final String TRANSLATE_ARCH_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate";
 	private final String TRANSLATE_HAZARDS_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate-hazards";
@@ -147,6 +148,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			hazardAnalysis.setErrorTypes(errors);
 			hazardAnalysis.setSystemModel(archTranslator.getSystemModel());
 			hazardAnalysis.parseOccurrences(archTranslator.getSystemImplementation());
+			
+			writeHazardReport(archTranslator.getSystemModel());
 		}
 
 		// 6) Write the generated files
@@ -171,6 +174,12 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		return rs;
 	}
 
+	private void writeHazardReport(SystemModel sysModel) {
+		String reportDir = "/Users/Sam/Desktop";
+		String reportStr = stpa_markdownSTG.getInstanceOf("report").add("model", sysModel).render();
+		WriteOutputFiles.writeHazardReport(reportStr, reportDir, sysModel.getName());
+	}
+	
 	private void writeOutput(Translator stats) {
 		// Filename -> file contents
 		HashMap<String, String> compsigs = new HashMap<>();

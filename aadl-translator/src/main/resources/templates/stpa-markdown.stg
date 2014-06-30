@@ -1,0 +1,61 @@
+report(model) ::=<<
+<header(model)>
+<preliminaries(model)>
+<hazCtrlActs(model)>
+>>
+
+header(model) ::=<<
+# STAMP-Report: <model.name>
+
+>>
+
+preliminaries(model) ::=<<
+## STPA Preliminaries
+
+### Accident Levels
+<model.accidentLevels.keys:{k | <accidentLevel(model.accidentLevels.(k))>
+}>
+### Accidents
+<model.accidents.keys:{k | <preliminary(model.accidents.(k))>
+}>
+### Hazards
+<model.hazards.keys:{k | <preliminary(model.hazards.(k))>
+}>
+### Constraints
+<model.constraints.values:{v | <preliminary(v)>
+}>
+### Control Actions
+<model.channels.values:{v | <controlAction(v)>
+}>
+>>
+
+accidentLevel(accLvl) ::=<<
+<accLvl.number>. **<accLvl.name>**
+>>
+
+preliminary(prelim) ::=<<
+<prelim.number>. **<prelim.name>**: <prelim.description> [<prelim.parent.name>]
+>>
+
+controlAction(ctrlAct) ::=<<
+#. <ctrlAct.name>: <ctrlAct.publisher.name> -> <ctrlAct.subscriber.name> (<ctrlAct.publisher.ports.(ctrlAct.pubPortName).type>) 
+>>
+
+hazCtrlActs(model) ::=<<
+## Hazardous Control Actions
+
+<model.channels.values:{v | <hazControlAction(v)>
+}>
+>>
+
+hazControlAction(ctrlAct) ::=<<
+#### <ctrlAct.name>
+<ctrlAct.occurrences:{o | <occurrenceBlock(o)>
+}>
+>>
+
+occurrenceBlock(occ) ::=<<
+* **<occ.keyword>**: <occ.description>
+	* Cause: <occ.cause>
+	* Compensation: <occ.compensation>
+>>

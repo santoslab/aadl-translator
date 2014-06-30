@@ -7,84 +7,88 @@ import java.util.HashMap;
 
 public class WriteOutputFiles {
 
-	public static void writeFiles(HashMap<String, String> compsigs,
-			HashMap<String, String> javaClasses, String appName,
-			String appSpecContents, String appDevDirectory) {
-		
-		if (appDevDirectory == null){
-			//TODO: Handle this
-			System.err.println("Error: AppDev Directory not set");
-			return;
-		}
-		
-		// Make sure we have a trailing slash
-		if(appDevDirectory.charAt(appDevDirectory.length() - 1) != '/')
-			appDevDirectory += "/";
-		
-		// Create the package structure
-		appDevDirectory += appName + "/mdcf/app/"; 
-		
-		File cfgDir = new File(appDevDirectory + appName + "/appcfg");
-		File compDir = new File(appDevDirectory + appName + "/appcomp");
+	public static void writeHazardReport(String reportText,
+			String reportDirectory, String reportName) {
+		createDir(reportDirectory + "/reports");
+		writeStrToFile(reportText, reportDirectory + "/reports/" + reportName + ".md");
+	}
 
+	private static void writeStrToFile(String contents, String path) {
 		FileWriter fw = null;
-
 		try {
-			// TODO: Handle failure / permission problems
-			cfgDir.mkdirs();
-			compDir.mkdirs();			
-			
-			for (String fileName : javaClasses.keySet()) {
-				fw = new FileWriter(appDevDirectory + appName + "/" + fileName
-						+ ".java");
-				fw.write(javaClasses.get(fileName));
-				fw.close();
-			}
-
-			for (String fileName : compsigs.keySet()) {
-				fw = new FileWriter(appDevDirectory + appName + "/appcomp/"
-						+ fileName + ".compsig.xml");
-				fw.write(compsigs.get(fileName));
-				fw.close();
-			}
-
-			fw = new FileWriter(appDevDirectory + appName + "/appcfg/" + appName
-					+ ".cfg.xml");
-			fw.write(appSpecContents);
+			fw = new FileWriter(path);
+			fw.write(contents);
 			fw.close();
 		} catch (IOException e) {
-			// TODO: handle this
 			e.printStackTrace();
 		}
 	}
 	
-
-	public static void writeDeviceFiles(
-			String superType,
-			String userAPI,
-			String compsigs, String devName,
-			String devDirectory) {
+	private static void createDir(String dirName){
+		File theDir = new File(dirName);
 		
-		if (devDirectory == null){
+		// TODO: Handle failure / permission problems
+		theDir.mkdirs();
+	}
+
+	public static void writeFiles(HashMap<String, String> compsigs,
+			HashMap<String, String> javaClasses, String appName,
+			String appSpecContents, String appDevDirectory) {
+
+		if (appDevDirectory == null) {
+			// TODO: Handle this
+			System.err.println("Error: AppDev Directory not set");
+			return;
+		}
+
+		// Make sure we have a trailing slash
+		if (appDevDirectory.charAt(appDevDirectory.length() - 1) != '/')
+			appDevDirectory += "/";
+
+		// Create the package structure
+		appDevDirectory += appName + "/mdcf/app/";
+
+		createDir(appDevDirectory + appName + "/appcfg");
+		createDir(appDevDirectory + appName + "/appcomp");
+		
+		for (String fileName : javaClasses.keySet()) {
+			writeStrToFile(javaClasses.get(fileName), appDevDirectory + appName
+					+ "/" + fileName + ".java");
+		}
+
+		for (String fileName : compsigs.keySet()) {
+			writeStrToFile(compsigs.get(fileName), appDevDirectory + appName
+					+ "/appcomp/" + fileName + ".compsig.xml");
+		}
+
+		writeStrToFile(appSpecContents, appDevDirectory + appName + "/appcfg/"
+				+ appName + ".cfg.xml");
+
+	}
+
+	public static void writeDeviceFiles(String superType, String userAPI,
+			String compsigs, String devName, String devDirectory) {
+
+		if (devDirectory == null) {
 			System.err.println("Error: Dev Directory not set");
 			return;
 		}
-		
+
 		// Make sure we have a trailing slash
-		if(devDirectory.charAt(devDirectory.length() - 1) != '/')
+		if (devDirectory.charAt(devDirectory.length() - 1) != '/')
 			devDirectory += "/";
-		
+
 		// Create the package structure
-		devDirectory += devName + "/mdcf/device/"; 
-		
+		devDirectory += devName + "/mdcf/device/";
+
 		File dir = new File(devDirectory + devName);
 
 		FileWriter fw = null;
 
 		try {
 			// TODO: Handle failure / permission problems
-			dir.mkdirs();		
-			
+			dir.mkdirs();
+
 			fw = new FileWriter(devDirectory + devName + "/" + devName
 					+ ".compsig.xml");
 			fw.write(compsigs);
