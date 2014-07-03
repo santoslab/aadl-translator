@@ -79,11 +79,11 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	
 	
 	private final STGroup java_device_supertypeSTG = new STGroupFile(
-			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/java-device-supertype.stg");
+			"src/main/resources/templates/java-device-supertype.stg");
 	private final STGroup java_device_userimplSTG = new STGroupFile(
-			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/java-device-userimpl.stg");
+			"src/main/resources/templates/java-device-userimpl.stg");
 	private final STGroup device_compsigSTG = new STGroupFile(
-			"bin/edu/ksu/cis/projects/mdcf/aadltranslator/view/device-compsig.stg");
+			"src/main/resources/templates/device-compsig.stg");
 	
 	private ExecutionEvent triggeringEvent;
 	private final String TRANSLATE_ARCH_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate";
