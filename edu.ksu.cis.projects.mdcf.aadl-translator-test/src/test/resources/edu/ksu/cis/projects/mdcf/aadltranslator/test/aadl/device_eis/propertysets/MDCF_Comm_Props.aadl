@@ -1,0 +1,72 @@
+------------------------------------------------------------------------------+
+-- MDCF_Comm_Props.aadl - Properties and measure units for use by the
+--   MDCF_Comms communication patterns.
+--
+-- Author: Stephen C. Barrett (scbarrett@ksu.edu)
+--         Department of Computing & Information Sciences
+--               
+-- Licensed Material - Property of Kansas State University.               
+------------------------------------------------------------------------------+
+-- Properties extracted from exchanges found in MDD4MS document and in
+--   mdcf.dms.examplev2.scheme.
+------------------------------------------------------------------------------+
+
+
+property set MDCF_Comm_Props is
+  with Timing_Properties;
+  with MDCF_Data_Props;
+
+
+------------------------------------------------------------------------------+
+-- Unit of measure definitions.
+------------------------------------------------------------------------------+
+freq_units: type units (hz, khz => hz * 1000, mhz => hz * 1000000, ghz => hz * 1000000000);
+freq: type aadlinteger 0 hz .. 100 ghz units MDCF_Comm_Props::freq_units;
+  
+  
+------------------------------------------------------------------------------+
+-- Support for properties in DML models.
+------------------------------------------------------------------------------+
+Access_Exchange_Security: type enumeration (ICE_Security_Access_Read, 
+    ICE_Security_Access_Write, ICE_Security_Access_Read_Write,
+    ICE_Security_Access_Action);  
+
+Comm_Access: MDCF_Comm_Props::Access_Exchange_Security applies to (port);  -- Applicable to all exchanges.
+
+separation_interval:  Time
+    applies to (port);  -- Applicable to sporadic exchanges.
+separation_interval_range: range of Time
+    applies to (port);  -- Applicable to periodic, get, set & action exchanges.
+service_time: Time
+   applies to (port);  -- Applicable to get, set & action exchanges.
+service_time_range: range of Time
+   applies to (port);  -- Applicable to get, set & action exchanges.
+
+
+--com_value_min: aadlinteger applies to (port);
+--com_value_max: aadlinteger applies to (port);
+
+--com_lifetime_min: Time applies to (port);
+  
+--period: type aadlinteger 0 ps .. Max_Time units Time_Units;  -- From AADL_Project
+
+
+------------------------------------------------------------------------------+
+-- Support for MDD4MS properties.
+------------------------------------------------------------------------------+
+Worst_Case_Latency: Time applies to (port);
+Tolerable_Latency: Time applies to (port);
+Remaining_Life_Min: Time applies to (port);
+Timeout: Time applies to (port); 
+Period : Time applies to (port);
+Output_Separation : Time_Range applies to (port);
+Frequency: MDCF_Comm_Props::freq applies to (port); 
+  
+--com_timeout: MDCF_Port_Props::period applies to (port, connection, flow);
+--com_freq_max: MDCF_Port_Props::freq applies to (port); 
+--
+--com_period: MDCF_Port_Props::period applies to (port); 
+--com_period_min: MDCF_Port_Props::period applies to (port); 
+
+
+end MDCF_Comm_Props;

@@ -1,0 +1,192 @@
+------------------------------------------------------------------------------+
+-- MDCF_Types.aadl - Data types for exercising the end-to-end apps and devices.
+--
+-- Author: Stephen C. Barrett (scbarrett@ksu.edu)
+--         Department of Computing & Information Sciences
+--               
+-- Licensed Material - Property of Kansas State University.               
+------------------------------------------------------------------------------+
+
+
+package MDCF_Types
+public
+  with Base_Types, Data_Model;
+  with MDCF_Data_Props;
+  with IEEE11073_Nomenclature;
+
+
+------------------------------------------------------------------------------+
+-- Sample generic payload data types.
+------------------------------------------------------------------------------+
+
+-- Device status.
+data Status
+properties
+  MDCF_Data_Props::access_val => ICE_Security_Access_Read;    
+  MDCF_Data_Props::state_val => NotOk;  -- Can this be changed dynamically?    
+end Status;
+
+
+-- Limit violation alert.
+data LimitAlert
+end LimitAlert;
+
+
+------------------------------------------------------------------------------+
+-- Sample payload data types.
+------------------------------------------------------------------------------+
+
+-- SpO2
+data SpO2
+properties
+  Data_Model::Data_Representation => Integer;
+  IEEE11073_Nomenclature::OID => IEEE11073_Nomenclature::MDC_PULS_OXIM_SAT_O2; 
+  Data_Model::Integer_Range => 0 .. 100;
+
+  -- From DML example...
+  MDCF_Data_Props::MDC_ATTR_ID_PARAM_GRP => "SpO2 Channel";
+end SpO2;
+
+
+-- Alternate SpO2 - demonstrate multiple metrics in the metric sub-channel.
+data SpO2_alt
+properties
+  Data_Model::Data_Representation => Integer;
+  IEEE11073_Nomenclature::OID => IEEE11073_Nomenclature::MDC_PULS_OXIM_SAT_O2; 
+  Data_Model::Integer_Range => 0 .. 100;
+
+  -- From DML example...
+  MDCF_Data_Props::MDC_ATTR_ID_PARAM_GRP => "SpO2 Channel";
+end SpO2_alt;
+
+
+-- EtCO2
+data EtCO2
+properties
+  Data_Model::Data_Representation => Integer;
+  IEEE11073_Nomenclature::OID => IEEE11073_Nomenclature::MDC_CONC_AWAY_CO2_ET; 
+  Data_Model::Integer_Range => 25 .. 50;
+end EtCO2;
+
+data mdcf_etco2_num
+end mdcf_etco2_num;
+
+data implementation mdcf_etco2_num.impl
+subcomponents
+  spo2_num: data Base_Types::Float;  -- The exchange payload.
+properties
+  Data_Model::Real_Range => 0.0 .. 100.0;
+  MDCF_Data_Props::MDC_ATTR_ID_PARAM_GRP => "EtCo2 Channel";
+end mdcf_etco2_num.impl;
+
+
+-- Respiratory Rate
+data RespiratoryRate
+properties
+  Data_Model::Data_Representation => Integer;
+  IEEE11073_Nomenclature::OID => IEEE11073_Nomenclature::MDC_CO2_RESP_RATE; 
+  Data_Model::Integer_Range => 0 .. 25;
+
+  -- From DML example...
+  MDCF_Data_Props::MDC_ATTR_ID_PARAM_GRP => "Respiratory Rate Channel";
+end RespiratoryRate;
+
+
+-- Pulse Rate
+data PulseRate
+properties
+  Data_Model::Data_Representation => Integer;
+  IEEE11073_Nomenclature::OID => IEEE11073_Nomenclature::MDC_PULS_RATE; 
+  Data_Model::Integer_Range => 0 .. 190;
+
+  -- From DML example...
+  MDCF_Data_Props::MDC_ATTR_ID_PARAM_GRP => "Pulse Rate Channel";
+end PulseRate;
+
+
+
+-- Bolus Loading
+data BolusLoading
+properties
+  Data_Model::Data_Representation => Integer;
+  Data_Model::Integer_Range => 0 .. 190;
+end BolusLoading;
+
+
+-- Bolus Dose
+data BolusDose
+properties
+  Data_Model::Data_Representation => Integer;
+  Data_Model::Integer_Range => 0 .. 190;
+end BolusDose;
+
+
+-- Lock Out Interval
+data LockOutInterval
+properties
+  Data_Model::Data_Representation => Integer;
+  Data_Model::Integer_Range => 0 .. 190;
+end LockOutInterval;
+
+
+-- Lock Out Timer Status
+data LockOutTimerStatus
+properties
+  Data_Model::Data_Representation => Integer;
+  Data_Model::Integer_Range => 0 .. 190;
+end LockOutTimerStatus;
+
+
+-- Drug Concentration
+data DrugConcentration
+properties
+  Data_Model::Data_Representation => Integer;
+  Data_Model::Integer_Range => 0 .. 190;
+end DrugConcentration;
+
+
+-- Drug Name
+data DrugName
+properties
+  Data_Model::Data_Representation => Integer;
+  Data_Model::Integer_Range => 0 .. 190;
+end DrugName;
+
+
+-- Drug Initial Volume
+data DrugInitialVolume
+properties
+  Data_Model::Data_Representation => Integer;
+  Data_Model::Integer_Range => 0 .. 190;
+end DrugInitialVolume;
+
+
+-- Infused Volume Status
+data InfusedVolumeStatus
+properties
+  Data_Model::Data_Representation => Integer;
+  Data_Model::Integer_Range => 0 .. 190;
+end InfusedVolumeStatus;
+
+
+-- Operational Status
+data OperationalStatus
+properties
+  Data_Model::Data_Representation => Integer;
+  Data_Model::Integer_Range => 0 .. 190;
+end OperationalStatus;
+
+
+data WarningLowReservoir
+properties
+  Data_Model::Data_Representation => Boolean;
+end WarningLowReservoir;
+
+
+data AlarmEmptyReservoir
+properties
+  Data_Model::Data_Representation => Boolean;
+end AlarmEmptyReservoir;
+
+
+end MDCF_Types;

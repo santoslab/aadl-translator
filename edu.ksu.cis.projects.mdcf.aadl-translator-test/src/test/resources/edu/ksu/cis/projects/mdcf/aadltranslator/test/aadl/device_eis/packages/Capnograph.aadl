@@ -1,0 +1,108 @@
+------------------------------------------------------------------------------+
+-- Capnograph.aadl - Corresponding AADL model of the Simple Capnography DML
+--   model in project mdcf.dms.examplev2.product.
+--
+-- Author: Stephen C. Barrett (scbarrett@ksu.edu)
+--         Department of Computing & Information Sciences
+--               
+-- Licensed Material - Property of Kansas State University.               
+------------------------------------------------------------------------------+
+-- Exchanges and their payload types are defined directly in this code. 
+------------------------------------------------------------------------------+
+
+
+package Capnograph
+public
+  with MAP_Properties;
+  with MDCF_Data_Props, MDCF_Comm_Props;
+  with MDCF_Types;
+
+
+------------------------------------------------------------------------------+
+-- The entire Capnograph medical device unit.
+------------------------------------------------------------------------------+
+system SimpleCapnograph
+-- The unit's interface.
+end SimpleCapnograph;
+
+system implementation SimpleCapnograph.impl
+subcomponents
+  -- The unit's VMDs...
+  capnograph: device CapnographVmd;
+
+properties
+--   The unit's meta-data...
+  MDCF_Data_Props::IEEE11073_MDC_ATTR_SYS_TYPE => "Simple Capnograph";
+  
+  MDCF_Data_Props::ICE_ManufacturerModel => [
+  	MDC_ATTR_ID_MODEL => [
+  	  manufacturer => "Simple";
+  	  model_number => "Capnograph 2000";
+  	];
+  	credentials => ("cert1", "cert2");
+  ];
+end SimpleCapnograph.impl;
+
+
+------------------------------------------------------------------------------+
+-- Capnograph unit's virtual medical devices.
+------------------------------------------------------------------------------+
+abstract CapnographVmd  -- More than an AADL device, so make abstract.
+-- Features consist of the unit's payload-exchange "bundles".
+features
+  -- Device status of vmd through requester-responser communication pair. 
+  Status_req: in event data port;  -- Trigger for output from requester.
+  Status_res: out event data port MDCF_Types::Status {  -- Responder output.
+  -- Properties found in AADL subset:  
+    MAP_Properties::Output_Rate => 100 ms .. 300 ms;
+  
+  -- Properties found in MDD4MS pattern:               -- Raise_Error(data_unavailable)
+    -- MDCF_Comm_Props::Remaining_Life_Min => 200 ms;  -- Raise_Error(stale_data | data_unavailable)     
+    -- MDCF_Comm_Props::Worst_Case_Latency => 500 ms;  -- Raise_Error(timeout)
+  
+  -- Properties found in DML model: 
+    -- MDCF_Comm_Props::Comm_Access => ICE_Security_Access_Read;  -- Whose access to what?
+    -- MDCF_Comm_Props::separation_interval => 30 ms;  -- Same as output separation? Revision per Andrew's paper?
+    -- MDCF_Comm_Props::service_time => 40 ms;  -- Same as worst case latency?
+  };
+  
+ 
+  -- EtCO2 numeric of Etco2.Metrics sub-channel through requester-responser communication pair. 
+  Etco2_Metric_Etco2Num_req: in event data port;  -- Trigger for output from requester.
+  Etco2_Metric_Etco2Num_res: out event data port MDCF_Types::EtCO2 {  -- Responder output.  
+  -- Properties found in AADL subset:  
+    MAP_Properties::Output_Rate => 100 ms .. 300 ms;
+  
+  -- Properties found in MDD4MS pattern:               -- Raise_Error(data_unavailable)
+    -- MDCF_Comm_Props::Remaining_Life_Min => 200 ms;  -- Raise_Error(stale_data | data_unavailable)     
+    -- MDCF_Comm_Props::Worst_Case_Latency => 500 ms;  -- Raise_Error(timeout)
+  
+  -- Properties found in DML model: 
+    -- MDCF_Comm_Props::Comm_Access => ICE_Security_Access_Read;  -- Whose access to what?
+    -- MDCF_Comm_Props::separation_interval => 30 ms;  -- Same as output separation? Revision per Andrew's paper?
+    -- MDCF_Comm_Props::service_time => 40 ms;  -- Same as worst case latency?
+  };
+
+
+  -- EtCO2 numeric of Etco2.Metrics sub-channel through publisher-subscriber communication pair. 
+  Etco2_Metric_Etco2Num_pub: out event data port MDCF_Types::EtCO2 {  -- Publisher output.      
+  -- Properties found in AADL subset:  
+    MAP_Properties::Output_Rate => 100 ms .. 300 ms;
+  
+  -- Properties found in MDD4MS pattern:               -- Raise_Error(data_unavailable)
+    -- MDCF_Comm_Props::Remaining_Life_Min => 200 ms;  -- Raise_Error(stale_data)     
+    -- MDCF_Comm_Props::Timeout => 100 ms;             -- Raise_Error(timeout)
+    -- MDCF_Comm_Props::Frequency => 100 mhz;
+  
+  -- Properties found in DML model: 
+    -- MDCF_Comm_Props::Comm_Access => ICE_Security_Access_Read;  -- Whose access to what?
+    -- MDCF_Comm_Props::separation_interval => 30 ms;  -- Same as output separation? Revision per Andrew's paper? 
+  };
+end CapnographVmd;
+
+
+abstract implementation CapnographVmd.impl  -- Implement an abstract component?
+end CapnographVmd.impl;
+
+
+end Capnograph;

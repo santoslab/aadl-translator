@@ -41,10 +41,12 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.DeviceTranslator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.ErrorTranslator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFactory;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ConnectionModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ControllerErrorTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.DeviceModelTests;
@@ -52,6 +54,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.PortModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ProcessModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.SystemModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.TaskModelTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEITests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ConnectionModelHazardTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesTests;
 
@@ -70,7 +73,11 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesT
 		HazardPreliminariesTests.class,
 
 		// Error-handling tests
-		ControllerErrorTests.class, })
+		ControllerErrorTests.class, 
+		
+		// Device EI tests
+		DeviceEITests.class
+		})
 public class AllTests {
 	public static HashMap<String, IFile> systemFiles = new HashMap<>();
 	public static ResourceSet resourceSet = null;
@@ -81,6 +88,10 @@ public class AllTests {
 	public static HashSet<String> supportingFiles = new HashSet<>();
 	public static HashSet<String> propertyFiles = new HashSet<>();
 	public static HashSet<String> deviceFiles = new HashSet<>();
+	
+	public static HashSet<String> deviceEIPackageFiles = new HashSet<>();
+	public static HashSet<String> deviceEIPropertyFiles = new HashSet<>();
+	
 	public final boolean GENERATE_EXPECTED = false;
 
 	public final static String BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator-test";
@@ -189,6 +200,29 @@ public class AllTests {
 				systemFiles, deviceFiles);
 		initFiles(packagesFolder, propertySetsFolder, aadlPropertysetsDir,
 				systemFiles, propertyFiles);
+		
+		
+		/*Device Equipment Interfaces Related Files*/
+		URL aadlDeviceEIPackageDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
+				TEST_DIR + "aadl/device_eis/packages/");
+		URL aadlDeviceEIPropertysetsDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
+				TEST_DIR + "aadl/device_eis/propertysets/");
+		
+		File aadlDeviceEIPackageDir = null;
+		File aadlDeviceEIPropertysetsDir = null;
+		
+		try {
+			aadlDeviceEIPackageDir = new File(FileLocator.toFileURL(aadlDeviceEIPackageDirUrl).getPath());
+			aadlDeviceEIPropertysetsDir = new File(FileLocator.toFileURL(
+					aadlDeviceEIPropertysetsDirUrl).getPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		initFiles(packagesFolder, propertySetsFolder, aadlDeviceEIPackageDir,
+				systemFiles, deviceEIPackageFiles);
+		initFiles(packagesFolder, propertySetsFolder, aadlDeviceEIPropertysetsDir,
+				systemFiles, deviceEIPropertyFiles);
 	}
 
 	private static void initFiles(IFolder packagesFolder,
@@ -309,4 +343,27 @@ public class AllTests {
 
 		return stats.getSystemModel();
 	}
+	
+	public static DeviceComponentModel runDeviceTransTest(final String testName,
+			final String systemName) {
+		IFile inputFile = systemFiles.get(systemName);
+		DeviceTranslator stats = new DeviceTranslator(new NullProgressMonitor());
+
+		parseErrManager = new ParseErrorReporterManager(
+				parseErrorReporterFactory);
+
+		stats.setErrorManager(parseErrManager);
+		for (String propSetName : usedProperties) {
+			stats.addPropertySetName(propSetName);
+		}
+		Resource res = resourceSet.getResource(
+				OsateResourceUtil.getResourceURI((IResource) inputFile), true);
+		Element target = (Element) res.getContents().get(0);
+		stats.process(target);
+		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
+				.toString());
+
+		return stats.getDeviceComponentModel();
+	}
+	
 }
