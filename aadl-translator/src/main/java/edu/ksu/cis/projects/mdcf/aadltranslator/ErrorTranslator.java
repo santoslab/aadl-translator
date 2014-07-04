@@ -109,7 +109,6 @@ public final class ErrorTranslator {
 					
 					// Create model
 					om = new OccurrenceModel();
-					systemModel.getChannelByName(connectionName).addOccurrence(om);
 					om.setKeyword(keyword);
 					om.setHazard(hm);
 					om.setConstraint(cm);
@@ -118,6 +117,7 @@ public final class ErrorTranslator {
 					om.setCompensation(compensation);
 					om.setImpact(im);
 					om.setConnErrorName(connErrorName);
+					systemModel.getChannelByName(connectionName).addOccurrence(om);
 				}
 			} catch (MissingRequiredPropertyException e) {
 				e.printStackTrace();

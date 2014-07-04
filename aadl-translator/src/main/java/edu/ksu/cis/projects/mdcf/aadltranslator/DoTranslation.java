@@ -47,6 +47,7 @@ import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.gui.STViz;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
@@ -148,6 +149,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			hazardAnalysis.setErrorTypes(errors);
 			hazardAnalysis.setSystemModel(archTranslator.getSystemModel());
 			hazardAnalysis.parseOccurrences(archTranslator.getSystemImplementation());
+			
+//			STViz stv = stpa_markdownSTG.getInstanceOf("report").add("model", archTranslator.getSystemModel()).inspect();
 			
 			writeHazardReport(archTranslator.getSystemModel());
 		}

@@ -1,6 +1,8 @@
 report(model) ::=<<
 <header(model)>
+<background(model)>
 <preliminaries(model)>
+<ctrlActTbl(model)>
 <hazCtrlActs(model)>
 >>
 
@@ -9,40 +11,76 @@ header(model) ::=<<
 
 >>
 
+background(model) ::=<<
+
+## Background
+
+### Context
+<model.hazardReportContext>
+
+### Assumptions
+<model.hazardReportAssumptions:{a | * <a>
+}>
+
+### Abbreviations
+<model.hazardReportAbbreviations:{a | <a.name>
+~   <a.full>: <a.definition>
+}>
+
+>>
+
 preliminaries(model) ::=<<
-## STPA Preliminaries
+## Preliminaries
 
 ### Accident Levels
-<model.accidentLevels.keys:{k | <accidentLevel(model.accidentLevels.(k))>
+<model.accidentLevels.keys:{k | <accidentLevel(model.accidentLevels.(k), i)>
 }>
 ### Accidents
-<model.accidents.keys:{k | <preliminary(model.accidents.(k))>
+<model.accidents.keys:{k | <preliminary(model.accidents.(k), i)>
 }>
 ### Hazards
-<model.hazards.keys:{k | <preliminary(model.hazards.(k))>
+<model.hazards.keys:{k | <preliminary(model.hazards.(k), i)>
 }>
 ### Constraints
-<model.constraints.values:{v | <preliminary(v)>
+<model.constraints.values:{v | <preliminary(v, i)>
 }>
 ### Control Actions
-<model.channels.values:{v | <controlAction(v)>
+<model.channels.values:{v | <controlAction(v, i)>
 }>
 >>
 
-accidentLevel(accLvl) ::=<<
-<accLvl.number>. **<accLvl.name>**
+accidentLevel(accLvl, i) ::=<<
+<i>. **<accLvl.name>**: <accLvl.description>
 >>
 
-preliminary(prelim) ::=<<
-<prelim.number>. **<prelim.name>**: <prelim.description> [<prelim.parent.name>]
+preliminary(prelim, i) ::=<<
+<i>. **<prelim.name>**: <prelim.description> [<prelim.parent.name>]
 >>
 
-controlAction(ctrlAct) ::=<<
-#. <ctrlAct.name>: <ctrlAct.publisher.name> -> <ctrlAct.subscriber.name> (<ctrlAct.publisher.ports.(ctrlAct.pubPortName).type>) 
+controlAction(ctrlAct, i) ::=<<
+<i>. <ctrlAct.name>: <ctrlAct.publisher.name> -> <ctrlAct.subscriber.name> (<ctrlAct.publisher.ports.(ctrlAct.pubPortName).type>) 
 >>
+
+ctrlActTbl(model) ::=<<
+## Unsafe Control Actions
+
+<model.longestColumnMap.("ALL")>
+| <["Control Action", "Providing", "Not Providing", "Applied Too Long", "Stopped Too Soon", "Early", "Late"]:{g | <g> | }>
+|----------------|-----------|---------------|------------------|------------------|-------|------|
+<model.channels.values:{v | <ctrlActTblRow(v)>
+}>
+
+>>
+
+ctrlActTblRow(ctrlAct) ::=<<
+| [<ctrlAct.name>](#<ctrlAct.name>) | <["PROVIDING", "NOTPROVIDING", "APPLIEDTOOLONG", "STOPPEDTOOSOON", "EARLY", "LATE"]:{g | <ctrlActTblCell(ctrlAct.occurrenceMap.(g))>}>
+>>
+
+ctrlActTblCell(lastOccurrence) ::=<<
+ <lastOccurrence:{o|<o.hazard.name> (<o.description>)}; separator=", "> | >>
 
 hazCtrlActs(model) ::=<<
-## Hazardous Control Actions
+## Unsafe Control Action Causes and Compensations
 
 <model.channels.values:{v | <hazControlAction(v)>
 }>

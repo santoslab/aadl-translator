@@ -1,5 +1,6 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class ConnectionModel {
@@ -7,9 +8,9 @@ public class ConnectionModel {
 	private ComponentModel subscriber;
 	
 	/**
-	 * Maps a connection error name to its associated occurrence
+	 * Maps an STPA guideword to any associated occurrences
 	 */
-	private HashSet<OccurrenceModel> occurrences = new HashSet<>();
+	private HashMap<String, HashSet<OccurrenceModel>> occurrenceMap = new HashMap<>();
 	
 	private boolean devicePublished;
 	private boolean deviceSubscribed;
@@ -114,11 +115,25 @@ public class ConnectionModel {
 	}
 	
 	public HashSet<OccurrenceModel> getOccurrences() {
-		return occurrences;
+		HashSet<OccurrenceModel> allOccurrences = new HashSet<>();
+		for(String k : occurrenceMap.keySet())
+			allOccurrences.addAll(occurrenceMap.get(k));
+		return allOccurrences;
+	}
+	
+	public HashMap<String, HashSet<OccurrenceModel>> getOccurrenceMap() {
+		return occurrenceMap;
 	}
 	
 	public void addOccurrence(OccurrenceModel occurrence) {
-		occurrences.add(occurrence); 	
+		String key = occurrence.getKeyword().toString().toUpperCase();
+		if(occurrenceMap.containsKey(key)){
+			occurrenceMap.get(key).add(occurrence);
+		} else {
+			HashSet<OccurrenceModel> set = new HashSet<>();
+			set.add(occurrence);
+			occurrenceMap.put(key, set);
+		}
 	}
 
 	public String getName() {

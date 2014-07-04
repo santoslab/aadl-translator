@@ -49,6 +49,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.MissingRequiredPropert
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.PropertyOutOfRangeException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.UseBeforeDeclarationException;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.AbbreviationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.AccidentLevelModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.AccidentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
@@ -190,10 +191,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		@Override
 		public String casePropertyConstant(PropertyConstant obj) {
 			try {
-				if(obj.getPropertyType().getName() == null) {
+				if(obj.getPropertyType() == null || obj.getPropertyType().getName() == null) {
 					return NOT_DONE;
 				} else if (obj.getPropertyType().getName().equals("Accident_Level")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
+					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
 					IntegerLiteral il = ((IntegerLiteral) PropertyUtils
 							.getRecordFieldValue(rv, "Level"));
 					if (il.getValue() > Integer.MAX_VALUE) {
@@ -203,7 +205,23 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					AccidentLevelModel alm = new AccidentLevelModel();
 					alm.setNumber((int) il.getValue());
 					alm.setName(obj.getName());
+					alm.setDescription(sl.getValue());
 					systemModel.addAccidentLevel(alm);
+				} else if (obj.getPropertyType().getName().equals("Context")) {
+					StringLiteral sl = (StringLiteral) obj.getConstantValue();
+					systemModel.setContext(sl.getValue());
+				} else if (obj.getPropertyType().getName().equals("Assumption")) {
+					StringLiteral sl = (StringLiteral) obj.getConstantValue();
+					systemModel.addAssumption(sl.getValue());
+				} else if (obj.getPropertyType().getName().equals("Abbreviation")) {
+					RecordValue rv = (RecordValue) obj.getConstantValue();
+					StringLiteral fullSL = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Full");
+					StringLiteral defSL = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Definition");
+					AbbreviationModel am = new AbbreviationModel();
+					am.setName(obj.getName());
+					am.setFull(fullSL.getValue());
+					am.setDefinition(defSL.getValue());
+					systemModel.addAbbreviation(am);
 				} else if (obj.getPropertyType().getName().equals("Accident")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
 					IntegerLiteral il = (IntegerLiteral) PropertyUtils.getRecordFieldValue(rv, "Number");

@@ -7,6 +7,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.Keyword;
 
 public class SystemModel {
 	private String name;
@@ -16,9 +17,13 @@ public class SystemModel {
 
 	// Type name -> Process Model
 	private HashMap<String, ComponentModel> typeToComponent;
-	
+
 	// Element name -> Element model
-	private HashMap<String, StpaPreliminaryModel> stpaPreliminaries; 
+	private HashMap<String, StpaPreliminaryModel> stpaPreliminaries;
+
+	private String hazardReportContext;
+	private HashSet<AbbreviationModel> hazardReportAbbreviations;
+	private HashSet<String> hazardReportAssumptions;
 
 	public SystemModel() {
 		logicComponents = new HashMap<>();
@@ -26,63 +31,86 @@ public class SystemModel {
 		channels = new HashMap<>();
 		devices = new HashMap<>();
 		stpaPreliminaries = new HashMap<>();
+		hazardReportAbbreviations = new HashSet<>();
+		hazardReportAssumptions = new HashSet<>();
 	}
-	
-	public void addAccidentLevel(AccidentLevelModel alm) throws DuplicateElementException {
+
+	public String getHazardReportContext() {
+		return hazardReportContext;
+	}
+
+	public void setHazardReportContext(String hazardReportContext) {
+		this.hazardReportContext = hazardReportContext;
+	}
+
+	public HashSet<AbbreviationModel> getHazardReportAbbreviations() {
+		return hazardReportAbbreviations;
+	}
+
+	public HashSet<String> getHazardReportAssumptions() {
+		return hazardReportAssumptions;
+	}
+
+	public void addAccidentLevel(AccidentLevelModel alm)
+			throws DuplicateElementException {
 		addStpaPreliminary(alm);
 	}
-	
+
 	public void addAccident(AccidentModel am) throws DuplicateElementException {
 		addStpaPreliminary(am);
 	}
 
-	public void addHazard(HazardModel hm) throws DuplicateElementException{
+	public void addHazard(HazardModel hm) throws DuplicateElementException {
 		addStpaPreliminary(hm);
 	}
 
-	public void addConstraint(ConstraintModel cm) throws DuplicateElementException{
+	public void addConstraint(ConstraintModel cm)
+			throws DuplicateElementException {
 		addStpaPreliminary(cm);
 	}
-	
-	public AccidentLevelModel getAccidentLevelByName(String name){
+
+	public AccidentLevelModel getAccidentLevelByName(String name) {
 		return (AccidentLevelModel) getStpaPreliminary(name);
 	}
-	
+
 	public Map<String, StpaPreliminaryModel> getAccidentLevels() {
-		return Maps.filterValues(stpaPreliminaries, ModelUtil.accidentLevelFilter);
+		return Maps.filterValues(stpaPreliminaries,
+				ModelUtil.accidentLevelFilter);
 	}
-	
+
 	public Map<String, StpaPreliminaryModel> getAccidents() {
 		return Maps.filterValues(stpaPreliminaries, ModelUtil.accidentFilter);
 	}
-	
+
 	public Map<String, StpaPreliminaryModel> getHazards() {
 		return Maps.filterValues(stpaPreliminaries, ModelUtil.hazardFilter);
 	}
-	
+
 	public Map<String, StpaPreliminaryModel> getConstraints() {
 		return Maps.filterValues(stpaPreliminaries, ModelUtil.constraintFilter);
 	}
-	
-	public AccidentModel getAccidentByName(String name){
+
+	public AccidentModel getAccidentByName(String name) {
 		return (AccidentModel) getStpaPreliminary(name);
 	}
-	
-	public HazardModel getHazardByName(String name){
+
+	public HazardModel getHazardByName(String name) {
 		return (HazardModel) getStpaPreliminary(name);
 	}
-	
-	public ConstraintModel getConstraintByName(String name){
+
+	public ConstraintModel getConstraintByName(String name) {
 		return (ConstraintModel) getStpaPreliminary(name);
 	}
-	
-	private StpaPreliminaryModel getStpaPreliminary(String name){
+
+	private StpaPreliminaryModel getStpaPreliminary(String name) {
 		return stpaPreliminaries.get(name);
 	}
-	
-	private void addStpaPreliminary(StpaPreliminaryModel prelim) throws DuplicateElementException {
-		if(stpaPreliminaries.containsKey(prelim.getName()))
-			throw new DuplicateElementException("STPA Preliminaries cannot share names or be redefined");
+
+	private void addStpaPreliminary(StpaPreliminaryModel prelim)
+			throws DuplicateElementException {
+		if (stpaPreliminaries.containsKey(prelim.getName()))
+			throw new DuplicateElementException(
+					"STPA Preliminaries cannot share names or be redefined");
 		stpaPreliminaries.put(prelim.getName(), prelim);
 	}
 
@@ -103,7 +131,7 @@ public class SystemModel {
 	public ConnectionModel getChannelByName(String connectionName) {
 		return channels.get(connectionName);
 	}
-	
+
 	public void addProcess(String instanceName, ProcessModel pm)
 			throws DuplicateElementException {
 		if (logicComponents.containsKey(instanceName))
@@ -151,7 +179,7 @@ public class SystemModel {
 		}
 		return ret;
 	}
-	
+
 	public HashMap<String, ConnectionModel> getChannels() {
 		return channels;
 	}
@@ -164,5 +192,17 @@ public class SystemModel {
 	public boolean hasDeviceType(String typeName) {
 		return (typeToComponent.containsKey(typeName) && (typeToComponent
 				.get(typeName) instanceof DeviceModel));
+	}
+
+	public void setContext(String value) {
+		hazardReportContext = value;
+	}
+	
+	public void addAbbreviation(AbbreviationModel am){
+		hazardReportAbbreviations.add(am);
+	}
+	
+	public void addAssumption(String assumption){
+		hazardReportAssumptions.add(assumption);
 	}
 }
