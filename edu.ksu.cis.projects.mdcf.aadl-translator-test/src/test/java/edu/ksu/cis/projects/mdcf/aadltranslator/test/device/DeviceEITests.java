@@ -3,9 +3,6 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.test.device;
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.initComplete;
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.usedProperties;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,7 +19,7 @@ public class DeviceEITests {
 			AllTests.initialize();
 		usedProperties.add("MDCF_Comm_Props");
 		usedProperties.add("MDCF_Data_Props");
-		deviceComponentModel = AllTests.runDeviceTransTest("SimpleCapnograph", "Capnograph");
+		deviceComponentModel = AllTests.runDeviceTransTest("SimpleCapnograph", "SimpleCapnograph");
 	}
 
 	@AfterClass

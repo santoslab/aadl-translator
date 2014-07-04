@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------+
--- Capnograph.aadl - Corresponding AADL model of the Simple Capnography DML
+-- SimpleCapnograph.aadl - Corresponding AADL model of the Simple Capnography DML
 --   model in project mdcf.dms.examplev2.product.
 --
 -- Author: Stephen C. Barrett (scbarrett@ksu.edu)
@@ -11,7 +11,7 @@
 ------------------------------------------------------------------------------+
 
 
-package Capnograph
+package SimpleCapnograph
 public
   with MAP_Properties;
   with MDCF_Data_Props, MDCF_Comm_Props;
@@ -105,4 +105,4 @@ abstract implementation CapnographVmd.impl  -- Implement an abstract component?
 end CapnographVmd.impl;
 
 
-end Capnograph;
+end SimpleCapnograph;

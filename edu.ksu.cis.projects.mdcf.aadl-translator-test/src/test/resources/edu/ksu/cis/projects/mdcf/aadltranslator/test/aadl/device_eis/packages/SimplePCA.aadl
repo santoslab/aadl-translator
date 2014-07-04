@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------+
--- PCAPump.aadl - Corresponding AADL model of the Simple PCA DML model
+-- SimplePCA.aadl - Corresponding AADL model of the Simple PCA DML model
 --   in project mdcf.dms.examplev2.product.
 --
 -- Author: Stephen C. Barrett (scbarrett@ksu.edu)
@@ -11,7 +11,7 @@
 ------------------------------------------------------------------------------+
 
 
-package PCAPump
+package SimplePCA
 public
   with MAP_Properties;
   with MDCF_Data_Props, MDCF_Comm_Props;
@@ -158,4 +158,4 @@ abstract implementation PCAPumpVmd.impl
 end PCAPumpVmd.impl;
 
 
-end PCAPump;
+end SimplePCA;

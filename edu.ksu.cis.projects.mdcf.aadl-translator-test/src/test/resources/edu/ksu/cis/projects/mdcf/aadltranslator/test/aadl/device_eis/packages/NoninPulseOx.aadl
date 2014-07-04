@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------+
--- PulseOx.aadl - Corresponding AADL model of the Nonin PulseOx DML model
+-- NoninPulseOx.aadl - Corresponding AADL model of the Nonin PulseOx DML model
 --   in project mdcf.dms.examplev2.product.
 --
 -- Author: Stephen C. Barrett (scbarrett@ksu.edu)
@@ -11,7 +11,7 @@
 ------------------------------------------------------------------------------+
 
 
-package PulseOx
+package NoninPulseOx
 public
   with MAP_Properties;
   with MDCF_Data_Props, MDCF_Comm_Props;
@@ -181,4 +181,4 @@ connections
 end PulseOxVmd.impl;
 
 
-end PulseOx;
+end NoninPulseOx;
