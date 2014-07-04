@@ -1,0 +1,161 @@
+------------------------------------------------------------------------------+
+-- SimplePCA.aadl - Corresponding AADL model of the Simple PCA DML model
+--   in project mdcf.dms.examplev2.product.
+--
+-- Author: Stephen C. Barrett (scbarrett@ksu.edu)
+--         Department of Computing & Information Sciences
+--               
+-- Licensed Material - Property of Kansas State University.               
+------------------------------------------------------------------------------+
+-- Exchanges and their payload types are defined directly in this code. 
+------------------------------------------------------------------------------+
+
+
+package SimplePCA
+public
+  with MAP_Properties;
+  with MDCF_Data_Props, MDCF_Comm_Props;
+  with MDCF_Types;
+
+
+------------------------------------------------------------------------------+
+-- The entire PCA Pump medical device unit.
+------------------------------------------------------------------------------+
+system SimplePCA
+-- The unit's interface.
+end SimplePCA;
+
+system implementation SimplePCA.impl
+subcomponents
+  -- The unit's VMDs...
+  pcapump: abstract PCAPumpVmd;
+
+properties
+--   The unit's meta-data...
+  MDCF_Data_Props::IEEE11073_MDC_ATTR_SYS_TYPE => "Simple PCA Pump";
+  
+  MDCF_Data_Props::ICE_ManufacturerModel => [
+  	MDC_ATTR_ID_MODEL => [
+  	  manufacturer => "KSU-Santos";
+  	  model_number => "HAL 9000";
+  	];
+  	credentials => ("cert1", "cert2");
+  ];
+end SimplePCA.impl;
+
+
+------------------------------------------------------------------------------+
+-- PCA Pump unit's virtual medical devices.
+------------------------------------------------------------------------------+
+abstract PCAPumpVmd  -- More than an AADL device, so make abstract.
+-- Features consist of the unit's payload-exchange "bundles".
+features
+  -- Device status of vmd through requester-responser communication pair. 
+  Status_req: in event data port;  -- Trigger for output from requester.
+  Status_res: out event data port MDCF_Types::Status {  -- Responder output.
+  -- Properties found in AADL subset:  
+    MAP_Properties::Output_Rate => 100 ms .. 300 ms;
+  
+  -- Properties found in MDD4MS pattern:               -- Raise_Error(data_unavailable)
+    -- MDCF_Comm_Props::Remaining_Life_Min => 200 ms;  -- Raise_Error(stale_data | data_unavailable)     
+    -- MDCF_Comm_Props::Worst_Case_Latency => 500 ms;  -- Raise_Error(timeout)
+  
+  -- Properties found in DML model: 
+    -- MDCF_Comm_Props::Comm_Access => ICE_Security_Access_Read;  -- Whose access to what?
+    -- MDCF_Comm_Props::separation_interval => 30 ms;  -- Same as output separation? Revision per Andrew's paper?
+    -- MDCF_Comm_Props::service_time => 40 ms;  -- Same as worst case latency?
+  };
+  
+ 
+  -- Loading Bolus numeric in Prescription_Dose_Settings.Settings sub-channel through requester-responser communication pair. 
+  PrescriptionDoseSettings_Settings_LoadingBolus_req: in event data port;
+  PrescriptionDoseSettings_Settings_LoadingBolus_res: out event data port 
+      MDCF_Types::BolusLoading;
+
+
+  -- >>> Demonstration of the sender-receiver communication pattern. <<<
+  -- Loading Bolus numeric in Prescription_Dose_Settings.Settings sub-channel through sender-receiver communication pair. 
+  PrescriptionDoseSettings_Settings_LoadingBolus_rcv: in event data port 
+      MDCF_Types::BolusLoading;    
+  PrescriptionDoseSettings_Settings_LoadingBolus_sen: out event data port;  -- Sender acknowledgment.
+  
+
+  -- Bolus Dose numeric in Prescription_Dose_Settings.Settings sub-channel through requester-responser communication pair. 
+  PrescriptionDoseSettings_Settings_BolusDose_req: in event data port;
+  PrescriptionDoseSettings_Settings_BolusDose_res: out event data port 
+      MDCF_Types::BolusDose;
+
+
+  -- Lock Out Interval in Prescription_Dose_Settings.Settings sub-channel through requester-responser communication pair. 
+  PrescriptionDoseSettings_Settings_LockOutInterval_req: in event data port;
+  PrescriptionDoseSettings_Settings_LockOutInterval_res: out event data port 
+      MDCF_Types::LockOutInterval;
+
+
+  -- Drug Concentration in Prescription_Drug_Info_Settings.Settings sub-channel through requester-responser communication pair. 
+  PrescriptionDrugInfoSettings_Settings_DrugConcentration_res: out event data port; 
+  PrescriptionDrugInfoSettings_Settings_DrugConcentration_req: in event data port
+      MDCF_Types::DrugConcentration;
+
+
+  -- Loading Bolus numeric in Prescription_Dose_Settings.Settings sub-channel through requester-responser communication pair. 
+  -- Requester-responser pattern for fetching device Drug Name. 
+  req_DrugName_Settings_PrescriptionDrugInfoSettings: in event data port;
+  res_DrugName_Settings_PrescriptionDrugInfoSettings: out event data port 
+      MDCF_Types::DrugName;
+
+
+  -- Drug Initial Volume in Prescription_Dose_Settings.Settings sub-channel through requester-responser communication pair. 
+  PrescriptionDrugInfoSettings_Settings_DrugInitialVolume_req: in event data port;
+  PrescriptionDrugInfoSettings_Settings_DrugInitialVolume_res: out event data port 
+      MDCF_Types::DrugInitialVolume;
+
+
+  -- Infused Volume in AdminSession_Settings.Settings sub-channel through requester-responser communication pair. 
+  AdminSession_Settings_Settings_InfusedVolumeStatus_req: in event data port;
+  AdminSession_Settings_Settings_InfusedVolumeStatus_res: out event data port 
+      MDCF_Types::InfusedVolumeStatus;
+
+
+  -- Lock Out Timer Status in StatusSettings.Statuses sub-channel through requester-responser communication pair. 
+  StatusSettings_Statuses_LockOutTimerStatus_req: in event data port;
+  StatusSettings_Statuses_LockOutTimerStatus_res: out event data port 
+      MDCF_Types::LockOutTimerStatus;
+
+
+  -- Lock Out Timer Status in Status_Settings.Statuses sub-channel through publisher-subscriber communication pair. 
+  StatusSettings_Statuses_LockOutTimerStatus_pub: out event data port 
+      MDCF_Types::LockOutTimerStatus;  -- Defined as periodic.    
+  
+
+  -- Operational Status in StatusSettings.Statuses sub-channel through requester-responser communication pair. 
+  StatusSettings_Statuses_OperationalStatus_req: in event data port;
+  StatusSettings_Statuses_OperationalStatus_res: out event data port 
+  MDCF_Types::OperationalStatus;
+
+
+  -- Operational Status in Status_Settings.Statuses sub-channel through publisher-subscriber communication pair. 
+  StatusSettings_Statuses_OperationalStatus_pub: out event data port 
+  MDCF_Types::OperationalStatus;  -- Defined as sporadic.     
+
+  
+  -- Stop action in Commands.Actions sub-channel through requester-responser communication pair. 
+  req_Stop_Actions_Commands: in event data port;  -- Defined as action??
+
+  
+  -- Warning Low Reservoir in Events.Alerts sub-channel through publisher-subscriber communication pair. 
+  -- Publisher-subscriber pattern for broadcasting device Warning Low Reservoir. 
+  Events_Alerts_WarningLowReservoir_pubs: out event data port 
+  MDCF_Types::WarningLowReservoir;  -- Defined as sporadic.    
+  
+
+  -- Publisher-subscriber pattern for broadcasting device Alarm Empty Reservoir. 
+  Events_Alerts_AlarmEmptyReservoir_pub: out event data port 
+  MDCF_Types::AlarmEmptyReservoir;  -- Defined as sporadic.     
+end PCAPumpVmd;
+
+abstract implementation PCAPumpVmd.impl
+end PCAPumpVmd.impl;
+
+
+end SimplePCA;

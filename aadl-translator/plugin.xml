@@ -26,7 +26,7 @@
             name="Translate Command">
       </command>
       <command
-            id="edu.ksu.cis.projects.mdcf.aadl-translator.TraslateAADLToDeviceMDCF"
+            id="edu.ksu.cis.projects.mdcf.aadl-translator.device-aadl-translate"
             name="Translate Device AADL to Device MDCF Command">
       </command>
       <command

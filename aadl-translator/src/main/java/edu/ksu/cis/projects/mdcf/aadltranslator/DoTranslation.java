@@ -1,6 +1,7 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -52,11 +53,18 @@ import org.stringtemplate.v4.gui.STViz;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.preference.PreferenceConstants;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.ActionExchangeModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.ExchangeModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.GetExchangeModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.PeriodicExchangeModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.SetExchangeModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.SporadicExchangeModel;
 
 public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 	public static enum Mode {
-		APP_ARCH, HAZARD_ANALYSIS
+		APP_ARCH, HAZARD_ANALYSIS, DEVICEDRIVER
 	};
 
 	private final STGroup java_superclassSTG = new STGroupFile(
@@ -69,10 +77,20 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			"src/main/resources/templates/midas-appspec.stg");
 	private final STGroup stpa_markdownSTG = new STGroupFile(
 			"src/main/resources/templates/stpa-markdown.stg");
+	
+	
+	private final STGroup java_device_supertypeSTG = new STGroupFile(
+			"src/main/resources/templates/java-device-supertype.stg");
+	private final STGroup java_device_userimplSTG = new STGroupFile(
+			"src/main/resources/templates/java-device-userimpl.stg");
+	private final STGroup device_compsigSTG = new STGroupFile(
+			"src/main/resources/templates/device-compsig.stg");
+	
 	private ExecutionEvent triggeringEvent;
 	private final String TRANSLATE_ARCH_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate";
 	private final String TRANSLATE_HAZARDS_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate-hazards";
-
+	private final String TRANSLATE_DEVICE_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.device-aadl-translate";
+	
 	public HashSet<IFile> getUsedFiles() {
 		IncludesCalculator ic = new IncludesCalculator(
 				new NullProgressMonitor());
@@ -161,6 +179,195 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		// 7) Shut down the progress monitor
 		wrapUpProgressMonitor(monitor);
 	}
+	
+	public void doDeviceTranslation(IProgressMonitor monitor) {
+		// 1) Initialize the progress monitor and translator
+		ResourceSet rs = initProgressMonitor(monitor);
+		DeviceTranslator stats = new DeviceTranslator(monitor);
+		
+		// 2) Get the list of files used in the model we're translating
+		HashSet<IFile> usedFiles = this.getUsedFiles();
+
+		// 3) Identify which file contains the AADL system
+		IFile systemFile = getDeviceSystemFile(rs, stats, usedFiles);
+		
+		// 4) Initialize the error reporter
+		ParseErrorReporterManager parseErrManager = initDeviceErrManager(stats);
+		
+		// 5) Build the in-memory system model
+		processFiles(monitor, rs, stats, usedFiles, systemFile, parseErrManager);
+		
+		// 6) Write the generated files
+		writeDeviceOutput(stats);
+
+		// 7) Shut down the progress monitor
+		wrapUpProgressMonitor(monitor);
+	}
+	
+	private void writeDeviceOutput(DeviceTranslator stats) {
+		IPreferencesService service = Platform.getPreferencesService();
+		
+		// Get user preferences
+		String appDevDirectory = service.getString(
+				"edu.ksu.cis.projects.mdcf.aadl-translator",
+				PreferenceConstants.P_APPDEVPATH, null, null);
+		
+		DeviceComponentModel dcm = null;
+
+		String supertype = buildDeviceSuperType(dcm);
+		
+		String userImplAPI = buildDeviceUserImpleAPI(dcm);
+		
+		String compsig = buildDeviceCompSig(dcm);
+
+		// Write the files
+		if (stats.notCancelled()) {
+			WriteOutputFiles.writeDeviceFiles(
+					supertype,
+					userImplAPI,
+					compsig, dcm.getName(),
+					appDevDirectory);
+		}
+
+	}
+	
+	private String buildDeviceSuperType(DeviceComponentModel dcm){
+		java_device_supertypeSTG.delimiterStartChar = '<';
+		java_device_supertypeSTG.delimiterStopChar = '>';
+		return java_device_supertypeSTG.
+				getInstanceOf("class").
+				add("class", dcm).
+				render();
+	}
+	
+	private String buildDeviceUserImpleAPI(DeviceComponentModel dcm){
+		java_device_userimplSTG.delimiterStartChar = '<';
+		java_device_userimplSTG.delimiterStopChar = '>';
+		return java_device_userimplSTG.
+				getInstanceOf("userimpl").
+				add("model", dcm).
+				render();
+	}
+	
+	private String buildDeviceCompSig(DeviceComponentModel dcm){
+
+		ArrayList<String> receivePorts = new ArrayList<String>();
+		ArrayList<String> sendPorts = new ArrayList<String>();
+		device_compsigSTG.delimiterStartChar = '$';
+		device_compsigSTG.delimiterStopChar = '$';
+		for (ExchangeModel em : dcm.exchangeModels.values()) {
+
+			if (em instanceof GetExchangeModel) {
+				GetExchangeModel gem = (GetExchangeModel) em;
+
+				receivePorts.add(device_compsigSTG
+						.getInstanceOf("get_recv_port")
+						.add("RECEIVE_PORT_NAME",
+								gem.getInPortInfo().getPortName())
+						.add("MIN_SEPARATION_TIME",
+								gem.getMinSeparationInterval())
+						.add("MAX_SEPARATION_TIME",
+								gem.getMaxSeparationInterval())
+						.add("RECV_MESSAGE_TYPE",
+								gem.getInPortInfo().getPortProperty(
+										"RECV_MESSAGE_TYPE")).render());
+
+				sendPorts.add(device_compsigSTG
+						.getInstanceOf("get_send_port")
+						.add("SEND_PORT_NAME",
+								gem.getOutPortInfo().getPortName())
+						.add("MIN_SEPARATION_TIME",
+								gem.getOutPortInfo().getPortProperty(
+										"MIN_SEPARATION_TIME"))
+						.add("MAX_SEPARATION_TIME",
+								gem.getOutPortInfo().getPortProperty(
+										"MAX_SEPARATION_TIME"))
+						.render());
+
+			} else if (em instanceof SetExchangeModel) {
+				SetExchangeModel sem = (SetExchangeModel) em;
+
+				receivePorts.add(device_compsigSTG
+						.getInstanceOf("set_recv_port")
+						.add("RECEIVE_PORT_NAME",
+								sem.getInPortInfo().getPortName())
+						.add("MIN_SEPARATION_TIME",
+								sem.getInPortInfo().getPortProperty(
+										"MIN_SEPARATION_TIME"))
+						.add("MAX_SEPARATION_TIME",
+								sem.getInPortInfo().getPortProperty(
+										"MAX_SEPARATION_TIME"))
+						.render());
+
+				sendPorts.add(device_compsigSTG
+						.getInstanceOf("set_send_port")
+						.add("SEND_PORT_NAME",
+								sem.getOutPortInfo().getPortName())
+						.add("MIN_SEPARATION_TIME",
+								sem.getOutPortInfo().getPortProperty(
+										"MIN_SEPARATION_TIME"))
+						.add("MAX_SEPARATION_TIME",
+								sem.getOutPortInfo().getPortProperty(
+										"MAX_SEPARATION_TIME"))
+						.add("SEND_MESSAGE_TYPE",
+								sem.getOutPortInfo().getPortProperty(
+										"SEND_MESSAGE_TYPE")).render());
+
+			} else if (em instanceof ActionExchangeModel) {
+				ActionExchangeModel aem = (ActionExchangeModel) em;
+
+				receivePorts.add(device_compsigSTG
+						.getInstanceOf("action_recv_port")
+						.add("RECEIVE_PORT_NAME",
+								aem.getInPortInfo().getPortName())
+						.add("MIN_SEPARATION_TIME",
+								aem.getInPortInfo().getPortProperty(
+										"MIN_SEPARATION_TIME"))
+						.add("MAX_SEPARATION_TIME",
+								aem.getInPortInfo().getPortProperty(
+										"MAX_SEPARATION_TIME"))
+						.render());
+
+				sendPorts.add(device_compsigSTG
+						.getInstanceOf("action_send_port")
+						.add("SEND_PORT_NAME",
+								aem.getOutPortInfo().getPortName())
+						.add("MIN_SEPARATION_TIME",
+								aem.getOutPortInfo().getPortProperty(
+										"MIN_SEPARATION_TIME"))
+						.add("MAX_SEPARATION_TIME",
+								aem.getOutPortInfo().getPortProperty(
+										"MAX_SEPARATION_TIME"))
+						.render());
+			} else if (em instanceof PeriodicExchangeModel) {
+				PeriodicExchangeModel pem = (PeriodicExchangeModel) em;
+
+				sendPorts.add(device_compsigSTG
+						.getInstanceOf("send_provider_initiated_port")
+						.add("SEND_PORT_NAME",
+								pem.getOutPortInfo().getPortName())
+						.add("SEND_MESSAGE_TYPE",
+								pem.getOutPortInfo().getPortProperty(
+										"SEND_MESSAGE_TYPE")).render());
+			} else if (em instanceof SporadicExchangeModel) {
+				SporadicExchangeModel sem = (SporadicExchangeModel) em;
+
+				sendPorts.add(device_compsigSTG
+						.getInstanceOf("send_provider_initiated_port")
+						.add("SEND_PORT_NAME",
+								sem.getOutPortInfo().getPortName())
+						.add("SEND_MESSAGE_TYPE",
+								sem.getOutPortInfo().getPortProperty(
+										"SEND_MESSAGE_TYPE")).render());
+			}
+
+		}
+
+		return device_compsigSTG.getInstanceOf("compsig")
+				.add("RECV_PORTS", receivePorts).add("SEND_PORTS", sendPorts)
+				.add("DEVICE_TYPE", dcm.getDeviceType()).render();
+	}
+	
 
 	private void wrapUpProgressMonitor(IProgressMonitor monitor) {
 		monitor.worked(1);
@@ -289,6 +496,21 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		stats.setErrorManager(parseErrManager);
 		return parseErrManager;
 	}
+	
+	private ParseErrorReporterManager initDeviceErrManager(DeviceTranslator stats) {
+		// The ParseErrorReporter provided by the OSATE model support is nearly
+		// perfect here, we only change the marker id (much of the code is
+		// directly lifted from elsewhere in the OSATE codebase
+		ParseErrorReporterFactory parseErrorLoggerFactory = new LogParseErrorReporter.Factory(
+				OsateCorePlugin.getDefault().getBundle());
+		ParseErrorReporterManager parseErrManager = new ParseErrorReporterManager(
+				new MarkerParseErrorReporter.Factory(
+						"edu.ksu.cis.projects.mdcf.aadl-translator.TranslatorErrorMarker",
+						parseErrorLoggerFactory));
+
+		stats.setErrorManager(parseErrManager);
+		return parseErrManager;
+	}
 
 	/**
 	 * This method does two things. One, it returns the (first) file containing
@@ -326,6 +548,46 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		}
 		return systemFile;
 	}
+	
+	/**
+	 * This method does two things. One, it returns the (first) file containing
+	 * an AADL system, and two, it removes that file from the set of usedFiles.
+	 * 
+	 * @param rs
+	 *            The set of resources in the workspace
+	 * @param stats
+	 *            The translator implementation
+	 * @param usedFiles
+	 *            The set of files used in the architecture description.
+	 * @return The file containing the AADL system.
+	 */
+	private IFile getDeviceSystemFile(ResourceSet rs, DeviceTranslator stats,
+			HashSet<IFile> usedFiles) {
+		IFile systemFile = null;
+		for (IFile f : usedFiles) {
+			Resource res = rs.getResource(
+					OsateResourceUtil.getResourceURI((IResource) f), true);
+			Element target = (Element) res.getContents().get(0);
+			if ((target instanceof PropertySet)) {
+				String propertySetName = ((PropertySet) target).getName();
+				if (!AadlUtil.getPredeclaredPropertySetNames().contains(
+						propertySetName))
+					stats.addPropertySetName(propertySetName);
+				continue;
+			}
+			AadlPackage pack = (AadlPackage) target;
+			PublicPackageSection sect = pack.getPublicSection();
+			for (Classifier ownedClassifier : sect.getOwnedClassifiers()) {
+				if ((ownedClassifier instanceof org.osate.aadl2.SystemType)) {
+					systemFile = f;
+					usedFiles.remove(f);
+					break;
+				}
+			}
+		}
+		return systemFile;
+	}
+
 
 	private HashSet<ErrorType> getErrorTypes(ResourceSet rs,
 			HashSet<IFile> usedFiles) {
@@ -398,11 +660,18 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			mode = Mode.APP_ARCH;
 		} else if (commandId.equals(TRANSLATE_HAZARDS_COMMAND_ID)) {
 			mode = Mode.HAZARD_ANALYSIS;
+		} else if (commandId.equals(TRANSLATE_DEVICE_COMMAND_ID)) {
+			mode = Mode.DEVICEDRIVER;
 		} else {
 			System.err.println("Bad command received, id was " + commandId);
 			return;
 		}
-		doTranslation(monitor, mode);
+		
+		if(mode == Mode.APP_ARCH || mode == Mode.HAZARD_ANALYSIS){
+			doTranslation(monitor, mode);
+		} else if(mode == Mode.DEVICEDRIVER) {
+			doDeviceTranslation(monitor);
+		}
 	}
 
 	public void setTriggeringEvent(ExecutionEvent event) {
