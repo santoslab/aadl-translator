@@ -77,7 +77,7 @@ ctrlActTblRow(ctrlAct) ::=<<
 >>
 
 ctrlActTblCell(lastOccurrence) ::=<<
- <lastOccurrence:{o|<o.hazard.name> (<o.description>)}; separator=", "> | >>
+ <lastOccurrence:{o|<o.hazard.name> (<o.title>)}; separator=", "> | >>
 
 hazCtrlActs(model) ::=<<
 ## Unsafe Control Action Causes and Compensations
@@ -93,7 +93,7 @@ hazControlAction(ctrlAct) ::=<<
 >>
 
 occurrenceBlock(occ) ::=<<
-* **<occ.keyword>**: <occ.description>
+* **<occ.keyword>**: <occ.title>
 	* Cause: <occ.cause>
 	* Compensation: <occ.compensation>
 >>
