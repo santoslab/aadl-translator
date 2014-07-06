@@ -10,6 +10,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -77,20 +78,19 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			"src/main/resources/templates/midas-appspec.stg");
 	private final STGroup stpa_markdownSTG = new STGroupFile(
 			"src/main/resources/templates/stpa-markdown.stg");
-	
-	
+
 	private final STGroup java_device_supertypeSTG = new STGroupFile(
 			"src/main/resources/templates/java-device-supertype.stg");
 	private final STGroup java_device_userimplSTG = new STGroupFile(
 			"src/main/resources/templates/java-device-userimpl.stg");
 	private final STGroup device_compsigSTG = new STGroupFile(
 			"src/main/resources/templates/device-compsig.stg");
-	
+
 	private ExecutionEvent triggeringEvent;
 	private final String TRANSLATE_ARCH_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate";
 	private final String TRANSLATE_HAZARDS_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate-hazards";
 	private final String TRANSLATE_DEVICE_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.device-aadl-translate";
-	
+
 	public HashSet<IFile> getUsedFiles() {
 		IncludesCalculator ic = new IncludesCalculator(
 				new NullProgressMonitor());
@@ -139,6 +139,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			file = (IFile) ((IAdaptable) ((IStructuredSelection) selection)
 					.getFirstElement()).getAdapter(IFile.class);
 		}
+
 		return file;
 	}
 
@@ -157,19 +158,37 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		ParseErrorReporterManager parseErrManager = initErrManager(archTranslator);
 
 		// 5) Build the in-memory system model
-		processFiles(monitor, rs, archTranslator, usedFiles, systemFile, parseErrManager);
+		processFiles(monitor, rs, archTranslator, usedFiles, systemFile,
+				parseErrManager);
 
 		// 5.1) If selected, build the in-memory hazard analysis model
 		if (mode == Mode.HAZARD_ANALYSIS) {
 			ErrorTranslator hazardAnalysis = new ErrorTranslator();
 			HashSet<ErrorType> errors = getErrorTypes(rs, usedFiles);
-			
+
 			hazardAnalysis.setErrorTypes(errors);
 			hazardAnalysis.setSystemModel(archTranslator.getSystemModel());
-			hazardAnalysis.parseOccurrences(archTranslator.getSystemImplementation());
-			
-//			STViz stv = stpa_markdownSTG.getInstanceOf("report").add("model", archTranslator.getSystemModel()).inspect();
-			
+			hazardAnalysis.parseOccurrences(archTranslator
+					.getSystemImplementation());
+
+			IProject proj = systemFile.getProject();
+			if (proj.getFolder("diagrams").exists()) {
+				IFile procModel = proj.getFolder("diagrams").getFile(
+						"ProcessModel.png");
+				IFile sysBoundary = proj.getFolder("diagrams").getFile(
+						"SystemBoundary.png");
+				if (procModel.exists()) {
+					archTranslator.getSystemModel().getHazardReportDiagrams()
+							.put("ProcessModel", procModel.getRawLocation()
+									.toString());
+				}
+				if (sysBoundary.exists()) {
+					archTranslator.getSystemModel().getHazardReportDiagrams()
+							.put("SystemBoundary", sysBoundary.getRawLocation()
+									.toString());
+				}
+			}
+
 			writeHazardReport(archTranslator.getSystemModel());
 		}
 
@@ -179,77 +198,70 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		// 7) Shut down the progress monitor
 		wrapUpProgressMonitor(monitor);
 	}
-	
+
 	public void doDeviceTranslation(IProgressMonitor monitor) {
 		// 1) Initialize the progress monitor and translator
 		ResourceSet rs = initProgressMonitor(monitor);
 		DeviceTranslator stats = new DeviceTranslator(monitor);
-		
+
 		// 2) Get the list of files used in the model we're translating
 		HashSet<IFile> usedFiles = this.getUsedFiles();
 
 		// 3) Identify which file contains the AADL system
 		IFile systemFile = getDeviceSystemFile(rs, stats, usedFiles);
-		
+
 		// 4) Initialize the error reporter
 		ParseErrorReporterManager parseErrManager = initDeviceErrManager(stats);
-		
+
 		// 5) Build the in-memory system model
 		processFiles(monitor, rs, stats, usedFiles, systemFile, parseErrManager);
-		
+
 		// 6) Write the generated files
 		writeDeviceOutput(stats);
 
 		// 7) Shut down the progress monitor
 		wrapUpProgressMonitor(monitor);
 	}
-	
+
 	private void writeDeviceOutput(DeviceTranslator stats) {
 		IPreferencesService service = Platform.getPreferencesService();
-		
+
 		// Get user preferences
 		String appDevDirectory = service.getString(
 				"edu.ksu.cis.projects.mdcf.aadl-translator",
 				PreferenceConstants.P_APPDEVPATH, null, null);
-		
+
 		DeviceComponentModel dcm = null;
 
 		String supertype = buildDeviceSuperType(dcm);
-		
+
 		String userImplAPI = buildDeviceUserImpleAPI(dcm);
-		
+
 		String compsig = buildDeviceCompSig(dcm);
 
 		// Write the files
 		if (stats.notCancelled()) {
-			WriteOutputFiles.writeDeviceFiles(
-					supertype,
-					userImplAPI,
-					compsig, dcm.getName(),
-					appDevDirectory);
+			WriteOutputFiles.writeDeviceFiles(supertype, userImplAPI, compsig,
+					dcm.getName(), appDevDirectory);
 		}
 
 	}
-	
-	private String buildDeviceSuperType(DeviceComponentModel dcm){
+
+	private String buildDeviceSuperType(DeviceComponentModel dcm) {
 		java_device_supertypeSTG.delimiterStartChar = '<';
 		java_device_supertypeSTG.delimiterStopChar = '>';
-		return java_device_supertypeSTG.
-				getInstanceOf("class").
-				add("class", dcm).
-				render();
+		return java_device_supertypeSTG.getInstanceOf("class")
+				.add("class", dcm).render();
 	}
-	
-	private String buildDeviceUserImpleAPI(DeviceComponentModel dcm){
+
+	private String buildDeviceUserImpleAPI(DeviceComponentModel dcm) {
 		java_device_userimplSTG.delimiterStartChar = '<';
 		java_device_userimplSTG.delimiterStopChar = '>';
-		return java_device_userimplSTG.
-				getInstanceOf("userimpl").
-				add("model", dcm).
-				render();
+		return java_device_userimplSTG.getInstanceOf("userimpl")
+				.add("model", dcm).render();
 	}
-	
-	private String buildDeviceCompSig(DeviceComponentModel dcm){
+
+	private String buildDeviceCompSig(DeviceComponentModel dcm) {
 
 		ArrayList<String> receivePorts = new ArrayList<String>();
 		ArrayList<String> sendPorts = new ArrayList<String>();
@@ -281,8 +293,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 										"MIN_SEPARATION_TIME"))
 						.add("MAX_SEPARATION_TIME",
 								gem.getOutPortInfo().getPortProperty(
-										"MAX_SEPARATION_TIME"))
-						.render());
+										"MAX_SEPARATION_TIME")).render());
 
 			} else if (em instanceof SetExchangeModel) {
 				SetExchangeModel sem = (SetExchangeModel) em;
@@ -296,8 +307,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 										"MIN_SEPARATION_TIME"))
 						.add("MAX_SEPARATION_TIME",
 								sem.getInPortInfo().getPortProperty(
-										"MAX_SEPARATION_TIME"))
-						.render());
+										"MAX_SEPARATION_TIME")).render());
 
 				sendPorts.add(device_compsigSTG
 						.getInstanceOf("set_send_port")
@@ -325,8 +335,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 										"MIN_SEPARATION_TIME"))
 						.add("MAX_SEPARATION_TIME",
 								aem.getInPortInfo().getPortProperty(
-										"MAX_SEPARATION_TIME"))
-						.render());
+										"MAX_SEPARATION_TIME")).render());
 
 				sendPorts.add(device_compsigSTG
 						.getInstanceOf("action_send_port")
@@ -337,8 +346,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 										"MIN_SEPARATION_TIME"))
 						.add("MAX_SEPARATION_TIME",
 								aem.getOutPortInfo().getPortProperty(
-										"MAX_SEPARATION_TIME"))
-						.render());
+										"MAX_SEPARATION_TIME")).render());
 			} else if (em instanceof PeriodicExchangeModel) {
 				PeriodicExchangeModel pem = (PeriodicExchangeModel) em;
 
@@ -367,7 +375,6 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				.add("RECV_PORTS", receivePorts).add("SEND_PORTS", sendPorts)
 				.add("DEVICE_TYPE", dcm.getDeviceType()).render();
 	}
-	
 
 	private void wrapUpProgressMonitor(IProgressMonitor monitor) {
 		monitor.worked(1);
@@ -386,10 +393,12 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 	private void writeHazardReport(SystemModel sysModel) {
 		String reportDir = "/Users/Sam/Desktop";
-		String reportStr = stpa_markdownSTG.getInstanceOf("report").add("model", sysModel).render();
-		WriteOutputFiles.writeHazardReport(reportStr, reportDir, sysModel.getName());
+		String reportStr = stpa_markdownSTG.getInstanceOf("report")
+				.add("model", sysModel).render();
+		WriteOutputFiles.writeHazardReport(reportStr, reportDir,
+				sysModel.getName());
 	}
-	
+
 	private void writeOutput(Translator stats) {
 		// Filename -> file contents
 		HashMap<String, String> compsigs = new HashMap<>();
@@ -457,7 +466,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 		// Remove the system from the used files so we don't double-translate it
 		usedFiles.remove(systemFile);
-		
+
 		// Now process all the other files
 		for (IFile f : usedFiles) {
 			processFile(monitor, rs, stats, f, parseErrManager);
@@ -496,8 +505,9 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		stats.setErrorManager(parseErrManager);
 		return parseErrManager;
 	}
-	
-	private ParseErrorReporterManager initDeviceErrManager(DeviceTranslator stats) {
+
+	private ParseErrorReporterManager initDeviceErrManager(
+			DeviceTranslator stats) {
 		// The ParseErrorReporter provided by the OSATE model support is nearly
 		// perfect here, we only change the marker id (much of the code is
 		// directly lifted from elsewhere in the OSATE codebase
@@ -548,7 +558,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		}
 		return systemFile;
 	}
-	
+
 	/**
 	 * This method does two things. One, it returns the (first) file containing
 	 * an AADL system, and two, it removes that file from the set of usedFiles.
@@ -588,7 +598,6 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		return systemFile;
 	}
 
-
 	private HashSet<ErrorType> getErrorTypes(ResourceSet rs,
 			HashSet<IFile> usedFiles) {
 		for (IFile f : usedFiles) {
@@ -603,9 +612,11 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			if (sect.getOwnedAnnexLibraries().size() > 0
 					&& sect.getOwnedAnnexLibraries().get(0).getName()
 							.equals("EMV2")) {
-				AnnexLibrary annexLibrary = sect.getOwnedAnnexLibraries().get(0);
+				AnnexLibrary annexLibrary = sect.getOwnedAnnexLibraries()
+						.get(0);
 				DefaultAnnexLibrary defaultAnnexLibrary = (DefaultAnnexLibrary) annexLibrary;
-				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary.getParsedAnnexLibrary();
+				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary
+						.getParsedAnnexLibrary();
 				return new HashSet<ErrorType>(emImpl.getTypes());
 			}
 		}
@@ -666,10 +677,10 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			System.err.println("Bad command received, id was " + commandId);
 			return;
 		}
-		
-		if(mode == Mode.APP_ARCH || mode == Mode.HAZARD_ANALYSIS){
+
+		if (mode == Mode.APP_ARCH || mode == Mode.HAZARD_ANALYSIS) {
 			doTranslation(monitor, mode);
-		} else if(mode == Mode.DEVICEDRIVER) {
+		} else if (mode == Mode.DEVICEDRIVER) {
 			doDeviceTranslation(monitor);
 		}
 	}

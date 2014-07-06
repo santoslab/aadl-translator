@@ -32,6 +32,9 @@ background(model) ::=<<
 preliminaries(model) ::=<<
 ## Preliminaries
 
+### System Boundaries
+![System Boundary](<model.hazardReportDiagrams.("SystemBoundary")>)
+
 ### Accident Levels
 <model.accidentLevels.keys:{k | <accidentLevel(model.accidentLevels.(k), i)>
 }>
@@ -47,6 +50,9 @@ preliminaries(model) ::=<<
 ### Control Actions
 <model.channels.values:{v | <controlAction(v, i)>
 }>
+### Process Model
+![Process Model](<model.hazardReportDiagrams.("ProcessModel")>)
+
 >>
 
 accidentLevel(accLvl, i) ::=<<

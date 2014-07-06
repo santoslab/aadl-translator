@@ -18,6 +18,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = AadlTranslatorPlugin.getDefault().getPreferenceStore();
 		store.setDefault(PreferenceConstants.P_USERSHELLS, true);
+		store.setDefault(PreferenceConstants.P_REPORTFORMAT, "markdown");
 	}
 
 }

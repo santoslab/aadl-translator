@@ -1,13 +1,18 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Platform;
+
 import com.google.common.collect.Maps;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.Keyword;
 
 public class SystemModel {
 	private String name;
@@ -24,6 +29,7 @@ public class SystemModel {
 	private String hazardReportContext;
 	private HashSet<AbbreviationModel> hazardReportAbbreviations;
 	private HashSet<String> hazardReportAssumptions;
+	private HashMap<String, String> hazardReportDiagrams;
 
 	public SystemModel() {
 		logicComponents = new HashMap<>();
@@ -33,6 +39,26 @@ public class SystemModel {
 		stpaPreliminaries = new HashMap<>();
 		hazardReportAbbreviations = new HashSet<>();
 		hazardReportAssumptions = new HashSet<>();
+		initHazardReportDiagrams();
+	}
+
+	private void initHazardReportDiagrams() {
+		hazardReportDiagrams = new HashMap<>();
+		URL imagesDirUrl = Platform.getBundle(
+				"edu.ksu.cis.projects.mdcf.aadl-translator").getEntry(
+				"src/main/resources/images/");
+		try {
+			File imagesDir = new File(FileLocator.toFileURL(imagesDirUrl).getPath());
+			File appBoundaryPH = new File(imagesDir,
+					"AppBoundary-Placeholder.png");
+			File procModelPH = new File(imagesDir, "ProcModel-Placeholder.png");
+			hazardReportDiagrams.put("SystemBoundary",
+					appBoundaryPH.getAbsolutePath());
+			hazardReportDiagrams.put("ProcessModel",
+					procModelPH.getAbsolutePath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public String getHazardReportContext() {
@@ -197,12 +223,16 @@ public class SystemModel {
 	public void setContext(String value) {
 		hazardReportContext = value;
 	}
-	
-	public void addAbbreviation(AbbreviationModel am){
+
+	public void addAbbreviation(AbbreviationModel am) {
 		hazardReportAbbreviations.add(am);
 	}
-	
-	public void addAssumption(String assumption){
+
+	public void addAssumption(String assumption) {
 		hazardReportAssumptions.add(assumption);
+	}
+
+	public HashMap<String, String> getHazardReportDiagrams() {
+		return hazardReportDiagrams;
 	}
 }
