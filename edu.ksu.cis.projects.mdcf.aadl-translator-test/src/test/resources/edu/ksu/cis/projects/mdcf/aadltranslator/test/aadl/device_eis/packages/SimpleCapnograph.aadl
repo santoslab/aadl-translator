@@ -81,13 +81,48 @@ features
 
 
   -- EtCO2 numeric of Etco2.Metrics sub-channel through publisher-subscriber communication pair. 
-  Etco2_Metric_Etco2Num_pub: out event data port MDCF_Types::EtCO2 {  -- Publisher output.  
+  Etco2_Metric_Etco2Num_pub: out event data port MDCF_Types::EtCO2 { 
   	MDCF_Comm_Props::separation_interval_range => 100 ms .. 200 ms;    
 	MDCF_ICE_Props::channel_group => "Etco2";
 	MDCF_ICE_Props::channel => "Metrics";
 	MDCF_ICE_Props::data_type => "EtCo2_Numeric";
 	MDCF_ICE_Props::comm_type => publisher;
   };
+  
+  
+    -- >>> Demonstration of the sender-receiver communication pattern. <<<
+  -- Loading Bolus numeric in Prescription_Dose_Settings.Settings sub-channel through sender-receiver communication pair. 
+  PrescriptionDoseSettings_Settings_LoadingBolus_sen: in event data port 
+      MDCF_Types::BolusLoading {  
+  	MDCF_Comm_Props::separation_interval_range => 100 ms .. 200 ms;    
+	MDCF_ICE_Props::channel_group => "PrescriptionDoseSettings";
+	MDCF_ICE_Props::channel => "Settings";
+	MDCF_ICE_Props::data_type => "LoadingBolus";
+	MDCF_ICE_Props::comm_type => sender;
+  };    
+  PrescriptionDoseSettings_Settings_LoadingBolus_rcv: out event data port { 
+	MDCF_ICE_Props::channel_group => "PrescriptionDoseSettings";
+	MDCF_ICE_Props::channel => "Settings";
+	MDCF_ICE_Props::data_type => "LoadingBolus";
+	MDCF_ICE_Props::comm_type => receiver;
+  };  -- Sender acknowledgment.
+  
+  -- Stop action in Commands.Actions sub-channel through requester-responser communication pair. 
+  Stop_Actions_Commands_ini: in event data port{
+  	MDCF_Comm_Props::separation_interval_range => 100 ms .. 200 ms;    
+	MDCF_ICE_Props::channel_group => "Stop";
+	MDCF_ICE_Props::channel => "Commands";
+	MDCF_ICE_Props::data_type => "Parameter";
+	MDCF_ICE_Props::comm_type => initiator;
+  };
+  Stop_Actions_Commands_exe: out event data port{
+	MDCF_ICE_Props::channel_group => "Stop";
+	MDCF_ICE_Props::channel => "Commands";
+	MDCF_ICE_Props::data_type => "Result";	
+	MDCF_ICE_Props::comm_type => executor;
+  };
+
+
 end CapnographVmd;
 
 

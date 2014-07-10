@@ -22,9 +22,8 @@ public class ActionExchangeModel extends ExchangeModel {
 	
 	public String actionName;
 	
-	public ActionExchangeModel(String actionName, String deviceType, String vmdType, String exchangeName,
-			ExchangeKind exchangekind) {
-		super(deviceType, vmdType, exchangeName, exchangekind);
+	public ActionExchangeModel(String actionName, String deviceType, String vmdType, String exchangeName) {
+		super(deviceType, vmdType, exchangeName, ExchangeKind.ACTION);
 		this.actionName = actionName;
 	}
 

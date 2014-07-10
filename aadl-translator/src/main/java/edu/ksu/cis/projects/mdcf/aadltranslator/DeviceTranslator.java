@@ -33,6 +33,7 @@ import java.lang.System;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.PropertyOutOfRangeException;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.ActionExchangeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.ExchangeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.GetExchangeModel;
@@ -49,8 +50,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 	};
 
 	private enum CommPatternType {
-		REQUEST("_req", 1), RESPONSE("_res", 2), SEND("_snd", 3), RECEIVE(
-				"_recv", 4), PUBLISH("_pub", 5);
+		REQUEST("_req", 1), RESPONSE("_res", 2), SEND("_sen", 3), RECEIVE(
+				"_rcv", 4), PUBLISH("_pub", 5), INITIATOR("_ini", 6), EXECUTOR("exe", 7);
 
 		private final String suffix;
 		private final int id;
@@ -265,9 +266,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 					ExchangeModel em = deviceComponentModel.exchangeModels
 							.get(exchangeName);
 					if (em == null) {// if not create a new one and register
-						em = new GetExchangeModel(extractParmeterName(
-								object.getFullName(),
-								CommPatternType.REQUEST.suffix), // Name of the parameter
+						em = new GetExchangeModel(extractParameterName(object),// Name of the parameter
 								systemName, // System Name
 								vmdTypeNames.get(vmdTypeNames.size() - 1), // VMD Name of the exchange
 								extractExchangeName(object.getFullName(),
@@ -348,9 +347,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 					ExchangeModel em = deviceComponentModel.exchangeModels
 							.get(exchangeName);
 					if (em == null) {// if not create a new one and register
-						em = new GetExchangeModel(extractParmeterName(
-								object.getFullName(),
-								CommPatternType.RESPONSE.suffix), // Name of the parameter
+						em = new GetExchangeModel(extractParameterName(object),// Name of the parameter
 								systemName, // System Name
 								vmdTypeNames.get(vmdTypeNames.size() - 1), // VMD Name of the exchange
 								extractExchangeName(object.getFullName(),
@@ -404,27 +401,52 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 					}
 				}
 					break;
-				case RECEIVE:
+				case SEND:
 				{
 					String exchangeName = extractExchangeName(
 							object.getFullName(),
-							CommPatternType.RECEIVE.suffix);
+							CommPatternType.SEND.suffix);
 
 					// See if the exchange has been registered in the model
 					ExchangeModel em = deviceComponentModel.exchangeModels
 							.get(exchangeName);
 					if (em == null) {// if not create a new one and register
-						em = new SetExchangeModel(extractParmeterName(
-								object.getFullName(),
-								CommPatternType.RECEIVE.suffix), // Name of the parameter
+						em = new SetExchangeModel(extractParameterName(object),// Name of the parameter
 								systemName, // System Name
 								vmdTypeNames.get(vmdTypeNames.size() - 1), // VMD Name of the exchange
 								extractExchangeName(object.getFullName(),
-										CommPatternType.RECEIVE.suffix) // ExchangeName
+										CommPatternType.SEND.suffix) // ExchangeName
 						);
 
 						PortInfoModel portInfo = new PortInfoModel(
 								PortDirection.In, object.getFullName());
+						
+						RangeValue rv = getSeperationIntervalRange(object);
+						if(rv != null){
+							IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
+							IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
+
+							System.err.println("Seperation Interval Max "  + max.getValue());
+							System.err.println("Seperation Interval Min "  + min.getValue());
+							
+							portInfo.setPortProperty(SetExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
+									Long.toString(max.getValue()));
+							portInfo.setPortProperty(SetExchangeModel.InPortProperty.MIN_SEPARATION_INTERVAL.name(), 
+									Long.toString(min.getValue()));
+						} else {
+							//TODO: if it is mandatory, process error
+						}
+						
+						//process data type
+						String dataType = AadlUtil.getSubcomponentTypeName(object.getDataFeatureClassifier(), object);
+						if(dataType != null){
+							portInfo.setPortProperty(SetExchangeModel.InPortProperty.MSG_TYPE.name(),
+									dataType);
+						} else {
+							handleException(object, new Exception("Missing Data Type for the Port:" + object.getFullName()));
+							return DONE;
+						}
+						
 						em.setInPortInfo(portInfo);
 
 						deviceComponentModel.exchangeModels.put(exchangeName,
@@ -438,37 +460,67 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						if (portInfo == null) {
 							portInfo = new PortInfoModel(PortDirection.In,
 									object.getFullName());
+							
+							RangeValue rv = getSeperationIntervalRange(object);
+							if(rv != null){
+								IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
+								IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
+
+								System.err.println("Seperation Interval Max "  + max.getValue());
+								System.err.println("Seperation Interval Min "  + min.getValue());
+								
+								portInfo.setPortProperty(SetExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
+										Long.toString(max.getValue()));
+								portInfo.setPortProperty(SetExchangeModel.InPortProperty.MIN_SEPARATION_INTERVAL.name(), 
+										Long.toString(min.getValue()));
+							} else {
+								//TODO: if it is mandatory, process error
+							}
+							
+							//process data type
+							String dataType = AadlUtil.getSubcomponentTypeName(object.getDataFeatureClassifier(), object);
+							if(dataType != null){
+								portInfo.setPortProperty(SetExchangeModel.InPortProperty.MSG_TYPE.name(),
+										dataType);
+							} else {
+								handleException(object, new Exception("Missing Data Type for the Port:" + object.getFullName()));
+								return DONE;
+							}							
+							
+							
 							em.setInPortInfo(portInfo);
 						} else {
 							handleException(object, new Exception(
-									"Can't have multiple in ports for one Exchange:"
+									"Can't have multiple out ports for one Exchange:"
 											+ portInfo.getPortName() + " and "
 											+ object.getFullName()));
 						}
 					}
+					//TODO: process properties and data type
+
 				}
 					break;
-				case SEND:
+					
+				case RECEIVE:
 				{
 					String exchangeName = extractExchangeName(
 							object.getFullName(),
-							CommPatternType.SEND.suffix);
+							CommPatternType.RECEIVE.suffix);
 
 					// See if the exchange has been registered in the model
 					ExchangeModel em = deviceComponentModel.exchangeModels
 							.get(exchangeName);
 					if (em == null) {// if not create a new one and register
-						em = new SetExchangeModel(extractParmeterName(
-								object.getFullName(),
-								CommPatternType.SEND.suffix), // Name of the parameter
+						em = new SetExchangeModel(extractParameterName(object),// Name of the parameter
 								systemName, // System Name
 								vmdTypeNames.get(vmdTypeNames.size() - 1), // VMD Name of the exchange
 								extractExchangeName(object.getFullName(),
-										CommPatternType.SEND.suffix) // ExchangeName
+										CommPatternType.RECEIVE.suffix) // ExchangeName
 						);
 
 						PortInfoModel portInfo = new PortInfoModel(
 								PortDirection.Out, object.getFullName());
+						
 						em.setOutPortInfo(portInfo);
 
 						deviceComponentModel.exchangeModels.put(exchangeName,
@@ -482,18 +534,23 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						if (portInfo == null) {
 							portInfo = new PortInfoModel(PortDirection.Out,
 									object.getFullName());
-							em.setOutPortInfo(portInfo);
+							
 						} else {
 							handleException(object, new Exception(
-									"Can't have multiple out ports for one Exchange:"
+									"Can't have multiple in ports for one Exchange:"
 											+ portInfo.getPortName() + " and "
 											+ object.getFullName()));
+							return DONE;
 						}
-					}
-					//TODO: process properties and data type
 
+						em.setOutPortInfo(portInfo);
+
+						deviceComponentModel.exchangeModels.put(exchangeName,
+								em);
+					}
 				}
 					break;
+
 				case PUBLISH:
 				{
 					String exchangeName = extractExchangeName(
@@ -525,13 +582,15 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						
 						if(separation_interval.first() == null && separation_interval_range.first() == null){
 							//none of them are defined. Then ignore for now.
+							return DONE;
+
 						} else if(separation_interval.first() != null && separation_interval_range.first() != null){
 							//Both of them are defined. Definitely an error.
 							handleException(object, new Exception("Only separation_interval or separation_interval_range should be present:" + object.getFullName()));
+							return DONE;
+
 						} else if(separation_interval.first() != null){//Sporadic Exchange
-							em = new SporadicExchangeModel(extractParmeterName(
-									object.getFullName(),
-									CommPatternType.PUBLISH.suffix), // Name of the parameter
+							em = new SporadicExchangeModel(extractParameterName(object),// Name of the parameter
 									systemName, // System Name
 									vmdTypeNames.get(vmdTypeNames.size() - 1), // VMD Name of the exchange
 									extractExchangeName(object.getFullName(),
@@ -546,9 +605,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							}
 							
 						} else {//Periodic Exchange
-							em = new PeriodicExchangeModel(extractParmeterName(
-									object.getFullName(),
-									CommPatternType.PUBLISH.suffix), // Name of the parameter
+							em = new PeriodicExchangeModel(extractParameterName(object),// Name of the parameter
 									systemName, // System Name
 									vmdTypeNames.get(vmdTypeNames.size() - 1), // VMD Name of the exchange
 									extractExchangeName(object.getFullName(),
@@ -610,6 +667,137 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 				}
 					break;
+					
+				case INITIATOR:
+				{
+					String exchangeName = extractExchangeName(
+							object.getFullName(),
+							CommPatternType.INITIATOR.suffix);
+
+					// See if the exchange has been registered in the model
+					ExchangeModel em = deviceComponentModel.exchangeModels
+							.get(exchangeName);
+					if (em == null) {// if not create a new one and register
+						em = new ActionExchangeModel(extractParameterName(object),// Name of the parameter
+								systemName, // System Name
+								vmdTypeNames.get(vmdTypeNames.size() - 1), // VMD Name of the exchange
+								extractExchangeName(object.getFullName(),
+										CommPatternType.INITIATOR.suffix) // ExchangeName
+						);
+
+						PortInfoModel portInfo = new PortInfoModel(
+								PortDirection.In, object.getFullName());
+						
+						RangeValue rv = getSeperationIntervalRange(object);
+						if(rv != null){
+							IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
+							IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
+
+							System.err.println("Seperation Interval Max "  + max.getValue());
+							System.err.println("Seperation Interval Min "  + min.getValue());
+							
+							portInfo.setPortProperty(ActionExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
+									Long.toString(max.getValue()));
+							portInfo.setPortProperty(ActionExchangeModel.InPortProperty.MIN_SEPARATION_INTERVAL.name(), 
+									Long.toString(min.getValue()));
+						} else {
+							//TODO: if it is mandatory, process error
+						}
+						
+						em.setInPortInfo(portInfo);
+
+						deviceComponentModel.exchangeModels.put(exchangeName,
+								em);
+					} else {
+						// if it is retrieve the existing exchange and add the
+						// information
+						// if there is already something in there, it is an
+						// error
+						PortInfoModel portInfo = em.getInPortInfo();
+						if (portInfo == null) {
+							portInfo = new PortInfoModel(PortDirection.In,
+									object.getFullName());
+							
+							RangeValue rv = getSeperationIntervalRange(object);
+							if(rv != null){
+								IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
+								IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
+
+								System.err.println("Seperation Interval Max "  + max.getValue());
+								System.err.println("Seperation Interval Min "  + min.getValue());
+								
+								portInfo.setPortProperty(ActionExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
+										Long.toString(max.getValue()));
+								portInfo.setPortProperty(ActionExchangeModel.InPortProperty.MIN_SEPARATION_INTERVAL.name(), 
+										Long.toString(min.getValue()));
+							} else {
+								//TODO: if it is mandatory, process error
+							}
+							
+							em.setInPortInfo(portInfo);
+						} else {
+							handleException(object, new Exception(
+									"Can't have multiple out ports for one Exchange:"
+											+ portInfo.getPortName() + " and "
+											+ object.getFullName()));
+						}
+					}
+					//TODO: process properties and data type
+
+				}				
+					break;
+					
+				case EXECUTOR:
+				{
+					String exchangeName = extractExchangeName(
+							object.getFullName(),
+							CommPatternType.EXECUTOR.suffix);
+
+					// See if the exchange has been registered in the model
+					ExchangeModel em = deviceComponentModel.exchangeModels
+							.get(exchangeName);
+					if (em == null) {// if not create a new one and register
+						em = new ActionExchangeModel(extractParameterName(object),// Name of the parameter
+								systemName, // System Name
+								vmdTypeNames.get(vmdTypeNames.size() - 1), // VMD Name of the exchange
+								extractExchangeName(object.getFullName(),
+										CommPatternType.EXECUTOR.suffix) // ExchangeName
+						);
+
+						PortInfoModel portInfo = new PortInfoModel(
+								PortDirection.Out, object.getFullName());
+
+						em.setOutPortInfo(portInfo);
+
+						deviceComponentModel.exchangeModels.put(exchangeName,
+								em);
+					} else {
+						// if it is retrieve the existing exchange and add the
+						// information
+						// if there is already something in there, it is an
+						// error
+						PortInfoModel portInfo = em.getOutPortInfo();
+						if (portInfo == null) {
+							portInfo = new PortInfoModel(PortDirection.Out,
+									object.getFullName());
+						} else {
+							handleException(object, new Exception(
+									"Can't have multiple in ports for one Exchange:"
+											+ portInfo.getPortName() + " and "
+											+ object.getFullName()));
+							return DONE;
+						}
+
+						em.setOutPortInfo(portInfo);
+
+						deviceComponentModel.exchangeModels.put(exchangeName,
+								em);
+					}
+				}
+					break;
+				default:
+					System.err.println("Unhandled Communication Pattern:" + commType.valueOf(commType.name()));
+					break;
 				}
 
 			} else {
@@ -644,11 +832,24 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				return null;
 		}
 
-		private String extractParmeterName(String fullPortName, String suffix) {
+		private String extractParameterName(String fullPortName, String suffix) {
 			String[] splits = fullPortName.split("_");
 			int count_of_underscore_in_suffix = suffix.length()
 					- suffix.replace("_", "").length();
 			return splits[splits.length - count_of_underscore_in_suffix - 1];
+		}
+		
+		private String extractParameterName(EventDataPort object){
+			Property pr = GetProperties.lookupPropertyDefinition(object, "MDCF_ICE_Props", "data_type");
+			if(pr == null) return null;
+			
+			PropertyAcc pa = object.getPropertyValue(pr);
+			ModalPropertyValue mpv = pa.first().getOwnedValues().get(0);
+			if(mpv.getOwnedValue() instanceof StringLiteral){
+				return ((StringLiteral) mpv.getOwnedValue()).getValue();
+			} else
+				return null;
+			
 		}
 
 		private String extractExchangeName(String fullPortName, String suffix) {
@@ -657,6 +858,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				exchange_suffix = "_set";
 			} else if (suffix.equals(CommPatternType.REQUEST.suffix) || suffix.equals(CommPatternType.RESPONSE.suffix)){
 				exchange_suffix = "_get";
+			} else if (suffix.equals(CommPatternType.INITIATOR.suffix) || suffix.equals(CommPatternType.EXECUTOR.suffix)){ 
+				exchange_suffix = "_action";
 			} else {
 				exchange_suffix = "_pub";
 			}
@@ -676,6 +879,10 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				return CommPatternType.RECEIVE;
 			} else if (portName.endsWith(CommPatternType.PUBLISH.suffix())) {
 				return CommPatternType.PUBLISH;
+			} else if (portName.endsWith(CommPatternType.INITIATOR.suffix())) {
+				return CommPatternType.INITIATOR;
+			} else if (portName.endsWith(CommPatternType.EXECUTOR.suffix())) {
+				return CommPatternType.EXECUTOR;
 			}
 			return null;
 		}

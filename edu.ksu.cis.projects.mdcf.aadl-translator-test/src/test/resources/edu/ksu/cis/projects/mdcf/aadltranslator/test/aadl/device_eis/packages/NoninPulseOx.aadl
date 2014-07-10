@@ -55,15 +55,6 @@ features
   Status_res: out event data port MDCF_Types::Status {  -- Responder output.
   -- Properties found in AADL subset:  
     MAP_Properties::Output_Rate => 100 ms .. 300 ms;
-  
-  -- Properties found in MDD4MS pattern:               -- Raise_Error(data_unavailable)
-    -- MDCF_Comm_Props::Remaining_Life_Min => 200 ms;  -- Raise_Error(stale_data | data_unavailable)     
-    -- MDCF_Comm_Props::Worst_Case_Latency => 500 ms;  -- Raise_Error(timeout)
-  
-  -- Properties found in DML model: 
-    -- MDCF_Comm_Props::Comm_Access => ICE_Security_Access_Read;  -- Whose access to what?
-    -- MDCF_Comm_Props::separation_interval => 30 ms;  -- Same as output separation? Revision per Andrew's paper?
-    -- MDCF_Comm_Props::service_time => 40 ms;  -- Same as worst case latency?
   };
   
  
@@ -71,15 +62,6 @@ features
   Spo2_Alerts_Limit_pub: out event data port MDCF_Types::LimitAlert {  -- Publisher output.     
   -- Properties found in AADL subset:  
     MAP_Properties::Output_Rate => 100 ms .. 300 ms;
-  
-  -- Properties found in MDD4MS pattern:               -- Raise_Error(data_unavailable)
-    -- MDCF_Comm_Props::Remaining_Life_Min => 200 ms;  -- Raise_Error(stale_data)     
-    -- MDCF_Comm_Props::Timeout => 100 ms;             -- Raise_Error(timeout)
-    -- MDCF_Comm_Props::Frequency => 100 mhz;
-  
-  -- Properties found in DML model: 
-    -- MDCF_Comm_Props::Comm_Access => ICE_Security_Access_Read;  -- Whose access to what?
-    -- MDCF_Comm_Props::separation_interval => 30 ms;  -- Same as output separation? Revision per Andrew's paper? 
   };
   
   
@@ -88,15 +70,6 @@ features
   Spo2_Metric_Spo2Num_res: out event data port MDCF_Types::SpO2 {  -- Responder output.  
   -- Properties found in AADL subset:  
     MAP_Properties::Output_Rate => 100 ms .. 300 ms;
-  
-  -- Properties found in MDD4MS pattern:               -- Raise_Error(data_unavailable)
-    -- MDCF_Comm_Props::Remaining_Life_Min => 200 ms;  -- Raise_Error(stale_data | data_unavailable)     
-    -- MDCF_Comm_Props::Worst_Case_Latency => 500 ms;  -- Raise_Error(timeout)
-  
-  -- Properties found in DML model: 
-    -- MDCF_Comm_Props::Comm_Access => ICE_Security_Access_Read;  -- Whose access to what?
-    -- MDCF_Comm_Props::separation_interval => 30 ms;  -- Same as output separation? Revision per Andrew's paper?
-    -- MDCF_Comm_Props::service_time => 40 ms;  -- Same as worst case latency?
   };
   dummy_num_in: in event data port MDCF_Types::SpO2;  -- For demonstrating connections.
 
@@ -105,15 +78,6 @@ features
   Spo2_Metric_Spo2Num_pub: out event data port MDCF_Types::SpO2 {  -- Publisher output.      
   -- Properties found in AADL subset:  
     MAP_Properties::Output_Rate => 100 ms .. 300 ms;
-  
-  -- Properties found in MDD4MS pattern:               -- Raise_Error(data_unavailable)
-    -- MDCF_Comm_Props::Remaining_Life_Min => 200 ms;  -- Raise_Error(stale_data)     
-    -- MDCF_Comm_Props::Timeout => 100 ms;             -- Raise_Error(timeout)
-    -- MDCF_Comm_Props::Frequency => 100 mhz;
-  
-  -- Properties found in DML model: 
-    -- MDCF_Comm_Props::Comm_Access => ICE_Security_Access_Read;  -- Whose access to what?
-    -- MDCF_Comm_Props::separation_interval => 30 ms;  -- Same as output separation? Revision per Andrew's paper? 
   };
 
   
@@ -123,15 +87,6 @@ features
   Spo2_Metric_Spo2NumAlt_res: out event data port MDCF_Types::SpO2 {  -- Responder output.   
   -- Properties found in AADL subset:  
     MAP_Properties::Output_Rate => 100 ms .. 300 ms;
-  
-  -- Properties found in MDD4MS pattern:               -- Raise_Error(data_unavailable)
-    -- MDCF_Comm_Props::Remaining_Life_Min => 200 ms;  -- Raise_Error(stale_data | data_unavailable)     
-    -- MDCF_Comm_Props::Worst_Case_Latency => 500 ms;  -- Raise_Error(timeout)
-  
-  -- Properties found in DML model: 
-    -- MDCF_Comm_Props::Comm_Access => ICE_Security_Access_Read;  -- Whose access to what?
-    -- MDCF_Comm_Props::separation_interval => 30 ms;  -- Same as output separation? Revision per Andrew's paper?
-    -- MDCF_Comm_Props::service_time => 40 ms;  -- Same as worst case latency?
   };
 
 
@@ -139,15 +94,6 @@ features
   Spo2_Metric_Spo2NumAlt_pub: out event data port MDCF_Types::SpO2 {  -- Publisher output.      
   -- Properties found in AADL subset:  
     MAP_Properties::Output_Rate => 100 ms .. 300 ms;
-  
-  -- Properties found in MDD4MS pattern:               -- Raise_Error(data_unavailable)
-    -- MDCF_Comm_Props::Remaining_Life_Min => 200 ms;  -- Raise_Error(stale_data)     
-    -- MDCF_Comm_Props::Timeout => 100 ms;             -- Raise_Error(timeout)
-    -- MDCF_Comm_Props::Frequency => 100 mhz;
-  
-  -- Properties found in DML model: 
-    -- MDCF_Comm_Props::Comm_Access => ICE_Security_Access_Read;  -- Whose access to what?
-    -- MDCF_Comm_Props::separation_interval => 30 ms;  -- Same as output separation? Revision per Andrew's paper? 
   };
   
   
@@ -155,15 +101,7 @@ features
   Spo2_Metrics_Alerts_Limit_pub: out event data port MDCF_Types::LimitAlert {  -- Publisher output.     
   -- Properties found in AADL subset:  
     MAP_Properties::Output_Rate => 100 ms .. 300 ms;
-  
-  -- Properties found in MDD4MS pattern:               -- Raise_Error(data_unavailable)
-    -- MDCF_Comm_Props::Remaining_Life_Min => 200 ms;  -- Raise_Error(stale_data)     
-    -- MDCF_Comm_Props::Timeout => 100 ms;             -- Raise_Error(timeout)
-    -- MDCF_Comm_Props::Frequency => 100 mhz;
-  
-  -- Properties found in DML model: 
-    -- MDCF_Comm_Props::Comm_Access => ICE_Security_Access_Read;  -- Whose access to what?
-    -- MDCF_Comm_Props::separation_interval => 30 ms;  -- Same as output separation? Revision per Andrew's paper? 
+
   };
   
   
