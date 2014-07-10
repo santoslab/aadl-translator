@@ -2,7 +2,8 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device;
 
 public class SporadicExchangeModel extends ExchangeModel {
 	public enum OutPortProperty{
-		MSG_TYPE("SEND_MESSAGE_TYPE");
+		MSG_TYPE("SEND_MESSAGE_TYPE"),
+		SEPARATION_INTERVAL("SEPARATION_TIME");
 		
 		private final String propName;
 		

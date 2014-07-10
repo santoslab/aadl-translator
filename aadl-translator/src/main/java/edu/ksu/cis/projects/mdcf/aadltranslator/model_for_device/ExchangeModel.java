@@ -59,12 +59,18 @@ public abstract class ExchangeModel {
 	}
 
 	public String toString(){
-		return "  Output Port:" + this.getOutPortInfo().getPortName() 
-				+ this.getOutPortInfo().printPortProperties()
-				+ "\n\n"
-				+ "  Input Port:" + this.getInPortInfo().getPortName() 
-				+ this.getInPortInfo().printPortProperties()
-				+ "\n";
+		String outPortInfo = null;
+		String inPortInfo = null;
+		if(this.getInPortInfo() != null)
+			inPortInfo = "  Input Port:" + this.getInPortInfo().getPortName() 
+					+ this.getInPortInfo().printPortProperties()
+					+ "\n";
 		
+		if(this.getOutPortInfo() != null)
+			outPortInfo = "  Output Port:" + this.getOutPortInfo().getPortName() 
+					+ this.getOutPortInfo().printPortProperties()
+					+ "\n\n";
+		return ((outPortInfo != null) ? outPortInfo : "") 
+			   + ((inPortInfo != null) ? inPortInfo : "");
 	}
 }

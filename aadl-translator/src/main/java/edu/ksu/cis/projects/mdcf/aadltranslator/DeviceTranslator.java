@@ -50,8 +50,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 	private enum CommPatternType {
 		REQUEST("_req", 1), RESPONSE("_res", 2), SEND("_snd", 3), RECEIVE(
-				"_recv", 4), PERIODIC("_period_pub", 5), SPORADIC(
-				"_sporadic_pub", 6);
+				"_recv", 4), PUBLISH("_pub", 5);
 
 		private final String suffix;
 		private final int id;
@@ -125,16 +124,9 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 					}
 					deviceComponentModel.setName(st.getName());
 
-				} else if (e instanceof SystemImplementation) { // find system
-																// implementation
-																// and see
-																// whether the
-																// name matches
-																// with the
-																// system type,
-																// if it doesn't
-																// trigger
-																// error.
+				} else if (e instanceof SystemImplementation) { 
+					 //find system implementationand seewhether the name matches with the system type,
+				     //if it doesn't trigger error.
 					SystemImplementation si = (SystemImplementation) e;
 					if (systemImpCount > 1) {
 						handleException(
@@ -284,9 +276,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 						PortInfoModel portInfo = new PortInfoModel(
 								PortDirection.In, object.getFullName());
-						
-						
-						
+
 						RangeValue rv = getSeperationIntervalRange(object);
 						if(rv != null){
 							IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
@@ -322,7 +312,29 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 									"Can't have multiple in ports for one Exchange:"
 											+ portInfo.getPortName() + " and "
 											+ object.getFullName()));
+							return DONE;
 						}
+						
+						RangeValue rv = getSeperationIntervalRange(object);
+						if(rv != null){
+							IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
+							IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
+
+							System.err.println("Seperation Interval Max "  + max.getValue());
+							System.err.println("Seperation Interval Min "  + min.getValue());
+							
+							portInfo.setPortProperty(GetExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
+									Long.toString(max.getValue()));
+							portInfo.setPortProperty(GetExchangeModel.InPortProperty.MIN_SEPARATION_INTERVAL.name(), 
+									Long.toString(min.getValue()));
+						} else {
+							//TODO: if it is mandatory, process error
+						}
+
+						em.setInPortInfo(portInfo);
+
+						deviceComponentModel.exchangeModels.put(exchangeName,
+								em);
 					}
 				}
 					break;
@@ -347,6 +359,17 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 						PortInfoModel portInfo = new PortInfoModel(
 								PortDirection.Out, object.getFullName());
+						
+						//process data type
+						String dataType = AadlUtil.getSubcomponentTypeName(object.getDataFeatureClassifier(), object);
+						if(dataType != null){
+							portInfo.setPortProperty(GetExchangeModel.OutPortProperty.MSG_TYPE.name(),
+									dataType);
+						} else {
+							handleException(object, new Exception("Missing Data Type for the Port:" + object.getFullName()));
+							return DONE;
+						}
+						
 						em.setOutPortInfo(portInfo);
 
 						deviceComponentModel.exchangeModels.put(exchangeName,
@@ -471,32 +494,90 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 				}
 					break;
-				case SPORADIC:
+				case PUBLISH:
 				{
 					String exchangeName = extractExchangeName(
 							object.getFullName(),
-							CommPatternType.SPORADIC.suffix);
+							CommPatternType.PUBLISH.suffix);
 
 					// See if the exchange has been registered in the model
 					ExchangeModel em = deviceComponentModel.exchangeModels
 							.get(exchangeName);
-					if (em == null) {// if not create a new one and register
-						em = new SporadicExchangeModel(extractParmeterName(
-								object.getFullName(),
-								CommPatternType.SPORADIC.suffix), // Name of the parameter
-								systemName, // System Name
-								vmdTypeNames.get(vmdTypeNames.size() - 1), // VMD Name of the exchange
-								extractExchangeName(object.getFullName(),
-										CommPatternType.SPORADIC.suffix) // ExchangeName
-						);
+					
+					
+					PropertyAcc separation_interval = object.getPropertyValue(GetProperties.lookupPropertyDefinition(object, "MDCF_Comm_Props", "separation_interval"));
+					PropertyAcc separation_interval_range = object.getPropertyValue(GetProperties.lookupPropertyDefinition(object, "MDCF_Comm_Props", "separation_interval_range"));
+					
 
+					
+					if (em == null) {// if not create a new one and register
 						PortInfoModel portInfo = new PortInfoModel(
 								PortDirection.Out, object.getFullName());
+						//process data type
+						String dataType = AadlUtil.getSubcomponentTypeName(object.getDataFeatureClassifier(), object);
+						if(dataType != null){
+							portInfo.setPortProperty(GetExchangeModel.OutPortProperty.MSG_TYPE.name(),
+									dataType);
+						} else {
+							handleException(object, new Exception("Missing Data Type for the Port:" + object.getFullName()));
+							return DONE;
+						}
+						
+						if(separation_interval.first() == null && separation_interval_range.first() == null){
+							//none of them are defined. Then ignore for now.
+						} else if(separation_interval.first() != null && separation_interval_range.first() != null){
+							//Both of them are defined. Definitely an error.
+							handleException(object, new Exception("Only separation_interval or separation_interval_range should be present:" + object.getFullName()));
+						} else if(separation_interval.first() != null){//Sporadic Exchange
+							em = new SporadicExchangeModel(extractParmeterName(
+									object.getFullName(),
+									CommPatternType.PUBLISH.suffix), // Name of the parameter
+									systemName, // System Name
+									vmdTypeNames.get(vmdTypeNames.size() - 1), // VMD Name of the exchange
+									extractExchangeName(object.getFullName(),
+											CommPatternType.PUBLISH.suffix) // ExchangeName
+							);
+							
+							IntegerLiteral il = getSeperationInterval(object);
+							if(il != null){
+								System.err.println("Seperation Interval:"  + il.getValue());
+								portInfo.setPortProperty(SporadicExchangeModel.OutPortProperty.SEPARATION_INTERVAL.name(),
+										Long.toString(il.getValue()));
+							}
+							
+						} else {//Periodic Exchange
+							em = new PeriodicExchangeModel(extractParmeterName(
+									object.getFullName(),
+									CommPatternType.PUBLISH.suffix), // Name of the parameter
+									systemName, // System Name
+									vmdTypeNames.get(vmdTypeNames.size() - 1), // VMD Name of the exchange
+									extractExchangeName(object.getFullName(),
+											CommPatternType.PUBLISH.suffix) // ExchangeName
+							);
+							
+							RangeValue rv = getSeperationIntervalRange(object);
+							if(rv != null){
+								IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
+								IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
+
+								System.err.println("Seperation Interval Max:"  + max.getValue());
+								System.err.println("Seperation Interval Min:"  + min.getValue());
+								
+								portInfo.setPortProperty(PeriodicExchangeModel.OutPortProperty.MAX_SEPARATION_INTERVAL.name(),
+										Long.toString(max.getValue()));
+								portInfo.setPortProperty(PeriodicExchangeModel.OutPortProperty.MIN_SEPARATION_INTERVAL.name(), 
+										Long.toString(min.getValue()));
+							} else {
+								//TODO: if it is mandatory, process error
+							}
+							
+						}
+						
 						em.setOutPortInfo(portInfo);
 
 						deviceComponentModel.exchangeModels.put(exchangeName,
 								em);
-					} else {
+					} else if (em instanceof SporadicExchangeModel){
 						// if it is retrieve the existing exchange and add the
 						// information
 						// if there is already something in there, it is an
@@ -512,41 +593,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 											+ portInfo.getPortName() + " and "
 											+ object.getFullName()));
 						}
-					}
-					//TODO: process properties and data type
-
-				}
-					break;
-				case PERIODIC:
-				{
-					String exchangeName = extractExchangeName(
-							object.getFullName(),
-							CommPatternType.PERIODIC.suffix);
-
-					// See if the exchange has been registered in the model
-					ExchangeModel em = deviceComponentModel.exchangeModels
-							.get(exchangeName);
-					if (em == null) {// if not create a new one and register
-						em = new PeriodicExchangeModel(extractParmeterName(
-								object.getFullName(),
-								CommPatternType.PERIODIC.suffix), // Name of the parameter
-								systemName, // System Name
-								vmdTypeNames.get(vmdTypeNames.size() - 1), // VMD Name of the exchange
-								extractExchangeName(object.getFullName(),
-										CommPatternType.PERIODIC.suffix) // ExchangeName
-						);
-
-						PortInfoModel portInfo = new PortInfoModel(
-								PortDirection.Out, object.getFullName());
-						em.setOutPortInfo(portInfo);
-
-						deviceComponentModel.exchangeModels.put(exchangeName,
-								em);
-					} else {
-						// if it is retrieve the existing exchange and add the
-						// information
-						// if there is already something in there, it is an
-						// error
+					} else if (em instanceof PeriodicExchangeModel) {
 						PortInfoModel portInfo = em.getOutPortInfo();
 						if (portInfo == null) {
 							portInfo = new PortInfoModel(PortDirection.Out,
@@ -560,6 +607,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						}
 					}
 					//TODO: process properties and data type
+
 				}
 					break;
 				}
@@ -570,18 +618,6 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 								+ lastElemProcessed));
 			}
 			return DONE;
-		}
-
-		private RangeValue getOutputRateRange(EventDataPort object) {
-			Property pr = GetProperties.lookupPropertyDefinition(object, "MAP_Properties", "Output_Rate");
-			if(pr == null) return null;
-			
-			PropertyAcc pa = object.getPropertyValue(pr);
-			ModalPropertyValue mpv = pa.first().getOwnedValues().get(0);
-			if(mpv.getOwnedValue() instanceof RangeValue){
-				return (RangeValue) mpv.getOwnedValue();
-			} else
-				return null;
 		}
 		
 		private RangeValue getSeperationIntervalRange(EventDataPort object) {
@@ -595,6 +631,18 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			} else
 				return null;
 		}
+		
+		private IntegerLiteral getSeperationInterval(EventDataPort object) {
+			Property pr = GetProperties.lookupPropertyDefinition(object, "MDCF_Comm_Props", "separation_interval");
+			if(pr == null) return null;
+			
+			PropertyAcc pa = object.getPropertyValue(pr);
+			ModalPropertyValue mpv = pa.first().getOwnedValues().get(0);
+			if(mpv.getOwnedValue() instanceof IntegerLiteral){
+				return (IntegerLiteral) mpv.getOwnedValue();
+			} else
+				return null;
+		}
 
 		private String extractParmeterName(String fullPortName, String suffix) {
 			String[] splits = fullPortName.split("_");
@@ -604,8 +652,17 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 		}
 
 		private String extractExchangeName(String fullPortName, String suffix) {
+			String exchange_suffix = "";
+			if(suffix.equals(CommPatternType.RECEIVE.suffix) || suffix.equals(CommPatternType.SEND.suffix)){
+				exchange_suffix = "_set";
+			} else if (suffix.equals(CommPatternType.REQUEST.suffix) || suffix.equals(CommPatternType.RESPONSE.suffix)){
+				exchange_suffix = "_get";
+			} else {
+				exchange_suffix = "_pub";
+			}
+			
 			return fullPortName.substring(0,
-					fullPortName.length() - suffix.length());
+					fullPortName.length() - suffix.length()) + exchange_suffix;
 		}
 
 		private CommPatternType decideCommPattern(String portName) {
@@ -617,10 +674,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				return CommPatternType.SEND;
 			} else if (portName.endsWith(CommPatternType.RECEIVE.suffix())) {
 				return CommPatternType.RECEIVE;
-			} else if (portName.endsWith(CommPatternType.SPORADIC.suffix())) {
-				return CommPatternType.SPORADIC;
-			} else if (portName.endsWith(CommPatternType.PERIODIC.suffix())) {
-				return CommPatternType.PERIODIC;
+			} else if (portName.endsWith(CommPatternType.PUBLISH.suffix())) {
+				return CommPatternType.PUBLISH;
 			}
 			return null;
 		}

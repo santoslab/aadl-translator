@@ -3,7 +3,8 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device;
 public class PeriodicExchangeModel extends ExchangeModel {
 	public enum OutPortProperty{
 		MSG_TYPE("SEND_MESSAGE_TYPE"),
-		PERIOD("PERIOD");
+		MIN_SEPARATION_INTERVAL("MIN_SEPARATION_TIME"),
+		MAX_SEPARATION_INTERVAL("MAX_SEPARATION_TIME");
 		
 		private final String propName;
 		

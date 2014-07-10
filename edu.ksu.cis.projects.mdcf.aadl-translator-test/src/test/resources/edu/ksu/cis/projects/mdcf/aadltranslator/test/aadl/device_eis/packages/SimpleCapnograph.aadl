@@ -82,7 +82,7 @@ features
 
   -- EtCO2 numeric of Etco2.Metrics sub-channel through publisher-subscriber communication pair. 
   Etco2_Metric_Etco2Num_pub: out event data port MDCF_Types::EtCO2 {  -- Publisher output.  
-  	MDCF_Comm_Props::separation_interval_range => 50 ms .. 100 ms;    
+  	MDCF_Comm_Props::separation_interval_range => 100 ms .. 200 ms;    
 	MDCF_ICE_Props::channel_group => "Etco2";
 	MDCF_ICE_Props::channel => "Metrics";
 	MDCF_ICE_Props::data_type => "EtCo2_Numeric";
