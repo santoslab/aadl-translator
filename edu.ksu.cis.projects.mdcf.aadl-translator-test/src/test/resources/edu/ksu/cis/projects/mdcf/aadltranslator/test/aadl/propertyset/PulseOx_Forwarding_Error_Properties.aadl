@@ -8,8 +8,20 @@ with EMV2, MAP_Error_Properties;
 	PulseOximiterFailUndetectablyHigh : constant aadlreal => 0.375;
 	PulseOximiterFailUndetectablyLow : constant aadlreal => 0.125;
 
+	Context1 : constant MAP_Error_Properties::Context => 
+		"A simple app that forwards information from a pulse oximeter to an app display.";
+		
+	Assumption1 : constant MAP_Error_Properties::Assumption =>
+		"We assume there are no alarms that need forwarding.";
+		
+	SpO2 : constant MAP_Error_Properties::Abbreviation => [
+		Full => "Blood-oxygen saturation";
+		Definition => "The ratio of SpO2 in the patient's blood";
+	];
+
 	AL1 : constant MAP_Error_Properties::Accident_Level => [
 		Level => 1;
+		Description => "A human is killed or seriously injured.";
 	];
 	
 	A1 : constant MAP_Error_Properties::Accident => [

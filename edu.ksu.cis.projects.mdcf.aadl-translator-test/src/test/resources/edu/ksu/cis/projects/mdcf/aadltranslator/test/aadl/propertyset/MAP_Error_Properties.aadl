@@ -1,12 +1,26 @@
 property set MAP_Error_Properties is
 with EMV2, MAP_Errors;
 
+-- ====================================== --
+-- Types related to the report background --
+-- ====================================== --
+
+Context : type aadlstring;
+
+Assumption : type aadlstring;
+
+Abbreviation : type record (
+	Full : aadlstring;
+	Definition : aadlstring;
+);
+
 -- =================================== --
 -- Types related to STPA preliminaries --
 -- =================================== --
 
 Accident_Level : type record (
 	Level : aadlinteger;
+	Description: aadlstring;
 );
 
 Accident : type record (
@@ -40,7 +54,7 @@ Occurrence : record (
 	Kind : MAP_Error_Properties::KindsType;
 	Hazard : MAP_Error_Properties::Hazard;
 	ViolatedConstraint : MAP_Error_Properties::Constraint;
-	Description : aadlstring;
+	Title : aadlstring;
 	Cause : aadlstring;
 	Compensation : aadlstring;
 	Impact : reference ({emv2}**error type);

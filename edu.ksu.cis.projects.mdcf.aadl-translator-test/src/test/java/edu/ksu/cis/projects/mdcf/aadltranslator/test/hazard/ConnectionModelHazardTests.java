@@ -59,8 +59,8 @@ public class ConnectionModelHazardTests {
 	}
 	
 	@Test
-	public void testOccurrenceDescription() {
-		assertEquals("Wrong values (Undetected)", occurrence.getDescription());
+	public void testOccurrenceTitle() {
+		assertEquals("Wrong values (Undetected)", occurrence.getTitle());
 	}
 	
 	@Test

@@ -1,8 +1,11 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.preference;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -35,14 +38,26 @@ public class TranslatorPreferencePage extends FieldEditorPreferencePage
 	 * editor knows how to save and restore itself.
 	 */
 	public void createFieldEditors() {
-		DirectoryFieldEditor dfe = new DirectoryFieldEditor(
+		DirectoryFieldEditor appDevPathField = new DirectoryFieldEditor(
 				PreferenceConstants.P_APPDEVPATH, "&AppDev Directory:",
 				getFieldEditorParent());
-		BooleanFieldEditor bfe = new BooleanFieldEditor(
+		addField(appDevPathField);
+		
+		BooleanFieldEditor userShellsField = new BooleanFieldEditor(
 				PreferenceConstants.P_USERSHELLS, "Generate &User Shells:",
 				BooleanFieldEditor.SEPARATE_LABEL, getFieldEditorParent());
-		addField(dfe);
-		addField(bfe);
+		addField(userShellsField);
+		
+		String[][] reportFormatOptions = new String[][] {{"html", "html"}, {"pdf", "pdf"}, {"markdown", "markdown"}};
+		ComboFieldEditor formatOptionsField = new ComboFieldEditor(
+				PreferenceConstants.P_REPORTFORMAT, "Report &Format:",
+				reportFormatOptions, getFieldEditorParent());
+		addField(formatOptionsField);
+		
+		DirectoryFieldEditor pandocPathField = new DirectoryFieldEditor(
+				PreferenceConstants.P_PANDOCPATH, "Path to &Pandoc:",
+				getFieldEditorParent());
+		addField(pandocPathField);
 	}
 
 	/*

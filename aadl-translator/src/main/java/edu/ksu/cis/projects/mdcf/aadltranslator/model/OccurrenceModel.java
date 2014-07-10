@@ -6,7 +6,7 @@ public class OccurrenceModel {
 	private Keyword keyword;
 	private HazardModel hazard;
 	private ConstraintModel constraint;
-	private String description;
+	private String title;
 	private String cause;
 	private String compensation;
 	private ImpactModel impact;
@@ -38,12 +38,12 @@ public class OccurrenceModel {
 		this.constraint = constraint;
 	}
 	
-	public String getDescription() {
-		return description;
+	public String getTitle() {
+		return title;
 	}
 	
-	public void setDescription(String description) {
-		this.description = description;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 	
 	public String getCause() {
