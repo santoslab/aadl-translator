@@ -1,0 +1,7 @@
+property set MDCF_ICE_Props is
+	channel_group : aadlstring applies to (port);
+	channel : aadlstring applies to (port);
+	data_type : aadlstring applies to (port);
+	comm_pattern : type enumeration (requester, responder, sender, receiver, publisher, subscriber, initiator, executor);
+	comm_type : MDCF_ICE_Props::comm_pattern applies to (port);
+end MDCF_ICE_Props;

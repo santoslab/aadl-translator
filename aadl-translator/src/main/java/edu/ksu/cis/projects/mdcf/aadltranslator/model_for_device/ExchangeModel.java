@@ -5,15 +5,18 @@ public abstract class ExchangeModel {
 	
 	private String deviceType;
 	
+	private String vmdType;
+	
 	private String exchangeName;
 
 	protected PortInfoModel outPortInfo;
 	protected PortInfoModel inPortInfo;
 	
-	public ExchangeModel(String deviceType, String exchangeName,
+	public ExchangeModel(String deviceType, String vmdType, String exchangeName,
 			ExchangeKind exchangekind) {
 		super();
 		this.deviceType = deviceType;
+		this.vmdType = vmdType;
 		this.exchangeName = exchangeName;
 	}
 
@@ -47,4 +50,21 @@ public abstract class ExchangeModel {
 	public void setInPortInfo(PortInfoModel inPortInfo) {
 	}
 
+	public String getVmdType() {
+		return vmdType;
+	}
+
+	public void setVmdType(String vmdType) {
+		this.vmdType = vmdType;
+	}
+
+	public String toString(){
+		return "  Output Port:" + this.getOutPortInfo().getPortName() 
+				+ this.getOutPortInfo().printPortProperties()
+				+ "\n\n"
+				+ "  Input Port:" + this.getInPortInfo().getPortName() 
+				+ this.getInPortInfo().printPortProperties()
+				+ "\n";
+		
+	}
 }

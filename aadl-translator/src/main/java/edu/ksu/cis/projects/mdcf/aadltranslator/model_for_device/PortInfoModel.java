@@ -12,6 +12,7 @@ public class PortInfoModel {
 		super();
 		this.inOut = inOut;
 		this.portName = portName;
+		this.portProperty = new PortProperty();
 	}
 	
 	public PortDirection getInOut() {
@@ -31,5 +32,9 @@ public class PortInfoModel {
 	}
 	public void setPortProperty(String propertyName, String propertyValue) {
 		this.portProperty.setProperty(propertyName, propertyValue);
+	}
+	
+	public String printPortProperties(){
+		return this.portProperty.toString();
 	}
 }

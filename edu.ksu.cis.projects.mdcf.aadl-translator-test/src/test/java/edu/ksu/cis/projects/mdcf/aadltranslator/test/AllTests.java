@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
@@ -33,6 +34,7 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.Element;
+import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterFactory;
@@ -40,6 +42,7 @@ import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
+import org.osate.xtext.aadl2.properties.util.GetProperties;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.DeviceTranslator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.ErrorTranslator;
@@ -359,9 +362,20 @@ public class AllTests {
 		Resource res = resourceSet.getResource(
 				OsateResourceUtil.getResourceURI((IResource) inputFile), true);
 		Element target = (Element) res.getContents().get(0);
+
+		for(Diagnostic diag : res.getErrors()){
+			System.err.println("Error:" + diag.getMessage());
+		}
+		
+		for(Diagnostic diag : res.getWarnings()){
+			System.err.println("Warning:" + diag.getMessage());
+		}
+		
 		stats.process(target);
+		
 		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
 				.toString());
+		System.out.println(stats.getDeviceComponentModel());
 
 		return stats.getDeviceComponentModel();
 	}

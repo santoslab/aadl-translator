@@ -14,7 +14,7 @@
 package SimpleCapnograph
 public
   with MAP_Properties;
-  with MDCF_Data_Props, MDCF_Comm_Props;
+  with MDCF_Data_Props, MDCF_Comm_Props, MDCF_ICE_Props;
   with MDCF_Types;
 
 
@@ -51,52 +51,42 @@ abstract CapnographVmd  -- More than an AADL device, so make abstract.
 -- Features consist of the unit's payload-exchange "bundles".
 features
   -- Device status of vmd through requester-responser communication pair. 
-  Status_req: in event data port;  -- Trigger for output from requester.
+  Status_req: in event data port{  -- Publisher output.  
+  	MDCF_Comm_Props::separation_interval_range => 200 ms .. 300 ms;          
+	MDCF_ICE_Props::data_type => "Status";
+	MDCF_ICE_Props::comm_type => requester;
+  };  -- Trigger for output from requester.
   Status_res: out event data port MDCF_Types::Status {  -- Responder output.
   -- Properties found in AADL subset:  
-    MAP_Properties::Output_Rate => 100 ms .. 300 ms;
-  
-  -- Properties found in MDD4MS pattern:               -- Raise_Error(data_unavailable)
-    -- MDCF_Comm_Props::Remaining_Life_Min => 200 ms;  -- Raise_Error(stale_data | data_unavailable)     
-    -- MDCF_Comm_Props::Worst_Case_Latency => 500 ms;  -- Raise_Error(timeout)
-  
-  -- Properties found in DML model: 
-    -- MDCF_Comm_Props::Comm_Access => ICE_Security_Access_Read;  -- Whose access to what?
-    -- MDCF_Comm_Props::separation_interval => 30 ms;  -- Same as output separation? Revision per Andrew's paper?
-    -- MDCF_Comm_Props::service_time => 40 ms;  -- Same as worst case latency?
+	MDCF_ICE_Props::data_type => "Status";
+	MDCF_ICE_Props::comm_type => responder;
   };
   
  
   -- EtCO2 numeric of Etco2.Metrics sub-channel through requester-responser communication pair. 
-  Etco2_Metric_Etco2Num_req: in event data port;  -- Trigger for output from requester.
+  Etco2_Metric_Etco2Num_req: in event data port{  -- Publisher output.  
+  	MDCF_Comm_Props::separation_interval_range => 100 ms .. 200 ms;          
+	MDCF_ICE_Props::channel_group => "Etco2";
+	MDCF_ICE_Props::channel => "Metrics";
+	MDCF_ICE_Props::data_type => "EtCo2_Numeric";
+	MDCF_ICE_Props::comm_type => requester;
+  };  -- Trigger for output from requester.
   Etco2_Metric_Etco2Num_res: out event data port MDCF_Types::EtCO2 {  -- Responder output.  
   -- Properties found in AADL subset:  
-    MAP_Properties::Output_Rate => 100 ms .. 300 ms;
-  
-  -- Properties found in MDD4MS pattern:               -- Raise_Error(data_unavailable)
-    -- MDCF_Comm_Props::Remaining_Life_Min => 200 ms;  -- Raise_Error(stale_data | data_unavailable)     
-    -- MDCF_Comm_Props::Worst_Case_Latency => 500 ms;  -- Raise_Error(timeout)
-  
-  -- Properties found in DML model: 
-    -- MDCF_Comm_Props::Comm_Access => ICE_Security_Access_Read;  -- Whose access to what?
-    -- MDCF_Comm_Props::separation_interval => 30 ms;  -- Same as output separation? Revision per Andrew's paper?
-    -- MDCF_Comm_Props::service_time => 40 ms;  -- Same as worst case latency?
+  	MDCF_ICE_Props::channel_group => "Etco2";
+	MDCF_ICE_Props::channel => "Metrics";
+	MDCF_ICE_Props::data_type => "EtCo2_Numeric";
+	MDCF_ICE_Props::comm_type => responder;
   };
 
 
   -- EtCO2 numeric of Etco2.Metrics sub-channel through publisher-subscriber communication pair. 
-  Etco2_Metric_Etco2Num_pub: out event data port MDCF_Types::EtCO2 {  -- Publisher output.      
-  -- Properties found in AADL subset:  
-    MAP_Properties::Output_Rate => 100 ms .. 300 ms;
-  
-  -- Properties found in MDD4MS pattern:               -- Raise_Error(data_unavailable)
-    -- MDCF_Comm_Props::Remaining_Life_Min => 200 ms;  -- Raise_Error(stale_data)     
-    -- MDCF_Comm_Props::Timeout => 100 ms;             -- Raise_Error(timeout)
-    -- MDCF_Comm_Props::Frequency => 100 mhz;
-  
-  -- Properties found in DML model: 
-    -- MDCF_Comm_Props::Comm_Access => ICE_Security_Access_Read;  -- Whose access to what?
-    -- MDCF_Comm_Props::separation_interval => 30 ms;  -- Same as output separation? Revision per Andrew's paper? 
+  Etco2_Metric_Etco2Num_pub: out event data port MDCF_Types::EtCO2 {  -- Publisher output.  
+  	MDCF_Comm_Props::separation_interval_range => 50 ms .. 100 ms;    
+	MDCF_ICE_Props::channel_group => "Etco2";
+	MDCF_ICE_Props::channel => "Metrics";
+	MDCF_ICE_Props::data_type => "EtCo2_Numeric";
+	MDCF_ICE_Props::comm_type => publisher;
   };
 end CapnographVmd;
 

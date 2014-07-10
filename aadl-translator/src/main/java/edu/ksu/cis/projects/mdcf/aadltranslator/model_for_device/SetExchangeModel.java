@@ -23,9 +23,8 @@ public class SetExchangeModel extends ExchangeModel {
 	
 	private String parameterName;
 	
-	public SetExchangeModel(String parameterName, String deviceType, String exchangeName,
-			ExchangeKind exchangekind) {
-		super(deviceType, exchangeName, exchangekind);
+	public SetExchangeModel(String parameterName, String deviceType, String vmdType, String exchangeName) {
+		super(deviceType, vmdType, exchangeName, ExchangeKind.SET);
 		this.parameterName = parameterName;
 	}
 	

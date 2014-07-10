@@ -13,13 +13,18 @@ public class DeviceComponentModel {
 	private String name;
 	private String deviceType;
 	
-	public HashMap<String, ExchangeModel> exchangeModels;
+	private String manufacturerName;
+	private String modelNumber;
 	
-	public HashMap<String, GetExchangeModel> getExchangeModels;
-	public HashMap<String, SetExchangeModel> setExchangeModels;
-	public HashMap<String, ActionExchangeModel> actionExchangeModels;
-	public HashMap<String, PeriodicExchangeModel> periodicExchangeModels;
-	public HashMap<String, SporadicExchangeModel> sporadicExchangeModels;
+	private ArrayList<String> credentials;
+	
+	public HashMap<String, ExchangeModel> exchangeModels;
+
+//	public HashMap<String, GetExchangeModel> getExchangeModels;
+//	public HashMap<String, SetExchangeModel> setExchangeModels;
+//	public HashMap<String, ActionExchangeModel> actionExchangeModels;
+//	public HashMap<String, PeriodicExchangeModel> periodicExchangeModels;
+//	public HashMap<String, SporadicExchangeModel> sporadicExchangeModels;
 	
 	public ArrayList<String> receivePortNames;
 	public ArrayList<String> sendPortNames;
@@ -28,8 +33,14 @@ public class DeviceComponentModel {
 		super();
 		this.name = deviceName;
 		this.deviceType = deviceType;
+		this.exchangeModels = new HashMap<String, ExchangeModel>();
 	}
 	
+	public DeviceComponentModel() {
+		super();
+		this.exchangeModels = new HashMap<String, ExchangeModel>();
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -49,13 +60,47 @@ public class DeviceComponentModel {
 	public void putExchangeModel(String exchangeName, ExchangeModel exchangeModel){
 		this.exchangeModels.put(exchangeName, exchangeModel);
 	}
-	
-	public ExchangeModel getExchangeModel(String exchangeName){
-		return this.exchangeModels.get(exchangeName);
+	public String getManufacturerName() {
+		return manufacturerName;
+	}
+
+	public void setManufacturerName(String manufacturerName) {
+		this.manufacturerName = manufacturerName;
+	}
+
+	public String getModelNumber() {
+		return modelNumber;
+	}
+
+	public void setModelNumber(String modelNumber) {
+		this.modelNumber = modelNumber;
 	}
 	
-	public Map<String, ExchangeModel> getGetExchanges(){
-		return Maps.filterValues(exchangeModels, ModelUtil.getExchangeFilter);
+	public ArrayList<String> getCredentials(){
+		if(this.credentials == null)
+			this.credentials = new ArrayList<String>();
+		return this.credentials;
 	}
 	
+	public void addCredential(String credential){
+		if(this.credentials == null)
+			this.credentials = new ArrayList<String>();
+		this.credentials.add(credential);
+	}
+	
+	public String toString(){
+		return "IEEE11073_MDC_ATTR_SYS_TYPE:" + this.deviceType + "\n" 
+				+ "Manufacturer:" + this.manufacturerName + "\n"
+				+ "Model Number:" + this.modelNumber + "\n"
+				+ "Credential:" + this.credentials.toString() + "\n"
+				+ printExchangeMap();
+	}
+	
+	public String printExchangeMap(){
+		StringBuffer sb = new StringBuffer("ExchangeMap of " + this.deviceType + "\n");
+		for(ExchangeModel em : this.exchangeModels.values()){
+			sb.append(em.getExchangeName() + "=>" + em.toString());
+		}
+		return sb.toString();
+	}
 }

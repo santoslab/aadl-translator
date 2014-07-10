@@ -16,4 +16,12 @@ public class PortProperty {
 	public String getProperty(String propertyName){
 		return this.propertyMap.get(propertyName);
 	}
+	
+	public String toString(){
+		StringBuffer sb = new StringBuffer("\n");
+		for(String key : propertyMap.keySet()){
+			sb.append("[" + key + "->" + propertyMap.get(key) + "]" + "\n");
+		}
+		return sb.toString();
+	}
 }

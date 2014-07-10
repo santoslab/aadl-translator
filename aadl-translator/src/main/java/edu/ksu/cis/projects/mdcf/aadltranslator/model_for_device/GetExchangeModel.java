@@ -32,9 +32,8 @@ public class GetExchangeModel extends ExchangeModel {
 	
 	private String parameterName;
 	
-	public GetExchangeModel(String parameterName, String deviceType, String exchangeName,
-			ExchangeKind exchangekind) {
-		super(deviceType, exchangeName, exchangekind);
+	public GetExchangeModel(String parameterName, String deviceType, String vmdType, String exchangeName) {
+		super(deviceType, vmdType, exchangeName, ExchangeModel.ExchangeKind.GET);
 		this.parameterName = parameterName;
 	}
 

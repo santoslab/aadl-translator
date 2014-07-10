@@ -17,9 +17,9 @@ public class SporadicExchangeModel extends ExchangeModel {
 
 	private String parameterName;
 	
-	public SporadicExchangeModel(String deviceType, String exchangeName,
-			ExchangeKind exchangekind) {
-		super(deviceType, exchangeName, exchangekind);
+	public SporadicExchangeModel(String parameterName, String deviceType, String vmdType, String exchangeName) {
+		super(deviceType, vmdType, exchangeName, ExchangeKind.SPORADIC);
+		this.parameterName = parameterName;
 	}
 	
 	public PortInfoModel getOutPortInfo() {

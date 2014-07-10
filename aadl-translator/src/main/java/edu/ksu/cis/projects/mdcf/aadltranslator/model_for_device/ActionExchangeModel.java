@@ -22,9 +22,9 @@ public class ActionExchangeModel extends ExchangeModel {
 	
 	public String actionName;
 	
-	public ActionExchangeModel(String actionName, String deviceType, String exchangeName,
+	public ActionExchangeModel(String actionName, String deviceType, String vmdType, String exchangeName,
 			ExchangeKind exchangekind) {
-		super(deviceType, exchangeName, exchangekind);
+		super(deviceType, vmdType, exchangeName, exchangekind);
 		this.actionName = actionName;
 	}
 

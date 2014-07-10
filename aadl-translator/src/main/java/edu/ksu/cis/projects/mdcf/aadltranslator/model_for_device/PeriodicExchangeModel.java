@@ -18,9 +18,8 @@ public class PeriodicExchangeModel extends ExchangeModel {
 	
 	public String parameterName;
 	
-	public PeriodicExchangeModel(String parameterName, String deviceType, String exchangeName,
-			ExchangeKind exchangekind) {
-		super(deviceType, exchangeName, exchangekind);
+	public PeriodicExchangeModel(String parameterName, String deviceType, String vmdType, String exchangeName) {
+		super(deviceType, vmdType, exchangeName, ExchangeKind.PERIODIC);
 		this.parameterName = parameterName;
 	}
 	
