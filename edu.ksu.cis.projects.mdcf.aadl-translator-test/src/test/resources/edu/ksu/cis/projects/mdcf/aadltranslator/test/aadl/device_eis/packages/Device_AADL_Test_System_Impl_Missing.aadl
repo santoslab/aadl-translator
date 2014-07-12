@@ -1,0 +1,10 @@
+package Device_AADL_Test_System_Impl_Missing
+public
+  with MAP_Properties;
+  with MDCF_Data_Props, MDCF_Comm_Props;
+  with MDCF_Types;
+
+system Device_AADL_Test_System_Impl_Missing
+end Device_AADL_Test_System_Impl_Missing;
+
+end Device_AADL_Test_System_Impl_Missing;

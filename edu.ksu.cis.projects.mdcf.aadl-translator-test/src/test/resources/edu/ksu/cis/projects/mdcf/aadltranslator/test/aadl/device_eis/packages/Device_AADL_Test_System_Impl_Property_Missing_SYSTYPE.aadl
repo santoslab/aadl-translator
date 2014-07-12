@@ -1,0 +1,35 @@
+package Device_AADL_Test_System_Impl_Property_Missing_SYSTYPE
+public
+  with MAP_Properties;
+  with MDCF_Data_Props, MDCF_Comm_Props;
+  with MDCF_Types;
+
+system Device_AADL_Test_System_Impl_Property_Missing_SYSTYPE
+end Device_AADL_Test_System_Impl_Property_Missing_SYSTYPE;
+
+system implementation Device_AADL_Test_System_Impl_Property_Missing_SYSTYPE.impl
+subcomponents
+  d1: device subdevice;
+
+properties
+  MDCF_Data_Props::ICE_ManufacturerModel => [
+  	MDC_ATTR_ID_MODEL => [
+  	  manufacturer => "Simple";
+  	  model_number => "Capnograph 2000";
+  	];
+  	credentials => ("cert1", "cert2");
+  ];
+end Device_AADL_Test_System_Impl_Property_Missing_SYSTYPE.impl;
+
+
+
+abstract subdevice 
+
+end subdevice;
+
+
+abstract implementation subdevice.impl  -- Implement an abstract component?
+end subdevice.impl;
+
+
+end Device_AADL_Test_System_Impl_Property_Missing_SYSTYPE;

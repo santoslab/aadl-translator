@@ -117,7 +117,12 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 					if (systemCount > 1) {
 						handleException(e, new Exception(
 								"Only one system is allowed in device AADL."));
-					} else {
+						return DONE;
+					} else if (!st.getName().equals(obj.getName())) {
+						handleException(e, new Exception(
+								"Mismatching name between the system and the package:" + st.getName() + "<->" + obj.getName()));
+						return DONE;
+					} else {					
 						System.out.println("System Type Reading:"
 								+ st.getName());
 						systemName = st.getName();
@@ -168,13 +173,19 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 			}
 
+			if(systemImpCount == 0){
+				handleException(obj, new Exception("Missing System Implementation:" + obj.getFullName()));
+				return DONE;
+			}
+			
 			// Checking the package contains the necessary VMD type definition.
 			// This is actually redundant since AADL compiler will complain if
 			// the definition is missing.
-			for (String typeName : vmdTypeNames) {
-				if (!vmdTypeDefNames.contains(typeName))
-					handleException(obj, new Exception("VMD:" + typeName
-							+ " is not provided in this package."));
+			for (String typeName :  vmdTypeNames) {
+				if (!vmdTypeDefNames.contains(typeName)){
+					handleException(obj, new Exception("Missing VMD type definition:" + obj.getFullName()));
+					return DONE;
+				}
 			}
 
 			return DONE;

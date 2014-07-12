@@ -43,6 +43,7 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
+import org.osate.xtext.aadl2.unparsing.AadlUnparser;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.DeviceTranslator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.ErrorTranslator;
@@ -57,7 +58,8 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.PortModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ProcessModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.SystemModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.TaskModelTests;
-import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEITests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIAADLSystemErrorTest;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIGeneratedArtifactsTest;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ConnectionModelHazardTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardBackgroundTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesTests;
@@ -81,7 +83,8 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesT
 		ControllerErrorTests.class, 
 		
 		// Device EI tests
-		DeviceEITests.class
+		DeviceEIGeneratedArtifactsTest.class,
+		DeviceEIAADLSystemErrorTest.class,
 		})
 public class AllTests {
 	public static HashMap<String, IFile> systemFiles = new HashMap<>();
@@ -372,12 +375,15 @@ public class AllTests {
 		for(Diagnostic diag : res.getWarnings()){
 			System.err.println("Warning:" + diag.getMessage());
 		}
-		
+
 		stats.process(target);
 		
 		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
 				.toString());
-		System.out.println(stats.getDeviceComponentModel());
+		System.err.println(errorSB.toString());
+		if(errorSB.length() == 0){
+			System.out.println(stats.getDeviceComponentModel());
+		}
 
 		return stats.getDeviceComponentModel();
 	}

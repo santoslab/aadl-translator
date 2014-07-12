@@ -1,0 +1,28 @@
+package Device_AADL_Test_Abstract_Device_Missing
+public
+  with MAP_Properties;
+  with MDCF_Data_Props, MDCF_Comm_Props;
+  with MDCF_Types;
+
+system Device_AADL_Test_Abstract_Device_Missing
+end Device_AADL_Test_Abstract_Device_Missing;
+
+system implementation Device_AADL_Test_Abstract_Device_Missing.impl
+subcomponents
+  d1: device subdevice;
+
+properties
+--   The unit's meta-data...
+  MDCF_Data_Props::IEEE11073_MDC_ATTR_SYS_TYPE => "Device_AADL_Test_System_Impl_Missing";
+  
+  MDCF_Data_Props::ICE_ManufacturerModel => [
+  	MDC_ATTR_ID_MODEL => [
+  	  manufacturer => "Tester";
+  	  model_number => "Test1000";
+  	];
+  	credentials => ("cert1", "cert2");
+  ];
+end Device_AADL_Test_Abstract_Device_Missing.impl;
+
+
+end Device_AADL_Test_Abstract_Device_Missing;

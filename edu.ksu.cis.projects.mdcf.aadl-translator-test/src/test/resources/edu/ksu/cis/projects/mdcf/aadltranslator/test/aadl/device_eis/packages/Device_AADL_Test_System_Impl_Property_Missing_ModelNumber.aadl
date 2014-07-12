@@ -1,0 +1,35 @@
+package Device_AADL_Test_System_Impl_Property_Missing_ModelNumber
+public
+  with MAP_Properties;
+  with MDCF_Data_Props, MDCF_Comm_Props;
+  with MDCF_Types;
+
+system Device_AADL_Test_System_Impl_Property_Missing_ModelNumber
+end Device_AADL_Test_System_Impl_Property_Missing_ModelNumber;
+
+system implementation Device_AADL_Test_System_Impl_Property_Missing_ModelNumber.impl
+subcomponents
+  d1: device subdevice;
+
+properties
+  MDCF_Data_Props::IEEE11073_MDC_ATTR_SYS_TYPE => "Device_AADL_Test_System_Impl_Property_Missing_ModelNumber";
+
+  MDCF_Data_Props::ICE_ManufacturerModel => [
+  	MDC_ATTR_ID_MODEL => [
+  	  manufacturer => "Tester";
+  	];
+  	credentials => ("cert1", "cert2");
+  ];
+end Device_AADL_Test_System_Impl_Property_Missing_ModelNumber.impl;
+
+
+
+abstract subdevice 
+end subdevice;
+
+
+abstract implementation subdevice.impl  -- Implement an abstract component?
+end subdevice.impl;
+
+
+end Device_AADL_Test_System_Impl_Property_Missing_ModelNumber;

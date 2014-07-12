@@ -1,0 +1,11 @@
+package Device_AADL_Test_System_File_Name_Mismatch
+public
+  with MAP_Properties;
+  with MDCF_Data_Props, MDCF_Comm_Props;
+  with MDCF_Types;
+
+system test
+end test;
+
+
+end Device_AADL_Test_System_File_Name_Mismatch;
