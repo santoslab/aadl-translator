@@ -74,10 +74,11 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesT
 		PortModelTests.class,
 		ConnectionModelTests.class,
 
-		// Hazard Model Tests
-		ConnectionModelHazardTests.class,
-		HazardPreliminariesTests.class,
-		HazardBackgroundTests.class,
+		// Hazard Model Tests -- Re-enable these if you've added the patch from 
+		// https://github.com/osate/ErrorModelV2/pull/48
+//		ConnectionModelHazardTests.class,
+//		HazardPreliminariesTests.class,
+//		HazardBackgroundTests.class,
 
 		// Error-handling tests
 		ControllerErrorTests.class, 
