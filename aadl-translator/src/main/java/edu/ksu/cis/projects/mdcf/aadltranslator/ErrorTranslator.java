@@ -46,6 +46,8 @@ public final class ErrorTranslator {
 			for(PropertyAssociation pa : EMV2Util.getOwnEMV2Subclause(sysImp).getProperties()){
 				// Setup 
 				rv = ((RecordValueImpl)pa.getOwnedValues().get(0).getOwnedValue());
+				if(!(pa.getAppliesTos().iterator().next().getContainmentPathElements().iterator().next().getNamedElement() instanceof ConnectionErrorSource))
+					continue;
 				connectionName = ((ConnectionErrorSource)pa.getAppliesTos().iterator().next().getContainmentPathElements().iterator().next().getNamedElement()).getConnection().getName();
 				connErrorName = pa.getAppliesTos().iterator().next().getContainmentPathElements().iterator().next().getNamedElement().getName();
 				OccurrenceModel om = null;

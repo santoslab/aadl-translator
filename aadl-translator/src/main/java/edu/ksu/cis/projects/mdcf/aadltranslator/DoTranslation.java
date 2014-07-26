@@ -552,7 +552,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			PublicPackageSection sect = pack.getPublicSection();
 			for (Classifier ownedClassifier : sect.getOwnedClassifiers()) {
 				if (ownedClassifier instanceof org.osate.aadl2.SystemType) {
-					return f;
+					// Can't return f directly, may have more propertysets to add
+					systemFile = f;
 				}
 			}
 		}
@@ -600,6 +601,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 	private HashSet<ErrorType> getErrorTypes(ResourceSet rs,
 			HashSet<IFile> usedFiles) {
+		HashSet<ErrorType> retSet = new HashSet<>();
 		for (IFile f : usedFiles) {
 			Resource res = rs.getResource(
 					OsateResourceUtil.getResourceURI((IResource) f), true);
@@ -617,10 +619,10 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				DefaultAnnexLibrary defaultAnnexLibrary = (DefaultAnnexLibrary) annexLibrary;
 				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary
 						.getParsedAnnexLibrary();
-				return new HashSet<ErrorType>(emImpl.getTypes());
+				retSet.addAll(emImpl.getTypes());
 			}
 		}
-		return null;
+		return retSet;
 	}
 
 	@Override
