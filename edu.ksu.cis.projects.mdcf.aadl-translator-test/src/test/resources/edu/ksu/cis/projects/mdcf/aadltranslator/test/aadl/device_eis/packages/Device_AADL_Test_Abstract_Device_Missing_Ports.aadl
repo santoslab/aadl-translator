@@ -1,19 +1,19 @@
-package Device_AADL_Test_Abstract_Device_Illegal_Port_Name
+package Device_AADL_Test_Abstract_Device_Missing_Ports
 public
   with MAP_Properties;
   with MDCF_Data_Props, MDCF_Comm_Props;
   with MDCF_Types;
 
-system Device_AADL_Test_Abstract_Device_Illegal_Port_Name
-end Device_AADL_Test_Abstract_Device_Illegal_Port_Name;
+system Device_AADL_Test_Abstract_Device_Missing_Ports
+end Device_AADL_Test_Abstract_Device_Missing_Ports;
 
-system implementation Device_AADL_Test_Abstract_Device_Illegal_Port_Name.impl
+system implementation Device_AADL_Test_Abstract_Device_Missing_Ports.impl
 subcomponents
   d1: device subdevice;
 
 properties
 --   The unit's meta-data...
-  MDCF_Data_Props::IEEE11073_MDC_ATTR_SYS_TYPE => "Device_AADL_Test_Abstract_Device_Illegal_Port_Name";
+  MDCF_Data_Props::IEEE11073_MDC_ATTR_SYS_TYPE => "Device_AADL_Test_Abstract_Device_Missing_Ports";
   
   MDCF_Data_Props::ICE_ManufacturerModel => [
   	MDC_ATTR_ID_MODEL => [
@@ -22,15 +22,19 @@ properties
   	];
   	credentials => ("cert1", "cert2");
   ];
-end Device_AADL_Test_Abstract_Device_Illegal_Port_Name.impl;
+end Device_AADL_Test_Abstract_Device_Missing_Ports.impl;
 
 abstract subdevice 
 features
-  Status_test: in event data port;
+  Status_req: in event data port{ 
+  	MDCF_Comm_Props::separation_interval_range => 200 ms .. 300 ms;          
+	MDCF_ICE_Props::data_type => "Status";
+	MDCF_ICE_Props::comm_type => requester;
+  };
 end subdevice;
 
 
 abstract implementation subdevice.impl 
 end subdevice.impl;
 
-end Device_AADL_Test_Abstract_Device_Illegal_Port_Name;
+end Device_AADL_Test_Abstract_Device_Missing_Ports;

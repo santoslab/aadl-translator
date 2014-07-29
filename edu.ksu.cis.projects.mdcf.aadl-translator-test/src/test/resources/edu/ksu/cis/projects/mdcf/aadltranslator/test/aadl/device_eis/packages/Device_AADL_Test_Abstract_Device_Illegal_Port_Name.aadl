@@ -1,19 +1,19 @@
-package Device_AADL_Test_Abstract_Device_Missing_Ports
+package Device_AADL_Test_Abstract_Device_Illegal_Port_Name
 public
   with MAP_Properties;
   with MDCF_Data_Props, MDCF_Comm_Props;
   with MDCF_Types;
 
-system Device_AADL_Test_Abstract_Device_Missing_Ports
-end Device_AADL_Test_Abstract_Device_Missing_Ports;
+system Device_AADL_Test_Abstract_Device_Illegal_Port_Name
+end Device_AADL_Test_Abstract_Device_Illegal_Port_Name;
 
-system implementation Device_AADL_Test_Abstract_Device_Missing_Ports.impl
+system implementation Device_AADL_Test_Abstract_Device_Illegal_Port_Name.impl
 subcomponents
   d1: device subdevice;
 
 properties
 --   The unit's meta-data...
-  MDCF_Data_Props::IEEE11073_MDC_ATTR_SYS_TYPE => "Device_AADL_Test_Abstract_Device_Missing_Ports";
+  MDCF_Data_Props::IEEE11073_MDC_ATTR_SYS_TYPE => "Device_AADL_Test_Abstract_Device_Illegal_Port_Name";
   
   MDCF_Data_Props::ICE_ManufacturerModel => [
   	MDC_ATTR_ID_MODEL => [
@@ -22,15 +22,15 @@ properties
   	];
   	credentials => ("cert1", "cert2");
   ];
-end Device_AADL_Test_Abstract_Device_Missing_Ports.impl;
+end Device_AADL_Test_Abstract_Device_Illegal_Port_Name.impl;
 
 abstract subdevice 
 features
-  Status_req: in event data port;
+  Status_in: in event data port;
 end subdevice;
 
 
 abstract implementation subdevice.impl  -- Implement an abstract component?
 end subdevice.impl;
 
-end Device_AADL_Test_Abstract_Device_Missing_Ports;
+end Device_AADL_Test_Abstract_Device_Illegal_Port_Name;

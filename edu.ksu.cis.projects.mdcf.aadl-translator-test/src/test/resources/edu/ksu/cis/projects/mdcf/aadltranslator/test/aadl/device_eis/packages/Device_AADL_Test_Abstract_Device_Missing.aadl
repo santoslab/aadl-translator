@@ -13,7 +13,7 @@ subcomponents
 
 properties
 --   The unit's meta-data...
-  MDCF_Data_Props::IEEE11073_MDC_ATTR_SYS_TYPE => "Device_AADL_Test_System_Impl_Missing";
+  MDCF_Data_Props::IEEE11073_MDC_ATTR_SYS_TYPE => "Device_AADL_Test_Abstract_Device_Missing";
   
   MDCF_Data_Props::ICE_ManufacturerModel => [
   	MDC_ATTR_ID_MODEL => [

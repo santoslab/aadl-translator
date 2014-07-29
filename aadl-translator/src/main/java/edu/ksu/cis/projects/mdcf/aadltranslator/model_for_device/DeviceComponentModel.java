@@ -103,4 +103,18 @@ public class DeviceComponentModel {
 		}
 		return sb.toString();
 	}
+
+	public String sanityCheckExchanges(String vmdTypeName) {
+		//Checking whether get/set/action exchanges has pairs
+		for(ExchangeModel em : this.exchangeModels.values()){
+			if(em.getVmdType().equals(vmdTypeName)){
+				if(em instanceof GetExchangeModel || em instanceof SetExchangeModel || em instanceof ActionExchangeModel){
+					if(em.inPortInfo == null || em.outPortInfo == null){
+						return "Missing Matching Port Pair:" + em.getExchangeName() + " in " + em.getVmdType();
+					}
+				}
+			}
+		}
+		return "";
+	}
 }

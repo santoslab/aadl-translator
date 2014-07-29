@@ -147,14 +147,28 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 					}
 
 					// Get the properties for the system.
+					boolean systemTypeExist = false;
+					boolean manufacturerModelExist = false;
 					for (PropertyAssociation pa : si
 							.getOwnedPropertyAssociations()) {
 						String propertyName = pa.getProperty().getFullName();
 						if (propertyName.equals("IEEE11073_MDC_ATTR_SYS_TYPE")) {
 							assignSystemType(pa.getOwnedValues().get(0));
+							systemTypeExist = true;
 						} else if (propertyName.equals("ICE_ManufacturerModel")) {
 							assignManufacturerModel(pa.getOwnedValues());
+							manufacturerModelExist = true;
 						}
+					}
+					
+					if(!systemTypeExist){
+						handleException(e, new Exception(
+								"Missing System Type Property:"+ si.getFullName()));
+						return DONE;
+					} else if(!manufacturerModelExist){
+						handleException(e, new Exception(
+								"Missing ManufacturerModel Property:"+ si.getFullName()));
+						return DONE;
 					}
 
 					// There could be more than one vmds in a device
@@ -214,7 +228,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				EList<ModalPropertyValue> ownedValues) {
 			if (ownedValues.size() != 1
 					|| !(ownedValues.get(0).getOwnedValue() instanceof RecordValue)) {
-				// exception
+				handleException(ownedValues.get(0).getOwnedValue(), new Exception(
+						"Invalid Structure Manfacturer Model Property:"+ ownedValues.get(0).getOwnedValue()));
 			} else {
 				RecordValue rvi = (RecordValue) ownedValues.get(0)
 						.getOwnedValue();
@@ -227,13 +242,40 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				StringLiteral model_number = (StringLiteral) PropertyUtils
 						.getRecordFieldValue(pe_model, "model_number");
 
+				if(model_manufacturer == null){
+					handleException(pe_model, new Exception(
+							"Missing Manufacturer Name in Manufacturer Model:"+ pe_model));
+					return;
+				} else if(model_number == null){
+					handleException(pe_model, new Exception(
+							"Missing Model Number in Manufacturer Model:"+ pe_model));
+					return;
+				}
+				
 				deviceComponentModel.setManufacturerName(model_manufacturer
 						.getValue());
 				deviceComponentModel.setModelNumber(model_number.getValue());
 
 				PropertyExpression pe_credential = PropertyUtils
 						.getRecordFieldValue(rvi, "credentials");
+				
+				if(pe_credential == null){
+					handleException(rvi,
+							new Exception("Missing Credential:"
+									+ rvi));
+					return;
+				}
+				
 				ListValue lv_credential = (ListValue) pe_credential;
+						
+				//TODO: This keeps returning empty even when there is credentials
+//				if(lv_credential.getOwnedElements().isEmpty()){
+//					handleException(lv_credential,
+//							new Exception("No Credential:"
+//									+ lv_credential));
+//					return;
+//				}
+				
 				for (PropertyExpression cred : lv_credential
 						.getOwnedListElements()) {
 					StringLiteral sl_cred = (StringLiteral) cred;
@@ -370,7 +412,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						
 						//process data type
 						String dataType = AadlUtil.getSubcomponentTypeName(object.getDataFeatureClassifier(), object);
-						if(dataType != null){
+						if(!dataType.equals("")){
 							portInfo.setPortProperty(GetExchangeModel.OutPortProperty.MSG_TYPE.name(),
 									dataType);
 						} else {
@@ -380,8 +422,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						
 						em.setOutPortInfo(portInfo);
 
-						deviceComponentModel.exchangeModels.put(exchangeName,
-								em);
+						deviceComponentModel.exchangeModels.put(exchangeName, em);
 					} else {
 						// if it is retrieve the existing exchange and add the
 						// information
@@ -394,7 +435,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							
 							//process data type
 							String dataType = AadlUtil.getSubcomponentTypeName(object.getDataFeatureClassifier(), object);
-							if(dataType != null){
+							if(!dataType.equals("")){
 								portInfo.setPortProperty(GetExchangeModel.OutPortProperty.MSG_TYPE.name(),
 										dataType);
 							} else {
@@ -450,7 +491,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						
 						//process data type
 						String dataType = AadlUtil.getSubcomponentTypeName(object.getDataFeatureClassifier(), object);
-						if(dataType != null){
+						if(!dataType.equals("")){
 							portInfo.setPortProperty(SetExchangeModel.InPortProperty.MSG_TYPE.name(),
 									dataType);
 						} else {
@@ -490,7 +531,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							
 							//process data type
 							String dataType = AadlUtil.getSubcomponentTypeName(object.getDataFeatureClassifier(), object);
-							if(dataType != null){
+							if(!dataType.equals("")){
 								portInfo.setPortProperty(SetExchangeModel.InPortProperty.MSG_TYPE.name(),
 										dataType);
 							} else {
@@ -580,7 +621,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 								PortDirection.Out, object.getFullName());
 						//process data type
 						String dataType = AadlUtil.getSubcomponentTypeName(object.getDataFeatureClassifier(), object);
-						if(dataType != null){
+						if(!dataType.equals("")){
 							portInfo.setPortProperty(GetExchangeModel.OutPortProperty.MSG_TYPE.name(),
 									dataType);
 						} else {
@@ -912,6 +953,12 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 			processEList(object.getAllFeatures());
 
+			//Check whether the exchanges are valid (e.g. matching pairs for req/res, send/recv, init/exec)
+			String checkReport = deviceComponentModel.sanityCheckExchanges(object.getFullName());
+			if(!checkReport.equals("")){
+				handleException(object, new Exception(checkReport));
+			}
+			
 			lastElemProcessed = ElementType.NONE;
 			return DONE;
 		}
@@ -922,6 +969,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 	public DeviceTranslator(final IProgressMonitor monitor) {
 		super(monitor, PROCESS_PRE_ORDER_ALL);
 		deviceComponentModel = new DeviceComponentModel();
+		log.setUseParentHandlers(false);
 	}
 
 	@Override
