@@ -1,6 +1,7 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.util.ArrayList;
+import java.util.logging.*;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,6 +46,8 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.SetExchangeMode
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.SporadicExchangeModel;
 
 public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
+	private static final Logger log = Logger.getLogger(DeviceTranslator.class.getName());
+	
 	private enum ElementType {
 		NONE, SYSTEM_IMPL, DEVICE_ABSTRACT
 	};
@@ -88,8 +91,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 		@Override
 		public String casePort(Port obj) {
-			System.err.println("casePort:" + obj.getFullName());
-
+			log.log(Level.FINE, "casePort:" + obj.getFullName());
 			if (obj.getCategory() == PortCategory.EVENT_DATA) {
 				process(obj);
 			} else if (obj.getCategory() == PortCategory.DATA) {
@@ -123,8 +125,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 								"Mismatching name between the system and the package:" + st.getName() + "<->" + obj.getName()));
 						return DONE;
 					} else {					
-						System.out.println("System Type Reading:"
-								+ st.getName());
+						log.log(Level.FINE, "System Type Reading:" + st.getName());
 						systemName = st.getName();
 						systemCount++;
 					}
@@ -140,7 +141,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 								new Exception(
 										"Only one system implementation is allowed in device AADL."));
 					} else {
-						System.out.println("System Implementation Reading:"
+						log.log(Level.FINE, "System Implementation Reading:"
 								+ si.getFullName());
 						systemImpCount++;
 					}
@@ -168,7 +169,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 					// Process it.
 					process(e);
 				} else {
-					System.err.println("getOwnedPublicSection:Ignored:" + e);
+					log.log(Level.FINE, "getOwnedPublicSection:Ignored:" + e);
 				}
 
 			}
@@ -199,13 +200,12 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						.getOwnedValue();
 				deviceComponentModel.setDeviceType(sl.getValue());
 			} else {
-				System.err
-						.println("Illegal format for IEEE11073_MDC_ATTR_SYS_TYPE");
-				handleException(modalPropertyValue,
-						new NotImplementedException(
-								"Illegal format for IEEE11073_MDC_ATTR_SYS_TYPE:"
-										+ "Expecting StringLiteralImpl but "
-										+ modalPropertyValue.getOwnedValue()));
+				Exception e = new NotImplementedException(
+						"Illegal format for IEEE11073_MDC_ATTR_SYS_TYPE:"
+								+ "Expecting StringLiteralImpl but "
+								+ modalPropertyValue.getOwnedValue());
+				log.log(Level.SEVERE, e.toString(), e);
+				handleException(modalPropertyValue,e);
 			}
 		}
 
@@ -253,7 +253,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 		@Override
 		public String caseEventDataPort(EventDataPort object) {
 			if (this.lastElemProcessed == ElementType.DEVICE_ABSTRACT) {
-				System.err.println("caseEventDataPort" + "("
+				log.log(Level.FINE, "caseEventDataPort" + "("
 						+ vmdTypeDefNames.get(vmdTypeDefNames.size() - 1) + ")"
 						+ ":" + object.getFullName() + ":"
 						+ object.getDirection());
@@ -292,8 +292,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
 							IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
 
-							System.err.println("Seperation Interval Max "  + max.getValue());
-							System.err.println("Seperation Interval Min "  + min.getValue());
+							log.log(Level.FINE, "Seperation Interval Max "  + max.getValue());
+							log.log(Level.FINE, "Seperation Interval Min "  + min.getValue());
 							
 							portInfo.setPortProperty(GetExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
 									Long.toString(max.getValue()));
@@ -330,8 +330,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
 							IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
 
-							System.err.println("Seperation Interval Max "  + max.getValue());
-							System.err.println("Seperation Interval Min "  + min.getValue());
+							log.log(Level.FINE, "Seperation Interval Max "  + max.getValue());
+							log.log(Level.FINE, "Seperation Interval Min "  + min.getValue());
 							
 							portInfo.setPortProperty(GetExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
 									Long.toString(max.getValue()));
@@ -437,8 +437,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
 							IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
 
-							System.err.println("Seperation Interval Max "  + max.getValue());
-							System.err.println("Seperation Interval Min "  + min.getValue());
+							log.log(Level.FINE, "Seperation Interval Max "  + max.getValue());
+							log.log(Level.FINE, "Seperation Interval Min "  + min.getValue());
 							
 							portInfo.setPortProperty(SetExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
 									Long.toString(max.getValue()));
@@ -477,8 +477,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 								IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
 								IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
 
-								System.err.println("Seperation Interval Max "  + max.getValue());
-								System.err.println("Seperation Interval Min "  + min.getValue());
+								log.log(Level.FINE, "Seperation Interval Max "  + max.getValue());
+								log.log(Level.FINE, "Seperation Interval Min "  + min.getValue());
 								
 								portInfo.setPortProperty(SetExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
 										Long.toString(max.getValue()));
@@ -572,11 +572,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 					ExchangeModel em = deviceComponentModel.exchangeModels
 							.get(exchangeName);
 					
-					
 					PropertyAcc separation_interval = object.getPropertyValue(GetProperties.lookupPropertyDefinition(object, "MDCF_Comm_Props", "separation_interval"));
 					PropertyAcc separation_interval_range = object.getPropertyValue(GetProperties.lookupPropertyDefinition(object, "MDCF_Comm_Props", "separation_interval_range"));
-					
-
 					
 					if (em == null) {// if not create a new one and register
 						PortInfoModel portInfo = new PortInfoModel(
@@ -610,7 +607,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							
 							IntegerLiteral il = getSeperationInterval(object);
 							if(il != null){
-								System.err.println("Seperation Interval:"  + il.getValue());
+								log.log(Level.FINE, "Seperation Interval:"  + il.getValue());
+								
 								portInfo.setPortProperty(SporadicExchangeModel.OutPortProperty.SEPARATION_INTERVAL.name(),
 										Long.toString(il.getValue()));
 							}
@@ -628,8 +626,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 								IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
 								IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
 
-								System.err.println("Seperation Interval Max:"  + max.getValue());
-								System.err.println("Seperation Interval Min:"  + min.getValue());
+								log.log(Level.FINE, "Seperation Interval Max:"  + max.getValue());
+								log.log(Level.FINE, "Seperation Interval Max:"  + min.getValue());
 								
 								portInfo.setPortProperty(PeriodicExchangeModel.OutPortProperty.MAX_SEPARATION_INTERVAL.name(),
 										Long.toString(max.getValue()));
@@ -704,8 +702,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
 							IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
 
-							System.err.println("Seperation Interval Max "  + max.getValue());
-							System.err.println("Seperation Interval Min "  + min.getValue());
+							log.log(Level.FINE, "Seperation Interval Max:"  + max.getValue());
+							log.log(Level.FINE, "Seperation Interval Max:"  + min.getValue());
 							
 							portInfo.setPortProperty(ActionExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
 									Long.toString(max.getValue()));
@@ -734,8 +732,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 								IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
 								IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
 
-								System.err.println("Seperation Interval Max "  + max.getValue());
-								System.err.println("Seperation Interval Min "  + min.getValue());
+								log.log(Level.FINE, "Seperation Interval Max:"  + max.getValue());
+								log.log(Level.FINE, "Seperation Interval Max:"  + min.getValue());
 								
 								portInfo.setPortProperty(ActionExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
 										Long.toString(max.getValue()));
@@ -807,7 +805,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				}
 					break;
 				default:
-					System.err.println("Unhandled Communication Pattern:" + commType.valueOf(commType.name()));
+					log.log(Level.SEVERE, "Unhandled Communication Pattern:" + commType.valueOf(commType.name()));
 					break;
 				}
 
@@ -907,7 +905,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 		 */
 		@Override
 		public String caseAbstractType(AbstractType object) {
-			System.err.println("AbstractTypeImpl:" + object.getFullName());
+			log.log(Level.FINE, "AbstractTypeImpl:" + object.getFullName());
 			vmdTypeDefNames.add(object.getFullName());
 
 			lastElemProcessed = ElementType.DEVICE_ABSTRACT;
@@ -924,7 +922,6 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 	public DeviceTranslator(final IProgressMonitor monitor) {
 		super(monitor, PROCESS_PRE_ORDER_ALL);
 		deviceComponentModel = new DeviceComponentModel();
-
 	}
 
 	@Override

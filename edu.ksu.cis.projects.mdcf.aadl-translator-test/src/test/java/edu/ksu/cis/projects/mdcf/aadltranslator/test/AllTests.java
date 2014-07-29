@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
@@ -88,6 +90,8 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesT
 		DeviceEIAADLSystemErrorTest.class,
 		})
 public class AllTests {
+	private static final Logger log = Logger.getLogger(AllTests.class.getName());
+
 	public static HashMap<String, IFile> systemFiles = new HashMap<>();
 	public static ResourceSet resourceSet = null;
 //	private static Translator stats;
@@ -355,8 +359,11 @@ public class AllTests {
 	
 	public static DeviceComponentModel runDeviceTransTest(final String testName,
 			final String systemName) {
+
 		IFile inputFile = systemFiles.get(systemName);
 		DeviceTranslator stats = new DeviceTranslator(new NullProgressMonitor());
+		
+		log.setUseParentHandlers(false);
 
 		parseErrManager = new ParseErrorReporterManager(
 				parseErrorReporterFactory);
@@ -369,23 +376,24 @@ public class AllTests {
 				OsateResourceUtil.getResourceURI((IResource) inputFile), true);
 		Element target = (Element) res.getContents().get(0);
 
+		
 		for(Diagnostic diag : res.getErrors()){
-			System.err.println("Error:" + diag.getMessage());
+			log.log(Level.SEVERE, "Error:" + diag.getMessage());
 		}
 		
 		for(Diagnostic diag : res.getWarnings()){
-			System.err.println("Warning:" + diag.getMessage());
+			log.log(Level.SEVERE, "Warnings:" + diag.getMessage());
 		}
 
 		stats.process(target);
 		
 		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
 				.toString());
-		System.err.println(errorSB.toString());
-		if(errorSB.length() == 0){
-			System.out.println(stats.getDeviceComponentModel());
-		}
 
+		log.log(Level.SEVERE, errorSB.toString());
+		if(errorSB.length() == 0){
+			log.log(Level.FINE, stats.getDeviceComponentModel().toString());
+		}
 		return stats.getDeviceComponentModel();
 	}
 	
