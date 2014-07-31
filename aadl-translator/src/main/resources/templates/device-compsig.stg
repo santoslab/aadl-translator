@@ -1,15 +1,74 @@
-compsig(DEVICE_TYPE, RECV_PORTS, SEND_PORTS) ::= <<
+compsig(model) ::= <<
 <mdcf.core.ctypes.ComponentSignature>
-	<type>$DEVICE_TYPE$</type>
+	<type>$model.deviceType$</type>
 	<portSignatures>
-	$RECV_PORTS; separator="\n"$
-	$SEND_PORTS; separator="\n"$
+	$getExchangeRecvPorts(model)$
+	$setExchangeRecvPorts(model)$
+	$actionExchangeRecvPorts(model)$
+	$getExchangeSendPorts(model)$
+	$setExchangeSendPorts(model)$
+	$actionExchangeSendPorts(model)$
+	$periodicExchangeSendPorts(model)$
+	$sporadicExchangeSendPorts(model)$
     </portSignatures>
   <shareable>false</shareable>
 </mdcf.core.ctypes.ComponentSignature>
 >>
 
-get_send_port(SEND_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME) ::= <<
+getExchangeRecvPorts(model) ::=<<
+	$model.getExchangeModels.values:{exchangeModel | $get_recv_port(exchangeModel.inPortInfo.portName,
+														exchangeModel.minSeparationInterval,
+														exchangeModel.maxSeparationInterval)$}$
+>>
+
+getExchangeSendPorts(model) ::=<<
+	$model.getExchangeModels.values:{exchangeModel | $get_send_port(exchangeModel.outPortInfo.portName,
+														exchangeModel.minSeparationInterval,
+														exchangeModel.maxSeparationInterval,
+														exchangeModel.sendMessageType)$}$
+>>
+
+setExchangeRecvPorts(model) ::=<<
+	$model.setExchangeModels.values:{exchangeModel | $set_recv_port(exchangeModel.inPortInfo.portName,
+														exchangeModel.minSeparationInterval,
+														exchangeModel.maxSeparationInterval,
+														exchangeModel.sendMessageType)$}$
+>>
+
+setExchangeSendPorts(model) ::=<<
+	$model.setExchangeModels.values:{exchangeModel | $set_send_port(exchangeModel.outPortInfo.portName,
+														exchangeModel.minSeparationInterval,
+														exchangeModel.maxSeparationInterval)$}$
+>>
+
+actionExchangeRecvPorts(model) ::=<<
+	$model.actionExchangeModels.values:{exchangeModel | $action_recv_port(exchangeModel.inPortInfo.portName,
+														exchangeModel.minSeparationInterval,
+														exchangeModel.maxSeparationInterval)$}$
+>>
+
+actionExchangeSendPorts(model) ::=<<
+	$model.actionExchangeModels.values:{exchangeModel | $action_send_port(exchangeModel.outPortInfo.portName,
+														exchangeModel.minSeparationInterval,
+														exchangeModel.maxSeparationInterval)$}$
+>>
+
+
+periodicExchangeSendPorts(model) ::=<<
+	$model.periodicExchangeModels.values:{exchangeModel | $send_provider_initiated_port(exchangeModel.outPortInfo.portName,
+														exchangeModel.minSeparationInterval,
+														exchangeModel.maxSeparationInterval,
+														exchangeModel.sendMessageType)$}$
+>>
+
+sporadicExchangeSendPorts(model) ::=<<
+	$model.sporadicExchangeModels.values:{exchangeModel | $send_provider_initiated_port(exchangeModel.outPortInfo.portName,
+														exchangeModel.minSeparationInterval,
+														exchangeModel.maxSeparationInterval,
+														exchangeModel.sendMessageType)$}$
+>>
+
+get_recv_port(SEND_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME) ::= <<
     <entry>
       <string>$SEND_PORT_NAME$</string>
       <mdcf.core.ctypes.PortSignature>
@@ -22,7 +81,7 @@ get_send_port(SEND_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME) ::= <<
     </entry>
  >>
  
- get_recv_port(RECEIVE_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME, RECEIVE_MESSAGE_TYPE) ::= <<
+ get_send_port(RECEIVE_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME, SEND_MESSAGE_TYPE) ::= <<
     <entry>
       <string>$RECEIVE_PORT_NAME$</string>
       <mdcf.core.ctypes.PortSignature>
@@ -30,12 +89,12 @@ get_send_port(SEND_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME) ::= <<
         <minPeriod>$MIN_SEPARATION_TIME$</minPeriod>
         <maxPeriod>$MAX_SEPARATION_TIME$</maxPeriod>
         <portDirection>SUBSCRIBE</portDirection>
-        <portType>$RECV_MESSAGE_TYPE$</portType>
+        <portType>$SEND_MESSAGE_TYPE$</portType>
       </mdcf.core.ctypes.PortSignature>
     </entry>
  >>
  
- set_send_port(SEND_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME, SEND_MESSAGE_TYPE) ::= <<
+ set_recv_port(SEND_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME, RECV_MESSAGE_TYPE) ::= <<
     <entry>
       <string>$SEND_PORT_NAME$</string>
       <mdcf.core.ctypes.PortSignature>
@@ -43,12 +102,12 @@ get_send_port(SEND_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME) ::= <<
         <minPeriod>$MIN_SEPARATION_TIME$</minPeriod>
         <maxPeriod>$MAX_SEPARATION_TIME$</maxPeriod>
         <portDirection>PUBLISH</portDirection>
-        <portType>$SEND_MESSAGE_TYPE$</portType>
+        <portType>$RECV_MESSAGE_TYPE$</portType>
       </mdcf.core.ctypes.PortSignature>
     </entry>
  >>
  
- set_recv_port(RECEIVE_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME) ::= <<
+ set_send_port(RECEIVE_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME) ::= <<
     <entry>
       <string>$RECEIVE_PORT_NAME$</string>
       <mdcf.core.ctypes.PortSignature>
@@ -87,7 +146,7 @@ get_send_port(SEND_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME) ::= <<
     </entry>
  >>
  
- send_provider_initiated_port(SEND_PORT_NAME, SEND_MESSAGE_TYPE) ::= <<
+ send_provider_initiated_port(SEND_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME, SEND_MESSAGE_TYPE) ::= <<
     <entry>
       <string>$SEND_PORT_NAME$</string>
       <mdcf.core.ctypes.PortSignature>

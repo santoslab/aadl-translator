@@ -20,11 +20,11 @@ public class DeviceComponentModel {
 	
 	public HashMap<String, ExchangeModel> exchangeModels;
 
-//	public HashMap<String, GetExchangeModel> getExchangeModels;
-//	public HashMap<String, SetExchangeModel> setExchangeModels;
-//	public HashMap<String, ActionExchangeModel> actionExchangeModels;
-//	public HashMap<String, PeriodicExchangeModel> periodicExchangeModels;
-//	public HashMap<String, SporadicExchangeModel> sporadicExchangeModels;
+	public Map<String, GetExchangeModel> getExchangeModels;
+	public Map<String, SetExchangeModel> setExchangeModels;
+	public Map<String, ActionExchangeModel> actionExchangeModels;
+	public Map<String, PeriodicExchangeModel> periodicExchangeModels;
+	public Map<String, SporadicExchangeModel> sporadicExchangeModels;
 	
 	public ArrayList<String> receivePortNames;
 	public ArrayList<String> sendPortNames;
@@ -34,11 +34,15 @@ public class DeviceComponentModel {
 		this.name = deviceName;
 		this.deviceType = deviceType;
 		this.exchangeModels = new HashMap<String, ExchangeModel>();
+		this.receivePortNames = new ArrayList<String>();
+		this.sendPortNames = new ArrayList<String>();
 	}
 	
 	public DeviceComponentModel() {
 		super();
 		this.exchangeModels = new HashMap<String, ExchangeModel>();
+		this.receivePortNames = new ArrayList<String>();
+		this.sendPortNames = new ArrayList<String>();
 	}
 
 	public String getName() {
@@ -86,6 +90,31 @@ public class DeviceComponentModel {
 		if(this.credentials == null)
 			this.credentials = new ArrayList<String>();
 		this.credentials.add(credential);
+	}
+	
+	public void distributeExchanges(){
+		getExchangeModels = (Map<String, GetExchangeModel>) Maps.transformValues(
+				(Map<String, ExchangeModel>) Maps.filterValues(exchangeModels, ModelUtil.getExchangeFilter), 
+				ModelUtil.transformToGetExchangeModel);
+		setExchangeModels = (Map<String, SetExchangeModel>) Maps.transformValues(
+				(Map<String, ExchangeModel>) Maps.filterValues(exchangeModels, ModelUtil.setExchangeFilter), 
+				ModelUtil.transformToSetExchangeModel);
+		actionExchangeModels = (Map<String, ActionExchangeModel>) Maps.transformValues(
+				(Map<String, ExchangeModel>) Maps.filterValues(exchangeModels, ModelUtil.actionExchangeFilter), 
+				ModelUtil.transformToActionExchangeModel);
+		periodicExchangeModels = (Map<String, PeriodicExchangeModel>) Maps.transformValues(
+				(Map<String, ExchangeModel>) Maps.filterValues(exchangeModels, ModelUtil.periodicExchangeFilter), 
+				ModelUtil.transformToPeriodicExchangeModel);
+		sporadicExchangeModels = (Map<String, SporadicExchangeModel>) Maps.transformValues(
+				(Map<String, ExchangeModel>) Maps.filterValues(exchangeModels, ModelUtil.sporadicExchangeFilter), 
+				ModelUtil.transformToSporadicExchangeModel);
+		
+		for(ExchangeModel em : getExchangeModels.values()){
+			if(em.inPortInfo != null)
+				this.receivePortNames.add(em.getExchangeName());
+			if(em.outPortInfo != null)
+				this.sendPortNames.add(em.getExchangeName());
+		}
 	}
 	
 	public String toString(){

@@ -40,6 +40,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.ExchangeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.GetExchangeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.ExchangeModel.ExchangeKind;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.PeriodicExchangeModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.PortDataTypeMap;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.PortInfoModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.PortInfoModel.PortDirection;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.SetExchangeModel;
@@ -54,7 +55,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 	private enum CommPatternType {
 		REQUEST("_req", 1), RESPONSE("_res", 2), SEND("_sen", 3), RECEIVE(
-				"_rcv", 4), PUBLISH("_pub", 5), INITIATOR("_ini", 6), EXECUTOR("exe", 7);
+				"_rcv", 4), PUBLISH("_pub", 5), INITIATOR("_ini", 6), EXECUTOR("_exe", 7);
 
 		private final String suffix;
 		private final int id;
@@ -203,6 +204,9 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				}
 			}
 
+			//Distribute exchanges
+			deviceComponentModel.distributeExchanges();
+
 			return DONE;
 		}
 
@@ -282,7 +286,6 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 					deviceComponentModel.addCredential(sl_cred.getValue());
 				}
 			}
-
 		}
 
 		/*
@@ -337,10 +340,9 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							log.log(Level.FINE, "Seperation Interval Max "  + max.getValue());
 							log.log(Level.FINE, "Seperation Interval Min "  + min.getValue());
 							
-							portInfo.setPortProperty(GetExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
-									Long.toString(max.getValue()));
-							portInfo.setPortProperty(GetExchangeModel.InPortProperty.MIN_SEPARATION_INTERVAL.name(), 
-									Long.toString(min.getValue()));
+							portInfo.setMaxSeparationInterval((int) max.getValue());
+							portInfo.setMinSeparationInterval((int) min.getValue());
+							
 						} else {
 							//TODO: if it is mandatory, process error
 						}
@@ -375,10 +377,9 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							log.log(Level.FINE, "Seperation Interval Max "  + max.getValue());
 							log.log(Level.FINE, "Seperation Interval Min "  + min.getValue());
 							
-							portInfo.setPortProperty(GetExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
-									Long.toString(max.getValue()));
-							portInfo.setPortProperty(GetExchangeModel.InPortProperty.MIN_SEPARATION_INTERVAL.name(), 
-									Long.toString(min.getValue()));
+							portInfo.setMaxSeparationInterval((int) max.getValue());
+							portInfo.setMinSeparationInterval((int) min.getValue());
+
 						} else {
 							//TODO: if it is mandatory, process error
 						}
@@ -413,8 +414,14 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						//process data type
 						String dataType = AadlUtil.getSubcomponentTypeName(object.getDataFeatureClassifier(), object);
 						if(!dataType.equals("")){
-							portInfo.setPortProperty(GetExchangeModel.OutPortProperty.MSG_TYPE.name(),
-									dataType);
+							String javaType = PortDataTypeMap.getJavaTypeString(dataType);
+							if(javaType == null) 
+							{
+								handleException(object, new Exception("Unknown Port Data Type:No Java Type Known:" + object.getFullName()));
+								return DONE;
+							} else {
+								portInfo.setMessageType(javaType);
+							}				
 						} else {
 							handleException(object, new Exception("Missing Data Type for the Port:" + object.getFullName()));
 							return DONE;
@@ -436,8 +443,14 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							//process data type
 							String dataType = AadlUtil.getSubcomponentTypeName(object.getDataFeatureClassifier(), object);
 							if(!dataType.equals("")){
-								portInfo.setPortProperty(GetExchangeModel.OutPortProperty.MSG_TYPE.name(),
-										dataType);
+								String javaType = PortDataTypeMap.getJavaTypeString(dataType);
+								if(javaType == null) 
+								{
+									handleException(object, new Exception("Unknown Port Data Type:No Java Type Known:" + object.getFullName()));
+									return DONE;
+								} else {
+									portInfo.setMessageType(javaType);
+								}
 							} else {
 								handleException(object, new Exception("Missing Data Type for the Port:" + object.getFullName()));
 								return DONE;
@@ -481,10 +494,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							log.log(Level.FINE, "Seperation Interval Max "  + max.getValue());
 							log.log(Level.FINE, "Seperation Interval Min "  + min.getValue());
 							
-							portInfo.setPortProperty(SetExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
-									Long.toString(max.getValue()));
-							portInfo.setPortProperty(SetExchangeModel.InPortProperty.MIN_SEPARATION_INTERVAL.name(), 
-									Long.toString(min.getValue()));
+							portInfo.setMaxSeparationInterval((int) max.getValue());
+							portInfo.setMinSeparationInterval((int) min.getValue());
 						} else {
 							//TODO: if it is mandatory, process error
 						}
@@ -492,8 +503,14 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						//process data type
 						String dataType = AadlUtil.getSubcomponentTypeName(object.getDataFeatureClassifier(), object);
 						if(!dataType.equals("")){
-							portInfo.setPortProperty(SetExchangeModel.InPortProperty.MSG_TYPE.name(),
-									dataType);
+							String javaType = PortDataTypeMap.getJavaTypeString(dataType);
+							if(javaType == null) 
+							{
+								handleException(object, new Exception("Unknown Port Data Type:No Java Type Known:" + object.getFullName()));
+								return DONE;
+							} else {
+								portInfo.setMessageType(javaType);
+							}
 						} else {
 							handleException(object, new Exception("Missing Data Type for the Port:" + object.getFullName()));
 							return DONE;
@@ -521,10 +538,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 								log.log(Level.FINE, "Seperation Interval Max "  + max.getValue());
 								log.log(Level.FINE, "Seperation Interval Min "  + min.getValue());
 								
-								portInfo.setPortProperty(SetExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
-										Long.toString(max.getValue()));
-								portInfo.setPortProperty(SetExchangeModel.InPortProperty.MIN_SEPARATION_INTERVAL.name(), 
-										Long.toString(min.getValue()));
+								portInfo.setMaxSeparationInterval((int) max.getValue());
+								portInfo.setMinSeparationInterval((int) min.getValue());
 							} else {
 								//TODO: if it is mandatory, process error
 							}
@@ -532,8 +547,14 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							//process data type
 							String dataType = AadlUtil.getSubcomponentTypeName(object.getDataFeatureClassifier(), object);
 							if(!dataType.equals("")){
-								portInfo.setPortProperty(SetExchangeModel.InPortProperty.MSG_TYPE.name(),
-										dataType);
+								String javaType = PortDataTypeMap.getJavaTypeString(dataType);
+								if(javaType == null) 
+								{
+									handleException(object, new Exception("Unknown Port Data Type:No Java Type Known:" + object.getFullName()));
+									return DONE;
+								} else {
+									portInfo.setMessageType(javaType);
+								}
 							} else {
 								handleException(object, new Exception("Missing Data Type for the Port:" + object.getFullName()));
 								return DONE;
@@ -622,8 +643,14 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						//process data type
 						String dataType = AadlUtil.getSubcomponentTypeName(object.getDataFeatureClassifier(), object);
 						if(!dataType.equals("")){
-							portInfo.setPortProperty(GetExchangeModel.OutPortProperty.MSG_TYPE.name(),
-									dataType);
+							String javaType = PortDataTypeMap.getJavaTypeString(dataType);
+							if(javaType == null) 
+							{
+								handleException(object, new Exception("Unknown Port Data Type:No Java Type Known:" + object.getFullName()));
+								return DONE;
+							} else {
+								portInfo.setMessageType(javaType);
+							}
 						} else {
 							handleException(object, new Exception("Missing Data Type for the Port:" + object.getFullName()));
 							return DONE;
@@ -650,8 +677,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							if(il != null){
 								log.log(Level.FINE, "Seperation Interval:"  + il.getValue());
 								
-								portInfo.setPortProperty(SporadicExchangeModel.OutPortProperty.SEPARATION_INTERVAL.name(),
-										Long.toString(il.getValue()));
+								portInfo.setSeparationInterval((int)il.getValue());
 							}
 							
 						} else {//Periodic Exchange
@@ -670,10 +696,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 								log.log(Level.FINE, "Seperation Interval Max:"  + max.getValue());
 								log.log(Level.FINE, "Seperation Interval Max:"  + min.getValue());
 								
-								portInfo.setPortProperty(PeriodicExchangeModel.OutPortProperty.MAX_SEPARATION_INTERVAL.name(),
-										Long.toString(max.getValue()));
-								portInfo.setPortProperty(PeriodicExchangeModel.OutPortProperty.MIN_SEPARATION_INTERVAL.name(), 
-										Long.toString(min.getValue()));
+								portInfo.setMaxSeparationInterval((int) max.getValue());
+								portInfo.setMinSeparationInterval((int) min.getValue());
 							} else {
 								//TODO: if it is mandatory, process error
 							}
@@ -728,7 +752,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 					ExchangeModel em = deviceComponentModel.exchangeModels
 							.get(exchangeName);
 					if (em == null) {// if not create a new one and register
-						em = new ActionExchangeModel(extractParameterName(object),// Name of the parameter
+						em = new ActionExchangeModel(extractActionName(object.getFullName(),CommPatternType.EXECUTOR.suffix),// Name of the parameter
 								systemName, // System Name
 								vmdTypeNames.get(vmdTypeNames.size() - 1), // VMD Name of the exchange
 								extractExchangeName(object.getFullName(),
@@ -746,10 +770,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							log.log(Level.FINE, "Seperation Interval Max:"  + max.getValue());
 							log.log(Level.FINE, "Seperation Interval Max:"  + min.getValue());
 							
-							portInfo.setPortProperty(ActionExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
-									Long.toString(max.getValue()));
-							portInfo.setPortProperty(ActionExchangeModel.InPortProperty.MIN_SEPARATION_INTERVAL.name(), 
-									Long.toString(min.getValue()));
+							portInfo.setMaxSeparationInterval((int) max.getValue());
+							portInfo.setMinSeparationInterval((int) min.getValue());
 						} else {
 							//TODO: if it is mandatory, process error
 						}
@@ -776,10 +798,8 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 								log.log(Level.FINE, "Seperation Interval Max:"  + max.getValue());
 								log.log(Level.FINE, "Seperation Interval Max:"  + min.getValue());
 								
-								portInfo.setPortProperty(ActionExchangeModel.InPortProperty.MAX_SEPARATION_INTERVAL.name(),
-										Long.toString(max.getValue()));
-								portInfo.setPortProperty(ActionExchangeModel.InPortProperty.MIN_SEPARATION_INTERVAL.name(), 
-										Long.toString(min.getValue()));
+								portInfo.setMaxSeparationInterval((int) max.getValue());
+								portInfo.setMinSeparationInterval((int) min.getValue());
 							} else {
 								//TODO: if it is mandatory, process error
 							}
@@ -807,7 +827,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 					ExchangeModel em = deviceComponentModel.exchangeModels
 							.get(exchangeName);
 					if (em == null) {// if not create a new one and register
-						em = new ActionExchangeModel(extractParameterName(object),// Name of the parameter
+						em = new ActionExchangeModel(extractActionName(object.getFullName(),CommPatternType.EXECUTOR.suffix),// Name of the parameter
 								systemName, // System Name
 								vmdTypeNames.get(vmdTypeNames.size() - 1), // VMD Name of the exchange
 								extractExchangeName(object.getFullName(),
@@ -901,6 +921,12 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				return null;
 			
 		}
+		
+		private String extractActionName(String fullPortName, String suffix){
+			return fullPortName.substring(0,
+					fullPortName.length() - suffix.length());
+		}
+		
 
 		private String extractExchangeName(String fullPortName, String suffix) {
 			String exchange_suffix = "";

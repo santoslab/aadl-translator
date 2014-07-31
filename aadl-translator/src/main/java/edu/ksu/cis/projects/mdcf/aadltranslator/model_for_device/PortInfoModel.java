@@ -6,13 +6,17 @@ public class PortInfoModel {
 	
 	private PortDirection inOut;
 	private String portName;
-	private PortProperty portProperty;
+	
+	private String messageType;
+	private String messageTypeDefault;
+	private int minSeparationInterval;
+	private int maxSeparationInterval;
+	private int separationInterval;
 	
 	public PortInfoModel(PortDirection inOut, String portName) {
 		super();
 		this.inOut = inOut;
 		this.portName = portName;
-		this.portProperty = new PortProperty();
 	}
 	
 	public PortDirection getInOut() {
@@ -27,14 +31,72 @@ public class PortInfoModel {
 	public void setPortName(String portName) {
 		this.portName = portName;
 	}
-	public String getPortProperty(String propertyName) {
-		return this.portProperty.getProperty(propertyName);
+
+	/**
+	 * @return the messageType
+	 */
+	public String getMessageType() {
+		return messageType;
 	}
-	public void setPortProperty(String propertyName, String propertyValue) {
-		this.portProperty.setProperty(propertyName, propertyValue);
+
+	/**
+	 * @param messageType the messageType to set
+	 */
+	public void setMessageType(String messageType) {
+		this.messageType = messageType;
+		this.messageTypeDefault = PortDataTypeMap.getJavaTypeDefaultValueString(messageType);
 	}
-	
-	public String printPortProperties(){
-		return this.portProperty.toString();
+
+	/**
+	 * @return the messageTypeDefault
+	 */
+	public String getMessageTypeDefault() {
+		return messageTypeDefault;
+	}
+
+	/**
+	 * @return the minSeparationInterval
+	 */
+	public int getMinSeparationInterval() {
+		return minSeparationInterval;
+	}
+
+	/**
+	 * @param minSeparationInterval the minSeparationInterval to set
+	 */
+	public void setMinSeparationInterval(int minSeparationInterval) {
+		this.minSeparationInterval = minSeparationInterval;
+	}
+
+	/**
+	 * @return the maxSeparationInterval
+	 */
+	public int getMaxSeparationInterval() {
+		return maxSeparationInterval;
+	}
+
+	/**
+	 * @param maxSeparationInterval the maxSeparationInterval to set
+	 */
+	public void setMaxSeparationInterval(int maxSeparationInterval) {
+		this.maxSeparationInterval = maxSeparationInterval;
+	}
+
+	/**
+	 * @return the separationInterval
+	 */
+	public int getSeparationInterval() {
+		return separationInterval;
+	}
+
+	/**
+	 * @param separationInterval the separationInterval to set
+	 */
+	public void setSeparationInterval(int separationInterval) {
+		this.separationInterval = separationInterval;
+	}
+
+	public String printPortProperties() {
+		return "";
 	}
 }

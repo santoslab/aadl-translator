@@ -1,22 +1,7 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device;
 
 public class PeriodicExchangeModel extends ExchangeModel {
-	public enum OutPortProperty{
-		MSG_TYPE("SEND_MESSAGE_TYPE"),
-		MIN_SEPARATION_INTERVAL("MIN_SEPARATION_TIME"),
-		MAX_SEPARATION_INTERVAL("MAX_SEPARATION_TIME");
-		
-		private final String propName;
-		
-		private OutPortProperty(final String propName){
-			this.propName = propName;
-		}
-		
-		public String toString(){
-			return this.propName;
-		}
-	};
-	
+
 	public String parameterName;
 	
 	public PeriodicExchangeModel(String parameterName, String deviceType, String vmdType, String exchangeName) {
@@ -37,6 +22,6 @@ public class PeriodicExchangeModel extends ExchangeModel {
 	}
 	
 	public String getSendMessageType(){
-		return this.outPortInfo.getPortProperty(OutPortProperty.MSG_TYPE.toString());
+		return this.outPortInfo.getMessageType();
 	}
 }

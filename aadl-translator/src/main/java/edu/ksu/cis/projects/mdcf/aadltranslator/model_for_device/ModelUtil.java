@@ -4,30 +4,22 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 
 public class ModelUtil {
 	
-	private final static Map<String, String> Default_Value_Dictionary = 
-			Collections.unmodifiableMap(new HashMap<String, String>(){/**
-				 * 
-				 */
-				private static final long serialVersionUID = 1L;
 
-			{
-				put("int", "0");
-				put("float", "0.0");
-				put("SpO2", "0");
-				put("PulseRate", "0");
-			}});
-	
-	public static String getDefaultValueString(String type){
-		return Default_Value_Dictionary.get(type);
-	}
 	
 	public final static Predicate<ExchangeModel> getExchangeFilter = new Predicate<ExchangeModel>() {
 		public boolean apply(ExchangeModel em) {
 			return (em instanceof GetExchangeModel);
+		}
+	};
+	
+	public final static Function<ExchangeModel, GetExchangeModel> transformToGetExchangeModel = new Function<ExchangeModel, GetExchangeModel>(){
+		public GetExchangeModel apply(ExchangeModel em){
+			return ((GetExchangeModel) em);
 		}
 	};
 	
@@ -37,9 +29,21 @@ public class ModelUtil {
 		}
 	};
 	
+	public final static Function<ExchangeModel, SetExchangeModel> transformToSetExchangeModel = new Function<ExchangeModel, SetExchangeModel>(){
+		public SetExchangeModel apply(ExchangeModel em){
+			return ((SetExchangeModel) em);
+		}
+	};
+	
 	public final static Predicate<ExchangeModel> actionExchangeFilter = new Predicate<ExchangeModel>() {
 		public boolean apply(ExchangeModel em) {
 			return (em instanceof ActionExchangeModel);
+		}
+	};
+	
+	public final static Function<ExchangeModel, ActionExchangeModel> transformToActionExchangeModel = new Function<ExchangeModel, ActionExchangeModel>(){
+		public ActionExchangeModel apply(ExchangeModel em){
+			return ((ActionExchangeModel) em);
 		}
 	};
 	
@@ -49,9 +53,21 @@ public class ModelUtil {
 		}
 	};
 	
+	public final static Function<ExchangeModel, PeriodicExchangeModel> transformToPeriodicExchangeModel = new Function<ExchangeModel, PeriodicExchangeModel>(){
+		public PeriodicExchangeModel apply(ExchangeModel em){
+			return ((PeriodicExchangeModel) em);
+		}
+	};
+	
 	public final static Predicate<ExchangeModel> sporadicExchangeFilter = new Predicate<ExchangeModel>() {
 		public boolean apply(ExchangeModel em) {
 			return (em instanceof SporadicExchangeModel);
+		}
+	};
+	
+	public final static Function<ExchangeModel, SporadicExchangeModel> transformToSporadicExchangeModel = new Function<ExchangeModel, SporadicExchangeModel>(){
+		public SporadicExchangeModel apply(ExchangeModel em){
+			return ((SporadicExchangeModel) em);
 		}
 	};
 }

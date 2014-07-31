@@ -229,7 +229,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		// Get user preferences
 		String appDevDirectory = service.getString(
 				"edu.ksu.cis.projects.mdcf.aadl-translator",
-				PreferenceConstants.P_APPDEVPATH, null, null);
+				PreferenceConstants.P_DEVDEVPATH, null, null);
 
 		DeviceComponentModel dcm = null;
 
@@ -251,129 +251,21 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		java_device_supertypeSTG.delimiterStartChar = '<';
 		java_device_supertypeSTG.delimiterStopChar = '>';
 		return java_device_supertypeSTG.getInstanceOf("class")
-				.add("class", dcm).render();
+				.add("model", dcm).render();
 	}
 
 	private String buildDeviceUserImpleAPI(DeviceComponentModel dcm) {
-		java_device_userimplSTG.delimiterStartChar = '<';
-		java_device_userimplSTG.delimiterStopChar = '>';
+		java_device_userimplSTG.delimiterStartChar = '$';
+		java_device_userimplSTG.delimiterStopChar = '$';
 		return java_device_userimplSTG.getInstanceOf("userimpl")
 				.add("model", dcm).render();
 	}
 
 	private String buildDeviceCompSig(DeviceComponentModel dcm) {
-
-		ArrayList<String> receivePorts = new ArrayList<String>();
-		ArrayList<String> sendPorts = new ArrayList<String>();
 		device_compsigSTG.delimiterStartChar = '$';
 		device_compsigSTG.delimiterStopChar = '$';
-		for (ExchangeModel em : dcm.exchangeModels.values()) {
-
-			if (em instanceof GetExchangeModel) {
-				GetExchangeModel gem = (GetExchangeModel) em;
-
-				receivePorts.add(device_compsigSTG
-						.getInstanceOf("get_recv_port")
-						.add("RECEIVE_PORT_NAME",
-								gem.getInPortInfo().getPortName())
-						.add("MIN_SEPARATION_TIME",
-								gem.getMinSeparationInterval())
-						.add("MAX_SEPARATION_TIME",
-								gem.getMaxSeparationInterval())
-						.add("RECV_MESSAGE_TYPE",
-								gem.getInPortInfo().getPortProperty(
-										"RECV_MESSAGE_TYPE")).render());
-
-				sendPorts.add(device_compsigSTG
-						.getInstanceOf("get_send_port")
-						.add("SEND_PORT_NAME",
-								gem.getOutPortInfo().getPortName())
-						.add("MIN_SEPARATION_TIME",
-								gem.getOutPortInfo().getPortProperty(
-										"MIN_SEPARATION_TIME"))
-						.add("MAX_SEPARATION_TIME",
-								gem.getOutPortInfo().getPortProperty(
-										"MAX_SEPARATION_TIME")).render());
-
-			} else if (em instanceof SetExchangeModel) {
-				SetExchangeModel sem = (SetExchangeModel) em;
-
-				receivePorts.add(device_compsigSTG
-						.getInstanceOf("set_recv_port")
-						.add("RECEIVE_PORT_NAME",
-								sem.getInPortInfo().getPortName())
-						.add("MIN_SEPARATION_TIME",
-								sem.getInPortInfo().getPortProperty(
-										"MIN_SEPARATION_TIME"))
-						.add("MAX_SEPARATION_TIME",
-								sem.getInPortInfo().getPortProperty(
-										"MAX_SEPARATION_TIME")).render());
-
-				sendPorts.add(device_compsigSTG
-						.getInstanceOf("set_send_port")
-						.add("SEND_PORT_NAME",
-								sem.getOutPortInfo().getPortName())
-						.add("MIN_SEPARATION_TIME",
-								sem.getOutPortInfo().getPortProperty(
-										"MIN_SEPARATION_TIME"))
-						.add("MAX_SEPARATION_TIME",
-								sem.getOutPortInfo().getPortProperty(
-										"MAX_SEPARATION_TIME"))
-						.add("SEND_MESSAGE_TYPE",
-								sem.getOutPortInfo().getPortProperty(
-										"SEND_MESSAGE_TYPE")).render());
-
-			} else if (em instanceof ActionExchangeModel) {
-				ActionExchangeModel aem = (ActionExchangeModel) em;
-
-				receivePorts.add(device_compsigSTG
-						.getInstanceOf("action_recv_port")
-						.add("RECEIVE_PORT_NAME",
-								aem.getInPortInfo().getPortName())
-						.add("MIN_SEPARATION_TIME",
-								aem.getInPortInfo().getPortProperty(
-										"MIN_SEPARATION_TIME"))
-						.add("MAX_SEPARATION_TIME",
-								aem.getInPortInfo().getPortProperty(
-										"MAX_SEPARATION_TIME")).render());
-
-				sendPorts.add(device_compsigSTG
-						.getInstanceOf("action_send_port")
-						.add("SEND_PORT_NAME",
-								aem.getOutPortInfo().getPortName())
-						.add("MIN_SEPARATION_TIME",
-								aem.getOutPortInfo().getPortProperty(
-										"MIN_SEPARATION_TIME"))
-						.add("MAX_SEPARATION_TIME",
-								aem.getOutPortInfo().getPortProperty(
-										"MAX_SEPARATION_TIME")).render());
-			} else if (em instanceof PeriodicExchangeModel) {
-				PeriodicExchangeModel pem = (PeriodicExchangeModel) em;
-
-				sendPorts.add(device_compsigSTG
-						.getInstanceOf("send_provider_initiated_port")
-						.add("SEND_PORT_NAME",
-								pem.getOutPortInfo().getPortName())
-						.add("SEND_MESSAGE_TYPE",
-								pem.getOutPortInfo().getPortProperty(
-										"SEND_MESSAGE_TYPE")).render());
-			} else if (em instanceof SporadicExchangeModel) {
-				SporadicExchangeModel sem = (SporadicExchangeModel) em;
-
-				sendPorts.add(device_compsigSTG
-						.getInstanceOf("send_provider_initiated_port")
-						.add("SEND_PORT_NAME",
-								sem.getOutPortInfo().getPortName())
-						.add("SEND_MESSAGE_TYPE",
-								sem.getOutPortInfo().getPortProperty(
-										"SEND_MESSAGE_TYPE")).render());
-			}
-
-		}
-
-		return device_compsigSTG.getInstanceOf("compsig")
-				.add("RECV_PORTS", receivePorts).add("SEND_PORTS", sendPorts)
-				.add("DEVICE_TYPE", dcm.getDeviceType()).render();
+		
+		return device_compsigSTG.getInstanceOf("compsig").add("model",  dcm).render();
 	}
 
 	private void wrapUpProgressMonitor(IProgressMonitor monitor) {

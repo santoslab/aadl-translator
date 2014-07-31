@@ -1,22 +1,24 @@
 userimpl(model) ::=<<
-package mdcf.device.<model.name>;
+package mdcf.device.$model.name$;
 
-public class <model.name> extends <model.name>SuperType {
+import mdcf.device.common.messages.Confirmation.Status;
+
+public class $model.name$ extends $model.name$SuperType {
 
 	// FIXME: this should be defined elsewhere.
 	private final static String authenticationParameter = "SSL";
 	
-	protected <model.name>(){
+	protected $model.name$(){
 		this(false);
 	}
 
-	protected <model.name>(boolean useCommunicationSecurityFeature) {
+	protected $model.name$(boolean useCommunicationSecurityFeature) {
 		super(useCommunicationSecurityFeature ? generateUUID(
 				authenticationParameter, "") : generateUUID(
 						null,
-						<model.name>SuperType.IEEE11073_MDC_ATTR_SYS_TYPE
+						$model.name$SuperType.IEEE11073_MDC_ATTR_SYS_TYPE
 						+ System.currentTimeMillis()),
-						<model.name>SuperType.IEEE11073_MDC_ATTR_SYS_TYPE,
+						$model.name$SuperType.IEEE11073_MDC_ATTR_SYS_TYPE,
 						useCommunicationSecurityFeature);
 		this.setSecurityParams(useCommunicationSecurityFeature ? authenticationParameter
 				: null);
@@ -38,47 +40,54 @@ public class <model.name> extends <model.name>SuperType {
 	}
 	
 	//Collection of Get Exchange APIs
-	<getAPIs(model)>
+	$getAPIs(model)$
 	
 	//Collection of Set Exchange APIs
-	<setAPIs(model)>
+	$setAPIs(model)$
 	
 	//Collection of Action Exchange APIs
-	<actionAPIs(model)>
-	
+	$actionAPIs(model)$
+}
 >>
 
 getAPIs(model) ::=<<
-<model.getExchangeModels.values:{exchangeModel | <getAPI(exchangeModel.SendMessageType, exchangeModel.ParamterName, exchangeModel.MessageTypeDefault)>}
+	$model.getExchangeModels.values:{exchangeModel | $getAPI(
+															exchangeModel.sendMessageType, 
+															exchangeModel.parameterName, 
+															exchangeModel.exchangeName,
+															exchangeModel.messageTypeDefault)$}$
 >>
 
 setAPIs(model) ::=<<
-<model.setExchangeModels.values:{exchangeModel | <setAPI(exchangeModel.SendMessageType, exchangeModel.ParamterName)>}
+$model.setExchangeModels.values:{exchangeModel | $setAPI(
+													exchangeModel.sendMessageType, 
+													exchangeModel.parameterName, 
+													exchangeModel.exchangeName)$}$
 >>
 
 actionAPIs(model) ::=<<
-<model.actionExchangeModels.values:{exchangeModel | <actionAPI(exchangeModel.actionName)>}
+$model.actionExchangeModels.values:{exchangeModel | $actionAPI(exchangeModel.actionName)$}$
 >>
 
-getAPI(Type, ParameterName, TypeDefault) ::=<<
+getAPI(Type, ParameterName, ExchangeName, TypeDefault) ::=<<
 	@Override
-	protected <Type> get<ParameterName>() {
+	protected $Type$ get$ParameterName$_$ExchangeName$() {
 		// TODO Auto-generated method stub
-		return <TypeDefault>;
+		return $TypeDefault$;
 	}
 >>	
 
-setAPI(Type, ParameterName) ::=<<
+setAPI(Type, ParameterName, ExchangeName) ::=<<
 	@Override
-	protected void set<ParameterName>(<Type> value) {
+	protected Status set$ParameterName$_$ExchangeName$($Type$ value) {
 		// TODO Auto-generated method stub
-		return;
+		return Status.OK;
 	}
 >>
 
 actionAPI(ActionName) ::=<<	
 	@Override
-	protected boolean action<ActionName>() {
+	protected boolean action$ActionName$() {
 		// TODO Auto-generated method stub
 		return false;
 	}
