@@ -97,8 +97,8 @@
 		<profile>
 			<id>copyToSite</id>
 			<properties>
-		<file.toDir>/research/plgroup/web/santoslab.org/pub/mdcf-architect/updatesite/</file.toDir>
-				<file.from>${project.build.directory}/site/</file.from>
+		<file.toDir>/research/plgroup/web/santoslab.org/pub/mdcf-architect/</file.toDir>
+				<file.from>${basedir}/src/site/sphinx/_build/html</file.from>
 			</properties>
 			<build>
 				<plugins>
