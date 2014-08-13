@@ -1,7 +1,6 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -49,18 +48,11 @@ import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
-import org.stringtemplate.v4.gui.STViz;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.preference.PreferenceConstants;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.ActionExchangeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.ExchangeModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.GetExchangeModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.PeriodicExchangeModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.SetExchangeModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.SporadicExchangeModel;
 
 public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
