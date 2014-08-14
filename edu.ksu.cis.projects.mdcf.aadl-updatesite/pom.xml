@@ -58,34 +58,5 @@
 				</plugins>
 			</build>
 		</profile>
-		<profile>
-			<id>copyToSite</id>
-			<properties>
-		<file.toDir>/research/plgroup/web/santoslab.org/pub/mdcf-architect/updatesite/</file.toDir>
-				<file.from>${project.build.directory}/site/</file.from>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>wagon-maven-plugin</artifactId>
-						<version>1.0-beta-5</version>
-						<executions>
-							<execution>
-								<id>copy</id>
-								<phase>install</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<source>${file.from}</source>
-									<target>${file.toDir}</target>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 	</profiles>
 </project>
