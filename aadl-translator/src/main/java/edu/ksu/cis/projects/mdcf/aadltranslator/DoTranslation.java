@@ -1,5 +1,6 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +12,7 @@ import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -49,10 +51,11 @@ import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.WriteOutputFiles.OutputFormat;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.preference.PreferenceConstants;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.preference.PreferenceConstants;
 
 public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
@@ -170,14 +173,18 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				IFile sysBoundary = proj.getFolder("diagrams").getFile(
 						"SystemBoundary.png");
 				if (procModel.exists()) {
-					archTranslator.getSystemModel().getHazardReportDiagrams()
-							.put("ProcessModel", procModel.getRawLocation()
-									.toString());
+					archTranslator
+							.getSystemModel()
+							.getHazardReportDiagrams()
+							.put("ProcessModel",
+									procModel.getRawLocation().toString());
 				}
 				if (sysBoundary.exists()) {
-					archTranslator.getSystemModel().getHazardReportDiagrams()
-							.put("SystemBoundary", sysBoundary.getRawLocation()
-									.toString());
+					archTranslator
+							.getSystemModel()
+							.getHazardReportDiagrams()
+							.put("SystemBoundary",
+									sysBoundary.getRawLocation().toString());
 				}
 			}
 
@@ -256,8 +263,9 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	private String buildDeviceCompSig(DeviceComponentModel dcm) {
 		device_compsigSTG.delimiterStartChar = '$';
 		device_compsigSTG.delimiterStopChar = '$';
-		
-		return device_compsigSTG.getInstanceOf("compsig").add("model",  dcm).render();
+
+		return device_compsigSTG.getInstanceOf("compsig").add("model", dcm)
+				.render();
 	}
 
 	private void wrapUpProgressMonitor(IProgressMonitor monitor) {
@@ -276,11 +284,39 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	}
 
 	private void writeHazardReport(SystemModel sysModel) {
-		String reportDir = "/Users/Sam/Desktop";
+
+		IPreferencesService service = Platform.getPreferencesService();
+		String appDevDirectory = service.getString(
+				"edu.ksu.cis.projects.mdcf.aadl-translator",
+				PreferenceConstants.P_APPDEVPATH, null, null);
+		String fmtStr = service.getString(
+				"edu.ksu.cis.projects.mdcf.aadl-translator",
+				PreferenceConstants.P_REPORTFORMAT, null, null);
+		String pandocPath = service.getString(
+				"edu.ksu.cis.projects.mdcf.aadl-translator",
+				PreferenceConstants.P_PANDOCPATH, null, null);
+
 		String reportStr = stpa_markdownSTG.getInstanceOf("report")
 				.add("model", sysModel).render();
-		WriteOutputFiles.writeHazardReport(reportStr, reportDir,
-				sysModel.getName());
+		try {
+			WriteOutputFiles
+					.writeHazardReport(
+							reportStr,
+							appDevDirectory,
+							sysModel.getName(),
+							OutputFormat.valueOf(fmtStr),
+							pandocPath,
+							FileLocator
+									.toFileURL(
+											Platform.getBundle(
+													"edu.ksu.cis.projects.mdcf.aadl-translator")
+													.getEntry(
+															"src/main/resources/styles/default.html"))
+									.getPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void writeOutput(Translator stats) {
@@ -436,7 +472,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			PublicPackageSection sect = pack.getPublicSection();
 			for (Classifier ownedClassifier : sect.getOwnedClassifiers()) {
 				if (ownedClassifier instanceof org.osate.aadl2.SystemType) {
-					// Can't return f directly, may have more propertysets to add
+					// Can't return f directly, may have more propertysets to
+					// add
 					systemFile = f;
 				}
 			}

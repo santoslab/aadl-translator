@@ -4,8 +4,7 @@ import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -48,14 +47,15 @@ public class TranslatorPreferencePage extends FieldEditorPreferencePage
 				BooleanFieldEditor.SEPARATE_LABEL, getFieldEditorParent());
 		addField(userShellsField);
 		
-		String[][] reportFormatOptions = new String[][] {{"html", "html"}, {"pdf", "pdf"}, {"markdown", "markdown"}};
+		// First field: Displayed value, second field: stored value
+		String[][] reportFormatOptions = new String[][] {{"html", "HTML"}, {"markdown", "MARKDOWN"}}; //{"pdf", "PDF"}, 
 		ComboFieldEditor formatOptionsField = new ComboFieldEditor(
 				PreferenceConstants.P_REPORTFORMAT, "Report &Format:",
 				reportFormatOptions, getFieldEditorParent());
 		addField(formatOptionsField);
 		
-		DirectoryFieldEditor pandocPathField = new DirectoryFieldEditor(
-				PreferenceConstants.P_PANDOCPATH, "Path to &Pandoc:",
+		FileFieldEditor pandocPathField = new FileFieldEditor(
+				PreferenceConstants.P_PANDOCPATH, "Path to &Pandoc Executable:",
 				getFieldEditorParent());
 		addField(pandocPathField);
 	}

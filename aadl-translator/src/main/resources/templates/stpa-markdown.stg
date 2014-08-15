@@ -44,7 +44,7 @@ preliminaries(model) ::=<<
 ### Hazards
 <model.hazards.keys:{k | <preliminary(model.hazards.(k), i)>
 }>
-### Constraints
+### Safety Constraints
 <model.constraints.values:{v | <preliminary(v, i)>
 }>
 ### Control Actions
