@@ -2,7 +2,9 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +38,6 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.Element;
-import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterFactory;
@@ -44,8 +45,6 @@ import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
-import org.osate.xtext.aadl2.properties.util.GetProperties;
-import org.osate.xtext.aadl2.unparsing.AadlUnparser;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.DeviceTranslator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.ErrorTranslator;
@@ -94,7 +93,6 @@ public class AllTests {
 
 	public static HashMap<String, IFile> systemFiles = new HashMap<>();
 	public static ResourceSet resourceSet = null;
-//	private static Translator stats;
 
 	// This may need to turn into a map from system name -> the set of
 	// supporting files
@@ -104,10 +102,8 @@ public class AllTests {
 	
 	public static HashSet<String> deviceEIPackageFiles = new HashSet<>();
 	public static HashSet<String> deviceEIPropertyFiles = new HashSet<>();
-	
-	public final boolean GENERATE_EXPECTED = false;
 
-	public final static String BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator-test";
+	public final static String TEST_PLUGIN_BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator-test";
 	public final static String TEST_DIR = "src/test/resources/edu/ksu/cis/projects/mdcf/aadltranslator/test/";
 
 	public static IProject testProject = null;
@@ -179,13 +175,13 @@ public class AllTests {
 
 	private static void initFiles(IFolder packagesFolder,
 			IFolder propertySetsFolder) {
-		URL aadlDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
+		URL aadlDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID).getEntry(
 				TEST_DIR + "aadl/");
-		URL aadlPropertysetsDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
+		URL aadlPropertysetsDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID).getEntry(
 				TEST_DIR + "aadl/propertyset/");
-		URL aadlSystemDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
+		URL aadlSystemDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID).getEntry(
 				TEST_DIR + "aadl/system/");
-		URL aadlDeviceDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
+		URL aadlDeviceDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID).getEntry(
 				TEST_DIR + "aadl/device/");
 		File aadlDir = null;
 		File aadlPropertysetsDir = null;
@@ -216,9 +212,9 @@ public class AllTests {
 		
 		
 		/*Device Equipment Interfaces Related Files*/
-		URL aadlDeviceEIPackageDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
+		URL aadlDeviceEIPackageDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID).getEntry(
 				TEST_DIR + "aadl/device_eis/packages/");
-		URL aadlDeviceEIPropertysetsDirUrl = Platform.getBundle(BUNDLE_ID).getEntry(
+		URL aadlDeviceEIPropertysetsDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID).getEntry(
 				TEST_DIR + "aadl/device_eis/propertysets/");
 		
 		File aadlDeviceEIPackageDir = null;
@@ -294,7 +290,7 @@ public class AllTests {
 		}
 
 		supportingFiles.removeAll(usedDevices);
-
+		
 		return stats.getSystemModel();
 	}
 	
@@ -353,7 +349,16 @@ public class AllTests {
 
 		hazardAnalysis.setSystemModel(stats.getSystemModel());
 		hazardAnalysis.parseOccurrences(stats.getSystemImplementation());
-
+		
+		try{
+			FileOutputStream fos = new FileOutputStream("/Users/sam/test.serial");
+			ObjectOutputStream out = new ObjectOutputStream(fos);
+			out.writeObject(stats.getSystemModel());
+			out.close();
+		} catch (Exception e) {
+			
+		}
+		
 		return stats.getSystemModel();
 	}
 	

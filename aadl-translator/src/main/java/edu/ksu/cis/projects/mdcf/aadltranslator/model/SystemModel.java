@@ -2,6 +2,7 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,7 +15,9 @@ import com.google.common.collect.Maps;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 
-public class SystemModel {
+public class SystemModel implements Serializable{
+	private static final long serialVersionUID = 6124458968238193891L;
+	
 	private String name;
 	private HashMap<String, ProcessModel> logicComponents;
 	private HashMap<String, DeviceModel> devices;
