@@ -8,10 +8,11 @@ If you just want to use the translator, you just need to install it into OSATE2 
 After cloning, the translator can be built by the command "mvn install"  Note that the build process requires [Maven](http://maven.apache.org/) (version 3.0+) and [Java](http://www.java.com/en/) (version 1.7+). If you also wish to build the documentation, you'll need [Pygments](http://pygments.org/) (version 1.2+).
 
 # Building with Eclipse
-In order to use eclipse you'll need to first download and setup eclipse for OSATE2 development (steps adapted from the [OSATE 2 wiki](https://wiki.sei.cmu.edu/aadl/index.php/Getting_Osate_2_sources)):
+In order to use eclipse you'll need to:
 
-1. Start by downloading the [Eclipse Modeling Tools](http://www.eclipse.org/downloads/packages/eclipse-modeling-tools/keplersr2) (version "Kepler" (4.3)).
-2. Install [XText](http://download.eclipse.org/modeling/tmf/xtext/updates/composite/releases/) (version 2.4.2+), [Google Guice](http://guice-plugin.googlecode.com/svn/trunk/eclipse-update-site/), the [graphical editing framework zest visualization toolkit](http://download.eclipse.org/tools/gef/updates/releases/) and [slf4j](http://download.eclipse.org/releases/kepler) into eclipse.
+1. Install Java 7+.
+2. Follow the steps in the "Getting Eclipse and XText Environment" section of [this page](https://wiki.sei.cmu.edu/aadl/index.php/Getting_Osate_2_sources#Getting_the_Eclipse_and_XText_environment).
+	* Note: Don't worry about any of the other sections of this page if you're using Eclipse -- getting the sources of everything is handled automatically via the project set file. 
 3. Import the project set file (AADL Translator.psf) by going to File, Import... then under "Team" select "Team Project Project"
 
 # License
