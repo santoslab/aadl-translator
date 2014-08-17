@@ -19,4 +19,4 @@ In order to use eclipse you'll need to:
 This project, and its source, are publicly available under the [EPL](http://www.eclipse.org/legal/epl-v10.html), unless otherwise stated in the file header.
 
 # Acknowledgements
-This project uses icons from [famfamfam](http://famfamfam.com/lab/icons/silk/)'s silk icon set.
+This project uses icons from [famfamfam](http://famfamfam.com/lab/icons/silk/)'s silk icon set, and CSS from [Marked.app](http://markedapp.com) by Brett Terpstra.
