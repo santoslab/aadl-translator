@@ -1,0 +1,9 @@
+@Override
+public void processSubscriberChannelAssignment(SubChannelAssignmentMsg subAssign) {
+  subscriberChannelAssignmentHelper(subAssign, this.SpO2ReceiverPort);
+}
+
+@Override
+public void processPublisherChannelAssignment(PubChannelAssignmentMsg pubAssign) {
+  publisherChannelAssignmentHelper(pubAssign, this.DerivedAlarmSenderPort);
+}

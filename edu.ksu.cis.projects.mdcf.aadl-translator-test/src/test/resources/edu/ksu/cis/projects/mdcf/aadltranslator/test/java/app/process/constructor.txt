@@ -1,0 +1,7 @@
+public PulseOx_Logic_ProcessSuperType(String GUID) {
+  super(GUID, "PulseOx_Logic_Process");
+  taskInstanceMap = new HashMap<>();
+  receiverPortMap = new HashMap<>();
+  taskInstanceMap.put(CheckSpO2ThreadTask.class.getSimpleName(), new CheckSpO2ThreadTask());
+  receiverPortMap.put(SpO2ReceiverPort.getName(), SpO2ReceiverPort);
+}

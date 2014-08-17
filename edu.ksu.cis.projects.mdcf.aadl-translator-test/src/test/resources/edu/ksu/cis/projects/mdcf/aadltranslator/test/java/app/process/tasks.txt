@@ -1,0 +1,7 @@
+
+public class CheckSpO2ThreadTask implements Task {
+  @Override
+  public void run() {
+      CheckSpO2ThreadMethod();
+  }
+}

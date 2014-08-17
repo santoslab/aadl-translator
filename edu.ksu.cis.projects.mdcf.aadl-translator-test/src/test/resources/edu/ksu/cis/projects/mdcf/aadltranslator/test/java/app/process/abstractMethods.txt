@@ -1,0 +1,4 @@
+
+protected abstract void initComponent();
+
+protected abstract void CheckSpO2ThreadMethod();

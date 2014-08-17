@@ -1,0 +1,3 @@
+private void SpO2ListenerOnMessage(MdcfMessage msg, Integer SpO2Data){
+	this.SpO2Data = SpO2Data; 
+}

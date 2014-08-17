@@ -1,0 +1,9 @@
+
+private void initComponent(){
+  // Do nothing, pseudodevices require no initialization
+}
+
+private void RawSpO2ListenerOnMessage(MdcfMessage msg, Integer RawSpO2Data){
+  SpO2SenderPort.send(RawSpO2Data);
+}
+

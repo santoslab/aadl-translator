@@ -1,11 +1,16 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.logging.Level;
@@ -45,6 +50,7 @@ import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
+import org.stringtemplate.v4.STGroup;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.DeviceTranslator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.ErrorTranslator;
@@ -61,9 +67,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.SystemModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.TaskModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIAADLSystemErrorTest;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIGeneratedArtifactsTest;
-import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ConnectionModelHazardTests;
-import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardBackgroundTests;
-import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.writer.AppWriterTests;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
@@ -75,21 +79,25 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesT
 		PortModelTests.class,
 		ConnectionModelTests.class,
 
-		// Hazard Model Tests -- Re-enable these if you've added the patch from 
+		// Hazard Model Tests -- Re-enable these if you've added the patch from
 		// https://github.com/osate/ErrorModelV2/pull/48
-//		ConnectionModelHazardTests.class,
-//		HazardPreliminariesTests.class,
-//		HazardBackgroundTests.class,
+		// ConnectionModelHazardTests.class,
+		// HazardPreliminariesTests.class,
+		// HazardBackgroundTests.class,
 
 		// Error-handling tests
-		ControllerErrorTests.class, 
-		
+		ControllerErrorTests.class,
+
 		// Device EI tests
 		DeviceEIGeneratedArtifactsTest.class,
 		DeviceEIAADLSystemErrorTest.class,
-		})
+
+		// View tests
+		AppWriterTests.class,
+})
 public class AllTests {
-	private static final Logger log = Logger.getLogger(AllTests.class.getName());
+	private static final Logger log = Logger
+			.getLogger(AllTests.class.getName());
 
 	public static HashMap<String, IFile> systemFiles = new HashMap<>();
 	public static ResourceSet resourceSet = null;
@@ -99,12 +107,14 @@ public class AllTests {
 	public static HashSet<String> supportingFiles = new HashSet<>();
 	public static HashSet<String> propertyFiles = new HashSet<>();
 	public static HashSet<String> deviceFiles = new HashSet<>();
-	
+
 	public static HashSet<String> deviceEIPackageFiles = new HashSet<>();
 	public static HashSet<String> deviceEIPropertyFiles = new HashSet<>();
 
 	public final static String TEST_PLUGIN_BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator-test";
+	public final static String MAIN_PLUGIN_BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator";
 	public final static String TEST_DIR = "src/test/resources/edu/ksu/cis/projects/mdcf/aadltranslator/test/";
+	public final static String TEMPLATE_DIR = "src/main/resources/templates/";
 
 	public static IProject testProject = null;
 
@@ -177,12 +187,12 @@ public class AllTests {
 			IFolder propertySetsFolder) {
 		URL aadlDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID).getEntry(
 				TEST_DIR + "aadl/");
-		URL aadlPropertysetsDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID).getEntry(
-				TEST_DIR + "aadl/propertyset/");
-		URL aadlSystemDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID).getEntry(
-				TEST_DIR + "aadl/system/");
-		URL aadlDeviceDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID).getEntry(
-				TEST_DIR + "aadl/device/");
+		URL aadlPropertysetsDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID)
+				.getEntry(TEST_DIR + "aadl/propertyset/");
+		URL aadlSystemDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID)
+				.getEntry(TEST_DIR + "aadl/system/");
+		URL aadlDeviceDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID)
+				.getEntry(TEST_DIR + "aadl/device/");
 		File aadlDir = null;
 		File aadlPropertysetsDir = null;
 		File aadlSystemDir = null;
@@ -209,29 +219,31 @@ public class AllTests {
 				systemFiles, deviceFiles);
 		initFiles(packagesFolder, propertySetsFolder, aadlPropertysetsDir,
 				systemFiles, propertyFiles);
-		
-		
-		/*Device Equipment Interfaces Related Files*/
-		URL aadlDeviceEIPackageDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID).getEntry(
+
+		/* Device Equipment Interfaces Related Files */
+		URL aadlDeviceEIPackageDirUrl = Platform.getBundle(
+				TEST_PLUGIN_BUNDLE_ID).getEntry(
 				TEST_DIR + "aadl/device_eis/packages/");
-		URL aadlDeviceEIPropertysetsDirUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID).getEntry(
+		URL aadlDeviceEIPropertysetsDirUrl = Platform.getBundle(
+				TEST_PLUGIN_BUNDLE_ID).getEntry(
 				TEST_DIR + "aadl/device_eis/propertysets/");
-		
+
 		File aadlDeviceEIPackageDir = null;
 		File aadlDeviceEIPropertysetsDir = null;
-		
+
 		try {
-			aadlDeviceEIPackageDir = new File(FileLocator.toFileURL(aadlDeviceEIPackageDirUrl).getPath());
+			aadlDeviceEIPackageDir = new File(FileLocator.toFileURL(
+					aadlDeviceEIPackageDirUrl).getPath());
 			aadlDeviceEIPropertysetsDir = new File(FileLocator.toFileURL(
 					aadlDeviceEIPropertysetsDirUrl).getPath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		initFiles(packagesFolder, propertySetsFolder, aadlDeviceEIPackageDir,
 				systemFiles, deviceEIPackageFiles);
-		initFiles(packagesFolder, propertySetsFolder, aadlDeviceEIPropertysetsDir,
-				systemFiles, deviceEIPropertyFiles);
+		initFiles(packagesFolder, propertySetsFolder,
+				aadlDeviceEIPropertysetsDir, systemFiles, deviceEIPropertyFiles);
 	}
 
 	private static void initFiles(IFolder packagesFolder,
@@ -278,7 +290,7 @@ public class AllTests {
 				.toString());
 
 		supportingFiles.addAll(usedDevices);
-		
+
 		for (String supportingFileName : supportingFiles) {
 			IFile supportingFile = systemFiles.get(supportingFileName);
 			res = resourceSet.getResource(OsateResourceUtil
@@ -290,10 +302,10 @@ public class AllTests {
 		}
 
 		supportingFiles.removeAll(usedDevices);
-		
+
 		return stats.getSystemModel();
 	}
-	
+
 	public static SystemModel runHazardTransTest(final String testName,
 			final String systemName) {
 		IFile inputFile = systemFiles.get(systemName);
@@ -317,7 +329,7 @@ public class AllTests {
 		supportingFiles.add("PulseOx_Forwarding_Error_Properties");
 
 		ErrorTranslator hazardAnalysis = new ErrorTranslator();
-		
+
 		for (String supportingFileName : supportingFiles) {
 			IFile supportingFile = systemFiles.get(supportingFileName);
 			res = resourceSet.getResource(OsateResourceUtil
@@ -326,7 +338,7 @@ public class AllTests {
 			stats.process(target);
 			errorSB.append(parseErrManager.getReporter(
 					(IResource) supportingFile).toString());
-			if(target instanceof PropertySet)
+			if (target instanceof PropertySet)
 				continue;
 			AadlPackage pack = (AadlPackage) target;
 			PublicPackageSection sect = pack.getPublicSection();
@@ -349,25 +361,26 @@ public class AllTests {
 
 		hazardAnalysis.setSystemModel(stats.getSystemModel());
 		hazardAnalysis.parseOccurrences(stats.getSystemImplementation());
-		
-		try{
-			FileOutputStream fos = new FileOutputStream("/Users/sam/test.serial");
+
+		try {
+			FileOutputStream fos = new FileOutputStream(
+					"/Users/sam/test.serial");
 			ObjectOutputStream out = new ObjectOutputStream(fos);
 			out.writeObject(stats.getSystemModel());
 			out.close();
 		} catch (Exception e) {
-			
+
 		}
-		
+
 		return stats.getSystemModel();
 	}
-	
-	public static DeviceComponentModel runDeviceTransTest(final String testName,
-			final String systemName) {
+
+	public static DeviceComponentModel runDeviceTransTest(
+			final String testName, final String systemName) {
 
 		IFile inputFile = systemFiles.get(systemName);
 		DeviceTranslator stats = new DeviceTranslator(new NullProgressMonitor());
-		
+
 		log.setUseParentHandlers(false);
 
 		parseErrManager = new ParseErrorReporterManager(
@@ -381,25 +394,48 @@ public class AllTests {
 				OsateResourceUtil.getResourceURI((IResource) inputFile), true);
 		Element target = (Element) res.getContents().get(0);
 
-		
-		for(Diagnostic diag : res.getErrors()){
+		for (Diagnostic diag : res.getErrors()) {
 			log.log(Level.SEVERE, "Error:" + diag.getMessage());
 		}
-		
-		for(Diagnostic diag : res.getWarnings()){
+
+		for (Diagnostic diag : res.getWarnings()) {
 			log.log(Level.SEVERE, "Warnings:" + diag.getMessage());
 		}
 
 		stats.process(target);
-		
+
 		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
 				.toString());
 
 		log.log(Level.SEVERE, errorSB.toString());
-		if(errorSB.length() == 0){
+		if (errorSB.length() == 0) {
 			log.log(Level.FINE, stats.getDeviceComponentModel().toString());
 		}
 		return stats.getDeviceComponentModel();
 	}
-	
+
+	public static void runWriterTest(String testName, Object model,
+			STGroup stg, boolean GENERATE_EXPECTED, String expectedDir) {
+		URL expectedOutputUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID)
+				.getEntry(TEST_DIR + expectedDir + testName + ".txt");
+		String actualStr = stg.getInstanceOf(testName).add("model", model)
+				.render();
+		String expectedStr = null;
+		try {
+			if (GENERATE_EXPECTED) {
+				Files.write(Paths.get(FileLocator.toFileURL(expectedOutputUrl)
+						.getPath()), actualStr.getBytes());
+				expectedStr = actualStr;
+				fail("Test was run in generate expected mode!");
+			} else {
+				expectedStr = new String(
+						Files.readAllBytes(Paths.get(FileLocator.toFileURL(
+								expectedOutputUrl).getPath())));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		assertEquals(expectedStr, actualStr);
+	}
+
 }

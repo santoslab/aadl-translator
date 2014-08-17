@@ -2,7 +2,7 @@ class(model) ::=<<
 <packageAndImports(model)>
 <headerAndFields(model)>
 
-  <model.ports.values:{v |<portDeclarations(v)>}>
+  <portDeclarations(model)>
   
   <constructor(model)>
   <initAndGetters(model)>
@@ -208,7 +208,11 @@ taskInstanceMapEntry(exchName) ::=<<
 taskInstanceMap.put(<exchName>Task.class.getSimpleName(), new <exchName>Task());
 >>
 
-portDeclarations(port) ::=<<
+portDeclarations(model) ::=<<
+  <model.ports.values:{v |<portDeclarations(v)>}>
+>>
+
+portDeclaration(port) ::=<<
 <if(port.subscribe)>
 private MdcfReceiverPort\<<port.type>\> <port.name>ReceiverPort = new MdcfReceiverPort\<>("<port.name>In", <port.type>.class);<else>
 private MdcfSenderPort\<<port.type>\> <port.name>SenderPort = new MdcfSenderPort\<>("<port.name>Out", <port.type>.class);<endif> 
