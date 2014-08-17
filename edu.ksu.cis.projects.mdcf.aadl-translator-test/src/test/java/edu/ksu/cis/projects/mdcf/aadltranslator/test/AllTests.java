@@ -67,7 +67,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.SystemModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.TaskModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIAADLSystemErrorTest;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIGeneratedArtifactsTest;
-import edu.ksu.cis.projects.mdcf.aadltranslator.writer.AppWriterTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
@@ -93,7 +93,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.writer.AppWriterTests;
 		DeviceEIAADLSystemErrorTest.class,
 
 		// View tests
-		AppWriterTests.class,
+		AppSuperClassViewTests.class,
 })
 public class AllTests {
 	private static final Logger log = Logger

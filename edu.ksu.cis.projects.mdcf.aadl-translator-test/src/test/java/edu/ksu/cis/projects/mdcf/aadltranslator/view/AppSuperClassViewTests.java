@@ -1,4 +1,4 @@
-package edu.ksu.cis.projects.mdcf.aadltranslator.writer;
+package edu.ksu.cis.projects.mdcf.aadltranslator.view;
 
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.MAIN_PLUGIN_BUNDLE_ID;
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.TEMPLATE_DIR;
@@ -20,7 +20,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
-public class AppWriterTests {
+public class AppSuperClassViewTests {
 
 	// Enable to overwrite existing expected values
 	// Note that doing so will cause all tests to fail until this value is
