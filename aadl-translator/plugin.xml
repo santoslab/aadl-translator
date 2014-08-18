@@ -69,7 +69,7 @@
             </command>
             <command
                   commandId="edu.ksu.cis.projects.mdcf.aadl-translator.TranslateAADLToDeviceMDCF"
-                  icon="src/main/resources/icons/deviceaadltojava.png"
+                  icon="src/main/resources/icons/report_go.png"
                   label="Translate Device AADL to MDCF Java"
                   mnemonic="&amp;t"
                   style="push">
