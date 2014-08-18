@@ -1,6 +1,9 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -90,8 +93,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				handleException(obj, e);
 				return DONE;
 			}
+			SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy 'at' h:mm a");
 			systemModel = new SystemModel();
 			systemModel.setName(obj.getName());
+			systemModel.setTimestamp(sdf.format(new Date()));
 			lastElemProcessed = ElementType.SYSTEM;
 			return NOT_DONE;
 		}

@@ -16,6 +16,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementExcept
 
 public class SystemModel {
 	private String name;
+	private String timestamp;
 	private HashMap<String, ProcessModel> logicComponents;
 	private HashMap<String, DeviceModel> devices;
 	private HashMap<String, ConnectionModel> channels;
@@ -30,7 +31,7 @@ public class SystemModel {
 	private HashSet<AbbreviationModel> hazardReportAbbreviations;
 	private HashSet<String> hazardReportAssumptions;
 	private HashMap<String, String> hazardReportDiagrams;
-
+	
 	public SystemModel() {
 		logicComponents = new HashMap<>();
 		typeToComponent = new HashMap<>();
@@ -185,6 +186,14 @@ public class SystemModel {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(String timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	public HashMap<String, ProcessModel> getLogicComponents() {
