@@ -77,10 +77,6 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 		private ElementType lastElemProcessed = ElementType.NONE;
 
-		private String DONE = "Done";
-		@SuppressWarnings("unused")
-		private String NOT_DONE = "Not Done";
-
 		@Override
 		public String casePort(Port obj) {
 			log.log(Level.FINE, "casePort:" + obj.getFullName());
@@ -90,10 +86,12 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				// Not processed in device component
 				handleException(obj, new Exception(
 						"Data Port is not expected in the Device AADL"));
+				return DONE;
 			} else if (obj.getCategory() == PortCategory.EVENT) {
 				// Not processed in device component
 				handleException(obj, new Exception(
 						"Event Port is not expected in the Device AADL"));
+				return DONE;
 			}
 
 			return DONE;
@@ -167,6 +165,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						new Exception(
 								"Invalid Structure Manfacturer Model Property:"
 										+ ownedValues.get(0).getOwnedValue()));
+				return;
 			} else {
 				RecordValue rvi = (RecordValue) ownedValues.get(0)
 						.getOwnedValue();
@@ -253,6 +252,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						si,
 						new Exception(
 								"Only one system implementation is allowed in device AADL."));
+				return DONE;
 			} else {
 				log.log(Level.FINE, "System Implementation Reading:"
 						+ si.getFullName());
@@ -360,6 +360,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				handleException(object, new Exception(
 						"Only Abstract Device type contains port information:"
 								+ lastElemProcessed));
+				return DONE;
 			}
 			return DONE;
 		}
@@ -567,10 +568,74 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 					.sanityCheckExchanges(object.getFullName());
 			if (!checkReport.equals("")) {
 				handleException(object, new Exception(checkReport));
+				return DONE;
 			}
 
 			lastElemProcessed = ElementType.NONE;
 			return DONE;
+		}
+		
+		
+		class DML_Port_Properties {
+			String channel = "";
+			String channelGroup = "";
+			String payloadType = "";
+			String role = "";
+			
+			public DML_Port_Properties() {
+				
+			}
+			
+			public DML_Port_Properties(String channel, String channelGroup, String payloadType, String role) {
+				this.channel = channel;
+				this.channelGroup = channelGroup;
+				this.payloadType = payloadType;
+				this.role = role;
+			}
+
+			public String toString(){
+				return "Channel:" + channel + " in " + this.channelGroup + "\n"
+						+ "Payload:" + payloadType + "\n"
+						+ "Role:" + role;
+			}
+		}
+		
+		private DML_Port_Properties getCommunicationProperties(
+				EventDataPort object) {
+			
+			Property pr = GetProperties.lookupPropertyDefinition(object,
+					"MDCF_Comm_Props", "DML_Port");
+			if (pr == null)
+				return new DML_Port_Properties();
+			
+			PropertyAcc pa = object.getPropertyValue(pr);
+			
+			if(pa.first() == null)
+				return new DML_Port_Properties();
+			
+			ModalPropertyValue mpv = pa.first().getOwnedValues().get(0); //DML_PORT
+			RecordValue rvi = (RecordValue) mpv
+					.getOwnedValue();
+			StringLiteral channel = (StringLiteral) PropertyUtils
+					.getRecordFieldValue(rvi, "Channel");
+			NamedValue channel_group = (NamedValue) PropertyUtils
+					.getRecordFieldValue(rvi, "Channel_Group");
+			NamedValue payload_type = (NamedValue) PropertyUtils
+					.getRecordFieldValue(rvi, "Payload_Type");
+			NamedValue comm_role = (NamedValue) PropertyUtils
+					.getRecordFieldValue(rvi, "Comm_Role");
+
+			return new DML_Port_Properties(channel.getValue(), 
+					convertNamedValueToEnumerationLiteralString(channel_group), 
+					convertNamedValueToEnumerationLiteralString(payload_type), 
+					convertNamedValueToEnumerationLiteralString(comm_role));
+		}
+		
+		private String convertNamedValueToEnumerationLiteralString(NamedValue nv){
+			if(nv == null) return "";
+			AbstractNamedValue anv = nv.getNamedValue();
+			if(anv instanceof EnumerationLiteral) return ((EnumerationLiteral) anv).getName();
+			else return "";
 		}
 		
 		class GetRequestExchangeMethods implements ExchangeMethods{
@@ -590,6 +655,9 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							object.getFullName());
 					portInfo.setMaxSeparationInterval(getMaxSeperationIntervalFromRange(object));
 					portInfo.setMinSeparationInterval(getMinSeperationIntervalFromRange(object));
+					
+					DML_Port_Properties dpp = getCommunicationProperties(object);
+					
 					em.setInPortInfo(portInfo);
 				} else {
 					handleException(object,
@@ -599,6 +667,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 											+ object.getFullName()));
 				}
 			}
+
 		}
 		
 		
