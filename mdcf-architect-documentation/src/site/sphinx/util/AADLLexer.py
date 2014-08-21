@@ -65,6 +65,7 @@ class AADLLexer(RegexLexer):
         'property-value' : [
             (r'[0-9]+', Number.Integer),
             (r'[0-9]+\.[0-9]*', Number.Float),
+            (r'"[^"]*"', Literal.String.Double),
             (r'(\s*)(ms)(\s*)', bygroups(Whitespace, Literal, Whitespace)),
             (r'(\s*)(\.\.)(\s+)', bygroups(Whitespace, Operator, Whitespace)),
             (class_iden_rex, bygroups(Name.Class, Punctuation, Name.Constant)),
@@ -82,6 +83,12 @@ class AADLLexer(RegexLexer):
             include('property-value'),
             (r'(;)(\s+)', bygroups(Punctuation, Whitespace), '#pop:2')
         ],
+        'aggregate-property-constant-list' : [
+	        (r'(' + iden_rex + r')(\s*)(=>)(\s*)', bygroups(Name.Class, Whitespace, Operator, Whitespace)),
+        	include('property-value'),
+            (r'\s*;\s*', Punctuation),
+            (r'(\];)(\s+)', bygroups(Punctuation, Whitespace), '#pop:2'),
+        ],
         'property-declaration' : [
             text_tuple,
             (r'(' + iden_rex + r')(\s*)(=>)(\s*)', bygroups(Name.Class, Whitespace, Operator, Whitespace), 'applies-to-property-value'),
@@ -89,7 +96,10 @@ class AADLLexer(RegexLexer):
         ],
         'property-constant-declaration' : [
             text_tuple,
-            (r'(' + iden_rex + r')(\s*)(=>)(\s*)', bygroups(Name.Class, Whitespace, Operator, Whitespace), 'property-constant-value')
+            (class_iden_rex + r'(\s*)(=>)(\s*)(\[)(\s*)', bygroups(Name.Class, Punctuation, Name.Constant, Whitespace, Operator, Whitespace, Punctuation, Whitespace), 'aggregate-property-constant-list'),
+            (r'(' + iden_rex + r')(\s*)(=>)(\s*)(\[)(\s*)', bygroups(Name.Class, Whitespace, Operator, Whitespace, Punctuation, Whitespace), 'aggregate-property-constant-list'),
+            (class_iden_rex + r'(\s*)(=>)(\s*)', bygroups(Name.Class, Punctuation, Name.Constant, Whitespace, Operator, Whitespace), 'property-constant-value'),
+            (r'(' + iden_rex + r')(\s*)(=>)(\s*)', bygroups(Name.Class, Whitespace, Operator, Whitespace), 'property-constant-value'),
         ],
         'property-set' : [
             with_tuple,

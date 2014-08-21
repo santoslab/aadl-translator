@@ -31,7 +31,6 @@ Properties, Contexts and Directions
 	
 .. note::
 	Triggers on ``out`` ports, while required by AADL, are ignored for MDCF Architect translation.
-	
 
 .. construct:: port connection
 
@@ -44,6 +43,9 @@ Properties, Contexts and Directions
 	:context-type SystemImplementation: :construct:`System Implementation<systemimplementation>`
 	:context-type ProcessImplementation: :construct:`Process Implementation<processimplementation>`
 	:Direction: Either ``<-`` or ``->``
+
+.. note::
+	The ``ChannelDelay`` property is only required for the ``SystemImplementation`` context -- it will be ignored in ``ProcessImplementations``.
 	
 *******
 Example

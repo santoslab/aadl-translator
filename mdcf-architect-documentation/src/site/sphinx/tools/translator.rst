@@ -17,7 +17,7 @@ Installing
 6. This plugin is licensed under the |EPL|. To proceed, select the "I accept the terms of the license agreement." Click ``Finish``.
 7. The plugin is not digitally signed, so click ``Ok`` on the pop-up titled "Security Warning."
 8. OSATE2 now has to restart to complete the installation.  Click ``Yes`` on the "Software Updates" pop-up.
-9. Verify that the installation was successful by going selecting ``About OSATE2`` (under OSATE2 on Mac OS X, under Help on Windows and Linux).  Click ``Installation Details`` and you should see "Aadl-plugin" at the top of the "Installed Software" tab.
+9. Verify that the installation was successful by selecting ``About OSATE2`` (under OSATE2 on Mac OS X, under Help on Windows and Linux).  Click ``Installation Details`` and you should see "Aadl-plugin" at the top of the "Installed Software" tab.
 
 *******
 Running
@@ -25,5 +25,7 @@ Running
 
 1. Configure the output directory by clicking ``Preferences`` (under "OSATE2" on Mac OS X, under "Window" in Windows and Linux) and then setting the "AppDev Directory" option. Click ``Ok``.
 2. Open both the "map-globals" project and the app's project.
-3. Double-click the file that contains your :construct:`system`, and then click the run button (|gear icon|).
-
+3. Double-click the file that contains your :construct:`system`, and then click the icon associated with your target format:
+	1. |cog_go icon|: Java and XML for the MDCF
+	2. |cog_error icon|: An app hazard analysis report
+	3. |report_go icon|: Java for an MDCF device driver

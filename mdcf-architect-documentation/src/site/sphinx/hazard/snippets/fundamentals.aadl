@@ -1,0 +1,38 @@
+property set PulseOx_Forwarding_Error_Properties is
+with EMV2, MAP_Error_Properties;
+
+	Context1 : constant MAP_Error_Properties::Context => 
+		"A simple app that forwards information from a pulse oximeter to an app display.";
+		
+	Assumption1 : constant MAP_Error_Properties::Assumption =>
+		"We assume there are no alarms that need forwarding.";
+		
+	SpO2 : constant MAP_Error_Properties::Abbreviation => [
+		Full => "Blood-oxygen saturation";
+		Definition => "The ratio of SpO2 in the patient's blood";
+	];
+
+	AL1 : constant MAP_Error_Properties::Accident_Level => [
+		Level => 1;
+		Description => "A human is killed or seriously injured.";
+	];
+	
+	A1 : constant MAP_Error_Properties::Accident => [
+		Number => 1;
+		Description => "Patient is killed or seriously injured.";
+		Level => PulseOx_Forwarding_Error_Properties::AL1;
+	];
+	
+	H1 : constant MAP_Error_Properties::Hazard => [
+		Number => 1;
+		Description => "Incorrect information is sent to the display.";
+		Accident => PulseOx_Forwarding_Error_Properties::A1;
+	];
+	
+	C1 : constant MAP_Error_Properties::Constraint => [
+		Number => 1;
+		Description => "The app must inform the display of the status of the patient's vital signs.";
+		Hazard => PulseOx_Forwarding_Error_Properties::H1;
+	];
+	
+end PulseOx_Forwarding_Error_Properties;

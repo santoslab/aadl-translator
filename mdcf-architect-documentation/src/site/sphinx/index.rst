@@ -29,8 +29,9 @@ Contents
 	:includehidden:
 	:maxdepth: 2
 
-	language/overview.rst
 	tools/translator.rst
+	language/overview.rst
+	hazard/overview.rst
 
 
 .. admonition:: Acknowledgements

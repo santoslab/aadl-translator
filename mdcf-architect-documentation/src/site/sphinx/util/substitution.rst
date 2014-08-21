@@ -6,13 +6,21 @@
 
 .. |MDCF| replace:: `MDCF <http://mdcf.santos.cis.ksu.edu/>`__
 
-.. |SEHC14 publication| replace:: `SEHC14 publication <http://samprocter.com/wp-content/uploads/2014/05/sehc14-aadl-for-map-apps.pdf>`__
+.. |SEHC14 publication| replace:: `SEHC14 publication <http://samprocter.com/wp-content/uploads/2014/06/sehc14-aadl-for-map-apps.pdf>`__
+
+.. |MEMOCODE14 publication| replace:: `MEMOCODE14 publication <http://samprocter.com/wp-content/uploads/2012/06/memocode14.pdf>`__
 
 .. |EPL| replace:: `Eclipse Public License <http://www.eclipse.org/legal/epl-v10.html>`__
 
-.. |gear icon| image:: images/cog_go.png
+.. |cog_go icon| image:: /tools/images/cog_go.png
+
+.. |cog_error icon| image:: /tools/images/cog_error.png
+
+.. |report_go icon| image:: /tools/images/report_go.png
 
 .. |AADL book| replace:: `AADL book <http://books.google.com/books/about/Model_Based_Engineering_with_AADL.html?id=T_nOltBoX64C>`__
+
+.. |STPA book| replace:: `STPA book <http://mitpress.mit.edu/books/engineering-safer-world>`__
 
 .. |prop period| replace:: The task's period. Ignored for sporadic tasks.
 
