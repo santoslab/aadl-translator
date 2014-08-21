@@ -31,6 +31,7 @@ public class WriteOutputFiles {
 		case HTML:
 			args.add("--to=html5");
 			args.add("--include-in-header=" + stylePath);
+			args.add("--self-contained");
 			args.add("--smart");
 			args.add("--output=" + reportDirectory + "/reports/" + reportName + ".html");
 			break;

@@ -32,7 +32,7 @@ background(model) ::=<<
 >>
 
 preliminaries(model) ::=<<
-## Preliminaries
+## Fundamentals
 
 ### System Boundaries
 ![System Boundary](<model.hazardReportDiagrams.("SystemBoundary")>)
@@ -72,10 +72,14 @@ controlAction(ctrlAct, i) ::=<<
 ctrlActTbl(model) ::=<<
 ## Unsafe Control Actions
 
-<model.longestColumnMap.("ALL")>
 | <["Control Action", "Providing", "Not Providing", "Applied Too Long", "Stopped Too Soon", "Early", "Late"]:{g | <g> | }>
 |----------------|-----------|---------------|------------------|------------------|-------|------|
 <model.channels.values:{v | <ctrlActTblRow(v)>
+}>
+
+| <["Control Action", "Value Too High", "Value Too Low"]:{g | <g> | }>
+|----------------|----------------|---------------|
+<model.rangedChannels.values:{v | <rngdCtrlActTblRow(v)>
 }>
 
 >>
@@ -85,6 +89,13 @@ ctrlActTblRow(ctrlAct) ::=<<
 >>
 
 ctrlActTblCell(lastOccurrence) ::=<<
+ <lastOccurrence:{o|<o.hazard.name> (<o.title>)}; separator=", "> | >>
+
+rngdCtrlActTblRow(rngdCtrlAct) ::=<<
+| [<rngdCtrlAct.name>](#<rngdCtrlAct.name>) | <["VALUEHIGH", "VALUELOW"]:{g | <rngdCtrlActTblCell(rngdCtrlAct.occurrenceMap.(g))>}>
+>>
+
+rngdCtrlActTblCell(lastOccurrence) ::=<<
  <lastOccurrence:{o|<o.hazard.name> (<o.title>)}; separator=", "> | >>
 
 hazCtrlActs(model) ::=<<

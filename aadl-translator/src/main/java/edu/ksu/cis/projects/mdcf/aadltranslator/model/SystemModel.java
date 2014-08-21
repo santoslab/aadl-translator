@@ -218,6 +218,10 @@ public class SystemModel {
 	public HashMap<String, ConnectionModel> getChannels() {
 		return channels;
 	}
+	
+	public Map<String, ConnectionModel> getRangedChannels() {
+		return Maps.filterValues(channels, ModelUtil.rangedChannelFilter);
+	}
 
 	public boolean hasProcessType(String typeName) {
 		return (typeToComponent.containsKey(typeName) && (typeToComponent

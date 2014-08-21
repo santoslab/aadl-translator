@@ -81,4 +81,10 @@ public class ModelUtil {
 			return prelim instanceof ConstraintModel;
 		}
 	};
+
+	public final static Predicate<ConnectionModel> rangedChannelFilter = new Predicate<ConnectionModel>() {
+		public boolean apply(ConnectionModel connection) {
+			return !connection.getPublisher().getPortByName(connection.getPubPortName()).getType().equals("Object");
+		}
+	};
 }
