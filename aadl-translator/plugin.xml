@@ -27,7 +27,7 @@
       </command>
       <command
             id="edu.ksu.cis.projects.mdcf.aadl-translator.device-aadl-translate"
-            name="Translate Device AADL to Device MDCF Command">
+            name="Translate Device AADL Command">
       </command>
       <command
             id="edu.ksu.cis.projects.mdcf.aadl-translator.translate-hazards"
@@ -43,8 +43,8 @@
             commandId="edu.ksu.cis.projects.mdcf.aadl-translator.translate">
       </handler>
       <handler
-            class="DeviceAADLToJavaTranslation"
-            commandId="edu.ksu.cis.projects.mdcf.aadl-translator.TraslateAADLToDeviceMDCF">
+            class="edu.ksu.cis.projects.mdcf.aadltranslator.DoTranslation"
+            commandId="edu.ksu.cis.projects.mdcf.aadl-translator.device-aadl-translate">
       </handler>
       <handler
             class="edu.ksu.cis.projects.mdcf.aadltranslator.DoTranslation"
@@ -68,10 +68,10 @@
                   style="push">
             </command>
             <command
-                  commandId="edu.ksu.cis.projects.mdcf.aadl-translator.TranslateAADLToDeviceMDCF"
+                  commandId="edu.ksu.cis.projects.mdcf.aadl-translator.device-aadl-translate"
                   icon="src/main/resources/icons/report_go.png"
-                  label="Translate Device AADL to MDCF Java"
-                  mnemonic="&amp;t"
+                  label="Translate Device"
+                  mnemonic="&amp;d"
                   style="push">
             </command>
             <command
