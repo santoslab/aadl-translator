@@ -226,11 +226,11 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		IPreferencesService service = Platform.getPreferencesService();
 
 		// Get user preferences
-		String appDevDirectory = service.getString(
+		String devDevDirectory = service.getString(
 				"edu.ksu.cis.projects.mdcf.aadl-translator",
 				PreferenceConstants.P_DEVDEVPATH, null, null);
 
-		DeviceComponentModel dcm = null;
+		DeviceComponentModel dcm = stats.getDeviceComponentModel();
 
 		String supertype = buildDeviceSuperType(dcm);
 
@@ -241,7 +241,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		// Write the files
 		if (stats.notCancelled()) {
 			WriteOutputFiles.writeDeviceFiles(supertype, userImplAPI, compsig,
-					dcm.getName(), appDevDirectory);
+					dcm.getName(), devDevDirectory);
 		}
 
 	}

@@ -58,6 +58,11 @@ public class TranslatorPreferencePage extends FieldEditorPreferencePage
 				PreferenceConstants.P_PANDOCPATH, "Path to &Pandoc Executable:",
 				getFieldEditorParent());
 		addField(pandocPathField);
+		
+		DirectoryFieldEditor devDevPathField = new DirectoryFieldEditor(
+				PreferenceConstants.P_DEVDEVPATH, "&DevDev Directory:",
+				getFieldEditorParent());
+		addField(devDevPathField);
 	}
 
 	/*

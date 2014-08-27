@@ -128,6 +128,14 @@ public class WriteOutputFiles {
 					+ ".compsig.xml");
 			fw.write(compsigs);
 			fw.close();
+			
+			fw = new FileWriter(devDirectory + devName + "/" + devName + "SuperType.java");
+			fw.write(superType);
+			fw.close();
+			
+			fw = new FileWriter(devDirectory + devName + "/" + devName + ".java");
+			fw.write(userAPI);
+			fw.close();
 		} catch (IOException e) {
 			// TODO: handle this
 			e.printStackTrace();
