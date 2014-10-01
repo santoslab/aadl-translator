@@ -9,7 +9,7 @@ end Device_AADL_Test_System_Impl_Property_Missing_SYSTYPE;
 
 system implementation Device_AADL_Test_System_Impl_Property_Missing_SYSTYPE.impl
 subcomponents
-  d1: device subdevice;
+  d1: abstract subdevice;
 
 properties
   MDCF_Data_Props::ICE_ManufacturerModel => [

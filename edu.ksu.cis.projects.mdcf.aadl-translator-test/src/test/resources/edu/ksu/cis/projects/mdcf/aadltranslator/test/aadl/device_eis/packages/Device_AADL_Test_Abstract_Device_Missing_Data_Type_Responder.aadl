@@ -9,7 +9,7 @@ end Device_AADL_Test_Abstract_Device_Missing_Data_Type_Responder;
 
 system implementation Device_AADL_Test_Abstract_Device_Missing_Data_Type_Responder.impl
 subcomponents
-  d1: device subdevice;
+  d1: abstract subdevice;
 
 properties
 --   The unit's meta-data...
@@ -26,7 +26,7 @@ end Device_AADL_Test_Abstract_Device_Missing_Data_Type_Responder.impl;
 
 abstract subdevice 
 features
-  Status_res: in event data port { 
+  Status_res_out: in event data port { 
 	MDCF_ICE_Props::data_type => "Status";
 	MDCF_ICE_Props::comm_type => responder;
   };

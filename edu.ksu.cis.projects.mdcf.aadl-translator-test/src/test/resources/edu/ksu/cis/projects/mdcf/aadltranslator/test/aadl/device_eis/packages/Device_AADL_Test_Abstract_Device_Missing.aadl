@@ -9,7 +9,7 @@ end Device_AADL_Test_Abstract_Device_Missing;
 
 system implementation Device_AADL_Test_Abstract_Device_Missing.impl
 subcomponents
-  d1: device subdevice;
+  d1: abstract subdevice;
 
 properties
 --   The unit's meta-data...

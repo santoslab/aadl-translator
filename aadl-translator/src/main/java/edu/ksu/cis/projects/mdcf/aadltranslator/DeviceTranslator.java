@@ -41,9 +41,9 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 	};
 
 	private enum CommPatternType {
-		REQUEST("_req", 1), RESPONSE("_res", 2), SEND("_sen", 3), RECEIVE(
-				"_rcv", 4), PUBLISH("_pub", 5), INITIATOR("_ini", 6), EXECUTOR(
-				"_exe", 7);
+		REQUEST("_res_in", 1), RESPONSE("_res_out", 2), SEND("_rec_in", 3), RECEIVE(
+				"_rec_out", 4), PUBLISH("_pub_out", 5), INITIATOR("_exec_in", 6), EXECUTOR(
+				"_exec_out", 7);
 
 		private final String suffix;
 		private final int id;
@@ -288,9 +288,9 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			}
 
 			// There could be more than one vmds in a device
-			for (DeviceSubcomponent dsc : si
-					.getOwnedDeviceSubcomponents()) {
-				vmdTypeNames.add(dsc.getDeviceSubcomponentType()
+			
+			for (AbstractSubcomponent asc : si.getOwnedAbstractSubcomponents()) {
+				vmdTypeNames.add(asc.getAbstractSubcomponentType()
 						.getFullName());
 			}
 			return DONE;
@@ -502,7 +502,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 		private String extractExchangeName(EventDataPort object) {
 			String fullPortName = object.getFullName();
 			String[] split_pieces = fullPortName.split("_");
-			String suffix = "_" + split_pieces[split_pieces.length - 1];
+			String suffix = "_" + split_pieces[split_pieces.length - 2] + "_" + split_pieces[split_pieces.length - 1]; //Take last two terms for matching
 
 			String exchange_suffix = "";
 			if (suffix.equals(CommPatternType.RECEIVE.suffix)

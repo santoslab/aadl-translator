@@ -14,6 +14,20 @@
 
 
 property set MDCF_Data_Props is
+-- The various device payload types.
+ICE_Payload: type enumeration (
+  ICE_VMD_Status, ICE_SpO2_Limit_Alert, ICE_SpO2_Numeric, 
+  ICE_SpO2_Numeric_Alternative, ICE_PulseRate_Numeric, 
+  ICE_BloodPressure_Systolic_Numeric, ICE_BloodPressure_Diastolic_Numeric, 
+  ICE_BloodPressure_Mean_Numeric, ICE_EtCo2_Numeric, ICE_RepiratoryRate_Numeric
+);
+
+
+-- Transporter groups that exist in an ICE channel. 
+ICE_Channel_Group: type enumeration (
+  nil, alerts, metrics, settings, statuses, actions, metrics_alerts
+);
+
 
 -- Use simple attribute definition...
 IEEE11073_MDC_ATTR_SYS_TYPE: aadlstring applies to (system);

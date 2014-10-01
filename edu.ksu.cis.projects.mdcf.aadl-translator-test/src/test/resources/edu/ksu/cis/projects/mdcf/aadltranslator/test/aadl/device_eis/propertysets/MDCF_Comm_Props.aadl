@@ -15,6 +15,7 @@
 property set MDCF_Comm_Props is
   with Timing_Properties;
   with MDCF_Data_Props;
+  with Data_Model;
 
 
 ------------------------------------------------------------------------------+
@@ -49,6 +50,21 @@ service_time_range: range of Time
 --com_lifetime_min: Time applies to (port);
   
 --period: type aadlinteger 0 ps .. Max_Time units Time_Units;  -- From AADL_Project
+
+
+------------------------------------------------------------------------------+
+-- Types and properties to capture DML hierarchy. 
+------------------------------------------------------------------------------+
+MDCF_Comm_Role: type enumeration (
+  requester, responder, sender, receiver, publisher, subscriber, 
+  initiator, executor
+);
+
+DML_Port: record (
+  Channel: aadlstring;
+  Channel_Group: MDCF_Data_Props::ICE_Channel_Group;
+  Comm_Role: MDCF_Comm_Props::MDCF_Comm_Role;
+) applies to (port);
 
 
 ------------------------------------------------------------------------------+

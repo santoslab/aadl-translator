@@ -15,7 +15,7 @@ package SimpleCapnograph
 public
   with MAP_Properties;
   with MDCF_Data_Props, MDCF_Comm_Props, MDCF_ICE_Props;
-  with MDCF_Types;
+  with MDCF_Types, ICE_Types;
 
 
 ------------------------------------------------------------------------------+
@@ -28,7 +28,7 @@ end SimpleCapnograph;
 system implementation SimpleCapnograph.impl
 subcomponents
   -- The unit's VMDs...
-  capnograph: device CapnographVmd;
+  capnograph: abstract CapnographVmd;
 
 properties
 --   The unit's meta-data...
@@ -51,75 +51,141 @@ abstract CapnographVmd  -- More than an AADL device, so make abstract.
 -- Features consist of the unit's payload-exchange "bundles".
 features
   -- Device status of vmd through requester-responser communication pair. 
-  Status_req: in event data port{  -- Publisher output.  
+  Status_res_in: in event data port MDCF_Types::Status {  -- Publisher output.  
   	MDCF_Comm_Props::separation_interval_range => 200 ms .. 300 ms;          
 	MDCF_ICE_Props::data_type => "Status";
 	MDCF_ICE_Props::comm_type => requester;
+	
+	MDCF_Comm_Props::DML_Port => [
+      Channel => "capnograph"; 
+      Channel_Group => nil;
+      Comm_Role => requester;
+    ];
+	
   };  -- Trigger for output from requester.
-  Status_res: out event data port MDCF_Types::Status {  -- Responder output.
+  Status_res_out: out event data port MDCF_Types::Status {  -- Responder output.
   -- Properties found in AADL subset:  
 	MDCF_ICE_Props::data_type => "Status";
 	MDCF_ICE_Props::comm_type => responder;
+	
+	MDCF_Comm_Props::DML_Port => [
+      Channel => "capnograph"; 
+      Channel_Group => nil;
+      Comm_Role => responder;
+    ];
   };
   
  
   -- EtCO2 numeric of Etco2.Metrics sub-channel through requester-responser communication pair. 
-  Etco2_Metric_Etco2Num_req: in event data port{  -- Publisher output.  
+  Etco2_Metric_Etco2Num_res_in: in event data port {  -- Publisher output.  
   	MDCF_Comm_Props::separation_interval_range => 100 ms .. 200 ms;          
 	MDCF_ICE_Props::channel_group => "Etco2";
 	MDCF_ICE_Props::channel => "Metrics";
 	MDCF_ICE_Props::data_type => "EtCo2_Numeric";
 	MDCF_ICE_Props::comm_type => requester;
+	
+	MDCF_Comm_Props::DML_Port => [
+      Channel => "etco2"; 
+      Channel_Group => metrics;
+      Comm_Role => responder;
+    ];
+    
   };  -- Trigger for output from requester.
-  Etco2_Metric_Etco2Num_res: out event data port MDCF_Types::EtCO2 {  -- Responder output.  
+  Etco2_Metric_Etco2Num_res_out: out event data port ICE_Types::ICE_SpO2_Numeric  {  -- Responder output.  
   -- Properties found in AADL subset:  
   	MDCF_ICE_Props::channel_group => "Etco2";
 	MDCF_ICE_Props::channel => "Metrics";
 	MDCF_ICE_Props::data_type => "EtCo2_Numeric";
 	MDCF_ICE_Props::comm_type => responder;
+	
+	MDCF_Comm_Props::DML_Port => [
+      Channel => "etco2"; 
+      Channel_Group => metrics;
+      Comm_Role => responder;
+    ];
+    
+    -- Properties found in AADL subset of MDCF architecture:
+    MAP_Properties::Output_Rate => 100 ms .. 200 ms;
   };
 
 
   -- EtCO2 numeric of Etco2.Metrics sub-channel through publisher-subscriber communication pair. 
-  Etco2_Metric_Etco2Num_pub: out event data port MDCF_Types::EtCO2 { 
+  Etco2_Metric_Etco2Num_pub_out: out event data port MDCF_Types::EtCO2 { 
   	MDCF_Comm_Props::separation_interval_range => 100 ms .. 200 ms;    
 	MDCF_ICE_Props::channel_group => "Etco2";
 	MDCF_ICE_Props::channel => "Metrics";
 	MDCF_ICE_Props::data_type => "EtCo2_Numeric";
 	MDCF_ICE_Props::comm_type => publisher;
+	
+	MDCF_Comm_Props::DML_Port => [
+      Channel => "etco2"; 
+      Channel_Group => metrics;
+      Comm_Role => publisher;
+    ];
+    
+    -- Properties found in AADL subset of MDCF architecture:
+    MAP_Properties::Output_Rate => 100 ms .. 200 ms;
   };
   
   
     -- >>> Demonstration of the sender-receiver communication pattern. <<<
   -- Loading Bolus numeric in Prescription_Dose_Settings.Settings sub-channel through sender-receiver communication pair. 
-  PrescriptionDoseSettings_Settings_LoadingBolus_sen: in event data port 
+  PrescriptionDoseSettings_Settings_LoadingBolus_rec_in: in event data port 
       MDCF_Types::BolusLoading {  
   	MDCF_Comm_Props::separation_interval_range => 100 ms .. 200 ms;    
 	MDCF_ICE_Props::channel_group => "PrescriptionDoseSettings";
 	MDCF_ICE_Props::channel => "Settings";
 	MDCF_ICE_Props::data_type => "LoadingBolus";
 	MDCF_ICE_Props::comm_type => sender;
+	
+	MDCF_Comm_Props::DML_Port => [
+      Channel => "prescriptiondose"; 
+      Channel_Group => settings;
+      Comm_Role => receiver;
+    ];
+    
+    -- Properties found in AADL subset of MDCF architecture:
+    MAP_Properties::Output_Rate => 100 ms .. 200 ms;
   };    
-  PrescriptionDoseSettings_Settings_LoadingBolus_rcv: out event data port { 
+  PrescriptionDoseSettings_Settings_LoadingBolus_rec_out: out event data port { 
 	MDCF_ICE_Props::channel_group => "PrescriptionDoseSettings";
 	MDCF_ICE_Props::channel => "Settings";
 	MDCF_ICE_Props::data_type => "LoadingBolus";
 	MDCF_ICE_Props::comm_type => receiver;
+	
+	MDCF_Comm_Props::DML_Port => [
+      Channel => "prescriptiondose"; 
+      Channel_Group => settings;
+      Comm_Role => receiver;
+    ];
   };  -- Sender acknowledgment.
   
   -- Stop action in Commands.Actions sub-channel through requester-responser communication pair. 
-  Stop_Actions_Commands_ini: in event data port{
+  Stop_Actions_Commands_exec_in: in event data port{
   	MDCF_Comm_Props::separation_interval_range => 100 ms .. 200 ms;    
 	MDCF_ICE_Props::channel_group => "Stop";
 	MDCF_ICE_Props::channel => "Commands";
 	MDCF_ICE_Props::data_type => "Parameter";
 	MDCF_ICE_Props::comm_type => initiator;
+	
+	MDCF_Comm_Props::DML_Port => [
+      Channel => "stop"; 
+      Channel_Group => actions;
+      Comm_Role => executor;
+    ];
   };
-  Stop_Actions_Commands_exe: out event data port{
+  Stop_Actions_Commands_exec_out: out event data port{
 	MDCF_ICE_Props::channel_group => "Stop";
 	MDCF_ICE_Props::channel => "Commands";
-	MDCF_ICE_Props::data_type => "Result";	
+	MDCF_ICE_Props::data_type => "Result";
 	MDCF_ICE_Props::comm_type => executor;
+	
+	MDCF_Comm_Props::DML_Port => [
+      Channel => "stop"; 
+      Channel_Group => actions;
+      Comm_Role => executor;
+    ];
+	
   };
 
 

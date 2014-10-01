@@ -1,0 +1,33 @@
+------------------------------------------------------------------------------+
+-- ICE_Types.aadl - Data types for exercising the end-to-end apps and devices.
+--
+-- Author: Stephen C. Barrett (scbarrett@ksu.edu)
+--         Department of Computing & Information Sciences
+--               
+-- Licensed Material - Property of Kansas State University.               
+------------------------------------------------------------------------------+
+
+
+package ICE_Types
+public
+  with Base_Types, Data_Model;
+
+
+------------------------------------------------------------------------------+
+-- Sample payload data types.
+------------------------------------------------------------------------------+
+
+-- SpO2
+data ICE_SpO2_Numeric
+properties
+  Data_Model::Integer_Range => 0 .. 100;
+end ICE_SpO2_Numeric;
+
+
+data ICE_SpO2_Numeric_Alternate
+properties
+  Data_Model::Integer_Range => 0 .. 100;
+end ICE_SpO2_Numeric_Alternate;
+
+
+end ICE_Types;
