@@ -22,10 +22,12 @@ In this language walkthrough, we'll be re-using the app developed in the :ref:`a
 
 .. You can also download :download:`annotated AADL<snippets/pulse-ox-forwarding.zip>`, or :download:`view the generated report<PulseOx_Forwarding_System.html>`.
 
-	occurrence
+
 	components
 
 .. toctree::
 	:hidden:
 	
 	fundamentals
+	occurrence
+	component

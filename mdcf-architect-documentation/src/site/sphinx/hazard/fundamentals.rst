@@ -2,9 +2,9 @@
 .. default-domain:: aadl
 .. _hazard-analysis-fundamentals:
 
-############################
-Background and  Fundamentals
-############################
+###########################
+Background and Fundamentals
+###########################
 
 Before a hazard analysis can begin, there are a number of app background elements and *fundamentals* that should be established. These fundamentals are documented as AADL property constants.
 
