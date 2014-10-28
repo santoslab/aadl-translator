@@ -26,13 +26,13 @@ The *occurrence* property is designed to do associate three main things with one
    An assumption about the environment / clinical process where the app will be used.
 
    :type: Record
-   :subproperty Kind: Derp
-   :subproperty Hazard: Derp
-   :subproperty ViolatedConstraint: Derp
-   :subproperty Title: Derp
-   :subproperty Cause: Derp
-   :subproperty Compensation: Derp
-   :subproperty Impact: Derp
+   :subproperty Kind: Temp
+   :subproperty Hazard: Temp
+   :subproperty ViolatedConstraint: Temp
+   :subproperty Title: Temp
+   :subproperty Cause: Temp
+   :subproperty Compensation: Temp
+   :subproperty Impact: Temp
    :type Kind: One of ``NotProviding``, ``Providing``, ``Early``, ``Late``, ``AppliedTooLong``, ``StoppedTooSoon``, ``ValueLow``, ``ValueHigh``, ``ParamsMissing``, ``ParamsWrong``, or ``ParamsOutOfOrder``
    :type Hazard: :property:`Hazard<hazard>`
    :type ViolatedConstraint: :property:`Constraint<constraint>`
