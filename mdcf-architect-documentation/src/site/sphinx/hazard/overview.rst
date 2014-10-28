@@ -26,9 +26,11 @@ In this language walkthrough, we'll be re-using the app developed in the :ref:`a
 Since our process and format are based on STPA, we focus first on hazard analysis :ref:`fundamentals<hazard-analysis-fundamentals>` (eg, accidents to be avoided, safety constraints that prevent them, etc.) then look at how faults can :ref:`occur<hazard-analysis-occurrence>` on potentially unsafe control actions (which are equivalent to system level :construct:`port connections<portconnection>` in our system) and finally document their architectural causes and impacts in individual :ref:`components<hazard-analysis-components>`.
 
 
+.. occurrence
+	component
+
 .. toctree::
 	:hidden:
 	
 	fundamentals
-	occurrence
-	component
+	
