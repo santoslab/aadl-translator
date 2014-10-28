@@ -40,11 +40,16 @@ class AADLLexer(RegexLexer):
              (r'(\s*)({\*\*)(\s+)', bygroups(Whitespace, Punctuation, Whitespace)),
              (r'(use)(\s+)(types)(\s+)(' + iden_rex+ ')(\s*)(;)(\s+)', bygroups(Keyword.Namespace, Whitespace, Keyword.Namespace, Whitespace, Name.Namespace, Whitespace, Punctuation, Whitespace)),
              (r'(error)(\s+)(propagations)(\s+)', bygroups (Keyword.Namespace, Whitespace, Keyword.Namespace, Whitespace), 'error-propagations'),
+             (r'(connection)(\s+)(error)(\s+)', bygroups (Keyword.Namespace, Whitespace, Keyword.Namespace, Whitespace), 'connection-error'),
              (r'(properties)(\s+)', bygroups(Keyword.Namespace, Whitespace), 'property-section'),
              (r'(error)(\s+)(types)(\s+)', bygroups (Keyword.Namespace, Whitespace, Keyword.Namespace, Whitespace), 'error-types'),
              (r'(\*\*})(\s*)(;)?(\s+)', bygroups(Punctuation, Whitespace, Punctuation, Whitespace), '#pop'),
              (iden_rex, Name.Class),
          ],
+        'connection-error' : [
+        	(r'(' + iden_rex + ')(\s*)(:)(\s*)(error)(\s+)(source)(\s+)(' + iden_rex + ')(\s*)(;)(\s+)' , bygroups(Name.Variable.Instance, Whitespace, Punctuation, Whitespace, Keyword.Pseudo, Whitespace, Keyword.Pseudo, Whitespace, Name.Variable.Class, Whitespace, Punctuation, Whitespace)),
+        	(r'(end)(\s*)(connection)(\s*)(;)(\s+)', bygroups(Keyword.Namespace, Whitespace, Keyword.Namespace, Whitespace, Punctuation, Whitespace), '#pop'),
+        ],
         'error-types' : [
         	(r'(' + iden_rex + ')(\s*)(:)(\s*)', bygroups(Name.Attribute, Whitespace, Punctuation, Whitespace), 'error-type-declaration'),#The use of Name.Attribute here is a hack because SAnToS's stylesheet doesn't differentiate between global (which this should be) and class variables, which makes the code much harder to read.
         	(r'(' + iden_rex + ')(\s+)(renames)(\s+)(type)(\s+)' + class_iden_rex, bygroups(Name.Attribute, Whitespace, Keyword.Pseudo, Whitespace, Keyword.Pseudo, Whitespace, Name.Namespace, Punctuation, Name.Variable.Class), 'error-type-declaration'),

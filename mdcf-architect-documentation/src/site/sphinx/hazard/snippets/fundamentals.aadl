@@ -1,15 +1,15 @@
 property set PulseOx_Forwarding_Error_Properties is
 with EMV2, MAP_Error_Properties;
 
-	Context1 : constant MAP_Error_Properties::Context => 
+	TheContext : constant MAP_Error_Properties::Context => 
 		"Clinicians want to view physiological parameters on a display not physically connected to a physiological monitor.";
 		
-	Assumption1 : constant MAP_Error_Properties::Assumption =>
+	NoAlarms : constant MAP_Error_Properties::Assumption =>
 		"There are no alarms that need forwarding.";
 		
-	SpO2 : constant MAP_Error_Properties::Abbreviation => [
-		Full => "Blood-oxygen saturation";
-		Definition => "The amount of oxygen in the patient's blood";
+	KVO : constant MAP_Error_Properties::Abbreviation => [
+		Full => "Keep Vein Open";
+		Definition => "A minimal rate (of drug administration)";
 	];
 
 	DeathOrInjury : constant MAP_Error_Properties::Accident_Level => [
@@ -23,16 +23,16 @@ with EMV2, MAP_Error_Properties;
 		Level => PulseOx_Forwarding_Error_Properties::DeathOrInjury;
 	];
 	
-	BadInfoDisplayed : constant MAP_Error_Properties::Hazard => [
+	InadvertentPumpNormally : constant MAP_Error_Properties::Hazard => [
 		Number => 1;
-		Description => "Incorrect information is sent to the display.";
+		Description => "An inadvertent `Pump Normally` command is sent to the pump.";
 		Accident => PulseOx_Forwarding_Error_Properties::PatientHarmed;
 	];
 	
-	ShowGoodInfo : constant MAP_Error_Properties::Constraint => [
+	PumpWhenSafe : constant MAP_Error_Properties::Constraint => [
 		Number => 1;
-		Description => "The app must inform the display of the status of the patient's vital signs.";
-		Hazard => PulseOx_Forwarding_Error_Properties::BadInfoDisplayed;
+		Description => "The app must only instruct the pump to run at a normal rate when the patient can tolerate more analgesic.";
+		Hazard => PulseOx_Forwarding_Error_Properties::InadvertentPumpNormally;
 	];
 	
 end PulseOx_Forwarding_Error_Properties;

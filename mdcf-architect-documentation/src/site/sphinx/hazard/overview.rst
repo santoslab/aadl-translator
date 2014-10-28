@@ -1,4 +1,5 @@
 .. include:: ../util/substitution.rst
+.. default-domain:: aadl
 .. _hazard-analysis-overview:
 
 ########################
@@ -22,8 +23,8 @@ In this language walkthrough, we'll be re-using the app developed in the :ref:`a
 
 .. You can also download :download:`annotated AADL<snippets/pulse-ox-forwarding.zip>`, or :download:`view the generated report<PulseOx_Forwarding_System.html>`.
 
+Since our process and format are based on STPA, we focus first on hazard analysis :ref:`fundamentals<hazard-analysis-fundamentals>` (eg, accidents to be avoided, safety constraints that prevent them, etc.) then look at how faults can :ref:`occur<hazard-analysis-occurrence>` on potentially unsafe control actions (which are equivalent to system level :construct:`port connections<portconnection>` in our system) and finally document their architectural causes and impacts in individual :ref:`components<hazard-analysis-components>`.
 
-	components
 
 .. toctree::
 	:hidden:
