@@ -2,116 +2,78 @@
 .. default-domain:: aadl
 .. _hazard-analysis-components:
 
-##############################
-Hazard Analysis for Components
-##############################
+##########################################
+Architecturally Integrated Hazard Analysis
+##########################################
 
-Some explanatory text about the the annotations for components, and credit / links to EMV2 go here.
+As part of specifying an :property:`occurrence<occurrence>` property, developers are asked to specify the *impact* of the hazardous occurrence.  That impact is an EMv2 :construct:`Error Type<errortype>` that is propagated between the components joined by the :construct:`connection<portconnection>` that the occurrence is applied to.
 
-.. code-block:: aadl
-   :linenos:
+***********
+Error Types
+***********
 
-   package PCA_Shutoff_Errors
-   public
-   with MAP_Errors, PCA_Shutoff_Error_Properties, MAP_Error_Properties,
-      PCA_Shutoff;
+Error types are faults that are specific to the app being constructed.  They can extend, rename, or be totally independent of existing error types.  Extension of MAP Errors is the most common way to create new error types, though completely new types can be created if necessary.  Similarly, existing types can be renamed.  Error types must be declared within an EMv2 annex block, and are typically placed in their own file.
 
-   annex EMV2
-   {**
-      error types
-      -- These errors aren't associated with unsafe states, but they're here for completeness
-      SpO2ValueLow : type extends MAP_Errors::WrongPhysioDataError;
-      RespiratoryRateLow : type extends MAP_Errors::WrongPhysioDataError;
-      ETCO2ValueHigh : type extends MAP_Errors::WrongPhysioDataError;
+Here's an example of the EMv2 error hierarchy used in our example app:
+
++--------------------+----------------------+------------------+
+| Error Library Type | MAP Error Type       | App Error Type   |
++====================+======================+==================+
+| LateDelivery       | LatePhysioDataError  | SpO2ValueLate    |
++--------------------+----------------------+------------------+
+| IncorrectValue     | WrongPhysioDataError | SpO2ValueHigh    |
++--------------------+----------------------+------------------+
+| N/A                | PhysioDeviceFailure  | NoSpO2Data       |
++--------------------+----------------------+------------------+
+| N/A                | N/A                  | MissedAlarm      |
++--------------------+----------------------+------------------+
+
+.. construct:: error type
+
+   An application specific fault and its relation (extension, renaming, or none) to existing error libraries.
    
-      -- These errors will cause the app to logic to think the patient is healthy when she isn't
-      SpO2ValueHigh : type extends MAP_Errors::WrongPhysioDataError;
-      RespiratoryRateHigh : type extends MAP_Errors::WrongPhysioDataError;
-      ETCO2ValueLow : type extends MAP_Errors::WrongPhysioDataError;
+   :context EMv2Block: Error types are must be in an EMv2 block
+   :context-type EMv2Block: Standalone EMv2 Block
    
-      -- These are errors with devices
-      DeviceAlarmFailsOn : type extends MAP_Errors::PhysioDeviceErrorCommission;
-      DeviceAlarmFailsOff : type extends MAP_Errors::PhysioDeviceErrorOmission;
-      BadInfoDisplayedToClinician : type extends MAP_Errors::WrongInfoDisplayedError;
-      InadvertentPumpNormally : type extends MAP_Errors::AppCommission;
-      InadvertentPumpMinimally : type extends MAP_Errors::AppOmission;
-      end types;
-   **};
+Example
+=======
 
-   end PCA_Shutoff_Errors; 
+.. literalinclude:: snippets/error-types.aadl
+	:language: aadl
+	:linenos:
+	
+******************
+Error Propagations
+******************
 
+Individual components propagate :construct:`error types<errortype>` in or out as sources, sinks, or transformations. These propagations are specified directly in the annexes of either :construct:`devices<device>` or :construct:`processes<process>`: the direction and error type is specified first, and then a more detailed flow specification (documenting whether the component is a source, sink, or path for the error type).
 
-.. code-block:: aadl
-   :linenos:
-   
-   package PulseOx_Interface
-   public
-   with PCA_Shutoff_Types, PCA_Shutoff_Errors, EMV2, MAP_Error_Properties, PCA_Shutoff;
-      device ICEpoInterface
-      features
-         SpO2 : out event data port PCA_Shutoff_Types::SpO2;
-      annex EMV2 {** 
-         use types PCA_Shutoff_Errors;
-         error propagations
-            SpO2 : out propagation {SpO2ValueHigh};
-            flows
-               SpO2UnDetectableHighValueFlowSource : error source SpO2 {SpO2ValueHigh};
-         end propagations;
-      **};
-      end ICEpoInterface;
+.. construct:: error propagations
 
-      device implementation ICEpoInterface.imp
-      end ICEpoInterface.imp;
+   Specifies how error types relevant to this component enter or leave the component.
+      
+   :context device: Device interfaces, as endpoints, are typically sources or sinks for error propagations.
+   :context process: Processes, as transformers, can be -- in addition to sources and sinks -- (potentially transformative) paths for errors to propagate through
+   :context-type device: :construct:`device`
+   :context-type process: :construct:`process`
 
-   end PulseOx_Interface;
+Examples
+========
 
-.. code-block:: aadl
-   :linenos:
+Here's a pulse oximeter interface that has been extended to specify that its value may be too high.
 
-   package PCA_Shutoff_Logic
-   public
-   with PCA_Shutoff_Types, PCA_Shutoff_Properties, MAP_Properties;
+.. literalinclude:: snippets/device.aadl
+	:language: aadl
+	:linenos:
+	
+Here's an excerpt of the app's logic extended to include an error path.  Note that this error path transforms the error -- the incoming incorrectly-high SpO\ :sub:`2` leads to a missed alarm.
 
-      process ICEpcaShutoffProcess
-      features
-         SpO2 : in event data port PCA_Shutoff_Types::SpO2;      
-         CommandPumpNormal : out event data port PCA_Shutoff_Types::PumpNormalCommand;
-      properties
-         MAP_Properties::Component_Type => logic;
-      annex EMV2 {** 
-         use types PCA_Shutoff_Errors;
-         error propagations
-            SpO2 : in propagation {SpO2ValueHigh};
-            CommandPumpNormal : out propagation {InadvertentPumpNormally};
-            flows
-               HighSpO2LeadsToOD : error path SpO2{SpO2ValueHigh} -> CommandPumpNormal{InadvertentPumpNormally};
-         end propagations;
-      **};
-      end ICEpcaShutoffProcess;
+.. literalinclude:: snippets/logic.aadl
+	:language: aadl
+	:linenos:
+	
+Finally, here's an error sink -- the missed alarm error is forwarded to our display.
 
-      -- Process implementation redacted
-   end PCA_Shutoff_Logic;
-
-.. code-block:: aadl
-   :linenos:
-
-   package PCAPump_Interface
-   public
-   with PCA_Shutoff_Types;
-      device ICEpcaInterface
-      features
-         PumpNormally : in event data port PCA_Shutoff_Types::PumpNormalCommand;
-      annex EMV2 {**
-         use types PCA_Shutoff_Errors;
-         error propagations
-            PumpNormally : in propagation {InadvertentPumpNormally};
-            flows
-               ODCommand : error sink PumpNormally {InadvertentPumpNormally};   
-         end propagations;
-      **};
-      end ICEpcaInterface;
-
-      device implementation ICEpcaInterface.imp
-      end ICEpcaInterface.imp;
-
-   end PCAPump_Interface;
+.. literalinclude:: snippets/display.aadl
+	:language: aadl
+	:linenos:

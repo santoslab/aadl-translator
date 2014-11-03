@@ -40,6 +40,7 @@ Device components translate to the "pseudo devices" which are java classes that 
    
 .. literalinclude:: snippets/device.java
 	:language: java
+	:linenos:
 
 .. literalinclude:: snippets/device.compsig.xml
 	:language: xml

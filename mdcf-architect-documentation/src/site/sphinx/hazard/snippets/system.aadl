@@ -1,220 +1,42 @@
-package PCA_Shutoff
+package PulseOx_Forwarding_System
 public
-with PulseOx_Interface, PCAPump_Interface, PCA_Shutoff_Logic, 
-	PCA_Shutoff_Properties, MAP_Error_Properties, PCA_Shutoff_Display,
-	PCA_Shutoff_Errors, Capnograph_Interface, MAP_Errors,
-	PCA_Shutoff_Error_Properties;
-	
-	system PCA_Shutoff_System
-	end PCA_Shutoff_System;
+with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display, PulseOx_Forwarding_Properties;
 
-	system implementation PCA_Shutoff_System.imp
+	system PulseOx_Forwarding_System
+	end PulseOx_Forwarding_System;
+	
+	system implementation PulseOx_Forwarding_System.imp
 	subcomponents
-		-- Physiological inputs	
+		-- Physiological inputs
 		pulseOx : device PulseOx_Interface::ICEpoInterface.imp;
-		capnograph : device Capnograph_Interface::ICEcapnographInterface.imp;
 		
 		-- App logic
-		appLogic : process PCA_Shutoff_Logic::ICEpcaShutoffProcess.imp;
-		appDisplay : process PCA_Shutoff_Display::ICEpcaDisplayProcess.imp;
-		
-		-- Controlled device
-		pcaPump : device PCAPump_Interface::ICEpcaInterface.imp;
+		appLogic : process PulseOx_Forwarding_Logic::PulseOx_Logic_Process.imp;
+		appDisplay : process PulseOx_Forwarding_Display::PulseOx_Display_Process.imp;
 	connections
-		-- From components to logic
-		spo2_logic : port pulseOx.SpO2 -> appLogic.SpO2;
-		respiratoryrate_logic : port capnograph.RespiratoryRate -> appLogic.RespiratoryRate;
-		pumpcommand_logic : port appLogic.CommandPumpNormal -> pcaPump.PumpNormally;
-		etco2_logic : port capnograph.ETCO2 -> appLogic.ETCO2;
-		capnograph_fail_logic : port capnograph.DeviceError -> appLogic.capnographError;
-		pulseox_fail_logic : port pulseOx.DeviceError -> appLogic.pulseOxError; 
+		-- From device to logic
+		spo2_to_logic : port pulseOx.SpO2 -> appLogic.SpO2;
 		
-		-- From components to display
-		spo2_disp : port pulseOx.SpO2 -> appDisplay.SpO2;
-		respiratoryrate_disp : port capnograph.RespiratoryRate -> appDisplay.RespiratoryRate;
-		pumpcommand_disp : port appLogic.CommandPumpNormal -> appDisplay.CommandPumpNormal;
-		etco2_disp : port capnograph.ETCO2 -> appDisplay.ETCO2;
-		capnograph_fail_disp : port capnograph.DeviceError -> appDisplay.capnographError;
-		pulseox_fail_disp : port pulseOx.DeviceError -> appDisplay.pulseOxError;
-	flows
-		spo2_flow : end to end flow pulseOx.spo2_flow -> spo2_logic -> appLogic.spo2_flow -> pumpcommand_logic -> pcaPump.spo2_flow;
+		-- From device to display
+		spo2_to_display : port pulseOx.SpO2 -> appDisplay.SpO2;
+		
+		-- From logic to display
+		alarm_to_display : port appLogic.DerivedAlarm -> appDisplay.DerivedAlarm;
+		package PCA_Shutoff
 	annex EMV2 {**
-		use types PCA_Shutoff_Errors;
-		connection error
-			spo2_high_err: error source spo2_logic;
-			spo2_high_disp_error : error source spo2_disp;
-			pulseox_fail_err: error source pulseox_fail_logic;
-			capnograph_fail_err: error source capnograph_fail_logic;
-			respiratoryrate_logic: error source respiratoryrate_logic;
-			od_cmd_err: error source pumpcommand_logic;
-		end connection;
-		properties
-		-- Errors between the app logic and the pump
-		MAP_Error_Properties::Occurrence => [
-			Kind => Providing;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "High Physio Params";
-			Cause => "One or more physiological parameters are too high, leading the app logic to incorrectly believe the patient is healthy";
-			Compensation => "Physiological values are cross-checked with others";
-			Impact => reference(InadvertentPumpNormally);
-		] applies to od_cmd_err;
-		MAP_Error_Properties::Occurrence => [
-			Kind => AppliedTooLong;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Network Drop";
-			Cause => "Network drops out, leaving the pump running normally when it should be shut off";
-			Compensation => "Pump-normal commands have a maximum time, after which the pump runs at the KVO rate";
-			Impact => reference(InadvertentPumpNormally);
-		] applies to od_cmd_err;
-		MAP_Error_Properties::Occurrence => [
-			Kind => StoppedTooSoon;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Software Error";
-			Cause => "Software error leads to the KVO command not being applied as long as it should";
-			Compensation => "???";
-			Impact => reference(InadvertentPumpNormally);
-		] applies to od_cmd_err;
-		MAP_Error_Properties::Occurrence => [
-			Kind => Early;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Software Error";
-			Cause => "Software error leads to the pump normal command arriving early";
-			Compensation => "???";
-			Impact => reference(InadvertentPumpNormally);
-		] applies to od_cmd_err;
-		MAP_Error_Properties::Occurrence => [
-			Kind => Late;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Software Error";
-			Cause => "Software error leads to the KVO command arriving late";
-			Compensation => "???";
-			Impact => reference(InadvertentPumpNormally);
-		] applies to od_cmd_err;
-		MAP_Error_Properties::Occurrence => [
-			Kind => Late;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Network Lag";
-			Cause => "The network lags, so the KVO command arrives too late";
-			Compensation => "Use a provisioned network";
-			Impact => reference(InadvertentPumpNormally);
-		] applies to od_cmd_err;
-	
-		-- Errors between the PulseOx and the App Logic
-		MAP_Error_Properties::Occurrence => [
-			Kind => NotProviding;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Device Alarm Unsent";
-			Cause => "The pulse oximeter does not send an alarm to the app logic when it should";
-			Compensation => "???";
-			Impact => reference(DeviceAlarmFailsOff);
-		] applies to pulseox_fail_err;
-		
-		-- Errors between the PulseOx's SpO2 channel and the App Logic
-		MAP_Error_Properties::Occurrence => [
-			Kind => ValueHigh;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Wrong Values (Undetected)";
-			Cause => "Incorrect values are gathered from the physiological sensors";
-			Compensation => "???";
-			Impact => reference(SpO2ValueHigh);
-		] applies to spo2_high_err;
-		MAP_Error_Properties::Occurrence => [
-			Kind => AppliedTooLong;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Network Drop";
-			Cause => "Network drops out, leaving the SpO2 value potentially too high";
-			Compensation => "Physiological readings have a maximum time, after which they are no longer valid";
-			Impact => reference(SpO2ValueHigh);
-		] applies to spo2_high_err;
-		MAP_Error_Properties::Occurrence => [
-			Kind => Providing;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Wrong values (Detection Dropped)";
-			Cause => "Incorrect SpO2 values are gathered from the pulse oximeter, and notification can't be provided to the app due to network failure";
-			Compensation => "Error state is bundled with physiological readings";
-			Impact => reference(SpO2ValueHigh);
-		] applies to spo2_high_err;
-		MAP_Error_Properties::Occurrence => [
-			Kind => Providing;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Wrong values (Detected)";
-			Cause => "Incorrect SpO2 values are gathered from the pulse oximeter";
-			Compensation => "Notification of erroneous values is provided to the app logic";
-			Impact => reference(SpO2ValueHigh);
-		] applies to spo2_high_err;
-		
-		-- Errors between the PulseOx and the App display panel
-		MAP_Error_Properties::Occurrence => [
-			Kind => Providing;
-			Hazard => PCA_Shutoff_Error_Properties::H2;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C2;
-			Title => "Wrong Values (Undetected)";
-			Cause => "Incorrect values are gathered from the physiological sensors";
-			Compensation => "???";
-			Impact => reference(BadInfoDisplayedToClinician);
-		] applies to spo2_high_disp_error;
-		
-		-- Errors between the Capnograph and the App Logic
-		MAP_Error_Properties::Occurrence => [
-			Kind => NotProviding;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Device Alarm Unsent";
-			Cause => "The capnograph does not send an alarm to the app logic when it should";
-			Compensation => "???";
-			Impact => reference(DeviceAlarmFailsOff);
-		] applies to capnograph_fail_err;
-		
-		-- Errors between the Capnograph's respiratory rate channel and the App Logic
-		MAP_Error_Properties::Occurrence => [
-			Kind => ValueHigh;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Wrong Values (Undetected)";
-			Cause => "Incorrect values are gathered from the physiological sensors";
-			Compensation => "???";
-			Impact => reference(RespiratoryRateHigh);
-		] applies to respiratoryrate_logic;
-		MAP_Error_Properties::Occurrence => [
-			Kind => AppliedTooLong;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Network Drop";
-			Cause => "Network drops out, leaving the SpO2 value potentially too high";
-			Compensation => "Physiological readings have a maximum time, after which they are no longer valid";
-			Impact => reference(RespiratoryRateHigh);
-		] applies to respiratoryrate_logic;
-		MAP_Error_Properties::Occurrence => [
-			Kind => Providing;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Wrong values (Detection Dropped)";
-			Cause => "Incorrect SpO2 values are gathered from the pulse oximeter, and notification can't be provided to the app due to network failure";
-			Compensation => "Error state is bundled with physiological readings";
-			Impact => reference(RespiratoryRateHigh);
-		] applies to respiratoryrate_logic;
-		MAP_Error_Properties::Occurrence => [
-			Kind => Providing;
-			Hazard => PCA_Shutoff_Error_Properties::H1;
-			ViolatedConstraint => PCA_Shutoff_Error_Properties::C1;
-			Title => "Wrong values (Detected)";
-			Cause => "Incorrect SpO2 values are gathered from the pulse oximeter";
-			Compensation => "Notification of erroneous values is provided to the app logic";
-			Impact => reference(RespiratoryRateHigh);
-		] applies to respiratoryrate_logic;
-		
+	   use types PulseOx_Forwarding_Errors;
+	   properties
+	   MAP_Error_Properties::Occurrence => [
+		  Kind => NotProviding;
+		  Hazard => PulseOx_Forwarding_Error_Properties::MissedAlarm;
+		  ViolatedConstraint => PulseOx_Forwarding_Error_Properties::ShowAllAlarms;
+		  Title => "Bad SpO2";
+		  Cause => "The SpO2 values from the pulse oximeter are too high, so the alarm is missed";
+		  Compensation => "None";
+		  Impact => reference(SpO2ValueHigh);
+	   ] applies to alarm_to_display;
+	   -- Other occurrences redacted
 	**};
-	end PCA_Shutoff_System.imp;
 
-end PCA_Shutoff;
+	end PulseOx_Forwarding_System.imp;
+end PulseOx_Forwarding_System;

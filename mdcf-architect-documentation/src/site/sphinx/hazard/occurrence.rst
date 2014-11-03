@@ -12,67 +12,32 @@ The *occurrence* property is designed to do associate three main things with one
 2. A human-readable description of the fault's cause and compensation
 3. A specific fault and control action
 
-.. construct:: EMV2 Annex
+The occurrence property (or, more likely, list of properties) should be placed in an EMv2 annex in the app's :construct:`System Implementation<systemimplementation>`.
 
-   Silly words
-
-   :contained-element connection-error: Lolololz
-   :contained-element use-types: Lolololz
-   :kind connection-error: :construct:`Port Connection<portconnection>`
-   :kind use-types: Set of :construct:`Error Types<error-type>`
-
-.. property:: Occurrence
+.. property:: occurrence
 
    An assumption about the environment / clinical process where the app will be used.
 
    :type: Record
-   :subproperty Kind: Temp
-   :subproperty Hazard: Temp
-   :subproperty ViolatedConstraint: Temp
-   :subproperty Title: Temp
-   :subproperty Cause: Temp
-   :subproperty Compensation: Temp
-   :subproperty Impact: Temp
+   :subproperty Kind: The STPA keyword associated with this hazardous occurrence
+   :subproperty Hazard: The hazard (as documented in the preliminaries file) associated with this hazardous occurrence
+   :subproperty ViolatedConstraint: The safety constraint (as documented in the preliminaries file) associated with this hazardous occurrence
+   :subproperty Title: A short title for the occurrence
+   :subproperty Cause: A human-readable cause for for the occurrence
+   :subproperty Compensation: Any compensatory steps that could be taken, or an explicit recognition that there is no way to compensate for this hazardous occurrence
+   :subproperty Impact: The EMv2 fault type representing the impact if this hazardous occurrence comes to pass.  This fault type should be propagated out of the component that is the source of the :construct:`connection<portconnection>` this property is applied to, and propagated into the component that is the sink of the connection.
    :type Kind: One of ``NotProviding``, ``Providing``, ``Early``, ``Late``, ``AppliedTooLong``, ``StoppedTooSoon``, ``ValueLow``, ``ValueHigh``, ``ParamsMissing``, ``ParamsWrong``, or ``ParamsOutOfOrder``
    :type Hazard: :property:`Hazard<hazard>`
    :type ViolatedConstraint: :property:`Constraint<constraint>`
    :type Title: AADLString
    :type Cause: AADLString
    :type Compensation: AADLString
-   :type Impact: :construct:`Error Type<error-type>`
-   :context: :construct:`System<system>`
+   :type Impact: :construct:`Error Type<errortype>`
+   :context: :construct:`System Implementation<systemimplementation>`
    :example: 
 
-.. code-block:: aadl
-   :linenos:
+.. literalinclude:: snippets/system.aadl
+	:language: aadl
+	:linenos:
    
-   package PCA_Shutoff
-   public
-   
-   system PCA_Shutoff_System
-   end PCA_Shutoff_System;
-
-   system implementation PCA_Shutoff_System.imp
-   subcomponents
-      pulseOx : device PulseOx_Interface::ICEpoInterface.imp;
-      appLogic : process PCA_Shutoff_Logic::ICEpcaShutoffProcess.imp;
-   connections
-      spo2_data : port pulseOx.SpO2 -> appLogic.SpO2;
-   annex EMV2 {**
-      use types PCA_Shutoff_Errors;
-      properties
-      MAP_Error_Properties::Occurrence => [
-         Kind => AppliedTooLong;
-         Hazard => PCA_Shutoff_Error_Properties::InadvertentPumpNormally;
-         ViolatedConstraint => PCA_Shutoff_Error_Properties::PumpWhenSafe;
-         Title => "Network Drop";
-         Cause => "Network drops out, leaving the SpO2 value potentially too high";
-         Compensation => "Physiological readings have a maximum time, after which they are no longer valid";
-         Impact => reference(SpO2ValueHigh);
-      ] applies to spo2_data;
-   **};
-   
-   end PCA_Shutoff_System.imp;
-   end PCA_Shutoff;
-   
-.. note:: The context must be set explicitly via the ``applies to`` operator, rather than by embedding this property in its context (see line 11 above).
+.. note:: The context must be set explicitly via the ``applies to`` operator, rather than by embedding this property in its context (see line 24 in the example above).
