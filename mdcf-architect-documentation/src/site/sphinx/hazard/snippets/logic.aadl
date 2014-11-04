@@ -1,0 +1,24 @@
+package PulseOx_Forwarding_Logic
+public
+with PulseOx_Forwarding_Types, PulseOx_Forwarding_Properties, MAP_Properties;
+
+	process PulseOx_Logic_Process
+	features
+		SpO2 : in event data port PulseOx_Forwarding_Types::SpO2;		
+		DerivedAlarm : out event port;
+	properties
+		MAP_Properties::Component_Type => logic;
+	annex EMV2 {** 
+		use types PulseOx_Forwarding_Errors;
+		error propagations
+			SpO2 : in propagation {SpO2ValueHigh};
+			DerivedAlarm : out propagation {MissedAlarm};
+			flows
+				HighSpO2LeadsToMissedAlarm : error path SpO2{SpO2ValueHigh} -> DerivedAlarm{MissedAlarm};
+		end propagations;
+	**};
+	end PulseOx_Logic_Process;
+
+	-- Process implementation and threads redacted
+	
+end PulseOx_Forwarding_Logic;

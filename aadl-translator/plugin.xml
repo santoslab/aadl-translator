@@ -23,7 +23,7 @@
          point="org.eclipse.ui.commands">
       <command
             id="edu.ksu.cis.projects.mdcf.aadl-translator.translate"
-            name="Translate Command">
+            name="Translate App">
       </command>
       <command
             id="edu.ksu.cis.projects.mdcf.aadl-translator.device-aadl-translate"

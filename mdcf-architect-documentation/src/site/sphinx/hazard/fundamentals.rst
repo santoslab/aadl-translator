@@ -2,9 +2,9 @@
 .. default-domain:: aadl
 .. _hazard-analysis-fundamentals:
 
-############################
-Background and  Fundamentals
-############################
+###########################
+Background and Fundamentals
+###########################
 
 Before a hazard analysis can begin, there are a number of app background elements and *fundamentals* that should be established. These fundamentals are documented as AADL property constants.
 
@@ -12,14 +12,14 @@ Before a hazard analysis can begin, there are a number of app background element
 Background Properties
 *********************
 
-.. property:: Context
+.. property:: context
 
    The clinical context of the app. That is, the problem that the app will address. There should only be one context per app.
 
    :type: AADLString
    :example: "Clinicians want to view physiological parameters on a display not physically connected to a physiological monitor."
 
-.. property:: Assumption
+.. property:: assumption
 
    An assumption about the environment / clinical process where the app will be used.
 
@@ -29,7 +29,7 @@ Background Properties
 .. note::
    The names of the context and assumption properties are ignored by the report generator.
 
-.. property:: Abbreviation
+.. property:: abbreviation
 
    An assumption about the environment / clinical process where the app will be used.
 
@@ -53,7 +53,7 @@ Background Properties
 Hazard Analysis Fundamentals
 ****************************
 
-.. property:: Accident_Level
+.. property:: accident_level
 
    The priority of an accident. Used for prioritization when mitigating one hazard would increase exposure to another.
 
@@ -73,7 +73,7 @@ Hazard Analysis Fundamentals
 	   ];
    end ExampleAccident_LevelSet;
    
-.. property:: Accident
+.. property:: accident
 
    A particular accident that could occur as a result of the app.
 
@@ -96,7 +96,7 @@ Hazard Analysis Fundamentals
 	   ];
    end ExampleAccidentSet;
    
-.. property:: Hazard
+.. property:: hazard
 
    A particular hazard that the app could encounter.
 
@@ -119,7 +119,7 @@ Hazard Analysis Fundamentals
 	   ];
    end ExampleHazardSet;
 
-.. property:: Constraint
+.. property:: constraint
 
    A safety constraint that, if enforced, will prevent a particular hazard from occurring.
 
