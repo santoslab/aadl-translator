@@ -24,7 +24,7 @@ Background Properties
    An assumption about the environment / clinical process where the app will be used.
 
    :type: AADLString
-   :example: "There are no alarms that need forwarding."
+   :example: "There are no device-based alarms that need forwarding."
 
 .. note::
    The names of the context and assumption properties are ignored by the report generator.
@@ -142,6 +142,23 @@ Hazard Analysis Fundamentals
 	   ];
    end ExampleConstraintSet;
 
+***************
+System Diagrams
+***************
+
+Two of the "fundamentals" identified in |STPA| are graphical in nature -- an identification of the system's boundaries and an allocation of control actions individual channels of communication between components.  Unfortunately, these diagrams cannot be automatically created. To add them to the report, save the diagrams as SystemBoundary.png and ProcessModel.png in a folder named diagrams at the top level of your project.
+
+Here is a specification of the boundaries for our example app (SystemBoundary.png):
+
+.. image:: images/app-boundary.png
+   :alt: The system boundary for our example app
+   :align: center
+
+Here is the process model (ProcessModel.png) for our example app, which has control actions and feedback messages allocated to the links between process elements:
+
+.. image:: images/process-model.png
+	:alt: The process model for our example app, showing control actions and feedback messages
+	:align: center
 
 *******
 Example
@@ -150,3 +167,9 @@ Example
 .. literalinclude:: snippets/fundamentals.aadl
 	:language: aadl
 	:linenos:
+	
+***********
+Translation
+***********
+
+The background and fundamental properties are pulled into / formatted as part of the report generation.  Additionally, control actions and feedback messages are identified and documented, and the process model and system boundary images are inserted into the report.  You can :download:`view an example report here<PulseOx_Forwarding_System.html>`.

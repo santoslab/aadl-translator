@@ -27,6 +27,15 @@ with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display, Pu
 	   use types PulseOx_Forwarding_Errors;
 	   properties
 	   MAP_Error_Properties::Occurrence => [
+		  Kind => ValueHigh;
+		  Hazard => PulseOx_Forwarding_Error_Properties::BadInfoDisplayed;
+		  ViolatedConstraint => PulseOx_Forwarding_Error_Properties::ShowGoodInfo;
+		  Title => "Wrong values";
+		  Cause => "Incorrect values are gathered from the physiological sensors";
+		  Compensation => "???";
+		  Impact => reference(SpO2ValueHigh);
+	   ] applies to spo2_to_logic;
+	   MAP_Error_Properties::Occurrence => [
 		  Kind => NotProviding;
 		  Hazard => PulseOx_Forwarding_Error_Properties::MissedAlarm;
 		  ViolatedConstraint => PulseOx_Forwarding_Error_Properties::ShowAllAlarms;
@@ -35,7 +44,15 @@ with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display, Pu
 		  Compensation => "None";
 		  Impact => reference(SpO2ValueHigh);
 	   ] applies to alarm_to_display;
-	   -- Other occurrences redacted
+	   MAP_Error_Properties::Occurrence => [
+		  Kind => ValueHigh;
+		  Hazard => PulseOx_Forwarding_Error_Properties::BadInfoDisplayed;
+		  ViolatedConstraint => PulseOx_Forwarding_Error_Properties::ShowGoodInfo;
+		  Title => "Bad SpO2";
+		  Cause => "Incorrect SpO2 values are sent to the display";
+		  Compensation => "None";
+		  Impact => reference(SpO2ValueHigh);
+	   ] applies to spo2_to_display;
 	**};
 
 	end PulseOx_Forwarding_System.imp;

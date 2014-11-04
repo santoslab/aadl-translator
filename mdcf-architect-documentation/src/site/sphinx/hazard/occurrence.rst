@@ -36,8 +36,62 @@ The occurrence property (or, more likely, list of properties) should be placed i
    :context: :construct:`System Implementation<systemimplementation>`
    :example: 
 
+.. note:: The context must be set explicitly via the ``applies to`` operator, rather than by embedding this property in its context (see line 24 in the example below).
+
+*******
+Example
+*******
+
 .. literalinclude:: snippets/system.aadl
 	:language: aadl
 	:linenos:
    
-.. note:: The context must be set explicitly via the ``applies to`` operator, rather than by embedding this property in its context (see line 24 in the example above).
+***********
+Translation
+***********
+
+Example output from the report generator that comes with the MDCF Architect can be :download:`viewed online<PulseOx_Forwarding_System.html>`, and is also documented here.
+
+Unsafe Control Actions
+======================
+
+The occurrence properties (and supporting fundamentals) are used to generate tables of unsafe control actions.  There are two tables created: the first looks at all :construct:`port connections<portconnection>` (which are the system's control actions and feedback messages) as simple events, and documents how they could fail:
+
++------------------+-----------------+------------------------+------------------+------------------+-------+------+
+| Control Action   | Providing       | Not providing          | Applied Too Long | Stopped Too Soon | Early | Late |
++==================+=================+========================+==================+==================+=======+======+
+| spo2_to_logic    |                 |                        |                  |                  |       |      |
++------------------+-----------------+------------------------+------------------+------------------+-------+------+
+| spo2_to_display  |                 |                        |                  |                  |       |      |
++------------------+-----------------+------------------------+------------------+------------------+-------+------+
+| alarm_to_display |                 | MissedAlarm (Bad SpO2) |                  |                  |       |      |
++------------------+-----------------+------------------------+------------------+------------------+-------+------+
+
+The second table looks at port connections with ranged types (eg, integers and floats) and documents how they could fail:
+
++----------------+----------------------------+---------------+
+| Control Action | Value Too High             | Value Too Low |
++================+============================+===============+
+| spo2_to_logic  | BadInfoDisplayed (BadSpO2) |               |
++----------------+----------------------------+---------------+
+| spo2_to_display| BadInfoDisplayed (BadSpO2) |               |
++----------------+----------------------------+---------------+
+
+Causes and Compensations
+========================
+
+The human-readable causes and compensations are then compiled into a list, organized by :construct:`port connection<portconnection>`:
+
+
+**alarm_to_display**
+
+* NOTPROVIDING: Bad SpO2
+	* Cause: Incorrect SpO2 values are sent to the display
+	* Compensation: The SpO2 values from the pulse oximeter are too high, so the alarm is missed
+
+**spo2_to_display**
+
+* VALUEHIGH: Bad SpO2
+	* Cause: Incorrect SpO2 values are sent to the display
+	* Compensation: None
+
