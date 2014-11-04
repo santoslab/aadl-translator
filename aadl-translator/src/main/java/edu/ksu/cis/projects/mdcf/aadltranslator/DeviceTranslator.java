@@ -515,7 +515,7 @@ public final class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 					|| suffix.equals(CommPatternType.EXECUTOR.suffix)) {
 				exchange_suffix = "_action";
 			} else {
-				exchange_suffix = "_pub";
+				exchange_suffix = "_pub_out";
 			}
 
 			return fullPortName.substring(0,

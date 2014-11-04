@@ -45,8 +45,6 @@ package mdcf.device.<model.name>;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import com.google.common.io.CharStreams;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.Xpp3Driver;
 
 import mdcf.channelservice.common.IMdcfMessageListener;
 import mdcf.channelservice.common.MdcfMessage;
@@ -57,7 +55,6 @@ import mdcf.core.ctypes.device.DeviceComponent;
 import mdcf.core.ctypes.device.factory.common.IDeviceModel;
 import mdcf.core.messagetypes.devicemgmt.PubChannelAssignmentMsg;
 import mdcf.core.messagetypes.devicemgmt.SubChannelAssignmentMsg;
-
 import mdcf.device.common.messages.Request;
 import mdcf.device.common.messages.ActionRequest;
 import mdcf.device.common.messages.ActionResult;
@@ -83,8 +80,10 @@ loadDeviceModel(mode) ::=<<
 			readCompSig("<model.name>.compsig.xml"),
 			readDML("<model.name>.dml.xml"));
 
-	private XStream xstream = null;
-
+	public static void main(String[] args) {
+			<model.name>SuperType dev = new <model.name>();
+			dev.connectToNetworkController();
+	}
 
 	private static String readCompSig(String compFileName) {
 		String comp_sig = null;
@@ -147,15 +146,12 @@ actionExchangeField(ModelName, ExchangeName) ::=<<
 constructor(model) ::=<<
 <! 	Building Constructors !>	
 	protected <model.name>SuperType(String GUID, String deviceTypeName) {
-		super(GUID, deviceTypeName);
-	    xstream = new XStream(new Xpp3Driver());
-		
+		super(GUID, deviceTypeName);		
 	}
 	
 	protected <model.name>SuperType(String guid, String name,
 			boolean useCommunicationSecurityFeature) {
 		super(guid, name);
-		xstream = new XStream(new Xpp3Driver());
 		setUseCommunicationSecurityFeature(useCommunicationSecurityFeature);
 	
 		// Setting device model for PnP
