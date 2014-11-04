@@ -50,7 +50,7 @@ public class ConnectionModelHazardTests {
 	
 	@Test
 	public void testOccurrenceConnectionErrorName() {
-		assertEquals("spo2_high_err", occurrence.getConnErrorName());
+		assertEquals("spo2_to_logic", occurrence.getConnErrorName());
 	}
 	
 	@Test

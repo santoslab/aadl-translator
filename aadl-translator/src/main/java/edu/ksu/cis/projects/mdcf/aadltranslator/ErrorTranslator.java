@@ -3,7 +3,6 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.osate.aadl2.ContainedNamedElement;
 import org.osate.aadl2.ContainmentPathElement;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.NamedValue;
@@ -12,6 +11,7 @@ import org.osate.aadl2.PropertyConstant;
 import org.osate.aadl2.ReferenceValue;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.SystemImplementation;
+import org.osate.aadl2.impl.PortConnectionImpl;
 import org.osate.aadl2.impl.RecordValueImpl;
 import org.osate.xtext.aadl2.errormodel.errorModel.ConnectionErrorSource;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
@@ -46,9 +46,9 @@ public final class ErrorTranslator {
 			for(PropertyAssociation pa : EMV2Util.getOwnEMV2Subclause(sysImp).getProperties()){
 				// Setup 
 				rv = ((RecordValueImpl)pa.getOwnedValues().get(0).getOwnedValue());
-				if(!(pa.getAppliesTos().iterator().next().getContainmentPathElements().iterator().next().getNamedElement() instanceof ConnectionErrorSource))
+				if(!(pa.getAppliesTos().iterator().next().getContainmentPathElements().iterator().next().getNamedElement() instanceof PortConnectionImpl))
 					continue;
-				connectionName = ((ConnectionErrorSource)pa.getAppliesTos().iterator().next().getContainmentPathElements().iterator().next().getNamedElement()).getConnection().getName();
+				connectionName = ((PortConnectionImpl)pa.getAppliesTos().iterator().next().getContainmentPathElements().iterator().next().getNamedElement()).getName();
 				connErrorName = pa.getAppliesTos().iterator().next().getContainmentPathElements().iterator().next().getNamedElement().getName();
 				OccurrenceModel om = null;
 				HazardModel hm = null;

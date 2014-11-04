@@ -27,9 +27,6 @@ with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display,
 		alarm_to_display : port appLogic.DerivedAlarm -> appDisplay.DerivedAlarm;
 	annex EMV2 {**
 		use types PulseOx_Forwarding_Errors;
-		connection error
-			spo2_high_err: error source spo2_to_logic;
-		end connection;
 		properties
 		MAP_Error_Properties::Occurrence => [
 			Kind => Providing;
@@ -39,7 +36,7 @@ with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display,
 			Cause => "Incorrect values are gathered from the physiological sensors";
 			Compensation => "???";
 			Impact => reference(SpO2ValueHigh);
-		] applies to spo2_high_err;
+		] applies to spo2_to_logic;
 	**};
 	end PulseOx_Forwarding_System.imp;
 end PulseOx_Forwarding_System;
