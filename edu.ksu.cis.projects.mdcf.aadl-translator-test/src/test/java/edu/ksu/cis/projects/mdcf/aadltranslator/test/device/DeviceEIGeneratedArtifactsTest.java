@@ -8,10 +8,7 @@ import static org.junit.Assert.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupFile;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.DoTranslationOfflineTest;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
@@ -35,38 +32,21 @@ public class DeviceEIGeneratedArtifactsTest {
 	}
 	
 	@Test
-	public void testCapnographSuperType() {
+	public void testCapnograph() {
 		deviceComponentModel = AllTests.runDeviceTransTest("SimpleCapnograph", "SimpleCapnograph");
-		DoTranslationOfflineTest doTranslationTest = new DoTranslationOfflineTest();
-		System.err.println(doTranslationTest.buildDeviceSuperType(deviceComponentModel));
-		assertTrue(true);
-	}
-	
-	@Test
-	public void testCapnographSuperImplAPI() {
-		deviceComponentModel = AllTests.runDeviceTransTest("SimpleCapnograph", "SimpleCapnograph");
-		DoTranslationOfflineTest doTranslationTest = new DoTranslationOfflineTest();
-		System.err.println(doTranslationTest.buildDeviceUserImpleAPI(deviceComponentModel));
-		assertTrue(true);
-	}
-	
-	@Test
-	public void testCapnographCompSig() {
-		deviceComponentModel = AllTests.runDeviceTransTest("SimpleCapnograph", "SimpleCapnograph");
-		DoTranslationOfflineTest doTranslationTest = new DoTranslationOfflineTest();
-		System.err.println(doTranslationTest.buildDeviceCompSig(deviceComponentModel));
-		assertTrue(true);
+		assertEquals(true, true);
 	}
 	
 	@Test
 	public void testPCA() {
 		deviceComponentModel = AllTests.runDeviceTransTest("SimpleCapnograph", "SimpleCapnograph");
-		assertTrue(true);
+		assertEquals(true, true);
 	}
 	
 	@Test
 	public void testPulseOx() {
 		deviceComponentModel = AllTests.runDeviceTransTest("SimpleCapnograph", "SimpleCapnograph");
-		assertTrue(true);
+		assertEquals(true, true);
 	}
+
 }
