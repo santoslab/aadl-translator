@@ -152,8 +152,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			dm.setName(obj.getComponentType().getName());
 			dm.setSystemName(systemModel.getName());
 			try {
+				String componentType = checkCustomProperty(obj, "Component_Type", "enum");
+				if(componentType == null)
+					throw new MissingRequiredPropertyException("Devices must declare their role with MAP_Properties::Component_Type");
+				dm.setComponentType(componentType);
 				systemModel.addDevice(obj.getName(), dm);
-			} catch (DuplicateElementException e) {
+			} catch (DuplicateElementException | MissingRequiredPropertyException e) {
 				handleException(obj, e);
 				return DONE;
 			}
@@ -294,13 +298,13 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					throw new UseBeforeDeclarationException(
 							"Attempted to define a process that wasn't declared as a system component");
 				}
-				String componentType = checkCustomProperty(obj,
-						"Component_Type", "enum");
-				if (componentType != null
-						&& componentType.equalsIgnoreCase("logic")) {
+				String processType = checkCustomProperty(obj,
+						"Process_Type", "enum");
+				if (processType != null
+						&& processType.equalsIgnoreCase("logic")) {
 					pm.setDisplay(false);
-				} else if (componentType != null
-						&& componentType.equalsIgnoreCase("display")) {
+				} else if (processType != null
+						&& processType.equalsIgnoreCase("display")) {
 					pm.setDisplay(true);
 				} else {
 					throw new PropertyOutOfRangeException(
@@ -654,6 +658,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						ret = handlePropertyValue(obj, prop, propType);
 				} catch (PropertyOutOfRangeException e) {
 					handleException(obj, e);
+					return null;
+				} catch (PropertyNotPresentException e) {
 					return null;
 				}
 			}

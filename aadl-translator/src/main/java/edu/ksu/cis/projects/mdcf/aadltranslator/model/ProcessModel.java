@@ -3,7 +3,8 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 import java.util.HashMap;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentKind;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentType;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ProcessType;
 
 public class ProcessModel extends ComponentModel{
 	
@@ -33,10 +34,13 @@ public class ProcessModel extends ComponentModel{
 	}
 
 	public void setDisplay(boolean display) {
-		if(display)
-			this.kind = ComponentKind.DISPLAY;
-		else
-			this.kind = ComponentKind.LOGIC;
+		if(display){
+			this.processType = ProcessType.DISPLAY;
+			this.componentType = ComponentType.ACTUATOR;
+		} else {
+			this.processType = ProcessType.LOGIC;
+			this.componentType = ComponentType.CONTROLLER;
+		}
 	}
 
 	public TaskModel getLastThread(){

@@ -31,7 +31,7 @@ public class SystemModel {
 	private HashSet<AbbreviationModel> hazardReportAbbreviations;
 	private HashSet<String> hazardReportAssumptions;
 	private HashMap<String, String> hazardReportDiagrams;
-	
+
 	public SystemModel() {
 		logicComponents = new HashMap<>();
 		typeToComponent = new HashMap<>();
@@ -49,7 +49,8 @@ public class SystemModel {
 				"edu.ksu.cis.projects.mdcf.aadl-translator").getEntry(
 				"src/main/resources/images/");
 		try {
-			File imagesDir = new File(FileLocator.toFileURL(imagesDirUrl).getPath());
+			File imagesDir = new File(FileLocator.toFileURL(imagesDirUrl)
+					.getPath());
 			File appBoundaryPH = new File(imagesDir,
 					"AppBoundary-Placeholder.png");
 			File procModelPH = new File(imagesDir, "ProcModel-Placeholder.png");
@@ -218,9 +219,15 @@ public class SystemModel {
 	public HashMap<String, ConnectionModel> getChannels() {
 		return channels;
 	}
-	
-	public Map<String, ConnectionModel> getRangedChannels() {
-		return Maps.filterValues(channels, ModelUtil.rangedChannelFilter);
+
+	public Map<String, ConnectionModel> getControlActions() {
+		return Maps.filterValues(channels, ModelUtil.controlActionFilter);
+	}
+
+	public Map<String, ConnectionModel> getRangedControlActions() {
+		Map<String, ConnectionModel> controlActions = Maps.filterValues(
+				channels, ModelUtil.controlActionFilter);
+		return Maps.filterValues(controlActions, ModelUtil.rangedChannelFilter);
 	}
 
 	public boolean hasProcessType(String typeName) {

@@ -1,7 +1,8 @@
 property set MAP_Properties is
-	-- TODO: This is not a good name.
-	Component_Type_Type : type enumeration (logic, display);
-	Component_Type : MAP_Properties::Component_Type_Type applies to (process); 
+	Process_Kind : type enumeration (logic, display);
+	Process_Type : MAP_Properties::Process_Kind applies to (process);
+	Component_Kind : type enumeration (actuator, sensor);
+	Component_Type : MAP_Properties::Component_Kind applies to (device);
 	Output_Rate : Time_Range applies to (port);
 	Channel_Delay : Time applies to (port connection);
 	Worst_Case_Execution_Time : Time applies to (thread);

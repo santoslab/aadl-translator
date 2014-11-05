@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentType;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
@@ -35,6 +36,11 @@ public class DeviceModelTests {
 	@Test
 	public void testDeviceExists() {
 		assertNotNull(deviceModel);
+	}
+	
+	@Test
+	public void testDevicesComponentType() {
+		assertEquals(ComponentType.SENSOR, deviceModel.getComponentType());
 	}
 
 	@Test

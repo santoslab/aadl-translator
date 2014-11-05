@@ -1,11 +1,9 @@
-package PulseOx_Interface
+package Typeless_PulseOx_Interface
 public
 with PulseOx_Forwarding_Types, PulseOx_Forwarding_Errors, MAP_Properties;
 	device ICEpoInterface
 	features
-		SpO2 : out event data port PulseOx_Forwarding_Types::SpO2;
-	properties
-		MAP_Properties::Component_Type => sensor;
+		TypelessSpO2 : out event data port PulseOx_Forwarding_Types::SpO2;
 	annex EMV2 {** 
  		use types PulseOx_Forwarding_Errors;
 		error propagations
@@ -19,4 +17,4 @@ with PulseOx_Forwarding_Types, PulseOx_Forwarding_Errors, MAP_Properties;
 	device implementation ICEpoInterface.imp
 	end ICEpoInterface.imp;
 
-end PulseOx_Interface;
+end Typeless_PulseOx_Interface;

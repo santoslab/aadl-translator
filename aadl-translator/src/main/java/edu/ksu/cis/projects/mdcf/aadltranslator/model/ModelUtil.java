@@ -3,8 +3,12 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 import com.google.common.base.Predicate;
 
 public class ModelUtil {
-	public static enum ComponentKind {
+	public static enum ProcessType {
 		PSEUDODEVICE, DISPLAY, LOGIC
+	};
+	
+	public static enum ComponentType {
+		SENSOR, ACTUATOR, CONTROLLER, CONTROLLEDPROCESS
 	};
 
 	public static enum Keyword {
@@ -84,7 +88,14 @@ public class ModelUtil {
 
 	public final static Predicate<ConnectionModel> rangedChannelFilter = new Predicate<ConnectionModel>() {
 		public boolean apply(ConnectionModel connection) {
-			return !connection.getPublisher().getPortByName(connection.getPubPortName()).getType().equals("Object");
+			return !(connection.getPublisher().getPortByName(connection.getPubPortName()).getType().equals("Object") || 
+					connection.getPublisher().getPortByName(connection.getPubPortName()).getType().equals("Boolean"));
+		}
+	};
+
+	public final static Predicate<ConnectionModel> controlActionFilter = new Predicate<ConnectionModel>() {
+		public boolean apply(ConnectionModel connection) {
+			return connection.getSubscriber().getComponentType() == ComponentType.ACTUATOR;
 		}
 	};
 }

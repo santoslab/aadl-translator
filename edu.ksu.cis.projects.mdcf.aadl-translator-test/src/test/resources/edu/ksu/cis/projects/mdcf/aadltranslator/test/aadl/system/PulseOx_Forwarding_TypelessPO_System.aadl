@@ -1,0 +1,42 @@
+package PulseOx_Forwarding_System
+public
+with Typeless_PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display, 
+	PulseOx_Forwarding_Properties, MAP_Properties, MAP_Error_Properties,
+	PulseOx_Forwarding_Errors;
+
+	system PulseOx_Forwarding_System
+	end PulseOx_Forwarding_System;
+	
+	system implementation PulseOx_Forwarding_System.imp
+	subcomponents
+		-- Physiological inputs
+		pulseOx : device Typeless_PulseOx_Interface::ICEpoInterface.imp;
+		
+		-- App logic
+		appLogic : process PulseOx_Forwarding_Logic::PulseOx_Logic_Process.imp;
+		appDisplay : process PulseOx_Forwarding_Display::PulseOx_Display_Process.imp;
+	connections
+		-- From device to logic
+		spo2_to_logic : port pulseOx.TypelessSpO2 -> appLogic.SpO2;
+		
+		-- From device to display
+		spo2_to_display : port pulseOx.TypelessSpO2 -> appDisplay.SpO2
+		{MAP_Properties::Channel_Delay => 150 ms;};
+		
+		-- From logic to display
+		alarm_to_display : port appLogic.DerivedAlarm -> appDisplay.DerivedAlarm;
+	annex EMV2 {**
+		use types PulseOx_Forwarding_Errors;
+		properties
+		MAP_Error_Properties::Occurrence => [
+			Kind => Providing;
+			Hazard => PulseOx_Forwarding_Error_Properties::H1;
+			ViolatedConstraint => PulseOx_Forwarding_Error_Properties::C1;
+			Title => "Wrong values (Undetected)";
+			Cause => "Incorrect values are gathered from the physiological sensors";
+			Compensation => "???";
+			Impact => reference(SpO2ValueHigh);
+		] applies to spo2_to_logic;
+	**};
+	end PulseOx_Forwarding_System.imp;
+end PulseOx_Forwarding_System;

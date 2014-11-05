@@ -13,10 +13,12 @@ import org.junit.Test;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentType;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
 public class ProcessModelTests {
-	private static ProcessModel processModel;
+	private static ProcessModel logicModel;
+	private static ProcessModel displayModel;
 	
 	@BeforeClass
 	public static void initialize() {
@@ -25,7 +27,8 @@ public class ProcessModelTests {
 		usedProperties.add("MAP_Properties");
 		usedProperties.add("PulseOx_Forwarding_Properties");
 		SystemModel systemModel = AllTests.runArchTransTest("PulseOx", "PulseOx_Forwarding_System");
-		processModel = systemModel.getProcessByType("PulseOx_Logic_Process");
+		logicModel = systemModel.getProcessByType("PulseOx_Logic_Process");
+		displayModel = systemModel.getProcessByType("PulseOx_Display_Process");
 	}
 
 	@AfterClass
@@ -35,70 +38,77 @@ public class ProcessModelTests {
 
 	@Test
 	public void testProcessExists() {
-		assertNotNull(processModel);
+		assertNotNull(logicModel);
 	}
 	
 	@Test
 	public void testProcessComponentType() {
-		assertTrue(processModel.isLogic());
+		assertTrue(logicModel.isLogic());
+		assertTrue(displayModel.isDisplay());
 	}
 	
 	@Test
 	public void testProcessContainedPorts() {
-		assertEquals(2, processModel.getPorts().size());
+		assertEquals(2, logicModel.getPorts().size());
 	}
 	
 	@Test
 	public void testProcessContainedTasks() {
-		assertEquals(1, processModel.getTasks().size());
-		assertNotNull(processModel.getTasks().get("CheckSpO2Thread"));
+		assertEquals(1, logicModel.getTasks().size());
+		assertNotNull(logicModel.getTasks().get("CheckSpO2Thread"));
 	}
 	
 	@Test
 	public void testProcessSporadicTasks() {
-		assertEquals(0, processModel.getSporadicTasks().size());
+		assertEquals(0, logicModel.getSporadicTasks().size());
 	}
 	
 	@Test
 	public void testProcessPeriodicTasks() {
-		assertEquals(1, processModel.getPeriodicTasks().size());
-		assertNotNull(processModel.getPeriodicTasks().get("CheckSpO2Thread"));
+		assertEquals(1, logicModel.getPeriodicTasks().size());
+		assertNotNull(logicModel.getPeriodicTasks().get("CheckSpO2Thread"));
 	}
 	
 	@Test
 	public void testProcessInDataPorts() {
-		assertEquals(1, processModel.getReceiveDataPorts().size());
-		assertNotNull(processModel.getReceiveDataPorts().get("SpO2"));
+		assertEquals(1, logicModel.getReceiveDataPorts().size());
+		assertNotNull(logicModel.getReceiveDataPorts().get("SpO2"));
 	}
 	
 	@Test
 	public void testProcessInEventPorts() {
-		assertEquals(0, processModel.getReceiveEventPorts().size());
+		assertEquals(0, logicModel.getReceiveEventPorts().size());
 	}
 	
 	@Test
 	public void testProcessInEventDataPorts() {
-		assertEquals(0, processModel.getReceiveEventDataPorts().size());
+		assertEquals(0, logicModel.getReceiveEventDataPorts().size());
 	}
 	
 	@Test
 	public void testProcessOutPorts() {
-		assertEquals(1, processModel.getSendPorts().size());
-		assertNotNull(processModel.getSendPorts().get("DerivedAlarm"));
+		assertEquals(1, logicModel.getSendPorts().size());
+		assertNotNull(logicModel.getSendPorts().get("DerivedAlarm"));
 	}
 	
 	@Test
 	public void testProcessIsPseudoDevice() {
-		assertFalse(processModel.isPseudoDevice());
+		assertFalse(logicModel.isPseudoDevice());
 	}
 	
 	@Test
 	public void testProcessSystemName() {
-		assertEquals("PulseOx_Forwarding_System", processModel.getSystemName());
+		assertEquals("PulseOx_Forwarding_System", logicModel.getSystemName());
 	}
 	
 	@Test
 	public void testProcessGlobals() {
-		assertEquals(0, processModel.getGlobals().size());
+		assertEquals(0, logicModel.getGlobals().size());
+	}
+	
+	@Test
+	public void testProcessComponentTypes() {
+		assertEquals(ComponentType.CONTROLLER, logicModel.getComponentType());
+		assertEquals(ComponentType.ACTUATOR, displayModel.getComponentType());
 	}
 }

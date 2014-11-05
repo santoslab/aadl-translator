@@ -50,7 +50,7 @@ preliminaries(model) ::=<<
 <model.constraints.values:{v | <preliminary(v, i)>
 }>
 ### Control Actions
-<model.channels.values:{v | <controlAction(v, i)>
+<model.controlActions.values:{v | <controlAction(v, i)>
 }>
 ### Process Model
 ![Process Model](<model.hazardReportDiagrams.("ProcessModel")>)
@@ -74,12 +74,12 @@ ctrlActTbl(model) ::=<<
 
 | <["Control Action", "Providing", "Not Providing", "Applied Too Long", "Stopped Too Soon", "Early", "Late"]:{g | <g> | }>
 |----------------|-----------|---------------|------------------|------------------|-------|------|
-<model.channels.values:{v | <ctrlActTblRow(v)>
+<model.controlActions.values:{v | <ctrlActTblRow(v)>
 }>
 
 | <["Control Action", "Value Too High", "Value Too Low"]:{g | <g> | }>
 |----------------|----------------|---------------|
-<model.rangedChannels.values:{v | <rngdCtrlActTblRow(v)>
+<model.rangedControlActions.values:{v | <rngdCtrlActTblRow(v)>
 }>
 
 >>

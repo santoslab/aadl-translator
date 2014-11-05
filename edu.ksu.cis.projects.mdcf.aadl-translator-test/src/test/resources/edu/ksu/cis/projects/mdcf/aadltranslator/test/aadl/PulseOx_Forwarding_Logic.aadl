@@ -8,7 +8,7 @@ with PulseOx_Forwarding_Types, MAP_Properties;
 		DerivedAlarm : out event port
 		{MAP_Properties::Output_Rate => 200 ms .. 400 ms;};
 	properties
-		MAP_Properties::Component_Type => logic;
+		MAP_Properties::Process_Type => logic;
 	annex EMV2 {** 
  		use types PulseOx_Forwarding_Errors;
 		error propagations

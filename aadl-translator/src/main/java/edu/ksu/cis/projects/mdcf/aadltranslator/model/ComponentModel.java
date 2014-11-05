@@ -7,7 +7,8 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentKind;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentType;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ProcessType;
 
 public class ComponentModel {
 
@@ -27,7 +28,8 @@ public class ComponentModel {
 	// task name -> task model
 	protected HashMap<String, TaskModel> tasks;
 	
-	protected ComponentKind kind;
+	protected ProcessType processType;
+	protected ComponentType componentType;
 	
 	protected HashSet<PropagationModel> propagations;
 	protected HashSet<ErrorFlowModel> errorFlows;
@@ -72,15 +74,15 @@ public class ComponentModel {
 	}
 	
 	public boolean isDisplay(){
-		return kind == ComponentKind.DISPLAY;
+		return processType == ProcessType.DISPLAY;
 	}
 	
 	public boolean isPseudoDevice(){
-		return kind == ComponentKind.PSEUDODEVICE;
+		return processType == ProcessType.PSEUDODEVICE;
 	}
 	
 	public boolean isLogic(){
-		return kind == ComponentKind.LOGIC;
+		return processType == ProcessType.LOGIC;
 	}
 
 	public void setName(String name) {
@@ -131,5 +133,9 @@ public class ComponentModel {
 
 	public void setSystemName(String systemName) {
 		this.systemName = systemName;
+	}
+
+	public ComponentType getComponentType() {
+		return this.componentType;
 	}
 }
