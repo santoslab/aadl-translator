@@ -101,7 +101,7 @@ rngdCtrlActTblCell(lastOccurrence) ::=<<
 hazCtrlActs(model) ::=<<
 ## Unsafe Control Action Causes and Compensations
 
-<model.channels.values:{v | <hazControlAction(v)>
+<model.controlActions.values:{v | <hazControlAction(v)>
 }>
 >>
 
