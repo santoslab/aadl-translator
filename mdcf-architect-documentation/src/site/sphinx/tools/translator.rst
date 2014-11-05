@@ -18,6 +18,8 @@ Installing
 7. The plugin is not digitally signed, so click ``Ok`` on the pop-up titled "Security Warning."
 8. OSATE2 now has to restart to complete the installation.  Click ``Yes`` on the "Software Updates" pop-up.
 9. Verify that the installation was successful by selecting ``About OSATE2`` (under OSATE2 on Mac OS X, under Help on Windows and Linux).  Click ``Installation Details`` and you should see "Aadl-plugin" at the top of the "Installed Software" tab.
+10. [Optional] If you want HTML-formatting for the generated hazard analysis reports, you'll need to install `Pandoc <http://johnmacfarlane.net/pandoc/installing.html>`_, and set its path in your OSATE2 preferences.
+
 
 *******
 Running

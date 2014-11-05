@@ -10,6 +10,18 @@ The |MDCF Architect| operates on a restricted subset of AADL's full syntax, with
 
 At a high level, MAP apps are defined by :construct:`systems<system>`, which contain :construct:`device` and :construct:`process` components.  Process components are further decomposed into :construct:`threads<thread>`.  The various components communicate over :construct:`ports<port>` via :construct:`port connections<portconnection>`.
 
+********
+Contents
+********
+.. toctree::
+	:maxdepth: 1
+	
+	system
+	device
+	process
+	port
+	property
+
 ***********
 Example App
 ***********
@@ -19,12 +31,3 @@ Example App
 	:align: center
 
 In this language walkthrough, we'll use the a very simple "Pulse Oximetry Display" app as a running example. A high-level, information-flow centric view of this app is shown above.  This app's job is to take information from a pulse oximeter device and display it on the MAP display. It does not have many advanced features (eg, alarms, device control, complex logic, etc.) but it allows us to illustrate the various features of the MDCF architect. You can also download :download:`the AADL for this app<snippets/pulse-ox-forwarding.zip>`, or :download:`the generated Java and XML<snippets/PulseOx_Forwarding_System.zip>`.
-   
-.. toctree::
-	:hidden:
-	
-	system
-	device
-	process
-	port
-	property

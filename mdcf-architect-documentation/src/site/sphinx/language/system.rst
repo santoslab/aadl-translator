@@ -21,8 +21,10 @@ Properties and Contained Elements
 
 	:contained-element subcomponents: Either :construct:`device` or :construct:`process` elements.
 	:contained-element connections: A list of :construct:`port connections<portconnection>` between the various elements.  Note that device-device connections are not allowed.
+	:contained-element EMv2Annex: [Optional] A list of :property:`occurrence` properties detailing what faults can be propagated along the system's connections.
 	:kind subcomponents: :construct:`device` or :construct:`process`
 	:kind connections: :construct:`port connection<portconnection>`
+	:kind EMv2Annex: :property:`occurrence`
    
 *******
 Example

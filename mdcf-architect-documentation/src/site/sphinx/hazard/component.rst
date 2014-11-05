@@ -48,7 +48,7 @@ Error Propagations
 
 Individual components propagate :construct:`error types<errortype>` in or out as sources, sinks, or transformations. These propagations are specified directly in the annexes of either :construct:`devices<device>` or :construct:`processes<process>`: the direction and error type is specified first, and then a more detailed flow specification (documenting whether the component is a source, sink, or path for the error type).
 
-.. construct:: error propagations
+.. construct:: error propagation
 
    Specifies how error types relevant to this component enter or leave the component.
       

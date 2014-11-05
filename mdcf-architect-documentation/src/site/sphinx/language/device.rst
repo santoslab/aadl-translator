@@ -18,7 +18,9 @@ Properties and Contained Elements
 	The external features the app will use of this device.
 	
 	:contained-element features: The ports this device exposes.
+	:contained-element EMv2Annex: [Optional] A list of :construct:`errors<errortype>` that will :construct:`propagate<errorpropagation>` in, out, or through this device.
 	:kind features: :construct:`port`
+	:kind EMv2Annex: :construct:`errorpropagation`
 	  
 .. construct:: device implementation
 	

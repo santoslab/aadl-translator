@@ -17,7 +17,9 @@ Properties and Contained Elements
 	Process components contain a listing of the ports exposed by the device, and a property specifying whether this process is a display or logic component.
 	
 	:contained-element features: The ports this process exposes to other components (either other processes or :construct:`devices<device>`).
+	:contained-element EMv2Annex: [Optional] A list of :construct:`errors<errortype>` that will :construct:`propagate<errorpropagation>` in, out, or through this process.
 	:kind features: :construct:`port`
+	:kind EMv2Annex: :construct:`errorpropagation`
 	:property ComponentType: |prop component-type|
 	:type ComponentType: :property:`MAP_Properties::Component_Type<component-type>`
 	
@@ -46,7 +48,7 @@ Properties and Contained Elements
 	:type Dispatch: :property:`Thread_Properties::Dispatch_Protocol<dispatch-protocol>`
 	
 .. note::
-	There must be one-to-one correspondence (bijective) mapping between sporadic threads and the combined set of event and event data ports.
+	There must be one-to-one correspondence (ie, a bijective mapping) between sporadic threads and the combined set of event and event data ports.
 
 .. construct:: thread implementation
 

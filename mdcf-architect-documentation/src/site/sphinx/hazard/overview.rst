@@ -10,6 +10,17 @@ Once your application has been modeled in the :ref:`supported subset of AADL<aad
 
 These annotations include both custom properties and a subset of AADL's error-modeling (EMV2) annex, and the report format is derivative of / inspired by |STPA|.
 
+********
+Contents
+********
+
+.. toctree::
+	:maxdepth: 1
+	
+	fundamentals
+	occurrence
+	component
+
 ***********
 Example App
 ***********
@@ -31,10 +42,3 @@ Hazard Analysis Process
 	:align: center
 
 One of the main goals of this work was to integrate the top-down nature of STPA with the bottom-up, component-focused EMv2.  To that end, the tooling enables developers / analysts to work in either direction (top-down or bottom-up) or use the two methodologies in tandem to drive analysis forward.
-
-.. toctree::
-	:hidden:
-	
-	fundamentals
-	occurrence
-	component
