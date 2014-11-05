@@ -19,9 +19,11 @@ Properties and Contained Elements
 	
 	:contained-element features: The ports this device exposes.
 	:contained-element EMv2Annex: [Optional] A list of :construct:`errors<errortype>` that will :construct:`propagate<errorpropagation>` in, out, or through this device.
+	:property ComponentType: |prop component-type|
 	:kind features: :construct:`port`
 	:kind EMv2Annex: :construct:`errorpropagation`
-	  
+	:type ComponentType: :property:`MAP_Properties::Component_Type<component-type>`
+	
 .. construct:: device implementation
 	
 	Device Implementation constructs are empty; the device is only exposed to the app as an interface which is fully described in the :construct:`device` type.

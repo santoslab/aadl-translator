@@ -87,15 +87,28 @@ Port Connection Properties
 Process Properties
 ==================
 
+.. property:: process-type
+
+	|prop process-type|
+	
+   :default name: N/A
+   :override: MAP_Properties::Process_Type
+   :type: Either ``logic`` or ``display``
+   :context: :construct:`process`
+   :example: ``display``
+   
+Device Properties
+==================
+
 .. property:: component-type
 
 	|prop component-type|
 	
    :default name: N/A
    :override: MAP_Properties::Component_Type
-   :type: Either ``Logic`` or ``Display``
-   :context: :construct:`process`
-   :example: ``Display``
+   :type: Either ``actuator`` or ``sensor``
+   :context: :construct:`device`
+   :example: ``sensor``
 
 Data Properties
 ==================

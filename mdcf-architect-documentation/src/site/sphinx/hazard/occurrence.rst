@@ -60,8 +60,6 @@ The occurrence properties (and supporting fundamentals) are used to generate tab
 +------------------+-----------------+------------------------+------------------+------------------+-------+------+
 | Control Action   | Providing       | Not providing          | Applied Too Long | Stopped Too Soon | Early | Late |
 +==================+=================+========================+==================+==================+=======+======+
-| spo2_to_logic    |                 |                        |                  |                  |       |      |
-+------------------+-----------------+------------------------+------------------+------------------+-------+------+
 | spo2_to_display  |                 |                        |                  |                  |       |      |
 +------------------+-----------------+------------------------+------------------+------------------+-------+------+
 | alarm_to_display |                 | MissedAlarm (Bad SpO2) |                  |                  |       |      |
@@ -72,8 +70,6 @@ The second table looks at port connections with ranged types (eg, integers and f
 +----------------+----------------------------+---------------+
 | Control Action | Value Too High             | Value Too Low |
 +================+============================+===============+
-| spo2_to_logic  | BadInfoDisplayed (BadSpO2) |               |
-+----------------+----------------------------+---------------+
 | spo2_to_display| BadInfoDisplayed (BadSpO2) |               |
 +----------------+----------------------------+---------------+
 

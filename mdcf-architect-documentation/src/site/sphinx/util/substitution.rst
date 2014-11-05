@@ -36,6 +36,8 @@
 
 .. |prop channel-delay| replace:: The maximum time that a message on this connection can spend on the network.
 
-.. |prop component-type| replace:: Whether this process is a logic or display component.
+.. |prop process-type| replace:: Whether this process is a ``logic`` or ``display`` component.
 
 .. |prop data-representation| replace:: The representation of this datatype.
+
+.. |prop component-type| replace:: Whether this device is an ``actuator`` or ``sensor``

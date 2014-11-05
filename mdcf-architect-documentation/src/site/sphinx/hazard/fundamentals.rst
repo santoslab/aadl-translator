@@ -240,9 +240,8 @@ Safety Constraints
 Control Actions
 ---------------
 
-1. spo2_to_logic: ICEpoInterface -> PulseOx_Logic_Process (Integer)
-2. spo2_to_display: ICEpoInterface -> PulseOx_Display_Process (Integer)
-3. alarm_to_display: PulseOx_Logic_Process -> PulseOx_Display_Process (Event)
+1. spo2_to_display: ICEpoInterface -> PulseOx_Display_Process (Integer)
+2. alarm_to_display: PulseOx_Logic_Process -> PulseOx_Display_Process (Event)
 
 Process Model
 -------------

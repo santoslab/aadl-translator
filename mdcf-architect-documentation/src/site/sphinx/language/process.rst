@@ -20,8 +20,8 @@ Properties and Contained Elements
 	:contained-element EMv2Annex: [Optional] A list of :construct:`errors<errortype>` that will :construct:`propagate<errorpropagation>` in, out, or through this process.
 	:kind features: :construct:`port`
 	:kind EMv2Annex: :construct:`errorpropagation`
-	:property ComponentType: |prop component-type|
-	:type ComponentType: :property:`MAP_Properties::Component_Type<component-type>`
+	:property ProcessType: |prop process-type|
+	:type ProcessType: :property:`MAP_Properties::Process_Type<process-type>`
 	
 .. construct:: process implementation
 
