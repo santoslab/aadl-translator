@@ -29,14 +29,14 @@ with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display,
 		use types PulseOx_Forwarding_Errors;
 		properties
 		MAP_Error_Properties::Occurrence => [
-			Kind => Providing;
-			Hazard => PulseOx_Forwarding_Error_Properties::H1;
-			ViolatedConstraint => PulseOx_Forwarding_Error_Properties::C1;
-			Title => "Wrong values (Undetected)";
-			Cause => "Incorrect values are gathered from the physiological sensors";
-			Compensation => "???";
+			Kind => NotProviding;
+			Hazard => PulseOx_Forwarding_Error_Properties::MissedAlarm;
+			ViolatedConstraint => PulseOx_Forwarding_Error_Properties::ShowAllAlarms;
+			Title => "Bad SpO2";
+			Cause => "The SpO2 values from the pulse oximeter are too high, so the alarm is missed";
+			Compensation => "None";
 			Impact => reference(SpO2ValueHigh);
-		] applies to spo2_to_logic;
+		] applies to alarm_to_display;
 	**};
 	end PulseOx_Forwarding_System.imp;
 end PulseOx_Forwarding_System;

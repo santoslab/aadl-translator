@@ -34,38 +34,38 @@ public class HazardPreliminariesTests {
 	@Test
 	public void testAccidentLevel() {
 		assertEquals(1, systemModel.getAccidentLevels().size());
-		assertEquals("AL1", systemModel.getAccidentLevelByName("AL1").getName());
+		assertEquals("DeathOrInjury", systemModel.getAccidentLevelByName("DeathOrInjury").getName());
 		assertEquals("A human is killed or seriously injured.", systemModel
-				.getAccidentLevelByName("AL1").getDescription());
-		assertEquals(1, systemModel.getAccidentLevelByName("AL1").getNumber());
+				.getAccidentLevelByName("DeathOrInjury").getDescription());
+		assertEquals(1, systemModel.getAccidentLevelByName("DeathOrInjury").getNumber());
 	}
 
 	@Test
 	public void testAccident() {
 		assertEquals(1, systemModel.getAccidents().size());
-		assertEquals("A1", systemModel.getAccidentByName("A1").getName());
+		assertEquals("PatientHarmed", systemModel.getAccidentByName("PatientHarmed").getName());
 		assertEquals("Patient is killed or seriously injured.", systemModel
-				.getAccidentByName("A1").getDescription());
-		assertEquals(1, systemModel.getAccidentByName("A1").getNumber());
+				.getAccidentByName("PatientHarmed").getDescription());
+		assertEquals(1, systemModel.getAccidentByName("PatientHarmed").getNumber());
 	}
 
 	@Test
 	public void testHazard() {
-		assertEquals(1, systemModel.getHazards().size());
-		assertEquals("H1", systemModel.getHazardByName("H1").getName());
+		assertEquals(2, systemModel.getHazards().size());
+		assertEquals("BadInfoDisplayed", systemModel.getHazardByName("BadInfoDisplayed").getName());
 		assertEquals("Incorrect information is sent to the display.",
-				systemModel.getHazardByName("H1").getDescription());
-		assertEquals(1, systemModel.getHazardByName("H1").getNumber());
+				systemModel.getHazardByName("BadInfoDisplayed").getDescription());
+		assertEquals(1, systemModel.getHazardByName("BadInfoDisplayed").getNumber());
 	}
 
 	@Test
 	public void testConstraint() {
-		assertEquals(1, systemModel.getConstraints().size());
-		assertEquals("C1", systemModel.getConstraintByName("C1").getName());
+		assertEquals(2, systemModel.getConstraints().size());
+		assertEquals("ShowGoodInfo", systemModel.getConstraintByName("ShowGoodInfo").getName());
 		assertEquals(
-				"The app must inform the display of the status of the patient's"
+				"The app must accurately inform the display of the status of the patient's"
 						+ " vital signs.", systemModel
-						.getConstraintByName("C1").getDescription());
-		assertEquals(1, systemModel.getConstraintByName("C1").getNumber());
+						.getConstraintByName("ShowGoodInfo").getDescription());
+		assertEquals(1, systemModel.getConstraintByName("ShowGoodInfo").getNumber());
 	}
 }

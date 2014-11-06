@@ -58,6 +58,6 @@ Occurrence : record (
 	Cause : aadlstring;
 	Compensation : aadlstring;
 	Impact : reference ({emv2}**error type);
-) applies to ({emv2}**connection error source);
+) applies to (port connection);
 
 end MAP_Error_Properties;

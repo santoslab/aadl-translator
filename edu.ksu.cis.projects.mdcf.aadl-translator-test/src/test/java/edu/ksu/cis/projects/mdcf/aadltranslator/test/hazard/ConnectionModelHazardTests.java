@@ -29,7 +29,7 @@ public class ConnectionModelHazardTests {
 		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		usedProperties.add("PulseOx_Forwarding_Properties");
 		systemModel = AllTests.runHazardTransTest("PulseOx", "PulseOx_Forwarding_System");
-		channel = systemModel.getChannelByName("spo2_to_logic");
+		channel = systemModel.getChannelByName("alarm_to_display");
 		occurrence = channel.getOccurrences().iterator().next();
 	}
 
@@ -45,27 +45,27 @@ public class ConnectionModelHazardTests {
 	
 	@Test
 	public void testOccurrenceCause() {
-		assertEquals("Incorrect values are gathered from the physiological sensors", occurrence.getCause());
+		assertEquals("The SpO2 values from the pulse oximeter are too high, so the alarm is missed", occurrence.getCause());
 	}
 	
 	@Test
 	public void testOccurrenceConnectionErrorName() {
-		assertEquals("spo2_to_logic", occurrence.getConnErrorName());
+		assertEquals("alarm_to_display", occurrence.getConnErrorName());
 	}
 	
 	@Test
 	public void testOccurrenceConstraint() {
-		assertEquals(systemModel.getConstraintByName("C1"), occurrence.getConstraint());
+		assertEquals(systemModel.getConstraintByName("ShowAllAlarms"), occurrence.getConstraint());
 	}
 	
 	@Test
 	public void testOccurrenceTitle() {
-		assertEquals("Wrong values (Undetected)", occurrence.getTitle());
+		assertEquals("Bad SpO2", occurrence.getTitle());
 	}
 	
 	@Test
 	public void testOccurrenceHazard() {
-		assertEquals(systemModel.getHazardByName("H1"), occurrence.getHazard());
+		assertEquals(systemModel.getHazardByName("MissedAlarm"), occurrence.getHazard());
 	}
 	
 	@Test
@@ -75,6 +75,6 @@ public class ConnectionModelHazardTests {
 	
 	@Test
 	public void testOccurrenceKeyword() {
-		assertEquals(Keyword.PROVIDING, occurrence.getKeyword());
+		assertEquals(Keyword.NOTPROVIDING, occurrence.getKeyword());
 	}
 }

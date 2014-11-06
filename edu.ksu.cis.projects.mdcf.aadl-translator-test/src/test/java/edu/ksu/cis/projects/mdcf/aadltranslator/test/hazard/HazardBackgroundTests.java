@@ -36,26 +36,26 @@ public class HazardBackgroundTests {
 	@Test
 	public void testContext() {
 		assertEquals(
-				"A simple app that forwards information from a pulse oximeter "
-						+ "to an app display.",
+				"Clinicians want to view physiological parameters on a display"
+				+ " not physically connected to a physiological monitor.",
 				systemModel.getHazardReportContext());
 	}
 
 	@Test
 	public void testAssumption() {
 		assertEquals(1, systemModel.getHazardReportAssumptions().size());
-		assertEquals("We assume there are no alarms that need forwarding.",
+		assertEquals("There are no alarms that need forwarding.",
 				systemModel.getHazardReportAssumptions().iterator().next());
 	}
 
 	@Test
 	public void testAbbreviation() {
 		assertEquals(1, systemModel.getHazardReportAbbreviations().size());
-		assertEquals("SpO2", systemModel.getHazardReportAbbreviations()
+		assertEquals("KVO", systemModel.getHazardReportAbbreviations()
 				.iterator().next().getName());
-		assertEquals("Blood-oxygen saturation", systemModel
+		assertEquals("Keep Vein Open", systemModel
 				.getHazardReportAbbreviations().iterator().next().getFull());
-		assertEquals("The ratio of SpO2 in the patient's blood", systemModel
+		assertEquals("A minimal rate (of drug administration)", systemModel
 				.getHazardReportAbbreviations().iterator().next()
 				.getDefinition());
 	}
