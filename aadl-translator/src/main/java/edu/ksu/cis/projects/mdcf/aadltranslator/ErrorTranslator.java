@@ -39,7 +39,6 @@ public final class ErrorTranslator {
 	}
 	
 	public void parseOccurrences(SystemImplementation sysImp){
-		HashSet<ConnectionErrorSource> connErrors = new HashSet<>(EMV2Util.getAllConnectionErrorSources(sysImp));
 		RecordValueImpl rv;
 		String connectionName, connErrorName;
 		try {

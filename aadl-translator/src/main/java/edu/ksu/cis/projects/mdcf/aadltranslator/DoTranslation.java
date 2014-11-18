@@ -33,6 +33,7 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.DefaultAnnexLibrary;
+import org.osate.aadl2.Device;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
@@ -81,6 +82,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	private final STGroup device_compsigSTG = new STGroupFile(
 			"src/main/resources/templates/device-compsig.stg");
 
+	private IFile targetFile;
 	private ExecutionEvent triggeringEvent;
 	private final String TRANSLATE_ARCH_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate";
 	private final String TRANSLATE_HAZARDS_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate-hazards";
@@ -91,15 +93,17 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				new NullProgressMonitor());
 
 		// 1) Get the current selection, convert it to an IFile
-		IFile file = getIFileFromSelection();
+		targetFile = getIFileFromSelection();
 
-		// 2) Get the target element (hopefully a system)
-		Element target = getTargetElement(file);
+		// 2) Get the target element
+		Element target = getTargetElement(targetFile);
 
-		// 3) Verify that the target is a system. If it isn't, abort the
+		// 3) Verify that the target is a valid type. If it isn't, abort the
 		// translation
-		if (!isSystem(target))
+		if (!isValidTarget(target)){
+			// TODO: Handle this more gracefully
 			return null;
+		}
 
 		// 4) Recursively traverse includes to build up IFile list
 		ic.process(target);
@@ -108,11 +112,23 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		return ic.getUsedFiles();
 	}
 
-	private boolean isSystem(Element target) {
+	/**
+	 * This checks to see if the intended translation target is valid, ie, a 
+	 * device, process, or system. 
+	 * @param target The AADL element that was selected
+	 * @return True if the target is valid for translation, false otherwise
+	 */
+	private boolean isValidTarget(Element target) {
 		AadlPackage pack = (AadlPackage) target;
 		PublicPackageSection sect = pack.getPublicSection();
 		Classifier ownedClassifier = sect.getOwnedClassifiers().get(0);
-		return ownedClassifier instanceof org.osate.aadl2.System;
+		if (ownedClassifier instanceof org.osate.aadl2.System ||
+				ownedClassifier instanceof org.osate.aadl2.Device ||
+				ownedClassifier instanceof org.osate.aadl2.Process){
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private Element getTargetElement(IFile file) {
@@ -146,14 +162,14 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		// 2) Get the list of files used in the model we're translating
 		HashSet<IFile> usedFiles = this.getUsedFiles();
 
-		// 3) Identify which file contains the AADL system
-		IFile systemFile = getSystemFile(rs, archTranslator, usedFiles);
+		// 3) Filter out the property sts
+		filterPropertySets(rs, archTranslator, usedFiles);
 
 		// 4) Initialize the error reporter
 		ParseErrorReporterManager parseErrManager = initErrManager(archTranslator);
 
 		// 5) Build the in-memory system model
-		processFiles(monitor, rs, archTranslator, usedFiles, systemFile,
+		processFiles(monitor, rs, archTranslator, usedFiles, targetFile,
 				parseErrManager);
 
 		// 5.1) If selected, build the in-memory hazard analysis model
@@ -166,7 +182,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			hazardAnalysis.parseOccurrences(archTranslator
 					.getSystemImplementation());
 
-			IProject proj = systemFile.getProject();
+			IProject proj = targetFile.getProject();
 			if (proj.getFolder("diagrams").exists()) {
 				IFile procModel = proj.getFolder("diagrams").getFile(
 						"ProcessModel.png");
@@ -345,8 +361,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		midas_appspecSTG.delimiterStopChar = '#';
 
 		// Give the model to the string templates
-		for (ComponentModel cm : stats.getSystemModel().getLogicAndDevices()
-				.values()) {
+		for (ComponentModel cm : stats.getSystemModel().getLogicAndDevices().values()) {
 			if (!cm.isPseudoDevice()) {
 				javaClasses.put(cm.getName() + "SuperType", java_superclassSTG
 						.getInstanceOf("class").add("model", cm).render());
@@ -369,7 +384,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		appName = stats.getSystemModel().getName();
 		appSpecContents = midas_appspecSTG.getInstanceOf("appspec")
 				.add("system", stats.getSystemModel()).render();
-
+		
 		// Write the files
 		if (stats.notCancelled()) {
 			WriteOutputFiles.writeFiles(compsigs, javaClasses, appName,
@@ -380,12 +395,24 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	private void processFiles(IProgressMonitor monitor, ResourceSet rs,
 			AadlProcessingSwitchWithProgress stats, HashSet<IFile> usedFiles,
 			IFile systemFile, ParseErrorReporterManager parseErrManager) {
-
-		// Process the system first...
-		processFile(monitor, rs, stats, systemFile, parseErrManager);
+		
+		// Configure the translator for our target
+		AadlPackage pack = (AadlPackage) getTargetElement(targetFile);
+		PublicPackageSection sect = pack.getPublicSection();
+		Classifier ownedClassifier = sect.getOwnedClassifiers().get(0);
+		if(ownedClassifier instanceof org.osate.aadl2.System){
+			((Translator)stats).setTarget("System");
+		} else if(ownedClassifier instanceof org.osate.aadl2.Device){
+			((Translator)stats).setTarget("Device");
+		} else if(ownedClassifier instanceof org.osate.aadl2.Process){
+			((Translator)stats).setTarget("Process");
+		}
+		
+		// Process the target first...
+		processFile(monitor, rs, stats, targetFile, parseErrManager);
 
 		// Remove the system from the used files so we don't double-translate it
-		usedFiles.remove(systemFile);
+		usedFiles.remove(targetFile);
 
 		// Now process all the other files
 		for (IFile f : usedFiles) {
@@ -442,19 +469,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		return parseErrManager;
 	}
 
-	/**
-	 * This method does two things. One, it returns the (first) file containing
-	 * an AADL system, and two, it removes that file from the set of usedFiles.
-	 * 
-	 * @param rs
-	 *            The set of resources in the workspace
-	 * @param stats
-	 *            The translator implementation
-	 * @param usedFiles
-	 *            The set of files used in the architecture description.
-	 * @return The file containing the AADL system.
-	 */
-	private IFile getSystemFile(ResourceSet rs, Translator stats,
+	private IFile filterPropertySets(ResourceSet rs, Translator stats,
 			HashSet<IFile> usedFiles) {
 		IFile systemFile = null;
 		for (IFile f : usedFiles) {
@@ -468,15 +483,15 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 					stats.addPropertySetName(propertySetName);
 				continue;
 			}
-			AadlPackage pack = (AadlPackage) target;
-			PublicPackageSection sect = pack.getPublicSection();
-			for (Classifier ownedClassifier : sect.getOwnedClassifiers()) {
-				if (ownedClassifier instanceof org.osate.aadl2.SystemType) {
-					// Can't return f directly, may have more propertysets to
-					// add
-					systemFile = f;
-				}
-			}
+//			AadlPackage pack = (AadlPackage) target;
+//			PublicPackageSection sect = pack.getPublicSection();
+//			for (Classifier ownedClassifier : sect.getOwnedClassifiers()) {
+//				if (ownedClassifier instanceof org.osate.aadl2.SystemType) {
+//					// Can't return f directly, may have more propertysets to
+//					// add
+//					systemFile = f;
+//				}
+//			}
 		}
 		return systemFile;
 	}

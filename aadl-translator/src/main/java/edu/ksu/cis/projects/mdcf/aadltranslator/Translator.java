@@ -1,6 +1,5 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,7 +68,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	private enum ElementType {
 		SYSTEM, PROCESS, THREAD, SUBPROGRAM, DEVICE, NONE
 	};
+	
+	private enum TranslationTarget {
+		SYSTEM, PROCESS, DEVICE
+	}
 
+	private TranslationTarget target = null;
 	private SystemModel systemModel = null;
 	private ArrayList<String> propertySetNames = new ArrayList<>();
 	private ParseErrorReporterManager errorManager;
@@ -180,17 +184,35 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		@Override
 		public String caseDeviceType(DeviceType obj) {
-			try {
-				if (systemModel.hasDeviceType(obj.getName())) {
-					componentModel = systemModel.getDeviceByType(obj.getName());
-				} else {
-					throw new UseBeforeDeclarationException(
-							"Attempted to define a device that wasn't declared as a system component");
+			if(target == TranslationTarget.SYSTEM){ 
+				try {
+					if (systemModel.hasDeviceType(obj.getName())) {
+						componentModel = systemModel.getDeviceByType(obj.getName());
+					} else {
+						throw new UseBeforeDeclarationException(
+								"Attempted to define a device that wasn't declared as a system component");
+					}
+				} catch (UseBeforeDeclarationException e) {
+					handleException(obj, e);
+					return DONE;
 				}
-
-			} catch (UseBeforeDeclarationException e) {
-				handleException(obj, e);
-				return DONE;
+			} else {
+				// Translating just a device...
+				systemModel = new SystemModel();
+				DeviceModel dm = new DeviceModel();
+				dm.setName(obj.getName());
+				dm.setSystemName(systemModel.getName());
+				try {
+					String componentType = checkCustomProperty(obj, "Component_Type", "enum");
+					if(componentType == null)
+						throw new MissingRequiredPropertyException("Devices must declare their role with MAP_Properties::Component_Type");
+					dm.setComponentType(componentType);
+					systemModel.addDevice(obj.getName(), dm);
+					componentModel = dm;
+				} catch (DuplicateElementException | MissingRequiredPropertyException e) {
+					handleException(obj, e);
+					return DONE;
+				}
 			}
 			lastElemProcessed = ElementType.DEVICE;
 			processEList(obj.getOwnedElements());
@@ -1000,5 +1022,13 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 	public SystemImplementation getSystemImplementation() {
 		return sysImpl;
+	}
+
+	public String getTarget() {
+		return target.name();
+	}
+
+	public void setTarget(String target) {
+		this.target = TranslationTarget.valueOf(target.toUpperCase());
 	}
 }

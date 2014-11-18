@@ -205,13 +205,19 @@ public class SystemModel {
 		HashMap<String, ComponentModel> ret = new HashMap<>();
 		HashSet<String> logicComponentNames = new HashSet<>(
 				logicComponents.keySet());
-		if (logicComponentNames.retainAll(devices.keySet())) {
+		if(logicComponentNames.isEmpty() && devices.isEmpty()) {
+			// TODO: Handle this more gracefully?
+			System.err.println("No components (logic or devices) to write");
+		} else if (logicComponentNames.isEmpty()) {
+			ret.putAll(devices);
+		} else if (devices.isEmpty()) {
+			ret.putAll(logicComponents);
+		} else if (logicComponentNames.retainAll(devices.keySet())) {
 			ret.putAll(devices);
 			ret.putAll(logicComponents);
 		} else {
 			// TODO: Handle this more gracefully?
-			System.err
-					.println("Device and Logic components can't have the same name");
+			System.err.println("Device and Logic components can't have the same name");
 		}
 		return ret;
 	}
