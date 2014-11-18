@@ -5,9 +5,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -66,7 +64,6 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ProcessModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.SystemModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.TaskModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIAADLSystemErrorTest;
-import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIGeneratedArtifactsTest;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ConnectionModelHazardTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardBackgroundTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesTests;
@@ -84,7 +81,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 
 		// Hazard Model Tests -- Re-enable these if you've added the patch from
 		// https://github.com/osate/ErrorModelV2/pull/48
-//		ConnectionModelHazardTests.class,
+		ConnectionModelHazardTests.class,
 		HazardPreliminariesTests.class,
 		HazardBackgroundTests.class,
 
@@ -92,7 +89,8 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 		ControllerErrorTests.class,
 
 		// Device EI tests
-		DeviceEIGeneratedArtifactsTest.class,
+		// Disabled by Sam, 11/8/14 -- all tests in this class just assume(true)
+//		DeviceEIGeneratedArtifactsTest.class,
 		DeviceEIAADLSystemErrorTest.class,
 
 		// View tests
@@ -181,6 +179,16 @@ public class AllTests {
 					.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
 		} catch (CoreException | ExecutionException | NotDefinedException
 				| NotEnabledException | NotHandledException e) {
+			e.printStackTrace();
+		}
+		
+		// This is a total hack because the guice injectors don't finish
+		// running until some time after the build has completed. This 10s wait
+		// allows them to finish, avoiding all sorts of nasty errors
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		initComplete = true;
@@ -364,16 +372,6 @@ public class AllTests {
 
 		hazardAnalysis.setSystemModel(stats.getSystemModel());
 		hazardAnalysis.parseOccurrences(stats.getSystemImplementation());
-
-		try {
-			FileOutputStream fos = new FileOutputStream(
-					"/Users/sam/test.serial");
-			ObjectOutputStream out = new ObjectOutputStream(fos);
-			out.writeObject(stats.getSystemModel());
-			out.close();
-		} catch (Exception e) {
-
-		}
 
 		return stats.getSystemModel();
 	}
