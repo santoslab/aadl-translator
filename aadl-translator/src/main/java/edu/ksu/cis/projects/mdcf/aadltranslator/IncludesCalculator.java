@@ -13,7 +13,7 @@ import org.osate.aadl2.util.Aadl2Switch;
 public class IncludesCalculator extends AadlProcessingSwitchWithProgress {
 	private HashSet<IFile> usedFiles;
 	
-	protected IncludesCalculator(IProgressMonitor pm) {
+	public IncludesCalculator(IProgressMonitor pm) {
 		super(pm);
 		usedFiles = new HashSet<>();
 	}
@@ -21,6 +21,8 @@ public class IncludesCalculator extends AadlProcessingSwitchWithProgress {
 	public class ComputeIncludesSwitch extends Aadl2Switch<String> {
 		@Override
 		public String caseAadlPackage(AadlPackage obj) {
+			if(obj.eResource() == null)
+				return DONE;
 			IFile f = OsateResourceUtil.getOsateIFile(obj.eResource().getURI());
 			if(usedFiles.contains(f))
 				return DONE;

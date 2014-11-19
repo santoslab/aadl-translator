@@ -53,6 +53,7 @@ import org.stringtemplate.v4.STGroup;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.DeviceTranslator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.ErrorTranslator;
+import edu.ksu.cis.projects.mdcf.aadltranslator.IncludesCalculator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFactory;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
@@ -65,7 +66,6 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ProcessModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.SystemModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.TaskModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIAADLSystemErrorTest;
-import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ConnectionModelHazardTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardBackgroundTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
@@ -101,17 +101,8 @@ public class AllTests {
 	private static final Logger log = Logger
 			.getLogger(AllTests.class.getName());
 
-	public static HashMap<String, IFile> systemFiles = new HashMap<>();
+	public static HashMap<String, IFile> targetableFiles = new HashMap<>();
 	public static ResourceSet resourceSet = null;
-
-	// This may need to turn into a map from system name -> the set of
-	// supporting files
-	public static HashSet<String> supportingFiles = new HashSet<>();
-	public static HashSet<String> propertyFiles = new HashSet<>();
-	public static HashSet<String> deviceFiles = new HashSet<>();
-
-	public static HashSet<String> deviceEIPackageFiles = new HashSet<>();
-	public static HashSet<String> deviceEIPropertyFiles = new HashSet<>();
 
 	public final static String TEST_PLUGIN_BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator-test";
 	public final static String MAIN_PLUGIN_BUNDLE_ID = "edu.ksu.cis.projects.mdcf.aadl-translator";
@@ -220,17 +211,13 @@ public class AllTests {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		initFiles(packagesFolder, propertySetsFolder, aadlDir, systemFiles,
-				supportingFiles);
-		// We don't actually maintain a set of system definitions, since
-		// they are each only used by a single test case, so we sort of
-		// kludge this in with an unused hashset...
+		initFiles(packagesFolder, propertySetsFolder, aadlDir, targetableFiles);
 		initFiles(packagesFolder, propertySetsFolder, aadlSystemDir,
-				systemFiles, new HashSet<String>());
+				targetableFiles);
 		initFiles(packagesFolder, propertySetsFolder, aadlDeviceDir,
-				systemFiles, deviceFiles);
+				targetableFiles);
 		initFiles(packagesFolder, propertySetsFolder, aadlPropertysetsDir,
-				systemFiles, propertyFiles);
+				targetableFiles);
 
 		/* Device Equipment Interfaces Related Files */
 		URL aadlDeviceEIPackageDirUrl = Platform.getBundle(
@@ -253,21 +240,20 @@ public class AllTests {
 		}
 
 		initFiles(packagesFolder, propertySetsFolder, aadlDeviceEIPackageDir,
-				systemFiles, deviceEIPackageFiles);
+				targetableFiles);
 		initFiles(packagesFolder, propertySetsFolder,
-				aadlDeviceEIPropertysetsDir, systemFiles, deviceEIPropertyFiles);
+				aadlDeviceEIPropertysetsDir, targetableFiles);
 	}
 
 	private static void initFiles(IFolder packagesFolder,
 			IFolder propertySetsFolder, File dir,
-			HashMap<String, IFile> fileMap, HashSet<String> fileNameMap) {
+			HashMap<String, IFile> fileMap) {
 		String fileName = null;
 		try {
 			for (File f : dir.listFiles()) {
 				if (f.isHidden() || f.isDirectory())
 					continue;
 				fileName = f.getName().substring(0, f.getName().length() - 5);
-				fileNameMap.add(fileName);
 				fileMap.put(fileName,
 						packagesFolder.getFile(fileName + ".aadl"));
 				if (!packagesFolder.getFile(fileName + ".aadl").exists()) {
@@ -284,7 +270,7 @@ public class AllTests {
 
 	public static SystemModel runArchTransTest(final String testName,
 			final String systemName) {
-		IFile inputFile = systemFiles.get(systemName);
+		IFile inputFile = targetableFiles.get(systemName);
 		Translator stats = new Translator(new NullProgressMonitor());
 
 		configureTranslator(inputFile, stats);
@@ -302,11 +288,10 @@ public class AllTests {
 		stats.process(target);
 		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
 				.toString());
-
-		supportingFiles.addAll(usedDevices);
-
-		for (String supportingFileName : supportingFiles) {
-			IFile supportingFile = systemFiles.get(supportingFileName);
+		
+		HashSet<IFile> supportingFiles = getSupportingFiles(inputFile);
+	
+		for (IFile supportingFile : supportingFiles) {
 			res = resourceSet.getResource(OsateResourceUtil
 					.getResourceURI((IResource) supportingFile), true);
 			target = (Element) res.getContents().get(0);
@@ -315,14 +300,22 @@ public class AllTests {
 					(IResource) supportingFile).toString());
 		}
 
-		supportingFiles.removeAll(usedDevices);
-
 		return stats.getSystemModel();
+	}
+
+	private static HashSet<IFile> getSupportingFiles(IFile inputFile) {
+		HashSet<IFile> newSupportingFiles = new HashSet<>();
+		IncludesCalculator ic = new IncludesCalculator(new NullProgressMonitor());
+		Element targetElem = getTargetElement(inputFile);
+		ic.process(targetElem);
+		newSupportingFiles.addAll(ic.getUsedFiles());
+		newSupportingFiles.remove(inputFile);
+		return newSupportingFiles;
 	}
 
 	public static SystemModel runHazardTransTest(final String testName,
 			final String systemName) {
-		IFile inputFile = systemFiles.get(systemName);
+		IFile inputFile = targetableFiles.get(systemName);
 		Translator stats = new Translator(new NullProgressMonitor());
 		
 		configureTranslator(inputFile, stats);
@@ -341,13 +334,11 @@ public class AllTests {
 		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
 				.toString());
 
-		supportingFiles.addAll(usedDevices);
-		supportingFiles.add("PulseOx_Forwarding_Error_Properties");
-
+		HashSet<IFile> supportingFiles = getSupportingFiles(inputFile);
+		
 		ErrorTranslator hazardAnalysis = new ErrorTranslator();
 
-		for (String supportingFileName : supportingFiles) {
-			IFile supportingFile = systemFiles.get(supportingFileName);
+		for (IFile supportingFile : supportingFiles) {
 			res = resourceSet.getResource(OsateResourceUtil
 					.getResourceURI((IResource) supportingFile), true);
 			target = (Element) res.getContents().get(0);
@@ -372,9 +363,6 @@ public class AllTests {
 			}
 		}
 
-		supportingFiles.remove("PulseOx_Forwarding_Error_Properties");
-		supportingFiles.removeAll(usedDevices);
-
 		hazardAnalysis.setSystemModel(stats.getSystemModel());
 		hazardAnalysis.parseOccurrences(stats.getSystemImplementation());
 
@@ -397,7 +385,7 @@ public class AllTests {
 	public static DeviceComponentModel runDeviceTransTest(
 			final String testName, final String systemName) {
 
-		IFile inputFile = systemFiles.get(systemName);
+		IFile inputFile = targetableFiles.get(systemName);
 		DeviceTranslator stats = new DeviceTranslator(new NullProgressMonitor());
 
 		log.setUseParentHandlers(false);

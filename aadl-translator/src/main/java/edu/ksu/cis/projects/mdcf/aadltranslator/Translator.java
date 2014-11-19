@@ -181,6 +181,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			} else if(target == TranslationTarget.DEVICE) {
 				// Translating just a device...
 				systemModel = new SystemModel();
+				systemModel.setName("Device_Stub_System");
 				if(handleNewDevice(obj) != null)
 					return DONE;
 			} else {
@@ -300,6 +301,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			} else if(target == TranslationTarget.PROCESS) {
 				// Translating just a process...
 				systemModel = new SystemModel();
+				systemModel.setName("Process_Stub_System");
 				if(handleNewProcess(obj) != null)
 					return DONE;
 				pm = systemModel.getProcessByType(obj.getName());
@@ -646,7 +648,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				if(componentType == null)
 					throw new MissingRequiredPropertyException("Devices must declare their role with MAP_Properties::Component_Type");
 				dm.setComponentType(componentType);
-				systemModel.addDevice(obj.getName(), dm);
+				systemModel.addDevice(dm.getName(), dm);
 				componentModel = dm;
 			} catch (DuplicateElementException | MissingRequiredPropertyException e) {
 				handleException(obj, e);

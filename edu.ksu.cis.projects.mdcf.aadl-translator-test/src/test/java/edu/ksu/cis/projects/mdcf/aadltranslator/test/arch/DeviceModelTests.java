@@ -16,7 +16,8 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
 public class DeviceModelTests {
 
-	private static DeviceModel deviceModel;
+	private static DeviceModel deviceModelFromSystem;
+	private static DeviceModel deviceModelStandalone;
 
 	@BeforeClass
 	public static void initialize() {
@@ -24,8 +25,10 @@ public class DeviceModelTests {
 			AllTests.initialize();
 		usedProperties.add("MAP_Properties");
 		usedProperties.add("PulseOx_Forwarding_Properties");
-		SystemModel systemModel = AllTests.runArchTransTest("PulseOx", "PulseOx_Forwarding_System");
-		deviceModel = systemModel.getDeviceByType("ICEpoInterface");
+		SystemModel fullSystemModel = AllTests.runArchTransTest("PulseOx", "PulseOx_Forwarding_System");
+		SystemModel deviceOnlySystemModel = AllTests.runArchTransTest("PulseOxDevOnly", "PulseOx_Interface");
+		deviceModelFromSystem = fullSystemModel.getDeviceByType("ICEpoInterface");
+		deviceModelStandalone = deviceOnlySystemModel.getDeviceByType("ICEpoInterface");
 	}
 
 	@AfterClass
@@ -35,23 +38,36 @@ public class DeviceModelTests {
 
 	@Test
 	public void testDeviceExists() {
-		assertNotNull(deviceModel);
+		assertNotNull(deviceModelFromSystem);
+		assertNotNull(deviceModelStandalone);
 	}
 	
 	@Test
 	public void testDevicesComponentType() {
-		assertEquals(ComponentType.SENSOR, deviceModel.getComponentType());
+		assertEquals(ComponentType.SENSOR, deviceModelFromSystem.getComponentType());
+		assertEquals(ComponentType.SENSOR, deviceModelStandalone.getComponentType());
 	}
 
 	@Test
 	public void testDeviceSendPortExists() {
-		assertEquals(1, deviceModel.getSendPorts().size());
-		assertNotNull(deviceModel.getSendPorts().get("SpO2"));
+		assertEquals(1, deviceModelStandalone.getSendPorts().size());
+		assertEquals(1, deviceModelFromSystem.getSendPorts().size());
+		assertNotNull(deviceModelFromSystem.getSendPorts().get("SpO2"));
+		assertNotNull(deviceModelStandalone.getSendPorts().get("SpO2"));
 	}
 	
 	@Test
 	public void testImplicitTasks() {
-		assertEquals(1, deviceModel.getTasks().size());
-		assertNotNull(deviceModel.getTasks().get("SpO2Task"));
+		assertEquals(1, deviceModelStandalone.getTasks().size());
+		assertEquals(1, deviceModelFromSystem.getTasks().size());
+		assertNotNull(deviceModelFromSystem.getTasks().get("SpO2Task"));
+		assertNotNull(deviceModelStandalone.getTasks().get("SpO2Task"));
 	}
+	
+	@Test
+	public void testProcessSystemName() {
+		assertEquals("PulseOx_Forwarding_System", deviceModelFromSystem.getSystemName());
+		assertEquals("Device_Stub_System", deviceModelStandalone.getSystemName());
+	}
+	
 }
