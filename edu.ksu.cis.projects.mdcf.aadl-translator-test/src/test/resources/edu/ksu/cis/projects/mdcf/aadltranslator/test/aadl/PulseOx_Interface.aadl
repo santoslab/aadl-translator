@@ -1,6 +1,6 @@
 package PulseOx_Interface
 public
-with PulseOx_Forwarding_Types, PulseOx_Forwarding_Errors, MAP_Properties;
+with PulseOx_Forwarding_Types, PulseOx_Forwarding_Properties, MAP_Properties;
 	device ICEpoInterface
 	features
 		SpO2 : out event data port PulseOx_Forwarding_Types::SpO2;

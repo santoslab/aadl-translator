@@ -39,6 +39,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexLibrary;
+import org.osate.aadl2.Classifier;
 import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.PropertySet;
@@ -286,6 +287,8 @@ public class AllTests {
 		IFile inputFile = systemFiles.get(systemName);
 		Translator stats = new Translator(new NullProgressMonitor());
 
+		configureTranslator(inputFile, stats);
+		
 		parseErrManager = new ParseErrorReporterManager(
 				parseErrorReporterFactory);
 
@@ -321,6 +324,8 @@ public class AllTests {
 			final String systemName) {
 		IFile inputFile = systemFiles.get(systemName);
 		Translator stats = new Translator(new NullProgressMonitor());
+		
+		configureTranslator(inputFile, stats);
 
 		parseErrManager = new ParseErrorReporterManager(
 				parseErrorReporterFactory);
@@ -374,6 +379,19 @@ public class AllTests {
 		hazardAnalysis.parseOccurrences(stats.getSystemImplementation());
 
 		return stats.getSystemModel();
+	}
+
+	private static void configureTranslator(IFile inputFile, Translator stats) {
+		AadlPackage pack = (AadlPackage) getTargetElement(inputFile);
+		PublicPackageSection sect = pack.getPublicSection();
+		Classifier ownedClassifier = sect.getOwnedClassifiers().get(0);
+		if(ownedClassifier instanceof org.osate.aadl2.System){
+			((Translator)stats).setTarget("System");
+		} else if(ownedClassifier instanceof org.osate.aadl2.Device){
+			((Translator)stats).setTarget("Device");
+		} else if(ownedClassifier instanceof org.osate.aadl2.Process){
+			((Translator)stats).setTarget("Process");
+		}
 	}
 
 	public static DeviceComponentModel runDeviceTransTest(
@@ -437,6 +455,14 @@ public class AllTests {
 			e.printStackTrace();
 		}
 		assertEquals(expectedStr, actualStr);
+	}
+
+	private static Element getTargetElement(IFile file) {
+		ResourceSet rs = OsateResourceUtil.createResourceSet();
+		Resource res = rs.getResource(
+				OsateResourceUtil.getResourceURI((IResource) file), true);
+		Element target = (Element) res.getContents().get(0);
+		return target;
 	}
 
 }

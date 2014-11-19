@@ -1,6 +1,6 @@
 package PulseOx_Forwarding_Logic
 public
-with PulseOx_Forwarding_Types, MAP_Properties;
+with PulseOx_Forwarding_Types, MAP_Properties, PulseOx_Forwarding_Properties;
 
 	process PulseOx_Logic_Process
 	features
