@@ -152,33 +152,15 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		@Override
 		public String caseDeviceSubcomponent(DeviceSubcomponent obj) {
-			DeviceModel dm = new DeviceModel();
-			dm.setName(obj.getComponentType().getName());
-			dm.setSystemName(systemModel.getName());
-			try {
-				String componentType = checkCustomProperty(obj, "Component_Type", "enum");
-				if(componentType == null)
-					throw new MissingRequiredPropertyException("Devices must declare their role with MAP_Properties::Component_Type");
-				dm.setComponentType(componentType);
-				systemModel.addDevice(obj.getName(), dm);
-			} catch (DuplicateElementException | MissingRequiredPropertyException e) {
-				handleException(obj, e);
+			if(handleNewDevice(obj) != null)
 				return DONE;
-			}
 			return NOT_DONE;
 		}
 
 		@Override
 		public String caseProcessSubcomponent(ProcessSubcomponent obj) {
-			ProcessModel pm = new ProcessModel();
-			pm.setName(obj.getComponentType().getName());
-			pm.setSystemName(systemModel.getName());
-			try {
-				systemModel.addProcess(obj.getName(), pm);
-			} catch (DuplicateElementException e) {
-				handleException(obj, e);
+			if(handleNewProcess(obj) != null)
 				return DONE;
-			}
 			return NOT_DONE;
 		}
 
@@ -196,23 +178,13 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					handleException(obj, e);
 					return DONE;
 				}
-			} else {
+			} else if(target == TranslationTarget.DEVICE) {
 				// Translating just a device...
 				systemModel = new SystemModel();
-				DeviceModel dm = new DeviceModel();
-				dm.setName(obj.getName());
-				dm.setSystemName(systemModel.getName());
-				try {
-					String componentType = checkCustomProperty(obj, "Component_Type", "enum");
-					if(componentType == null)
-						throw new MissingRequiredPropertyException("Devices must declare their role with MAP_Properties::Component_Type");
-					dm.setComponentType(componentType);
-					systemModel.addDevice(obj.getName(), dm);
-					componentModel = dm;
-				} catch (DuplicateElementException | MissingRequiredPropertyException e) {
-					handleException(obj, e);
+				if(handleNewDevice(obj) != null)
 					return DONE;
-				}
+			} else {
+				// TODO: This shouldn't be hit.  Throw an error?
 			}
 			lastElemProcessed = ElementType.DEVICE;
 			processEList(obj.getOwnedElements());
@@ -310,16 +282,31 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		@Override
 		public String caseProcessType(ProcessType obj) {
-			ProcessModel pm;
-			try {
-				if (systemModel.hasProcessType(obj.getName())) {
-					componentModel = systemModel
-							.getProcessByType(obj.getName());
-					pm = systemModel.getProcessByType(obj.getName());
-				} else {
-					throw new UseBeforeDeclarationException(
-							"Attempted to define a process that wasn't declared as a system component");
+			ProcessModel pm = null;
+			if(target == TranslationTarget.SYSTEM){ 
+				try {
+					if (systemModel.hasProcessType(obj.getName())) {
+						componentModel = systemModel
+								.getProcessByType(obj.getName());
+						pm = systemModel.getProcessByType(obj.getName());
+					} else {
+						throw new UseBeforeDeclarationException(
+								"Attempted to define a process that wasn't declared as a system component");
+					}
+				} catch (UseBeforeDeclarationException e) {
+					handleException(obj, e);
+					return DONE;
 				}
+			} else if(target == TranslationTarget.PROCESS) {
+				// Translating just a process...
+				systemModel = new SystemModel();
+				if(handleNewProcess(obj) != null)
+					return DONE;
+				pm = systemModel.getProcessByType(obj.getName());
+			} else {
+				// TODO: This shouldn't be hit.  Throw an error?
+			}
+			try {
 				String processType = checkCustomProperty(obj,
 						"Process_Type", "enum");
 				if (processType != null
@@ -332,8 +319,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					throw new PropertyOutOfRangeException(
 							"Processes must declare their component type to be either display or logic");
 				}
-			} catch (UseBeforeDeclarationException
-					| PropertyOutOfRangeException e) {
+			} catch (PropertyOutOfRangeException e ) {
 				handleException(obj, e);
 				return DONE;
 			}
@@ -642,6 +628,51 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				return;
 			}
 
+		}
+
+		private String handleNewDevice(NamedElement obj) {
+			DeviceModel dm = new DeviceModel();
+			if(obj instanceof DeviceType){
+				dm.setName(obj.getName());
+			} else if (obj instanceof DeviceSubcomponent) {
+				dm.setName(((DeviceSubcomponent)obj).getComponentType().getName());
+			} else {
+				// TODO: This should never happen... handle it?
+			}
+				
+			dm.setSystemName(systemModel.getName());
+			try {
+				String componentType = checkCustomProperty(obj, "Component_Type", "enum");
+				if(componentType == null)
+					throw new MissingRequiredPropertyException("Devices must declare their role with MAP_Properties::Component_Type");
+				dm.setComponentType(componentType);
+				systemModel.addDevice(obj.getName(), dm);
+				componentModel = dm;
+			} catch (DuplicateElementException | MissingRequiredPropertyException e) {
+				handleException(obj, e);
+				return DONE;
+			}
+			return NOT_DONE;
+		}
+
+		private String handleNewProcess(NamedElement obj) {
+			ProcessModel pm = new ProcessModel();
+			if(obj instanceof ProcessType){
+				pm.setName(obj.getName());
+			} else if (obj instanceof ProcessSubcomponent) {
+				pm.setName(((ProcessSubcomponent)obj).getComponentType().getName());
+			} else {
+				// TODO: This should never happen... handle it?
+			}
+			pm.setSystemName(systemModel.getName());
+			try {
+				systemModel.addProcess(obj.getName(), pm);
+			} catch (DuplicateElementException e) {
+				handleException(obj, e);
+				return DONE;
+			}
+			componentModel = pm;
+			return NOT_DONE;
 		}
 
 		private String handleOverridableProperty(NamedElement obj,
