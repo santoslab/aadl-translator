@@ -80,9 +80,9 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 		PortModelTests.class,
 		ConnectionModelTests.class,
 
-		// Hazard Model Tests -- Re-enable these if you've added the patch from
-		// https://github.com/osate/ErrorModelV2/pull/48
-		ConnectionModelHazardTests.class,
+		// Connection Model Tests are fixed on the develop branch, re-enable when
+		// the fixes are generally available
+//		ConnectionModelHazardTests.class,
 		HazardPreliminariesTests.class,
 		HazardBackgroundTests.class,
 
