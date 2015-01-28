@@ -228,30 +228,48 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					systemModel.addAbbreviation(am);
 				} else if (obj.getPropertyType().getName().equals("Accident")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
+					IntegerLiteral il = (IntegerLiteral) PropertyUtils.getRecordFieldValue(rv, "Number");
 					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
 					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Level");
 					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
+					if (il.getValue() > Integer.MAX_VALUE) {
+						throw new PropertyOutOfRangeException(
+								"Accident numbers must be less than 2,147,483,647");
+					} 
 					AccidentModel am = new AccidentModel();
+					am.setNumber((int) il.getValue());
 					am.setName(obj.getName());
 					am.setDescription(sl.getValue());
 					am.setParent(systemModel.getAccidentLevelByName(pc.getName()));
 					systemModel.addAccident(am);
 				} else if (obj.getPropertyType().getName().equals("Hazard")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
+					IntegerLiteral il = (IntegerLiteral) PropertyUtils.getRecordFieldValue(rv, "Number");
 					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
 					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Accident");
 					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
+					if (il.getValue() > Integer.MAX_VALUE) {
+						throw new PropertyOutOfRangeException(
+								"Hazard numbers must be less than 2,147,483,647");
+					} 
 					HazardModel hm = new HazardModel();
+					hm.setNumber((int) il.getValue());
 					hm.setName(obj.getName());
 					hm.setDescription(sl.getValue());
 					hm.setParent(systemModel.getAccidentByName(pc.getName()));
 					systemModel.addHazard(hm);
 				} else if (obj.getPropertyType().getName().equals("Constraint")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
+					IntegerLiteral il = (IntegerLiteral) PropertyUtils.getRecordFieldValue(rv, "Number");
 					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
 					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Hazard");
 					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
+					if (il.getValue() > Integer.MAX_VALUE) {
+						throw new PropertyOutOfRangeException(
+								"Constraint numbers must be less than 2,147,483,647");
+					} 
 					ConstraintModel cm = new ConstraintModel();
+					cm.setNumber((int) il.getValue());
 					cm.setName(obj.getName());
 					cm.setDescription(sl.getValue());
 					cm.setParent(systemModel.getHazardByName(pc.getName()));

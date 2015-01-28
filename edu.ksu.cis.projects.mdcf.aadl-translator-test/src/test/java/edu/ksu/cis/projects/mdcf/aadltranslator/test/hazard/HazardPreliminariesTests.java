@@ -46,6 +46,7 @@ public class HazardPreliminariesTests {
 		assertEquals("PatientHarmed", systemModel.getAccidentByName("PatientHarmed").getName());
 		assertEquals("Patient is killed or seriously injured.", systemModel
 				.getAccidentByName("PatientHarmed").getDescription());
+		assertEquals(1, systemModel.getAccidentByName("PatientHarmed").getNumber());
 	}
 
 	@Test
@@ -54,6 +55,7 @@ public class HazardPreliminariesTests {
 		assertEquals("BadInfoDisplayed", systemModel.getHazardByName("BadInfoDisplayed").getName());
 		assertEquals("Incorrect information is sent to the display.",
 				systemModel.getHazardByName("BadInfoDisplayed").getDescription());
+		assertEquals(1, systemModel.getHazardByName("BadInfoDisplayed").getNumber());
 	}
 
 	@Test
@@ -64,5 +66,6 @@ public class HazardPreliminariesTests {
 				"The app must accurately inform the display of the status of the patient's"
 						+ " vital signs.", systemModel
 						.getConstraintByName("ShowGoodInfo").getDescription());
+		assertEquals(1, systemModel.getConstraintByName("ShowGoodInfo").getNumber());
 	}
 }
