@@ -52,12 +52,13 @@ KindsType : type enumeration (
 
 Occurrence : record (
 	Kind : MAP_Error_Properties::KindsType;
-	Hazard : MAP_Error_Properties::Hazard;
 	ViolatedConstraint : MAP_Error_Properties::Constraint;
 	Title : aadlstring;
-	Cause : aadlstring;
+	Cause : record (
+		ErrorType : reference ({emv2}**error type);
+		Description : aadlstring;
+	);
 	Compensation : aadlstring;
-	Impact : reference ({emv2}**error type);
-) applies to (port connection);
+) applies to (port connection, {emv2}**connection error source);
 
 end MAP_Error_Properties;

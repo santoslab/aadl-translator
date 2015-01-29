@@ -70,7 +70,7 @@ public class ConnectionModelHazardTests {
 	
 	@Test
 	public void testOccurrenceImpactName() {
-		assertEquals("SpO2ValueHigh", occurrence.getImpact().getName());
+		assertEquals("SpO2ValueHigh", occurrence.getErrorType().getName());
 	}
 	
 	@Test

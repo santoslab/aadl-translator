@@ -21,20 +21,20 @@ import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.MissingRequiredPropertyException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ConstraintModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.HazardModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ImpactModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ErrorTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.Keyword;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.OccurrenceModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 
 public final class ErrorTranslator {
 	
-	private HashMap<String, ImpactModel> impacts;
+	private HashMap<String, ErrorTypeModel> errorTypes;
 	private SystemModel systemModel;
 	
 	public void setErrorTypes(HashSet<ErrorType> errors) {
-		impacts = new HashMap<>();
+		errorTypes = new HashMap<>();
 		for(ErrorType et : errors){
-			impacts.put(et.getName(), new ImpactModel(et.getName()));
+			errorTypes.put(et.getName(), new ErrorTypeModel(et.getName()));
 		}
 	}
 	
@@ -50,11 +50,11 @@ public final class ErrorTranslator {
 				connectionName = ((PortConnectionImpl)pa.getAppliesTos().iterator().next().getContainmentPathElements().iterator().next().getNamedElement()).getName();
 				connErrorName = pa.getAppliesTos().iterator().next().getContainmentPathElements().iterator().next().getNamedElement().getName();
 				OccurrenceModel om = null;
-				HazardModel hm = null;
 				ConstraintModel cm = null;
-				String title = "$UNSET$", cause = "$UNSET$", compensation = "$UNSET$";
-				ImpactModel im = null;
+				String title = "$UNSET$", description = "$UNSET$", compensation = "$UNSET$";
+				ErrorTypeModel errorType = null;
 				Keyword keyword = null;
+				RecordValueImpl cause;
 
 				// Kind
 				NamedValue nv = ((NamedValue) PropertyUtils.getRecordFieldValue(rv, "Kind"));
@@ -62,13 +62,9 @@ public final class ErrorTranslator {
 				String keywordName = el.getName();
 				keyword = Keyword.valueOf(keywordName.toUpperCase());
 				
-				// Hazard
-				nv = ((NamedValue) PropertyUtils.getRecordFieldValue(rv, "Hazard"));
-				PropertyConstant pc = (PropertyConstant)nv.getNamedValue();
-				hm = systemModel.getHazardByName(pc.getName());
-				
 				// Constraint
 				nv = ((NamedValue) PropertyUtils.getRecordFieldValue(rv, "ViolatedConstraint"));
+				PropertyConstant pc = (PropertyConstant)nv.getNamedValue();
 				pc = (PropertyConstant)nv.getNamedValue();
 				cm = systemModel.getConstraintByName(pc.getName());
 
@@ -77,46 +73,48 @@ public final class ErrorTranslator {
 				title = title.substring(1, title.length() - 1);
 				
 				// Cause
-				cause = ((StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Cause")).getValue();
-				cause = cause.substring(1, cause.length() - 1);
+				cause = ((RecordValueImpl) PropertyUtils.getRecordFieldValue(rv, "Cause"));
+				
+				// Description
+				description = ((StringLiteral) PropertyUtils.getRecordFieldValue(cause, "Description")).getValue();
+				description = description.substring(1, description.length() - 1);
+				
+				// ErrorType
+				ReferenceValue reva = (ReferenceValue) PropertyUtils.getRecordFieldValue(cause, "ErrorType");
+				ContainmentPathElement cpe = (ContainmentPathElement) reva.getContainmentPathElements().get(0);
+				errorType = errorTypes.get(cpe.getNamedElement().getName());
 				
 				// Compensation
 				compensation = ((StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Compensation")).getValue();
 				compensation = compensation.substring(1, compensation.length() - 1);
 				
-				// Impact
-				ReferenceValue reva = (ReferenceValue) PropertyUtils.getRecordFieldValue(rv, "Impact");
-				ContainmentPathElement cpe = (ContainmentPathElement) reva.getContainmentPathElements().get(0);
-				im = impacts.get(cpe.getNamedElement().getName());
-				
 				// Anything missing?
 				if(keyword == null){
 					throw new MissingRequiredPropertyException("Got an occurrence property missing the required subproperty \"Kind\"");
-				} else if(hm == null){
-					throw new MissingRequiredPropertyException("Got an occurrence property missing the required subproperty \"Hazard\"");
 				} else if(cm == null){
 					throw new MissingRequiredPropertyException("Got an occurrence property missing the required subproperty \"ViolatedConstraint\"");
 				} else if(title.equals("$UNSET$")){
 					throw new MissingRequiredPropertyException("Got an occurrence property missing the required subproperty \"Title\"");
-				} else if(cause.equals("$UNSET$")){
+				} else if(description.equals("$UNSET$")){
 					throw new MissingRequiredPropertyException("Got an occurrence property missing the required subproperty \"Cause\"");
 				} else if(compensation.equals("$UNSET$")){
 					throw new MissingRequiredPropertyException("Got an occurrence property missing the required subproperty \"Compensation\"");
-				} else if(im == null){
-					throw new MissingRequiredPropertyException("Got an occurrence property missing the required subproperty \"Impact\"");
+				} else if(errorType == null){
+					throw new MissingRequiredPropertyException("Got an occurrence property missing the required subproperty \"ErrorType\"");
 				}
 				
 				// Create model
 				om = new OccurrenceModel();
 				om.setKeyword(keyword);
-				om.setHazard(hm);
 				om.setConstraint(cm);
 				om.setTitle(title);
-				om.setCause(cause);
+				om.setCause(description);
 				om.setCompensation(compensation);
-				om.setImpact(im);
+				om.setErrorType(errorType);
 				om.setConnErrorName(connErrorName);
 				systemModel.getChannelByName(connectionName).addOccurrence(om);
+				
+				//TODO: Put in event chain trace
 			}
 		} catch (MissingRequiredPropertyException e) {
 			e.printStackTrace();

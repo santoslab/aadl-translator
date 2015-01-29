@@ -1,9 +1,9 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
-public class ImpactModel {
+public class ErrorTypeModel {
 	private String name;
 
-	public ImpactModel(String name) {
+	public ErrorTypeModel(String name) {
 		this.name = name;
 	}
 

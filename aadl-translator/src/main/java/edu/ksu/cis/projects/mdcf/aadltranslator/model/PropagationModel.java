@@ -2,10 +2,10 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 public class PropagationModel {
 	private boolean in;
-	private ImpactModel error;
+	private ErrorTypeModel error;
 	private ConnectionModel conn;
 	
-	public PropagationModel(boolean in, ImpactModel error, ConnectionModel conn) {
+	public PropagationModel(boolean in, ErrorTypeModel error, ConnectionModel conn) {
 		super();
 		this.in = in;
 		this.error = error;
@@ -28,11 +28,11 @@ public class PropagationModel {
 		this.in = false;
 	}
 
-	public ImpactModel getError() {
+	public ErrorTypeModel getError() {
 		return error;
 	}
 
-	public void setError(ImpactModel error) {
+	public void setError(ErrorTypeModel error) {
 		this.error = error;
 	}
 

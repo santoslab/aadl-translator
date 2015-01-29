@@ -9,7 +9,7 @@ public class OccurrenceModel {
 	private String title;
 	private String cause;
 	private String compensation;
-	private ImpactModel impact;
+	private ErrorTypeModel errorType;
 	private String connErrorName;
 	private ComponentModel parent;
 	private ComponentModel child;
@@ -62,12 +62,12 @@ public class OccurrenceModel {
 		this.compensation = compensation;
 	}
 	
-	public ImpactModel getImpact() {
-		return impact;
+	public ErrorTypeModel getErrorType() {
+		return errorType;
 	}
 	
-	public void setImpact(ImpactModel impact) {
-		this.impact = impact;
+	public void setErrorType(ErrorTypeModel impact) {
+		this.errorType = impact;
 	}
 	
 	public String getConnErrorName() {
