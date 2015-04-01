@@ -49,13 +49,11 @@ import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
-import org.osate.xtext.aadl2.unparsing.AadlUnparser;
 import org.stringtemplate.v4.STGroup;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.DeviceTranslator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.ErrorTranslator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.IncludesCalculator;
-import edu.ksu.cis.projects.mdcf.aadltranslator.NewDeviceTranslator;
+import edu.ksu.cis.projects.mdcf.aadltranslator.DeviceTranslator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFactory;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
@@ -388,7 +386,7 @@ public class AllTests {
 			final String testName, final String systemName) {
 
 		IFile inputFile = targetableFiles.get(systemName);
-		NewDeviceTranslator stats = new NewDeviceTranslator(new NullProgressMonitor());
+		DeviceTranslator stats = new DeviceTranslator(new NullProgressMonitor());
 
 		log.setUseParentHandlers(false);
 

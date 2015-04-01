@@ -218,7 +218,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		// 1) Initialize the progress monitor and translator
 		ResourceSet rs = initProgressMonitor(monitor);
 		//DeviceTranslator stats = new DeviceTranslator(monitor);
-		NewDeviceTranslator stats = new NewDeviceTranslator(monitor);
+		DeviceTranslator stats = new DeviceTranslator(monitor);
 
 		// 2) Get the list of files used in the model we're translating
 		HashSet<IFile> usedFiles = this.getUsedFiles();
@@ -239,7 +239,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		wrapUpProgressMonitor(monitor);
 	}
 
-	private void writeDeviceOutput(NewDeviceTranslator stats) {
+	private void writeDeviceOutput(DeviceTranslator stats) {
 		IPreferencesService service = Platform.getPreferencesService();
 
 		// Get user preferences
@@ -455,7 +455,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	}
 
 	private ParseErrorReporterManager initDeviceErrManager(
-			NewDeviceTranslator stats) {
+			DeviceTranslator stats) {
 		// The ParseErrorReporter provided by the OSATE model support is nearly
 		// perfect here, we only change the marker id (much of the code is
 		// directly lifted from elsewhere in the OSATE codebase
@@ -509,7 +509,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	 *            The set of files used in the architecture description.
 	 * @return The file containing the AADL system.
 	 */
-	private IFile getDeviceSystemFile(ResourceSet rs, NewDeviceTranslator stats,
+	private IFile getDeviceSystemFile(ResourceSet rs, DeviceTranslator stats,
 			HashSet<IFile> usedFiles) {
 		IFile systemFile = null;
 		for (IFile f : usedFiles) {

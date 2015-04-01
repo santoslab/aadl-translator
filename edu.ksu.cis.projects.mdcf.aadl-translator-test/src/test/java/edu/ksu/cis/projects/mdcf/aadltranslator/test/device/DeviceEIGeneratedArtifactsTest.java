@@ -71,7 +71,7 @@ public class DeviceEIGeneratedArtifactsTest {
 	public void testPulseOx() {
 		deviceComponentModel = AllTests.runDeviceTransTest("APulseOx", "APulseOx");
 		DoTranslationOfflineTest doTranslationTest = new DoTranslationOfflineTest();
-		System.err.println(doTranslationTest.buildDeviceSuperType(deviceComponentModel));
+		//System.err.println(doTranslationTest.buildDeviceSuperType(deviceComponentModel));
 		assertTrue(true);
 	}
 }
