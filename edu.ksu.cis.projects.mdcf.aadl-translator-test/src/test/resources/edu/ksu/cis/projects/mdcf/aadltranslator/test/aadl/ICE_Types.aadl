@@ -30,4 +30,10 @@ properties
 end ICE_SpO2_Numeric_Alternate;
 
 
+-- Pulse rate
+data ICE_Pulserate_Numeric
+properties
+  Data_Model::Integer_Range => 0 .. 100;
+end ICE_Pulserate_Numeric;
+
 end ICE_Types;

@@ -65,7 +65,7 @@ import mdcf.device.exchanges.SetExchange;
 import mdcf.device.exchanges.SporadicExchange;
 import mdcf.device.exchanges.ActionExchange;
 import mdcf.device.exchanges.PeriodicExchange;
-
+import mdcf.messagebus.config.Constants;
 >>
 
 
@@ -75,13 +75,14 @@ public abstract class <model.name>SuperType extends DeviceComponent
 
 loadDeviceModel(mode) ::=<<
 	public static final String IEEE11073_MDC_ATTR_SYS_TYPE = "edu.ksu.cis.santos.mdcf.dms.examplev2.product.<model.name>";
+	private String address;
 
 	public static final DeviceModelPair models = new DeviceModelPair(
 			readCompSig("<model.name>.compsig.xml"),
 			readDML("<model.name>.dml.xml"));
 
 	public static void main(String[] args) {
-			<model.name>SuperType dev = new <model.name>();
+			<model.name>SuperType dev = new <model.name>(Constants.getHostAddress());
 			dev.connectToNetworkController();
 	}
 
@@ -145,13 +146,15 @@ actionExchangeField(ModelName, ExchangeName) ::=<<
 
 constructor(model) ::=<<
 <! 	Building Constructors !>	
-	protected <model.name>SuperType(String GUID, String deviceTypeName) {
-		super(GUID, deviceTypeName);		
+	protected <model.name>SuperType(String GUID, String deviceTypeName, String host) {
+		super(GUID, deviceTypeName, host);	
+		address = host;	
 	}
 	
 	protected <model.name>SuperType(String guid, String name,
-			boolean useCommunicationSecurityFeature) {
-		super(guid, name);
+			boolean useCommunicationSecurityFeature, String host) {
+		super(guid, name, host);
+		address = host;
 		setUseCommunicationSecurityFeature(useCommunicationSecurityFeature);
 	
 		// Setting device model for PnP
@@ -165,65 +168,65 @@ constructor(model) ::=<<
 
 exchangeInits(model) ::=<<											
 	<model.getExchangeModels.values:{exchangeModel | <getExchangeInit(model.name, exchangeModel.SendMessageType, exchangeModel.exchangeName,
-											exchangeModel.OutPortInfo.portName, exchangeModel.InPortInfo.portName)>}>
+											exchangeModel.OutPortInfo.portName, exchangeModel.InPortInfo.portName)>}; separator="\n">
 											
 	<model.setExchangeModels.values:{exchangeModel | <setExchangeInit(model.name, exchangeModel.SendMessageType, exchangeModel.exchangeName,
-											exchangeModel.OutPortInfo.portName, exchangeModel.InPortInfo.portName)>}>
+											exchangeModel.OutPortInfo.portName, exchangeModel.InPortInfo.portName)>}; separator="\n">
 											
 	<model.periodicExchangeModels.values:{exchangeModel | <periodicExchangeInit(model.name, exchangeModel.SendMessageType, exchangeModel.exchangeName,
-											exchangeModel.OutPortInfo.portName)>}>
+											exchangeModel.OutPortInfo.portName)>}; separator="\n">
 
 	<model.sporadicExchangeModels.values:{exchangeModel | <sporadicExchangeInit(model.name, exchangeModel.SendMessageType, exchangeModel.exchangeName,
-											exchangeModel.OutPortInfo.portName)>}>
+											exchangeModel.OutPortInfo.portName)>}; separator="\n">
 
 	<model.actionExchangeModels.values:{exchangeModel | <actionExchangeInit(model.name, exchangeModel.exchangeName,
-											exchangeModel.OutPortInfo.portName, exchangeModel.InPortInfo.portName)>}>
+											exchangeModel.OutPortInfo.portName, exchangeModel.InPortInfo.portName)>}; separator="\n">
 >>
 
 getExchangeInit(ModelName, ParameterType, ExchangeName, SendPortName, RecvPortName) ::=<<
 		<ExchangeName>.receiver = new MdcfReceiverPort\<>(
 				"<RecvPortName>",
-				Request.class);
+				Request.class, address);
 		<ExchangeName>.receiver.getReceiver().registerMessageListener(
 				new <ExchangeName>_Listener());
 		<ExchangeName>.sender = new MdcfSenderPort\<>(
 				"<SendPortName>",
-				<ParameterType>.class);
+				<ParameterType>.class, address);
 >>
 
 
 setExchangeInit(ModelName, ParameterType, ExchangeName, SendPortName, RecvPortName) ::=<<
 		<ExchangeName>.receiver = new MdcfReceiverPort\<>(
 				"<RecvPortName>",
-				<ParameterType>.class);
+				<ParameterType>.class, address);
 		<ExchangeName>.receiver.getReceiver().registerMessageListener(
 				new <ExchangeName>_Listener());
 		<ExchangeName>.sender = new MdcfSenderPort\<>(
 				"<SendPortName>",
-				Confirmation.class);
+				Confirmation.class, address);
 >>
 
 periodicExchangeInit(ModelName, ParameterType, ExchangeName, SendPortName) ::=<<
 		<ExchangeName>.sender = new MdcfSenderPort\<>(
 				"<SendPortName>",
-				<ParameterType>.class);
+				<ParameterType>.class, address);
 >>
 
 sporadicExchangeInit(ModelName, ParameterType, ExchangeName, SendPortName) ::=<<
 		<ExchangeName>.sender = new MdcfSenderPort\<>(
 				"<SendPortName>",
-				<ParameterType>.class);
+				<ParameterType>.class, address);
 >>
 
 actionExchangeInit(ModelName, ExchangeName, SendPortName, RecvPortName) ::=<<
 		<ExchangeName>.receiver = new MdcfReceiverPort\<>(
 				"<RecvPortName>",
-				ActionRequest.class);
+				ActionRequest.class, address);
 		<ExchangeName>.receiver.getReceiver().registerMessageListener(
 				new <ExchangeName>_Listener());
 		<ExchangeName>.sender = new MdcfSenderPort\<>(
 				"<SendPortName>",
-				ActionResult.class);
+				ActionResult.class, address);
 >>
 	
 	
@@ -260,8 +263,8 @@ subscriberChannelAssignmentHelper(subAssign, this.<exchName>.receiver);
 
 senderMethods(model) ::=<<
 <! Sender Method !>
-	<model.periodicExchangeModels.values:{exchangeModel | <senderPeriodicMethod(exchangeModel.OutPortInfo.portName, exchangeModel.SendMessageType, exchangeModel.parameterName)>}>	
-	<model.sporadicExchangeModels.values:{exchangeModel | <senderSporadicMethod(exchangeModel.OutPortInfo.portName, exchangeModel.SendMessageType, exchangeModel.parameterName)>}>												
+	<model.periodicExchangeModels.values:{exchangeModel | <senderPeriodicMethod(exchangeModel.ExchangeName, exchangeModel.SendMessageType, exchangeModel.parameterName)>}>	
+	<model.sporadicExchangeModels.values:{exchangeModel | <senderSporadicMethod(exchangeModel.ExchangeName, exchangeModel.SendMessageType, exchangeModel.parameterName)>}>												
 >>
 
 senderPeriodicMethod(OutportName, ParameterType, ParameterName) ::=<<
@@ -301,11 +304,11 @@ actionAPIs(model) ::=<<
 >>
 
 getAPI(Type, ParameterName, ExchangeName) ::=<<
-	protected abstract <Type> get<ParameterName>_<ExchangeName>();
+	protected abstract <Type> get_<ExchangeName>();
 >>	
 
 setAPI(Type, ParameterName, ExchangeName) ::=<<
-	protected abstract Status set<ParameterName>_<ExchangeName>(<Type> value);
+	protected abstract Status set_<ExchangeName>(<Type> value);
 >>
 
 actionAPI(ActionName) ::=<<	
@@ -323,7 +326,7 @@ getListenerClass(ExchangeName, ParameterName) ::=<<
 	class <ExchangeName>_Listener implements IMdcfMessageListener {
 		@Override
 		public void onMessage(MdcfMessage message) {
-			<ExchangeName>.send(get<ParameterName>_<ExchangeName>());
+			<ExchangeName>.send(get_<ExchangeName>());
 		}
 	}
 >>	
@@ -332,7 +335,7 @@ setListenerClass(ExchangeName, ParameterName, SendMessageType) ::=<<
 	class <ExchangeName>_Listener implements IMdcfMessageListener {
 		@Override
 		public void onMessage(MdcfMessage message) {
-			Status status = set<ParameterName>_<ExchangeName>((<SendMessageType>) xstream.fromXML(message.getTextMsg()));
+			Status status = set_<ExchangeName>((<SendMessageType>) xstream.fromXML(message.getTextMsg()));
 			<ExchangeName>.send(new Confirmation(status));
 		}
 	}

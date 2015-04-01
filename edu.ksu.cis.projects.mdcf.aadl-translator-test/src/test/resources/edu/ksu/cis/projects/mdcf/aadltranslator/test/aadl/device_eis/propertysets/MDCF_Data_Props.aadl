@@ -7,20 +7,35 @@
 --               
 -- Licensed Material - Property of Kansas State University.               
 ------------------------------------------------------------------------------+
-
-
--- Can these instead be defined with the data modeling annex? Then this 
---   property set would become a package.
+-- Data properties are grouped here as a convenience, where they eventually
+-- take up residence is not yet determined.
+--
+-- If the contents can instead be defined with the data modeling annex, then 
+-- this property set would become a package.
+------------------------------------------------------------------------------+
 
 
 property set MDCF_Data_Props is
+  with Data_Model;
+
 -- The various device payload types.
-ICE_Payload: type enumeration (
-  ICE_VMD_Status, ICE_SpO2_Limit_Alert, ICE_SpO2_Numeric, 
-  ICE_SpO2_Numeric_Alternative, ICE_PulseRate_Numeric, 
-  ICE_BloodPressure_Systolic_Numeric, ICE_BloodPressure_Diastolic_Numeric, 
-  ICE_BloodPressure_Mean_Numeric, ICE_EtCo2_Numeric, ICE_RepiratoryRate_Numeric
-);
+--ICE_Payload: type enumeration (
+--  ICE_VMD_Status, ICE_SpO2_Limit_Alert, ICE_SpO2_Numeric, 
+--  ICE_SpO2_Numeric_Alternative, ICE_PulseRate_Numeric, 
+--  ICE_BloodPressure_Systolic_Numeric, ICE_BloodPressure_Diastolic_Numeric, 
+--  ICE_BloodPressure_Mean_Numeric, ICE_EtCo2_Numeric, ICE_RepiratoryRate_Numeric
+--);
+
+
+Nat_Range: type range of aadlinteger;
+Real_Range: type range of aadlreal;
+
+separation_interval: MDCF_Data_Props::Nat_Range applies to (data); 
+serviceTime: MDCF_Data_Props::Nat_Range applies to (data);
+-- FIXME: Substitute, ICE Range is a flexibly typed number.
+num_range: MDCF_Data_Props::Real_Range applies to (data);  
+
+-- observedValue: ICE_NuObsValue = DYN  XXX: Is a time stamp
 
 
 -- Transporter groups that exist in an ICE channel. 
@@ -29,45 +44,46 @@ ICE_Channel_Group: type enumeration (
 );
 
 
--- Use simple attribute definition...
-IEEE11073_MDC_ATTR_SYS_TYPE: aadlstring applies to (system);
-  
--- ...or adhere more closely to MDCF type system.  
+-- Attributes for types that follow MDCF type system will use these pieces. 
 IEEE11073_OID_TYPE: type aadlstring;
-IEEE11073_MDC_ATTR_SYS_TYPE_alt: MDCF_Data_Props::IEEE11073_OID_TYPE 
+
+ALERT_SOURCE: MDCF_Data_Props::IEEE11073_OID_TYPE applies to (all);
+ALERT_CODE: MDCF_Data_Props::IEEE11073_OID_TYPE applies to (all);
+MDC_ATTR_ID_PARAM_GRP: MDCF_Data_Props::IEEE11073_OID_TYPE applies to (all);
+MDC_ATTR_ID_PHYSIO: MDCF_Data_Props::IEEE11073_OID_TYPE applies to (all);
+MDC_ATTR_UNIT_CODE: MDCF_Data_Props::IEEE11073_OID_TYPE applies to (all);
+
+
+--ICE_Request: aadlboolean applies to (data);
+
+
+ICE_Security_Certificate: type aadlstring;  -- XXX: No actually a string.  
+
+ICE_Credential: type record (
+  name: aadlstring;
+  value: MDCF_Data_Props::ICE_Security_Certificate;
+);
+
+-- Construct simple & compound attributes from MDCF type pieces.
+
+IEEE11073_MDC_ATTR_SYS_TYPE: MDCF_Data_Props::IEEE11073_OID_TYPE 
     applies to (system);
 
-
--- Attribute inner type defined on the fly...
-ICE_Security_Certificate: type aadlstring;
-  
-ICE_ManufacturerModel: record (
-  MDC_ATTR_ID_MODEL: record (
-    manufacturer: aadlstring;
-    model_number: aadlstring;
-  );
-  credentials: list of aadlstring;  -- Closest AADL thing to a map.
-) applies to (system);
-
-
--- ...or defined to preserve MDCF hierarchy.
 IEEE11073_SystemModel: type record (
   manufacturer: aadlstring;
   model_number: aadlstring;
 );
 
-ICE_ManufacturerModel_alt: record (
+manufacturerModel: record (
   MDC_ATTR_ID_MODEL: MDCF_Data_Props::IEEE11073_SystemModel;
-  credentials: list of MDCF_Data_Props::ICE_Security_Certificate;
-) applies to (system);
+  credentials: list of MDCF_Data_Props::ICE_Credential;
+) applies to (system); 
   
   
-MDC_ATTR_ID_PARAM_GRP: aadlstring applies to (all);  --(data, feature group);
-MDC_ATTR_ID_PHYSIO: aadlstring applies to (data);
-MDC_ATTR_UNIT_CODE: aadlstring applies to (data);
-
-ICE_Request: aadlboolean applies to (data);
-
+--ICE_Numeric type ICE_Metric {
+--  val observedValue : ICE_NuObsValue = DYN
+--  val range : Range  
+--  }
 
 -- Make enumerated values from a type definition...
 access_literals: type enumeration (ICE_Security_Access_Read, ICE_Security_Access_Write,
@@ -77,5 +93,15 @@ access_val: MDCF_Data_Props::access_literals applies to (data);
 
 -- ...or do in one step, skipping type definition.
 state_val: inherit enumeration (Ok, NotOk) applies to (data);
-    
+
+
+-- Map testing
+a_map_entry: type record (
+  key: aadlstring;
+  value: aadlstring;
+);
+
+a_map: list of MDCF_Data_Props::a_map_entry applies to (system); 
+
+
 end MDCF_Data_Props;

@@ -1,0 +1,152 @@
+------------------------------------------------------------------------------+
+-- APulseOx.aadl - AADL of PulseOx DML in project mdcf.dms.examplev2.product.
+--
+-- Author: Stephen C. Barrett (scbarrett@ksu.edu)
+--         Department of Computing & Information Sciences
+--               
+------------------------------------------------------------------------------+
+
+package APulseOx
+public
+  with Base_Types, ICE_Types, MDCF_Types;
+  with MDCF_Data_Props, MDCF_Comm_Props;
+
+
+------------------------------------------------------------------------------+
+-- pulseox virtual medical device
+------------------------------------------------------------------------------+
+system APulseOx
+features
+  -- Device port groupings
+  status: feature group pulseoxStatus;
+  
+  -- Channel port groupings   
+  spo2_metrics: feature group spo2Metrics;      
+  pulserate_metrics: feature group pulserateMetrics;   
+end APulseOx;
+
+system implementation APulseOx.impl
+subcomponents
+  spo2: system spo2Channel.impl; 
+  pulserate: system pulserateChannel.impl; 
+                       
+connections
+  s2: feature group spo2.metrics <-> spo2_metrics; 
+  p2: feature group pulserate.metrics <-> pulserate_metrics;      
+
+properties
+  MDCF_Data_Props::IEEE11073_MDC_ATTR_SYS_TYPE => "Nonin PO";
+  
+  MDCF_Data_Props::manufacturerModel => [
+    MDC_ATTR_ID_MODEL => [
+      manufacturer => "Nonin";
+      model_number => "Onyx II X5551122"; 
+    ];
+  ];
+end APulseOx.impl;
+
+--test1                          
+feature group pulseoxStatus
+--test2
+features
+--test3
+  exchange_in: in event port --test4
+    --test5  
+  {
+  --test7
+    MDCF_Comm_Props::DML_Port => [        
+      Comm_Role => responder;
+      Output_Rate => 5ms .. 50ms;
+    ];
+  };  
+  exchange_out: out event data port MDCF_Types::ICE_VMD_Status   --test6   
+  { 
+    MDCF_Comm_Props::DML_Port => [
+      Comm_Role => responder;
+      Output_Rate => 5ms .. 50ms;
+    ];
+  };
+end pulseoxStatus;
+  
+------------------------------------------------------------------------------+
+-- pulseox VMD channel & port grouping definitions
+------------------------------------------------------------------------------+
+system spo2Channel   
+features
+  metrics: feature group spo2Metrics;
+end spo2Channel;  
+  
+system implementation spo2Channel.impl
+properties
+  MDCF_Data_Props::MDC_ATTR_ID_PARAM_GRP => "SpO2 Channel";  
+end spo2Channel.impl;  
+
+
+feature group spo2Metrics
+features
+  get_in: in event port {  
+    MDCF_Comm_Props::DML_Port => [                                
+      Comm_Role => responder; 
+      Output_Rate => 5ms .. 50ms;
+    ];
+  };
+  get_out: out event data port ICE_Types::ICE_SpO2_Numeric {   
+    MDCF_Comm_Props::DML_Port => [
+      Comm_Role => responder;
+      Output_Rate => 5ms .. 50ms;
+    ];
+  };
+
+  periodic_out: out event data port ICE_Types::ICE_SpO2_Numeric {     
+    MDCF_Comm_Props::DML_Port => [
+      Comm_Role => publisher; 
+      Output_Rate => 105ms .. 110ms;
+    ];
+  };
+
+properties
+  MDCF_Data_Props::MDC_ATTR_ID_PHYSIO => "MDC_PULS_OXIM_SAT_O2";
+  MDCF_Data_Props::MDC_ATTR_UNIT_CODE => "MDC_DIM_PERCENT";     
+end spo2Metrics;
+
+
+system pulserateChannel
+features
+  metrics: feature group pulserateMetrics;
+end pulserateChannel;  
+
+system implementation pulserateChannel.impl
+properties
+  MDCF_Data_Props::MDC_ATTR_ID_PARAM_GRP => "Pulse Rate Channel";  
+end pulserateChannel.impl;
+
+
+feature group pulserateMetrics
+features
+  get_in: in event port {  
+    MDCF_Comm_Props::DML_Port => [                                
+      Comm_Role => responder;
+      Output_Rate => 5ms .. 50ms;
+    ];
+  };
+  get_out: out event data port ICE_Types::ICE_PulseRate_Numeric {   
+    MDCF_Comm_Props::DML_Port => [
+      Comm_Role => responder;
+      Output_Rate => 5ms .. 50ms;
+    ];
+  };
+
+  periodic_out: out event data port ICE_Types::ICE_Pulserate_Numeric {     
+    MDCF_Comm_Props::DML_Port => [
+      Comm_Role => publisher;
+      Output_Rate => 105ms .. 110ms;
+    ];
+  };
+  
+properties
+  MDCF_Data_Props::MDC_ATTR_ID_PHYSIO => "MDC_PULS_OXIM_PULS_RATE";
+  MDCF_Data_Props::MDC_ATTR_UNIT_CODE => "MDC_DIM_BEAT_PER_MIN";  
+end PulserateMetrics;
+
+
+end APulseOx;

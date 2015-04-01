@@ -8,7 +8,7 @@
 -- Licensed Material - Property of Kansas State University.               
 ------------------------------------------------------------------------------+
 -- Properties extracted from exchanges found in MDD4MS document and in
---   mdcf.dms.examplev2.scheme.
+-- mdcf.dms.examplev2.scheme.
 ------------------------------------------------------------------------------+
 
 
@@ -55,6 +55,8 @@ service_time_range: range of Time
 ------------------------------------------------------------------------------+
 -- Types and properties to capture DML hierarchy. 
 ------------------------------------------------------------------------------+
+MDCF_Output_Rate: Time_Range applies to (port);
+
 MDCF_Comm_Role: type enumeration (
   requester, responder, sender, receiver, publisher, subscriber, 
   initiator, executor
@@ -64,7 +66,8 @@ DML_Port: record (
   Channel: aadlstring;
   Channel_Group: MDCF_Data_Props::ICE_Channel_Group;
   Comm_Role: MDCF_Comm_Props::MDCF_Comm_Role;
-) applies to (port);
+  Output_Rate: Time_Range;  -- TODO: This should come from MAP_Properties;
+) applies to (port);        --   But need an AADL type, and unit values.
 
 
 ------------------------------------------------------------------------------+

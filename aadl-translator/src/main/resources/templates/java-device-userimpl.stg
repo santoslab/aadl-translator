@@ -7,19 +7,20 @@ public class $model.name$ extends $model.name$SuperType {
 
 	// FIXME: this should be defined elsewhere.
 	private final static String authenticationParameter = "SSL";
+	private String address;
 	
-	protected $model.name$(){
-		this(false);
+	protected $model.name$(String host){
+		this(false, host);
 	}
 
-	protected $model.name$(boolean useCommunicationSecurityFeature) {
+	protected $model.name$(boolean useCommunicationSecurityFeature, String host) {
 		super(useCommunicationSecurityFeature ? generateUUID(
-				authenticationParameter, "") : generateUUID(
+				authenticationParameter, "", host) : generateUUID(
 						null,
 						$model.name$SuperType.IEEE11073_MDC_ATTR_SYS_TYPE
-						+ System.currentTimeMillis()),
+						+ System.currentTimeMillis(), host),
 						$model.name$SuperType.IEEE11073_MDC_ATTR_SYS_TYPE,
-						useCommunicationSecurityFeature);
+						useCommunicationSecurityFeature, host);
 		this.setSecurityParams(useCommunicationSecurityFeature ? authenticationParameter
 				: null);
 	}
@@ -71,7 +72,7 @@ $model.actionExchangeModels.values:{exchangeModel | $actionAPI(exchangeModel.act
 
 getAPI(Type, ParameterName, ExchangeName, TypeDefault) ::=<<
 	@Override
-	protected $Type$ get$ParameterName$_$ExchangeName$() {
+	protected $Type$ get_$ExchangeName$() {
 		// TODO Auto-generated method stub
 		return $TypeDefault$;
 	}
@@ -79,7 +80,7 @@ getAPI(Type, ParameterName, ExchangeName, TypeDefault) ::=<<
 
 setAPI(Type, ParameterName, ExchangeName) ::=<<
 	@Override
-	protected Status set$ParameterName$_$ExchangeName$($Type$ value) {
+	protected Status set_$ExchangeName$($Type$ value) {
 		// TODO Auto-generated method stub
 		return Status.OK;
 	}

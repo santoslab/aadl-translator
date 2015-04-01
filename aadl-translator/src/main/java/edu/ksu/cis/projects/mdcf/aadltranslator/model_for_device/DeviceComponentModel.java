@@ -121,7 +121,7 @@ public class DeviceComponentModel {
 		return "IEEE11073_MDC_ATTR_SYS_TYPE:" + this.deviceType + "\n" 
 				+ "Manufacturer:" + this.manufacturerName + "\n"
 				+ "Model Number:" + this.modelNumber + "\n"
-				+ "Credential:" + this.credentials.toString() + "\n"
+//				+ "Credential:" + this.credentials.toString() + "\n"
 				+ printExchangeMap();
 	}
 	

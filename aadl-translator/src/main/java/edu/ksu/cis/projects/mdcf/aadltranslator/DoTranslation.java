@@ -217,7 +217,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	public void doDeviceTranslation(IProgressMonitor monitor) {
 		// 1) Initialize the progress monitor and translator
 		ResourceSet rs = initProgressMonitor(monitor);
-		DeviceTranslator stats = new DeviceTranslator(monitor);
+		//DeviceTranslator stats = new DeviceTranslator(monitor);
+		NewDeviceTranslator stats = new NewDeviceTranslator(monitor);
 
 		// 2) Get the list of files used in the model we're translating
 		HashSet<IFile> usedFiles = this.getUsedFiles();
@@ -229,7 +230,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		ParseErrorReporterManager parseErrManager = initDeviceErrManager(stats);
 
 		// 5) Build the in-memory system model
-		processFiles(monitor, rs, stats, usedFiles, systemFile, parseErrManager);
+		processFile(monitor, rs, stats, systemFile, parseErrManager);
 
 		// 6) Write the generated files
 		writeDeviceOutput(stats);
@@ -238,7 +239,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		wrapUpProgressMonitor(monitor);
 	}
 
-	private void writeDeviceOutput(DeviceTranslator stats) {
+	private void writeDeviceOutput(NewDeviceTranslator stats) {
 		IPreferencesService service = Platform.getPreferencesService();
 
 		// Get user preferences
@@ -454,7 +455,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	}
 
 	private ParseErrorReporterManager initDeviceErrManager(
-			DeviceTranslator stats) {
+			NewDeviceTranslator stats) {
 		// The ParseErrorReporter provided by the OSATE model support is nearly
 		// perfect here, we only change the marker id (much of the code is
 		// directly lifted from elsewhere in the OSATE codebase
@@ -508,7 +509,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	 *            The set of files used in the architecture description.
 	 * @return The file containing the AADL system.
 	 */
-	private IFile getDeviceSystemFile(ResourceSet rs, DeviceTranslator stats,
+	private IFile getDeviceSystemFile(ResourceSet rs, NewDeviceTranslator stats,
 			HashSet<IFile> usedFiles) {
 		IFile systemFile = null;
 		for (IFile f : usedFiles) {
@@ -528,7 +529,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				if ((ownedClassifier instanceof org.osate.aadl2.SystemType)) {
 					systemFile = f;
 					usedFiles.remove(f);
-					break;
+					return systemFile;
 				}
 			}
 		}

@@ -26,6 +26,12 @@ properties
   MDCF_Data_Props::state_val => NotOk;  -- Can this be changed dynamically?    
 end Status;
 
+data ICE_VMD_Status extends ICE_Status
+  properties
+    -- FIXME: Seems to be a port's payload.
+    MDCF_Data_Props::state_val => OK; 
+end ICE_VMD_Status;
+
 
 -- Limit violation alert.
 data LimitAlert

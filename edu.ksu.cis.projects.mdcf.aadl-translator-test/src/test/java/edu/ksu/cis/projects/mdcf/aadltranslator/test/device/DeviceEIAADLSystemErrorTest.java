@@ -33,64 +33,64 @@ public class DeviceEIAADLSystemErrorTest {
 		usedProperties.clear();
 	}
 	
-	@Test
-	public void testMissingSystemImplementation(){
-		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_System_Impl_Missing", "Device_AADL_Test_System_Impl_Missing");
-		assertTrue(AllTests.errorSB.toString().contains("Missing System Implementation"));
-	}
-	
-	@Test
-	public void testMismatchingNameBetweenSystemAndPackage(){
-		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_System_File_Name_Mismatch", "Device_AADL_Test_System_File_Name_Mismatch");
-		assertTrue(AllTests.errorSB.toString().contains("Mismatching name between the system and the package:"));
-	}
-	
-
-	@Test
-	public void testMissingAbstractDevice(){
-		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_Abstract_Device_Missing", "Device_AADL_Test_Abstract_Device_Missing");
-		assertTrue(AllTests.errorSB.toString().contains("Missing VMD type definition:"));
-	}
-
-	@Test
-	public void testAbstractDeviceIllegalPortName(){
-		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_Abstract_Device_Illegal_Port_Name", "Device_AADL_Test_Abstract_Device_Illegal_Port_Name");
-		assertTrue(AllTests.errorSB.toString().contains("Unknown Communication Pattern:"));
-	}
-	@Test
-	public void testAbstractDeviceMissingPorts(){
-		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_Abstract_Device_Missing_Ports", "Device_AADL_Test_Abstract_Device_Missing_Ports");
-		assertTrue(AllTests.errorSB.toString().contains("Missing Matching Port Pair:"));
-	}
-	@Test
-	public void testAbstractDeviceMissingDataTypeResponder(){
-		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_Abstract_Device_Missing_Data_Type_Responder", "Device_AADL_Test_Abstract_Device_Missing_Data_Type_Responder");
-		assertTrue(AllTests.errorSB.toString().contains("Missing Data Type for the Port:"));
-	}
-	@Test
-	public void testSystemImplementationPorpertyMissingCredential(){
-		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_System_Impl_Property_Missing_Credentials", "Device_AADL_Test_System_Impl_Property_Missing_Credentials");
-		assertTrue(AllTests.errorSB.toString().contains("Missing Credential:"));
-	}
-	@Test
-	public void testSystemImplementationManufacturerName(){
-		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_System_Impl_Property_Missing_Manufacturer", "Device_AADL_Test_System_Impl_Property_Missing_Manufacturer");
-		assertTrue(AllTests.errorSB.toString().contains("Missing Manufacturer Name in Manufacturer Model:"));
-	}
+//	@Test
+//	public void testMissingSystemImplementation(){
+//		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_System_Impl_Missing", "Device_AADL_Test_System_Impl_Missing");
+//		assertTrue(AllTests.errorSB.toString().contains("Missing System Implementation"));
+//	}
+//	
+//	@Test
+//	public void testMismatchingNameBetweenSystemAndPackage(){
+//		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_System_File_Name_Mismatch", "Device_AADL_Test_System_File_Name_Mismatch");
+//		assertTrue(AllTests.errorSB.toString().contains("Mismatching name between the system and the package:"));
+//	}
+//	
+//
+//	@Test
+//	public void testMissingAbstractDevice(){
+//		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_Abstract_Device_Missing", "Device_AADL_Test_Abstract_Device_Missing");
+//		assertTrue(AllTests.errorSB.toString().contains("Missing VMD type definition:"));
+//	}
+//
+//	@Test
+//	public void testAbstractDeviceIllegalPortName(){
+//		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_Abstract_Device_Illegal_Port_Name", "Device_AADL_Test_Abstract_Device_Illegal_Port_Name");
+//		assertTrue(AllTests.errorSB.toString().contains("Unknown Communication Pattern:"));
+//	}
+//	@Test
+//	public void testAbstractDeviceMissingPorts(){
+//		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_Abstract_Device_Missing_Ports", "Device_AADL_Test_Abstract_Device_Missing_Ports");
+//		assertTrue(AllTests.errorSB.toString().contains("Missing Matching Port Pair:"));
+//	}
+//	@Test
+//	public void testAbstractDeviceMissingDataTypeResponder(){
+//		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_Abstract_Device_Missing_Data_Type_Responder", "Device_AADL_Test_Abstract_Device_Missing_Data_Type_Responder");
+//		assertTrue(AllTests.errorSB.toString().contains("Missing Data Type for the Port:"));
+//	}
+//	@Test
+//	public void testSystemImplementationPorpertyMissingCredential(){
+//		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_System_Impl_Property_Missing_Credentials", "Device_AADL_Test_System_Impl_Property_Missing_Credentials");
+//		assertTrue(AllTests.errorSB.toString().contains("Missing Credential:"));
+//	}
+//	@Test
+//	public void testSystemImplementationManufacturerName(){
+//		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_System_Impl_Property_Missing_Manufacturer", "Device_AADL_Test_System_Impl_Property_Missing_Manufacturer");
+//		assertTrue(AllTests.errorSB.toString().contains("Missing Manufacturer Name in Manufacturer Model:"));
+//	}
 	@Test
 	public void testSystemImplementationManufactureModel(){
 		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_System_Impl_Property_Missing_ManufacturerModel", "Device_AADL_Test_System_Impl_Property_Missing_ManufacturerModel");
 		assertTrue(AllTests.errorSB.toString().contains("Missing ManufacturerModel Property:"));
 	}
-	@Test
-	public void testSystemImplementationModelNumber(){
-		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_System_Impl_Property_Missing_ModelNumber", "Device_AADL_Test_System_Impl_Property_Missing_ModelNumber");
-		assertTrue(AllTests.errorSB.toString().contains("Missing Model Number in Manufacturer Model:"));
-	}
-	@Test
-	public void testSystemImplementationMissingSystemType(){
-		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_System_Impl_Property_Missing_SYSTYPE", "Device_AADL_Test_System_Impl_Property_Missing_SYSTYPE");
-		assertTrue(AllTests.errorSB.toString().contains("Missing System Type Property:"));
-	}
-	
+//	@Test
+//	public void testSystemImplementationModelNumber(){
+//		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_System_Impl_Property_Missing_ModelNumber", "Device_AADL_Test_System_Impl_Property_Missing_ModelNumber");
+//		assertTrue(AllTests.errorSB.toString().contains("Missing Model Number in Manufacturer Model:"));
+//	}
+//	@Test
+//	public void testSystemImplementationMissingSystemType(){
+//		deviceComponentModel = AllTests.runDeviceTransTest("Device_AADL_Test_System_Impl_Property_Missing_SYSTYPE", "Device_AADL_Test_System_Impl_Property_Missing_SYSTYPE");
+//		assertTrue(AllTests.errorSB.toString().contains("Missing System Type Property:"));
+//	}
+//	
 }
