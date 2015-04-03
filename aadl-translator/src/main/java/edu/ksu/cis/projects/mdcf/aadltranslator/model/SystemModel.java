@@ -19,10 +19,10 @@ public class SystemModel {
 	private String timestamp;
 	private HashMap<String, ProcessModel> logicComponents;
 	private HashMap<String, DeviceModel> devices;
-	private HashMap<String, ConnectionModel> channels;
+	private HashMap<String, SystemConnectionModel> channels;
 
 	// Type name -> Process Model
-	private HashMap<String, ComponentModel> typeToComponent;
+	private HashMap<String, ComponentModel<TaskModel>> typeToComponent;
 
 	// Element name -> Element model
 	private HashMap<String, StpaPreliminaryModel> stpaPreliminaries;
@@ -149,6 +149,10 @@ public class SystemModel {
 			return null;
 	}
 
+	public ProcessModel getProcessByName(String processName) {
+		return logicComponents.get(processName);
+	}
+
 	public DeviceModel getDeviceByType(String deviceTypeName) {
 		if (typeToComponent.get(deviceTypeName) instanceof DeviceModel)
 			return (DeviceModel) typeToComponent.get(deviceTypeName);
@@ -156,7 +160,7 @@ public class SystemModel {
 			return null;
 	}
 
-	public ConnectionModel getChannelByName(String connectionName) {
+	public SystemConnectionModel getChannelByName(String connectionName) {
 		return channels.get(connectionName);
 	}
 
@@ -177,7 +181,7 @@ public class SystemModel {
 		typeToComponent.put(dm.getName(), dm);
 	}
 
-	public void addConnection(String name, ConnectionModel cm) {
+	public void addConnection(String name, SystemConnectionModel cm) {
 		channels.put(name, cm);
 	}
 
@@ -201,8 +205,8 @@ public class SystemModel {
 		return logicComponents;
 	}
 
-	public HashMap<String, ComponentModel> getLogicAndDevices() {
-		HashMap<String, ComponentModel> ret = new HashMap<>();
+	public HashMap<String, ComponentModel<TaskModel>> getLogicAndDevices() {
+		HashMap<String, ComponentModel<TaskModel>> ret = new HashMap<>();
 		HashSet<String> logicComponentNames = new HashSet<>(
 				logicComponents.keySet());
 		if(logicComponentNames.isEmpty() && devices.isEmpty()) {
@@ -222,16 +226,16 @@ public class SystemModel {
 		return ret;
 	}
 
-	public HashMap<String, ConnectionModel> getChannels() {
+	public HashMap<String, SystemConnectionModel> getChannels() {
 		return channels;
 	}
 
-	public Map<String, ConnectionModel> getControlActions() {
+	public Map<String, SystemConnectionModel> getControlActions() {
 		return Maps.filterValues(channels, ModelUtil.controlActionFilter);
 	}
 
-	public Map<String, ConnectionModel> getRangedControlActions() {
-		Map<String, ConnectionModel> controlActions = Maps.filterValues(
+	public Map<String, SystemConnectionModel> getRangedControlActions() {
+		Map<String, SystemConnectionModel> controlActions = Maps.filterValues(
 				channels, ModelUtil.controlActionFilter);
 		return Maps.filterValues(controlActions, ModelUtil.rangedChannelFilter);
 	}

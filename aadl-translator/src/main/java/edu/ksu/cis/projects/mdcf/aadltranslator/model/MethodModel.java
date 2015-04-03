@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 
-public class MethodModel {
+public class MethodModel extends ComponentModel{
 	/**
 	 * This stores a mapping from param name -> param type
 	 */
@@ -58,5 +58,26 @@ public class MethodModel {
 					+ " is trying to add a parameter called " + paramName
 					+ " but it already has one by that name.");
 		parameters.put(paramName, type);
+	}
+
+	@Override
+	public void addChild(String name) throws DuplicateElementException {
+		// TODO Auto-generated method stub
+		System.err.println("addChild:" + this.name);
+		
+	}
+
+	@Override
+	public ComponentModel getChild(String name) {
+		// TODO Auto-generated method stub
+		System.err.println("getChild:" + this.name);
+		return null;
+	}
+
+	@Override
+	public HashMap getChildren() {
+		// TODO Auto-generated method stub
+		System.err.println("getChildren:" + name);
+		return null;
 	}
 }

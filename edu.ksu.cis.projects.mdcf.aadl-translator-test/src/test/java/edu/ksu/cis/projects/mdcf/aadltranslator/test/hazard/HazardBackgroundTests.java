@@ -3,13 +3,11 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard;
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.initComplete;
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.usedProperties;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.OccurrenceModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 

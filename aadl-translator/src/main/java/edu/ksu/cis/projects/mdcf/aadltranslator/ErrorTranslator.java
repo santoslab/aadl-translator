@@ -3,6 +3,7 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ContainmentPathElement;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.NamedValue;
@@ -10,17 +11,16 @@ import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyConstant;
 import org.osate.aadl2.ReferenceValue;
 import org.osate.aadl2.StringLiteral;
-import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.impl.PortConnectionImpl;
+import org.osate.aadl2.impl.ProcessImplementationImpl;
 import org.osate.aadl2.impl.RecordValueImpl;
-import org.osate.xtext.aadl2.errormodel.errorModel.ConnectionErrorSource;
+import org.osate.aadl2.impl.SystemImplementationImpl;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.util.EMV2Util;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.MissingRequiredPropertyException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ConstraintModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.HazardModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ErrorTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.Keyword;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.OccurrenceModel;
@@ -38,11 +38,11 @@ public final class ErrorTranslator {
 		}
 	}
 	
-	public void parseOccurrences(SystemImplementation sysImp){
+	public void parseOccurrences(Classifier cl){
 		RecordValueImpl rv;
 		String connectionName, connErrorName;
 		try {
-			for(PropertyAssociation pa : EMV2Util.getOwnEMV2Subclause(sysImp).getProperties()){
+			for(PropertyAssociation pa : EMV2Util.getOwnEMV2Subclause(cl).getProperties()){
 				// Setup 
 				rv = ((RecordValueImpl)pa.getOwnedValues().get(0).getOwnedValue());
 				if(!(pa.getAppliesTos().iterator().next().getContainmentPathElements().iterator().next().getNamedElement() instanceof PortConnectionImpl))
@@ -112,7 +112,9 @@ public final class ErrorTranslator {
 				om.setCompensation(compensation);
 				om.setErrorType(errorType);
 				om.setConnErrorName(connErrorName);
-				systemModel.getChannelByName(connectionName).addOccurrence(om);
+				if(cl instanceof SystemImplementationImpl){
+					systemModel.getChannelByName(connectionName).addOccurrence(om);
+				}
 				
 				//TODO: Put in event chain trace
 			}

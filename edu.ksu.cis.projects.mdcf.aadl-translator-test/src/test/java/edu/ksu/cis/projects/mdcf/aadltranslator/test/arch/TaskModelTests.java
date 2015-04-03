@@ -35,10 +35,10 @@ public class TaskModelTests {
 		ProcessModel displayProcess = systemModel
 				.getProcessByType("PulseOx_Display_Process");
 		DeviceModel deviceModel = systemModel.getDeviceByType("ICEpoInterface");
-		CheckSpO2Thread = logicProcess.getTask("CheckSpO2Thread");
-		UpdateSpO2Thread = displayProcess.getTask("UpdateSpO2Thread");
-		HandleAlarmThread = displayProcess.getTask("HandleAlarmThread");
-		PseudoDevThread = deviceModel.getTask("SpO2Task");
+		CheckSpO2Thread = logicProcess.getChild("CheckSpO2Thread");
+		UpdateSpO2Thread = displayProcess.getChild("UpdateSpO2Thread");
+		HandleAlarmThread = displayProcess.getChild("HandleAlarmThread");
+		PseudoDevThread = deviceModel.getChild("SpO2Task");
 	}
 
 	@AfterClass

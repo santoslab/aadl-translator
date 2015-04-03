@@ -195,7 +195,7 @@ public <model.name>SuperType(String GUID) {
   super(GUID, "<model.name>");
   taskInstanceMap = new HashMap\<>();
   receiverPortMap = new HashMap\<>();
-  <model.tasks.keys:{k |<taskInstanceMapEntry(k)>
+  <model.children.keys:{k |<taskInstanceMapEntry(k)>
   }><model.receivePorts.keys:{k |<receiverPortMapEntry(k)>
   }>}
 >>
@@ -236,7 +236,7 @@ globalDeclaration(name, type) ::=<<
 >>
 
 packageAndImports(model) ::=<<
-package mdcf.app.<model.systemName>;
+package mdcf.app.<model.parentName>;
 
 import java.util.HashMap;
 import java.util.Map;

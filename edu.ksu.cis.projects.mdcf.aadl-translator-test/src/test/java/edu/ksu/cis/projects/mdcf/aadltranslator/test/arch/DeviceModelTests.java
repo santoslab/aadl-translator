@@ -58,16 +58,16 @@ public class DeviceModelTests {
 	
 	@Test
 	public void testImplicitTasks() {
-		assertEquals(1, deviceModelStandalone.getTasks().size());
-		assertEquals(1, deviceModelFromSystem.getTasks().size());
-		assertNotNull(deviceModelFromSystem.getTasks().get("SpO2Task"));
-		assertNotNull(deviceModelStandalone.getTasks().get("SpO2Task"));
+		assertEquals(1, deviceModelStandalone.getChildren().size());
+		assertEquals(1, deviceModelFromSystem.getChildren().size());
+		assertNotNull(deviceModelFromSystem.getChildren().get("SpO2Task"));
+		assertNotNull(deviceModelStandalone.getChildren().get("SpO2Task"));
 	}
 	
 	@Test
 	public void testProcessSystemName() {
-		assertEquals("PulseOx_Forwarding_System", deviceModelFromSystem.getSystemName());
-		assertEquals("Device_Stub_System", deviceModelStandalone.getSystemName());
+		assertEquals("PulseOx_Forwarding_System", deviceModelFromSystem.getParentName());
+		assertEquals("Device_Stub_System", deviceModelStandalone.getParentName());
 	}
 	
 }

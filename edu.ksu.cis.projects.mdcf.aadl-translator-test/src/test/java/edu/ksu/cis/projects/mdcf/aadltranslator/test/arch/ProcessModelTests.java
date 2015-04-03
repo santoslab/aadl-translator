@@ -61,10 +61,10 @@ public class ProcessModelTests {
 	
 	@Test
 	public void testProcessContainedTasks() {
-		assertEquals(1, logicModel.getTasks().size());
-		assertNotNull(logicModel.getTasks().get("CheckSpO2Thread"));
-		assertEquals(1, processOnlyProcessModel.getTasks().size());
-		assertNotNull(processOnlyProcessModel.getTasks().get("CheckSpO2Thread"));
+		assertEquals(1, logicModel.getChildren().size());
+		assertNotNull(logicModel.getChildren().get("CheckSpO2Thread"));
+		assertEquals(1, processOnlyProcessModel.getChildren().size());
+		assertNotNull(processOnlyProcessModel.getChildren().get("CheckSpO2Thread"));
 	}
 	
 	@Test
@@ -117,8 +117,8 @@ public class ProcessModelTests {
 	
 	@Test
 	public void testProcessSystemName() {
-		assertEquals("PulseOx_Forwarding_System", logicModel.getSystemName());
-		assertEquals("Process_Stub_System", processOnlyProcessModel.getSystemName());
+		assertEquals("PulseOx_Forwarding_System", logicModel.getParentName());
+		assertEquals("Process_Stub_System", processOnlyProcessModel.getParentName());
 	}
 	
 	@Test

@@ -83,7 +83,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 
 		// Connection Model Tests are fixed on the develop branch, re-enable when
 		// the fixes are generally available
-//		ConnectionModelHazardTests.class,
+		ConnectionModelHazardTests.class,
 		HazardPreliminariesTests.class,
 		HazardBackgroundTests.class,
 

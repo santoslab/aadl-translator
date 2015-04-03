@@ -10,7 +10,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementExcept
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentType;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ProcessType;
 
-public class ComponentModel {
+public abstract class ComponentModel <ChildType extends ComponentModel> {
 
 	/**
 	 * The type name of this component
@@ -18,15 +18,15 @@ public class ComponentModel {
 	protected String name;
 
 	/**
-	 * The name of the system this component is used in
+	 * The name of the (super)component this (sub)component is contained in
 	 */
-	protected String systemName;
+	protected String parentName;
 	
 	// port name -> port model
 	protected HashMap<String, PortModel> ports;
 	
 	// task name -> task model
-	protected HashMap<String, TaskModel> tasks;
+	protected HashMap<String, ChildType> children;
 	
 	protected ProcessType processType;
 	protected ComponentType componentType;
@@ -36,7 +36,7 @@ public class ComponentModel {
 	
 	public ComponentModel(){
 		ports = new HashMap<>();
-		tasks = new HashMap<>();
+		children = new HashMap<>();
 	}
 	
 	public void addPropagation(PropagationModel propagation) throws DuplicateElementException {
@@ -51,39 +51,11 @@ public class ComponentModel {
 		errorFlows.add(errorFlow);
 	}
 	
-	public void addTask(String name) throws DuplicateElementException {
-		if(tasks.containsKey(name))
-			throw new DuplicateElementException("Tasks cannot have the same name");
-		tasks.put(name, new TaskModel(name));
-	}
+	public abstract void addChild(String name) throws DuplicateElementException;
 	
-	public TaskModel getTask(String name){
-		return tasks.get(name);
-	}
+	public abstract ChildType getChild(String name);
 	
-	public HashMap<String, TaskModel> getTasks() {
-		return tasks;
-	}
-	
-	public Map<String, TaskModel> getSporadicTasks() {
-		return Maps.filterValues(tasks, ModelUtil.sporadicTaskFilter);
-	}
-	
-	public Map<String, TaskModel> getPeriodicTasks() {
-		return Maps.filterValues(tasks, ModelUtil.periodicTaskFilter);
-	}
-	
-	public boolean isDisplay(){
-		return processType == ProcessType.DISPLAY;
-	}
-	
-	public boolean isPseudoDevice(){
-		return processType == ProcessType.PSEUDODEVICE;
-	}
-	
-	public boolean isLogic(){
-		return processType == ProcessType.LOGIC;
-	}
+	public abstract HashMap<String, ChildType> getChildren();
 
 	public void setName(String name) {
 		this.name = name;
@@ -127,12 +99,16 @@ public class ComponentModel {
 		return Maps.filterValues(ports, ModelUtil.sendPortFilter);
 	}
 	
-	public String getSystemName() {
-		return systemName;
+	public String getParentName() {
+		return parentName;
 	}
 
-	public void setSystemName(String systemName) {
-		this.systemName = systemName;
+	public void setParentName(String parentName) {
+		this.parentName = parentName;
+	}
+
+	public void getParentName(String parentName) {
+		this.parentName = parentName;
 	}
 
 	public ComponentType getComponentType() {

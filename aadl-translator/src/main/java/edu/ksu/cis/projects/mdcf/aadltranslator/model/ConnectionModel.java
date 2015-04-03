@@ -4,43 +4,38 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class ConnectionModel {
-	private ComponentModel publisher;
-	private ComponentModel subscriber;
+	protected ComponentModel publisher;
+	protected ComponentModel subscriber;
 	
 	/**
 	 * Maps an STPA guideword to any associated occurrences
 	 */
-	private HashMap<String, HashSet<OccurrenceModel>> occurrenceMap = new HashMap<>();
-	
-	private boolean devicePublished;
-	private boolean deviceSubscribed;
+	protected HashMap<String, HashSet<OccurrenceModel>> occurrenceMap = new HashMap<>();
 	
 	/**
-	 * The name the app developer uses to refer to this channel
+	 * The name the app developer uses to refer to this connection
 	 */
-	private String name;
+	protected String name;
 	
 	/**
 	 * The name the app developer uses to refer to the publishing component
 	 */
-	private String pubName;
+	protected String pubName;
 	
 	/**
 	 * The name the app developer uses to refer to the subscribing component
 	 */
-	private String subName;
+	protected String subName;
 	
 	/**
 	 * The name of the port the publisher uses to listen to this channel
 	 */
-	private String pubPortName;
+	protected String pubPortName;
 
 	/**
 	 * The name of the port the subscriber uses to publish to this channel
 	 */
-	private String subPortName;
-	
-	private int channelDelay;
+	protected String subPortName;
 	
 	public void setPublisher(ComponentModel publisher) {
 		this.publisher = publisher;
@@ -66,22 +61,6 @@ public class ConnectionModel {
 		this.subPortName = subPortName;
 	}
 
-	public boolean isDevicePublished() {
-		return devicePublished;
-	}
-
-	public void setDevicePublished(boolean devicePublished) {
-		this.devicePublished = devicePublished;
-	}
-
-	public boolean isDeviceSubscribed() {
-		return deviceSubscribed;
-	}
-
-	public void setDeviceSubscribed(boolean deviceSubscribed) {
-		this.deviceSubscribed = deviceSubscribed;
-	}
-
 	public ComponentModel getPublisher() {
 		return publisher;
 	}
@@ -104,14 +83,6 @@ public class ConnectionModel {
 
 	public String getSubPortName() {
 		return subPortName;
-	}
-
-	public int getChannelDelay() {
-		return channelDelay;
-	}
-
-	public void setChannelDelay(int channelDelay) {
-		this.channelDelay = channelDelay;
 	}
 	
 	public HashSet<OccurrenceModel> getOccurrences() {

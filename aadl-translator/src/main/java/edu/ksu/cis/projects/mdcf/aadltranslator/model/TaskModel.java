@@ -1,16 +1,12 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 
-public class TaskModel {
-
-	/**
-	 * The name of this task
-	 */
-	private String name;
-
+public class TaskModel extends ComponentModel<MethodModel>{
 	/**
 	 * The name of the triggering port
 	 */
@@ -220,6 +216,27 @@ public class TaskModel {
 
 	public void setSporadic(boolean sporadic) {
 		this.sporadic = sporadic;
+	}
+
+	@Override
+	public void addChild(String name) throws DuplicateElementException {
+		// TODO Auto-generated method stub
+		System.err.println("addChild:" + this.name);
+		
+	}
+
+	@Override
+	public MethodModel getChild(String name) {
+		// TODO Auto-generated method stub
+		System.err.println("getChild:" + this.name);
+		return null;
+	}
+
+	@Override
+	public HashMap<String, MethodModel> getChildren() {
+		// TODO Auto-generated method stub
+		System.err.println("getChildren:" + this.name);
+		return null;
 	}
 
 	/*-

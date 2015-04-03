@@ -64,11 +64,6 @@ public class ConnectionModelHazardTests {
 	}
 	
 	@Test
-	public void testOccurrenceHazard() {
-		assertEquals(systemModel.getHazardByName("MissedAlarm"), occurrence.getHazard());
-	}
-	
-	@Test
 	public void testOccurrenceImpactName() {
 		assertEquals("SpO2ValueHigh", occurrence.getErrorType().getName());
 	}

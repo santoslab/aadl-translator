@@ -33,8 +33,8 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.DefaultAnnexLibrary;
-import org.osate.aadl2.Device;
 import org.osate.aadl2.Element;
+import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.modelsupport.errorreporting.LogParseErrorReporter;
@@ -54,7 +54,9 @@ import org.stringtemplate.v4.STGroupFile;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.WriteOutputFiles.OutputFormat;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.DevOrProcComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.preference.PreferenceConstants;
 
@@ -181,6 +183,9 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			hazardAnalysis.setSystemModel(archTranslator.getSystemModel());
 			hazardAnalysis.parseOccurrences(archTranslator
 					.getSystemImplementation());
+			for(ProcessImplementation process : archTranslator.getProcessImplementations()){
+				hazardAnalysis.parseOccurrences(process);
+			}
 
 			IProject proj = targetFile.getProject();
 			if (proj.getFolder("diagrams").exists()) {
@@ -361,24 +366,25 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		midas_appspecSTG.delimiterStopChar = '#';
 
 		// Give the model to the string templates
-		for (ComponentModel cm : stats.getSystemModel().getLogicAndDevices().values()) {
-			if (!cm.isPseudoDevice()) {
-				javaClasses.put(cm.getName() + "SuperType", java_superclassSTG
-						.getInstanceOf("class").add("model", cm).render());
+		for (ComponentModel<TaskModel> cm : stats.getSystemModel().getLogicAndDevices().values()) {
+			DevOrProcComponentModel dpcm = (DevOrProcComponentModel) cm;
+			if (!dpcm.isPseudoDevice()) {
+				javaClasses.put(dpcm.getName() + "SuperType", java_superclassSTG
+						.getInstanceOf("class").add("model", dpcm).render());
 			} else {
 				javaClasses.put(
-						cm.getName(),
+						dpcm.getName(),
 						java_superclassSTG.getInstanceOf("class")
-								.add("model", cm).render());
+								.add("model", dpcm).render());
 			}
-			if (generateShells && !cm.isPseudoDevice()) {
+			if (generateShells && !dpcm.isPseudoDevice()) {
 				javaClasses.put(
-						cm.getName(),
+						dpcm.getName(),
 						java_userimplSTG.getInstanceOf("userimpl")
-								.add("model", cm).render());
+								.add("model", dpcm).render());
 			}
 			compsigs.put(cm.getName(), midas_compsigSTG
-					.getInstanceOf("compsig").add("model", cm).render());
+					.getInstanceOf("compsig").add("model", dpcm).render());
 		}
 
 		appName = stats.getSystemModel().getName();

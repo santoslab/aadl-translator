@@ -6,7 +6,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementExcept
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentType;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ProcessType;
 
-public class ProcessModel extends ComponentModel{
+public class ProcessModel extends DevOrProcComponentModel{
 	
 	// variable name -> type
 	private HashMap<String, String> globals;
@@ -44,7 +44,7 @@ public class ProcessModel extends ComponentModel{
 	}
 
 	public TaskModel getLastThread(){
-		return tasks.get(tasks.size() - 1);
+		return (TaskModel) children.get(children.size() - 1);
 	}
 	
 	public void addGlobal(String name, String type) {

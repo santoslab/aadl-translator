@@ -3,6 +3,8 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -22,6 +24,7 @@ import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortCategory;
 import org.osate.aadl2.PortConnection;
+import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.Property;
@@ -55,12 +58,13 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.AbbreviationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.AccidentLevelModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.AccidentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ConstraintModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.HazardModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
 
@@ -68,7 +72,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	private enum ElementType {
 		SYSTEM, PROCESS, THREAD, SUBPROGRAM, DEVICE, NONE
 	};
-	
+
 	private enum TranslationTarget {
 		SYSTEM, PROCESS, DEVICE
 	}
@@ -78,6 +82,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	private ArrayList<String> propertySetNames = new ArrayList<>();
 	private ParseErrorReporterManager errorManager;
 	public SystemImplementation sysImpl;
+	private HashSet<ProcessImplementation> procImpls = new HashSet<>();
 
 	public class TranslatorSwitch extends Aadl2Switch<String> {
 		/**
@@ -97,7 +102,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				handleException(obj, e);
 				return DONE;
 			}
-			SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy 'at' h:mm a");
+			SimpleDateFormat sdf = new SimpleDateFormat(
+					"MMMM d, yyyy 'at' h:mm a");
 			systemModel = new SystemModel();
 			systemModel.setName(obj.getName());
 			systemModel.setTimestamp(sdf.format(new Date()));
@@ -112,10 +118,16 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		@Override
+		public String caseProcessImplementation(ProcessImplementation obj) {
+			procImpls.add(obj);
+			return NOT_DONE;
+		}
+
+		@Override
 		public String caseThreadSubcomponent(ThreadSubcomponent obj) {
 			try {
 				if (componentModel instanceof ProcessModel)
-					((ProcessModel) componentModel).addTask(obj.getName());
+					((ProcessModel) componentModel).addChild(obj.getName());
 				else
 					throw new CoreException(
 							"Trying to add thread to non-process component "
@@ -152,24 +164,25 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		@Override
 		public String caseDeviceSubcomponent(DeviceSubcomponent obj) {
-			if(handleNewDevice(obj) != null)
+			if (handleNewDevice(obj) != null)
 				return DONE;
 			return NOT_DONE;
 		}
 
 		@Override
 		public String caseProcessSubcomponent(ProcessSubcomponent obj) {
-			if(handleNewProcess(obj) != null)
+			if (handleNewProcess(obj) != null)
 				return DONE;
 			return NOT_DONE;
 		}
 
 		@Override
 		public String caseDeviceType(DeviceType obj) {
-			if(target == TranslationTarget.SYSTEM){ 
+			if (target == TranslationTarget.SYSTEM) {
 				try {
 					if (systemModel.hasDeviceType(obj.getName())) {
-						componentModel = systemModel.getDeviceByType(obj.getName());
+						componentModel = systemModel.getDeviceByType(obj
+								.getName());
 					} else {
 						throw new UseBeforeDeclarationException(
 								"Attempted to define a device that wasn't declared as a system component");
@@ -178,14 +191,14 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					handleException(obj, e);
 					return DONE;
 				}
-			} else if(target == TranslationTarget.DEVICE) {
+			} else if (target == TranslationTarget.DEVICE) {
 				// Translating just a device...
 				systemModel = new SystemModel();
 				systemModel.setName("Device_Stub_System");
-				if(handleNewDevice(obj) != null)
+				if (handleNewDevice(obj) != null)
 					return DONE;
 			} else {
-				// TODO: This shouldn't be hit.  Throw an error?
+				// TODO: This shouldn't be hit. Throw an error?
 			}
 			lastElemProcessed = ElementType.DEVICE;
 			processEList(obj.getOwnedElements());
@@ -195,11 +208,14 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		@Override
 		public String casePropertyConstant(PropertyConstant obj) {
 			try {
-				if(obj.getPropertyType() == null || obj.getPropertyType().getName() == null) {
+				if (obj.getPropertyType() == null
+						|| obj.getPropertyType().getName() == null) {
 					return NOT_DONE;
-				} else if (obj.getPropertyType().getName().equals("Accident_Level")) {
+				} else if (obj.getPropertyType().getName()
+						.equals("Accident_Level")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
+					StringLiteral sl = (StringLiteral) PropertyUtils
+							.getRecordFieldValue(rv, "Description");
 					IntegerLiteral il = ((IntegerLiteral) PropertyUtils
 							.getRecordFieldValue(rv, "Level"));
 					if (il.getValue() > Integer.MAX_VALUE) {
@@ -217,10 +233,13 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				} else if (obj.getPropertyType().getName().equals("Assumption")) {
 					StringLiteral sl = (StringLiteral) obj.getConstantValue();
 					systemModel.addAssumption(sl.getValue());
-				} else if (obj.getPropertyType().getName().equals("Abbreviation")) {
+				} else if (obj.getPropertyType().getName()
+						.equals("Abbreviation")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral fullSL = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Full");
-					StringLiteral defSL = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Definition");
+					StringLiteral fullSL = (StringLiteral) PropertyUtils
+							.getRecordFieldValue(rv, "Full");
+					StringLiteral defSL = (StringLiteral) PropertyUtils
+							.getRecordFieldValue(rv, "Definition");
 					AbbreviationModel am = new AbbreviationModel();
 					am.setName(obj.getName());
 					am.setFull(fullSL.getValue());
@@ -228,18 +247,23 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					systemModel.addAbbreviation(am);
 				} else if (obj.getPropertyType().getName().equals("Accident")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
-					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Level");
+					StringLiteral sl = (StringLiteral) PropertyUtils
+							.getRecordFieldValue(rv, "Description");
+					NamedValue nv = (NamedValue) PropertyUtils
+							.getRecordFieldValue(rv, "Level");
 					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
 					AccidentModel am = new AccidentModel();
 					am.setName(obj.getName());
 					am.setDescription(sl.getValue());
-					am.setParent(systemModel.getAccidentLevelByName(pc.getName()));
+					am.setParent(systemModel.getAccidentLevelByName(pc
+							.getName()));
 					systemModel.addAccident(am);
 				} else if (obj.getPropertyType().getName().equals("Hazard")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
-					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Accident");
+					StringLiteral sl = (StringLiteral) PropertyUtils
+							.getRecordFieldValue(rv, "Description");
+					NamedValue nv = (NamedValue) PropertyUtils
+							.getRecordFieldValue(rv, "Accident");
 					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
 					HazardModel hm = new HazardModel();
 					hm.setName(obj.getName());
@@ -248,8 +272,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					systemModel.addHazard(hm);
 				} else if (obj.getPropertyType().getName().equals("Constraint")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
-					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Hazard");
+					StringLiteral sl = (StringLiteral) PropertyUtils
+							.getRecordFieldValue(rv, "Description");
+					NamedValue nv = (NamedValue) PropertyUtils
+							.getRecordFieldValue(rv, "Hazard");
 					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
 					ConstraintModel cm = new ConstraintModel();
 					cm.setName(obj.getName());
@@ -266,11 +292,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		@Override
 		public String caseProcessType(ProcessType obj) {
 			ProcessModel pm = null;
-			if(target == TranslationTarget.SYSTEM){ 
+			if (target == TranslationTarget.SYSTEM) {
 				try {
 					if (systemModel.hasProcessType(obj.getName())) {
-						componentModel = systemModel
-								.getProcessByType(obj.getName());
+						componentModel = systemModel.getProcessByType(obj
+								.getName());
 						pm = systemModel.getProcessByType(obj.getName());
 					} else {
 						throw new UseBeforeDeclarationException(
@@ -280,19 +306,19 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					handleException(obj, e);
 					return DONE;
 				}
-			} else if(target == TranslationTarget.PROCESS) {
+			} else if (target == TranslationTarget.PROCESS) {
 				// Translating just a process...
 				systemModel = new SystemModel();
 				systemModel.setName("Process_Stub_System");
-				if(handleNewProcess(obj) != null)
+				if (handleNewProcess(obj) != null)
 					return DONE;
 				pm = systemModel.getProcessByType(obj.getName());
 			} else {
-				// TODO: This shouldn't be hit.  Throw an error?
+				// TODO: This shouldn't be hit. Throw an error?
 			}
 			try {
-				String processType = checkCustomProperty(obj,
-						"Process_Type", "enum");
+				String processType = checkCustomProperty(obj, "Process_Type",
+						"enum");
 				if (processType != null
 						&& processType.equalsIgnoreCase("logic")) {
 					pm.setDisplay(false);
@@ -303,7 +329,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					throw new PropertyOutOfRangeException(
 							"Processes must declare their component type to be either display or logic");
 				}
-			} catch (PropertyOutOfRangeException e ) {
+			} catch (PropertyOutOfRangeException e) {
 				handleException(obj, e);
 				return DONE;
 			}
@@ -318,7 +344,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				handlePort(obj);
 			} else if (lastElemProcessed == ElementType.DEVICE) {
 				handlePort(obj); // Explicit "out" port
-				if(!cancelled()){
+				if (!cancelled()) {
 					handleImplicitPort(obj); // Implicit "in" port from device
 					handleImplicitTask(obj); // Implicit task to handle incoming
 												// data
@@ -524,8 +550,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			// TODO: Read these from plugin preferences?
 			int period = -1, deadline = 50, wcet = 5;
 			try {
-				dm.addTask(taskName);
-				tm = dm.getTask(taskName);
+				dm.addChild(taskName);
+				tm = dm.getChild(taskName);
 				tm.setSporadic(true);
 				tm.setPeriod(period);
 				tm.setDeadline(deadline);
@@ -560,6 +586,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		private void handleThreadProperties(ThreadType obj) {
 			try {
+				ProcessModel procModel = (ProcessModel)componentModel;
 				String trigType = handleOverridableProperty(obj,
 						"Default_Thread_Dispatch", "Thread_Properties",
 						"Dispatch_Protocol", "enum");
@@ -585,25 +612,25 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					throw new MissingRequiredPropertyException(
 							"Thread WCET must either be set with Default_Thread_WCET (at package level) or with Timing_Properties::Compute_Execution_Time (on individual thread)");
 				else {
-					if (componentModel.getTask(obj.getName()) == null) {
+					if (procModel.getChild(obj.getName()) == null) {
 						throw new UseBeforeDeclarationException(
 								"Threads must be declared as subcomponents before being defined");
 					}
 					if (trigType.equalsIgnoreCase("sporadic")) {
-						componentModel.getTask(obj.getName()).setSporadic(true);
+						procModel.getChild(obj.getName()).setSporadic(true);
 					} else if (trigType.equalsIgnoreCase("periodic")) {
-						componentModel.getTask(obj.getName())
+						procModel.getChild(obj.getName())
 								.setSporadic(false);
 					} else {
 						throw new NotImplementedException(
 								"Thread dispatch must be either sporadic or periodic, instead got "
 										+ trigType);
 					}
-					componentModel.getTask(obj.getName()).setPeriod(
+					procModel.getChild(obj.getName()).setPeriod(
 							Integer.valueOf(period));
-					componentModel.getTask(obj.getName()).setDeadline(
+					procModel.getChild(obj.getName()).setDeadline(
 							Integer.valueOf(deadline));
-					componentModel.getTask(obj.getName()).setWcet(
+					procModel.getChild(obj.getName()).setWcet(
 							Integer.valueOf(wcet));
 				}
 			} catch (MissingRequiredPropertyException | NotImplementedException
@@ -616,23 +643,27 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		private String handleNewDevice(NamedElement obj) {
 			DeviceModel dm = new DeviceModel();
-			if(obj instanceof DeviceType){
+			if (obj instanceof DeviceType) {
 				dm.setName(obj.getName());
 			} else if (obj instanceof DeviceSubcomponent) {
-				dm.setName(((DeviceSubcomponent)obj).getComponentType().getName());
+				dm.setName(((DeviceSubcomponent) obj).getComponentType()
+						.getName());
 			} else {
 				// TODO: This should never happen... handle it?
 			}
-				
-			dm.setSystemName(systemModel.getName());
+
+			((DeviceModel) dm).setParentName(systemModel.getName());
 			try {
-				String componentType = checkCustomProperty(obj, "Component_Type", "enum");
-				if(componentType == null)
-					throw new MissingRequiredPropertyException("Devices must declare their role with MAP_Properties::Component_Type");
+				String componentType = checkCustomProperty(obj,
+						"Component_Type", "enum");
+				if (componentType == null)
+					throw new MissingRequiredPropertyException(
+							"Devices must declare their role with MAP_Properties::Component_Type");
 				dm.setComponentType(componentType);
 				systemModel.addDevice(dm.getName(), dm);
 				componentModel = dm;
-			} catch (DuplicateElementException | MissingRequiredPropertyException e) {
+			} catch (DuplicateElementException
+					| MissingRequiredPropertyException e) {
 				handleException(obj, e);
 				return DONE;
 			}
@@ -641,14 +672,15 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		private String handleNewProcess(NamedElement obj) {
 			ProcessModel pm = new ProcessModel();
-			if(obj instanceof ProcessType){
+			if (obj instanceof ProcessType) {
 				pm.setName(obj.getName());
 			} else if (obj instanceof ProcessSubcomponent) {
-				pm.setName(((ProcessSubcomponent)obj).getComponentType().getName());
+				pm.setName(((ProcessSubcomponent) obj).getComponentType()
+						.getName());
 			} else {
 				// TODO: This should never happen... handle it?
 			}
-			pm.setSystemName(systemModel.getName());
+			pm.setParentName(systemModel.getName());
 			try {
 				systemModel.addProcess(obj.getName(), pm);
 			} catch (DuplicateElementException e) {
@@ -768,33 +800,59 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		private void handleProcessPortConnection(PortConnection obj) {
 			String taskName, localName, portName, portType;
 			TaskModel task;
-			if (obj.getAllSource().getOwner() instanceof ThreadType) {
-				// From thread to process
-				taskName = ((ThreadType) obj.getAllSource().getOwner())
-						.getName();
-				localName = obj.getAllSource().getName();
-				portName = obj.getAllDestination().getName();
-				portType = componentModel.getPortByName(portName).getType();
-				task = componentModel.getTask(taskName);
-			} else {
-				// From process to thread
-				boolean eventTriggered;
-				taskName = ((ThreadType) obj.getAllDestination().getOwner())
-						.getName();
-				localName = obj.getAllDestination().getName();
-				portName = obj.getAllSource().getName();
-				task = componentModel.getTask(taskName);
-				eventTriggered = componentModel.getPortByName(portName)
-						.isEvent();
-				portType = componentModel.getPortByName(portName).getType();
-				try {
-					task.setTrigPortInfo(portName, portType, localName,
-							eventTriggered);
-				} catch (NotImplementedException e) {
-					handleException(obj, e);
-					return;
-				}
+			ProcessConnectionModel connModel = new ProcessConnectionModel();
+			ProcessModel procModel = (ProcessModel)componentModel;
+			try {
+				if (obj.getAllSource().getOwner() instanceof ThreadType
+						&& obj.getAllDestination().getOwner() instanceof ProcessType) {
+					// From thread to process
+					taskName = ((ThreadType) obj.getAllSource().getOwner())
+							.getName();
+					localName = obj.getAllSource().getName();
+					portName = obj.getAllDestination().getName();
+					portType = procModel.getPortByName(portName).getType();
+					task = procModel.getChild(taskName);
 
+					connModel.setName(obj.getName());
+					connModel.setProcessToThread(false);
+					connModel.setPublisher(task);
+					connModel.setPubName(taskName);
+					connModel.setPubPortName(localName);
+					connModel.setSubName(portName);
+					connModel.setSubscriber(procModel);
+				} else if (obj.getAllSource().getOwner() instanceof ProcessType
+						&& obj.getAllDestination().getOwner() instanceof ThreadType) {
+					// From process to thread
+					boolean eventTriggered;
+					taskName = ((ThreadType) obj.getAllDestination().getOwner())
+							.getName();
+					localName = obj.getAllDestination().getName();
+					portName = obj.getAllSource().getName();
+					task = procModel.getChild(taskName);
+					eventTriggered = procModel.getPortByName(portName)
+							.isEvent();
+					portType = procModel.getPortByName(portName).getType();
+					try {
+						task.setTrigPortInfo(portName, portType, localName,
+								eventTriggered);
+					} catch (NotImplementedException e) {
+						handleException(obj, e);
+						return;
+					}
+				} else if (obj.getAllSource().getOwner() instanceof ThreadType
+						&& obj.getAllDestination().getOwner() instanceof ThreadType) {
+					// From thread to thread
+					throw new NotImplementedException(
+							"Thread <--> thread communication is handled via shared state");
+				} else if (obj.getAllSource().getOwner() instanceof ThreadType
+						&& obj.getAllDestination().getOwner() instanceof ThreadType) {
+					// From process port to other process port
+					throw new NotImplementedException(
+							"Direct pass-through is not supported, connect the ports directly at the system level");
+				}
+			} catch (NotImplementedException e) {
+				handleException(obj, e);
+				return;
 			}
 		}
 
@@ -808,8 +866,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				return;
 			}
 			String pubTypeName, pubPortName, subPortName, subTypeName, pubName, subName;
-			ComponentModel pubModel = null, subModel = null;
-			ConnectionModel connModel = new ConnectionModel();
+			ComponentModel<TaskModel> pubModel = null, subModel = null;
+			SystemConnectionModel connModel = new SystemConnectionModel();
 			String channelDelay = null;
 			try {
 				if ((obj.getAllSource().getOwner() instanceof DeviceType)
@@ -1037,6 +1095,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 	public SystemImplementation getSystemImplementation() {
 		return sysImpl;
+	}
+
+	public Set<ProcessImplementation> getProcessImplementations() {
+		return procImpls;
 	}
 
 	public String getTarget() {
