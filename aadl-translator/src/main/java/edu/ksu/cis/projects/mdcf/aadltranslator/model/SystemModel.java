@@ -14,7 +14,7 @@ import com.google.common.collect.Maps;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 
-public class SystemModel {
+public class SystemModel extends ComponentModel<DevOrProcComponentModel>{
 	private String name;
 	private String timestamp;
 	private HashMap<String, ProcessModel> logicComponents;
@@ -149,10 +149,6 @@ public class SystemModel {
 			return null;
 	}
 
-	public ProcessModel getProcessByName(String processName) {
-		return logicComponents.get(processName);
-	}
-
 	public DeviceModel getDeviceByType(String deviceTypeName) {
 		if (typeToComponent.get(deviceTypeName) instanceof DeviceModel)
 			return (DeviceModel) typeToComponent.get(deviceTypeName);
@@ -164,21 +160,70 @@ public class SystemModel {
 		return channels.get(connectionName);
 	}
 
-	public void addProcess(String instanceName, ProcessModel pm)
-			throws DuplicateElementException {
-		if (logicComponents.containsKey(instanceName))
-			throw new DuplicateElementException(instanceName
-					+ " already exists");
-		logicComponents.put(instanceName, pm);
-		typeToComponent.put(pm.getName(), pm);
+//	public void addProcess(String instanceName, ProcessModel pm)
+//			throws DuplicateElementException {
+//		if (logicComponents.containsKey(instanceName))
+//			throw new DuplicateElementException(instanceName
+//					+ " already exists");
+//		logicComponents.put(instanceName, pm);
+//		typeToComponent.put(pm.getName(), pm);
+//	}
+//
+//	public void addDevice(String deviceName, DeviceModel dm)
+//			throws DuplicateElementException {
+//		if (devices.containsKey(deviceName))
+//			throw new DuplicateElementException(deviceName + " already exists");
+//		devices.put(deviceName, dm);
+//		typeToComponent.put(dm.getName(), dm);
+//	}
+	
+	@Override
+	public void addChild(String childName, DevOrProcComponentModel childModel) throws DuplicateElementException {
+		if(typeToComponent.containsKey(childName))
+			throw new DuplicateElementException(childName + " already exists");
+		if(childModel instanceof ProcessModel){
+			if (logicComponents.containsKey(childName))
+				throw new DuplicateElementException(childName + " already exists");
+			logicComponents.put(childName, (ProcessModel)childModel);
+			typeToComponent.put(childModel.getName(), (ProcessModel)childModel);
+		} else if(childModel instanceof DeviceModel){
+			if (devices.containsKey(childName))
+				throw new DuplicateElementException(childName + " already exists");
+			devices.put(childName, (DeviceModel)childModel);
+			typeToComponent.put(childModel.getName(), (DeviceModel)childModel);
+		}
 	}
-
-	public void addDevice(String deviceName, DeviceModel dm)
-			throws DuplicateElementException {
-		if (devices.containsKey(deviceName))
-			throw new DuplicateElementException(deviceName + " already exists");
-		devices.put(deviceName, dm);
-		typeToComponent.put(dm.getName(), dm);
+	
+	@Override
+	public DevOrProcComponentModel getChild(String childName) {
+		if(logicComponents.containsKey(childName)) {
+			return logicComponents.get(childName);
+		} else {
+			return devices.get(childName);
+		}
+		
+	}
+	
+	@Override
+	public HashMap<String, DevOrProcComponentModel> getChildren() {
+		HashMap<String, DevOrProcComponentModel> ret = new HashMap<>();
+		HashSet<String> logicComponentNames = new HashSet<>(
+				logicComponents.keySet());
+		if(logicComponentNames.isEmpty() && devices.isEmpty()) {
+			// TODO: Handle this more gracefully?
+			System.err.println("No components (logic or devices) to write");
+		} else if (logicComponentNames.isEmpty()) {
+			ret.putAll(devices);
+		} else if (devices.isEmpty()) {
+			ret.putAll(logicComponents);
+		} else if (logicComponentNames.retainAll(devices.keySet())) {
+			ret.putAll(devices);
+			ret.putAll(logicComponents);
+		} else {
+			// TODO: Handle this more gracefully?
+			System.err.println("Device and Logic components can't have the same name");
+		}
+		return ret;
 	}
 
 	public void addConnection(String name, SystemConnectionModel cm) {
@@ -205,26 +250,26 @@ public class SystemModel {
 		return logicComponents;
 	}
 
-	public HashMap<String, ComponentModel<TaskModel>> getLogicAndDevices() {
-		HashMap<String, ComponentModel<TaskModel>> ret = new HashMap<>();
-		HashSet<String> logicComponentNames = new HashSet<>(
-				logicComponents.keySet());
-		if(logicComponentNames.isEmpty() && devices.isEmpty()) {
-			// TODO: Handle this more gracefully?
-			System.err.println("No components (logic or devices) to write");
-		} else if (logicComponentNames.isEmpty()) {
-			ret.putAll(devices);
-		} else if (devices.isEmpty()) {
-			ret.putAll(logicComponents);
-		} else if (logicComponentNames.retainAll(devices.keySet())) {
-			ret.putAll(devices);
-			ret.putAll(logicComponents);
-		} else {
-			// TODO: Handle this more gracefully?
-			System.err.println("Device and Logic components can't have the same name");
-		}
-		return ret;
-	}
+//	public HashMap<String, ComponentModel<TaskModel>> getLogicAndDevices() {
+//		HashMap<String, ComponentModel<TaskModel>> ret = new HashMap<>();
+//		HashSet<String> logicComponentNames = new HashSet<>(
+//				logicComponents.keySet());
+//		if(logicComponentNames.isEmpty() && devices.isEmpty()) {
+//			// TODO: Handle this more gracefully?
+//			System.err.println("No components (logic or devices) to write");
+//		} else if (logicComponentNames.isEmpty()) {
+//			ret.putAll(devices);
+//		} else if (devices.isEmpty()) {
+//			ret.putAll(logicComponents);
+//		} else if (logicComponentNames.retainAll(devices.keySet())) {
+//			ret.putAll(devices);
+//			ret.putAll(logicComponents);
+//		} else {
+//			// TODO: Handle this more gracefully?
+//			System.err.println("Device and Logic components can't have the same name");
+//		}
+//		return ret;
+//	}
 
 	public HashMap<String, SystemConnectionModel> getChannels() {
 		return channels;

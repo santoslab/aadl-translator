@@ -219,7 +219,7 @@ public class TaskModel extends ComponentModel<MethodModel>{
 	}
 
 	@Override
-	public void addChild(String name) throws DuplicateElementException {
+	public void addChild(String name, MethodModel cm) throws DuplicateElementException {
 		// TODO Auto-generated method stub
 		System.err.println("addChild:" + this.name);
 		

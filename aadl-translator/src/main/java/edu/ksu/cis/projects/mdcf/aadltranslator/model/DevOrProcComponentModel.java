@@ -23,11 +23,11 @@ public class DevOrProcComponentModel extends ComponentModel<TaskModel>{
 	}
 	
 	@Override
-	public void addChild(String name) throws DuplicateElementException {
+	public void addChild(String name, TaskModel cm) throws DuplicateElementException {
 		if (children.containsKey(name))
 			throw new DuplicateElementException(
 					"Tasks cannot have the same name");
-		children.put(name, new TaskModel(name));
+		children.put(name, cm);
 	}
 	
 	@Override

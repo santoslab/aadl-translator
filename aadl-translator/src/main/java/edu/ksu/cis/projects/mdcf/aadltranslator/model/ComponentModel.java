@@ -51,7 +51,7 @@ public abstract class ComponentModel <ChildType extends ComponentModel> {
 		errorFlows.add(errorFlow);
 	}
 	
-	public abstract void addChild(String name) throws DuplicateElementException;
+	public abstract void addChild(String name, ChildType childModel) throws DuplicateElementException;
 	
 	public abstract ChildType getChild(String name);
 	

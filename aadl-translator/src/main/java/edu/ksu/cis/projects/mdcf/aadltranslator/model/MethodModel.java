@@ -61,7 +61,7 @@ public class MethodModel extends ComponentModel{
 	}
 
 	@Override
-	public void addChild(String name) throws DuplicateElementException {
+	public void addChild(String name, ComponentModel cm) throws DuplicateElementException {
 		// TODO Auto-generated method stub
 		System.err.println("addChild:" + this.name);
 		

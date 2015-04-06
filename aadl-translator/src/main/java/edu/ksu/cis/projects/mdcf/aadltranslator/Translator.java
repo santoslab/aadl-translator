@@ -127,7 +127,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		public String caseThreadSubcomponent(ThreadSubcomponent obj) {
 			try {
 				if (componentModel instanceof ProcessModel)
-					((ProcessModel) componentModel).addChild(obj.getName());
+					((ProcessModel) componentModel).addChild(obj.getName(), new TaskModel(obj.getName()));
 				else
 					throw new CoreException(
 							"Trying to add thread to non-process component "
@@ -550,7 +550,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			// TODO: Read these from plugin preferences?
 			int period = -1, deadline = 50, wcet = 5;
 			try {
-				dm.addChild(taskName);
+				dm.addChild(taskName, new TaskModel(taskName));
 				tm = dm.getChild(taskName);
 				tm.setSporadic(true);
 				tm.setPeriod(period);
@@ -660,7 +660,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					throw new MissingRequiredPropertyException(
 							"Devices must declare their role with MAP_Properties::Component_Type");
 				dm.setComponentType(componentType);
-				systemModel.addDevice(dm.getName(), dm);
+				systemModel.addChild(dm.getName(), dm);
 				componentModel = dm;
 			} catch (DuplicateElementException
 					| MissingRequiredPropertyException e) {
@@ -682,7 +682,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 			pm.setParentName(systemModel.getName());
 			try {
-				systemModel.addProcess(obj.getName(), pm);
+				systemModel.addChild(obj.getName(), pm);
 			} catch (DuplicateElementException e) {
 				handleException(obj, e);
 				return DONE;

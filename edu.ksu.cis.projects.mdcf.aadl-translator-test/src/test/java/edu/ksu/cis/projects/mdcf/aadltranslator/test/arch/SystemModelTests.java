@@ -43,7 +43,7 @@ public class SystemModelTests {
 	
 	@Test
 	public void testSystemDeviceComponents() {
-		assertEquals(3, systemModel.getLogicAndDevices().size());
+		assertEquals(3, systemModel.getChildren().size());
 		assertNotNull(systemModel.getDeviceByType("ICEpoInterface"));
 	}
 	
