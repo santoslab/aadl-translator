@@ -19,6 +19,12 @@ public class ModelUtil {
 			false, null, null);
 	public final static PropagationModel FLOW_SINK = new PropagationModel(true,
 			null, null);
+	
+	public final static Predicate<DevOrProcModel> logicComponentFilter = new Predicate<DevOrProcModel>() {
+		public boolean apply(DevOrProcModel dopm) {
+			return (dopm instanceof ProcessModel);
+		}
+	};
 
 	public final static Predicate<PortModel> receivePortFilter = new Predicate<PortModel>() {
 		public boolean apply(PortModel pm) {

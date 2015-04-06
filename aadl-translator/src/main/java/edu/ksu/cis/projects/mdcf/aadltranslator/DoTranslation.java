@@ -54,7 +54,7 @@ import org.stringtemplate.v4.STGroupFile;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.WriteOutputFiles.OutputFormat;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.DevOrProcComponentModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.DevOrProcModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
@@ -367,7 +367,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 		// Give the model to the string templates
 		for (ComponentModel<TaskModel> cm : stats.getSystemModel().getChildren().values()) {
-			DevOrProcComponentModel dpcm = (DevOrProcComponentModel) cm;
+			DevOrProcModel dpcm = (DevOrProcModel) cm;
 			if (!dpcm.isPseudoDevice()) {
 				javaClasses.put(dpcm.getName() + "SuperType", java_superclassSTG
 						.getInstanceOf("class").add("model", dpcm).render());

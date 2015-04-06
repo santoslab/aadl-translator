@@ -6,7 +6,7 @@ import com.google.common.collect.HashBiMap;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentType;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ProcessType;
 
-public class DeviceModel extends DevOrProcComponentModel {
+public class DeviceModel extends DevOrProcModel {
 	
 	private HashBiMap<String, String> inToOutPortNames = HashBiMap.create();
 	

@@ -6,7 +6,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementExcept
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentType;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ProcessType;
 
-public class ProcessModel extends DevOrProcComponentModel{
+public class ProcessModel extends DevOrProcModel{
 	
 	// variable name -> type
 	private HashMap<String, String> globals;

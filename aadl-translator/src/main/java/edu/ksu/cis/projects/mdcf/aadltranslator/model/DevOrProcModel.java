@@ -8,7 +8,7 @@ import com.google.common.collect.Maps;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ProcessType;
 
-public class DevOrProcComponentModel extends ComponentModel<TaskModel>{
+public class DevOrProcModel extends ComponentModel<TaskModel>{
 	
 	public boolean isDisplay(){
 		return processType == ProcessType.DISPLAY;
