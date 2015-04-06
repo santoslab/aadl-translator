@@ -83,10 +83,6 @@ public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
 		this.name = name;
 	}
 
-	public void setName(String taskName) {
-		this.name = taskName;
-	}
-
 	public void setTrigPortInfo(String portName, String portType,
 			String localName, boolean isEventTriggered)
 			throws NotImplementedException {
@@ -143,11 +139,7 @@ public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
 			}
 		}
 	}
-
-	public String getName() {
-		return name;
-	}
-
+	
 	public String getTrigPortName() {
 		return trigPortName;
 	}
@@ -218,49 +210,7 @@ public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
 	public void setSporadic(boolean sporadic) {
 		this.sporadic = sporadic;
 	}
-
-	@Override
-	public void addChild(String name, MethodModel cm) throws DuplicateElementException {
-		// TODO Auto-generated method stub
-		System.err.println("addChild:" + this.name);
-		
-	}
-
-	@Override
-	public MethodModel getChild(String name) {
-		// TODO Auto-generated method stub
-		System.err.println("getChild:" + this.name);
-		return null;
-	}
-
-	@Override
-	public HashMap<String, MethodModel> getChildren() {
-		// TODO Auto-generated method stub
-		System.err.println("getChildren:" + this.name);
-		return null;
-	}
-
-	@Override
-	public ConnectionModel getChannelByName(String connectionName) {
-		// TODO Auto-generated method stub
-		System.err.println("getChannelByName:" + this.name);
-		return null;
-	}
-
-	@Override
-	public HashMap<String, ConnectionModel> getChannels() {
-		// TODO Auto-generated method stub
-		System.err.println("getChannels:" + this.name);
-		return null;
-	}
-
-	@Override
-	public void addConnection(String name, ConnectionModel cm) {
-		// TODO Auto-generated method stub
-		System.err.println("addConnection:" + name);
-		
-	}
-
+	
 	/*-
 	 public HashMap<String, ArrayList<String>> getMethodParameters() {
 		return methodParameters;

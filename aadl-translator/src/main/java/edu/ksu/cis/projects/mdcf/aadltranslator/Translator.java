@@ -231,7 +231,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					systemModel.addAccidentLevel(alm);
 				} else if (obj.getPropertyType().getName().equals("Context")) {
 					StringLiteral sl = (StringLiteral) obj.getConstantValue();
-					systemModel.setContext(sl.getValue());
+					systemModel.setHazardReportContext(sl.getValue());
 				} else if (obj.getPropertyType().getName().equals("Assumption")) {
 					StringLiteral sl = (StringLiteral) obj.getConstantValue();
 					systemModel.addAssumption(sl.getValue());
