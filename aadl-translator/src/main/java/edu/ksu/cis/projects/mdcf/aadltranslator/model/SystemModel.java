@@ -14,10 +14,10 @@ import com.google.common.collect.Maps;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 
-public class SystemModel extends ComponentModel<DevOrProcModel>{
+public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnectionModel>{
 	private String timestamp;
 	private HashMap<String, DevOrProcModel> children;
-	private HashMap<String, SystemConnectionModel> channels;
+//	private HashMap<String, SystemConnectionModel> channels;
 
 	// Type name -> Child name Model
 	private HashMap<String, DevOrProcModel> typeToComponent;
@@ -31,9 +31,9 @@ public class SystemModel extends ComponentModel<DevOrProcModel>{
 	private HashMap<String, String> hazardReportDiagrams;
 
 	public SystemModel() {
+		super();
 		children = new HashMap<>();
 		typeToComponent = new HashMap<>();
-		channels = new HashMap<>();
 		stpaPreliminaries = new HashMap<>();
 		hazardReportAbbreviations = new HashSet<>();
 		hazardReportAssumptions = new HashSet<>();
@@ -153,6 +153,7 @@ public class SystemModel extends ComponentModel<DevOrProcModel>{
 			return null;
 	}
 
+	@Override
 	public SystemConnectionModel getChannelByName(String connectionName) {
 		return channels.get(connectionName);
 	}
@@ -178,6 +179,7 @@ public class SystemModel extends ComponentModel<DevOrProcModel>{
 		return children;
 	}
 
+	@Override
 	public void addConnection(String name, SystemConnectionModel cm) {
 		channels.put(name, cm);
 	}
@@ -207,6 +209,7 @@ public class SystemModel extends ComponentModel<DevOrProcModel>{
 		return ret;
 	}
 
+	@Override
 	public HashMap<String, SystemConnectionModel> getChannels() {
 		return channels;
 	}

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 
-public class TaskModel extends ComponentModel<MethodModel>{
+public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
 	/**
 	 * The name of the triggering port
 	 */
@@ -73,6 +73,7 @@ public class TaskModel extends ComponentModel<MethodModel>{
 	private ArrayList<CallModel> callSequence;
 
 	public TaskModel(String name) {
+		super();
 		incomingGlobals = new ArrayList<>();
 		outgoingGlobals = new ArrayList<>();
 		callSequence = new ArrayList<>();
@@ -237,6 +238,27 @@ public class TaskModel extends ComponentModel<MethodModel>{
 		// TODO Auto-generated method stub
 		System.err.println("getChildren:" + this.name);
 		return null;
+	}
+
+	@Override
+	public ConnectionModel getChannelByName(String connectionName) {
+		// TODO Auto-generated method stub
+		System.err.println("getChannelByName:" + this.name);
+		return null;
+	}
+
+	@Override
+	public HashMap<String, ConnectionModel> getChannels() {
+		// TODO Auto-generated method stub
+		System.err.println("getChannels:" + this.name);
+		return null;
+	}
+
+	@Override
+	public void addConnection(String name, ConnectionModel cm) {
+		// TODO Auto-generated method stub
+		System.err.println("addConnection:" + name);
+		
 	}
 
 	/*-

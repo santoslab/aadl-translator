@@ -366,7 +366,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		midas_appspecSTG.delimiterStopChar = '#';
 
 		// Give the model to the string templates
-		for (ComponentModel<TaskModel> cm : stats.getSystemModel().getChildren().values()) {
+		for (DevOrProcModel cm : stats.getSystemModel().getChildren().values()) {
 			DevOrProcModel dpcm = (DevOrProcModel) cm;
 			if (!dpcm.isPseudoDevice()) {
 				javaClasses.put(dpcm.getName() + "SuperType", java_superclassSTG

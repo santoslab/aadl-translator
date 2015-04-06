@@ -8,7 +8,11 @@ import com.google.common.collect.Maps;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ProcessType;
 
-public class DevOrProcModel extends ComponentModel<TaskModel>{
+public class DevOrProcModel extends ComponentModel<TaskModel, ProcessConnectionModel>{
+	
+	public DevOrProcModel(){
+		super();
+	}
 	
 	public boolean isDisplay(){
 		return processType == ProcessType.DISPLAY;
@@ -50,6 +54,21 @@ public class DevOrProcModel extends ComponentModel<TaskModel>{
 	
 	public Map<String, TaskModel> getPeriodicTasks() {
 		return Maps.filterValues(this.getChildren(), ModelUtil.periodicTaskFilter);
+	}
+
+	@Override
+	public ProcessConnectionModel getChannelByName(String connectionName) {
+		return channels.get(connectionName);
+	}
+
+	@Override
+	public HashMap<String, ProcessConnectionModel> getChannels() {
+		return channels;
+	}
+
+	@Override
+	public void addConnection(String name, ProcessConnectionModel cm) {
+		channels.put(name, cm);
 	}
 	
 }

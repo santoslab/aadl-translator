@@ -58,11 +58,12 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFactory;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ConnectionModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ControllerErrorTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.DeviceModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.PortModelTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ProcessConnectionModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ProcessModelTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.SystemConnectionModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.SystemModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.TaskModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIAADLSystemErrorTest;
@@ -79,10 +80,9 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 		ProcessModelTests.class,
 		TaskModelTests.class,
 		PortModelTests.class,
-		ConnectionModelTests.class,
+		SystemConnectionModelTests.class,
+		ProcessConnectionModelTests.class,
 
-		// Connection Model Tests are fixed on the develop branch, re-enable when
-		// the fixes are generally available
 		ConnectionModelHazardTests.class,
 		HazardPreliminariesTests.class,
 		HazardBackgroundTests.class,

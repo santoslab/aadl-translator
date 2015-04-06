@@ -14,7 +14,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
-public class ConnectionModelTests {
+public class SystemConnectionModelTests {
 	private static SystemModel systemModel;
 	private static SystemConnectionModel devToProcessConn;
 	private static SystemConnectionModel processToProcessConn;

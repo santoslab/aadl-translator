@@ -19,6 +19,7 @@ public class MethodModel extends ComponentModel{
 //	private String retName;
 
 	public MethodModel(String methodName) {
+		super();
 		this.name = methodName;
 		parameters = new HashMap<>();
 	}
@@ -79,5 +80,26 @@ public class MethodModel extends ComponentModel{
 		// TODO Auto-generated method stub
 		System.err.println("getChildren:" + name);
 		return null;
+	}
+
+	@Override
+	public ConnectionModel getChannelByName(String connectionName) {
+		// TODO Auto-generated method stub
+		System.err.println("getChannelByName:" + name);
+		return null;
+	}
+
+	@Override
+	public HashMap getChannels() {
+		// TODO Auto-generated method stub
+		System.err.println("getChannels:" + name);
+		return null;
+	}
+
+	@Override
+	public void addConnection(String name, ConnectionModel cm) {
+		// TODO Auto-generated method stub
+		System.err.println("addConnection:" + name);
+		
 	}
 }

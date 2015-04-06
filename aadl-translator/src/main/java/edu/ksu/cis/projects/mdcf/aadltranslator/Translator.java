@@ -59,6 +59,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.AccidentLevelModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.AccidentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ConstraintModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.DevOrProcModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.HazardModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
@@ -127,7 +128,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		public String caseThreadSubcomponent(ThreadSubcomponent obj) {
 			try {
 				if (componentModel instanceof ProcessModel)
-					((ProcessModel) componentModel).addChild(obj.getName(), new TaskModel(obj.getName()));
+					((ProcessModel) componentModel).addChild(obj.getName(),
+							new TaskModel(obj.getName()));
 				else
 					throw new CoreException(
 							"Trying to add thread to non-process component "
@@ -586,7 +588,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		private void handleThreadProperties(ThreadType obj) {
 			try {
-				ProcessModel procModel = (ProcessModel)componentModel;
+				ProcessModel procModel = (ProcessModel) componentModel;
 				String trigType = handleOverridableProperty(obj,
 						"Default_Thread_Dispatch", "Thread_Properties",
 						"Dispatch_Protocol", "enum");
@@ -619,8 +621,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					if (trigType.equalsIgnoreCase("sporadic")) {
 						procModel.getChild(obj.getName()).setSporadic(true);
 					} else if (trigType.equalsIgnoreCase("periodic")) {
-						procModel.getChild(obj.getName())
-								.setSporadic(false);
+						procModel.getChild(obj.getName()).setSporadic(false);
 					} else {
 						throw new NotImplementedException(
 								"Thread dispatch must be either sporadic or periodic, instead got "
@@ -801,7 +802,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			String taskName, localName, portName, portType;
 			TaskModel task;
 			ProcessConnectionModel connModel = new ProcessConnectionModel();
-			ProcessModel procModel = (ProcessModel)componentModel;
+			ProcessModel procModel = (ProcessModel) componentModel;
 			try {
 				if (obj.getAllSource().getOwner() instanceof ThreadType
 						&& obj.getAllDestination().getOwner() instanceof ProcessType) {
@@ -820,6 +821,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					connModel.setPubPortName(localName);
 					connModel.setSubName(portName);
 					connModel.setSubscriber(procModel);
+					procModel.addConnection(connModel.getName(), connModel);
 				} else if (obj.getAllSource().getOwner() instanceof ProcessType
 						&& obj.getAllDestination().getOwner() instanceof ThreadType) {
 					// From process to thread
@@ -832,13 +834,17 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					eventTriggered = procModel.getPortByName(portName)
 							.isEvent();
 					portType = procModel.getPortByName(portName).getType();
-					try {
-						task.setTrigPortInfo(portName, portType, localName,
-								eventTriggered);
-					} catch (NotImplementedException e) {
-						handleException(obj, e);
-						return;
-					}
+					task.setTrigPortInfo(portName, portType, localName,
+							eventTriggered);
+
+					connModel.setName(obj.getName());
+					connModel.setProcessToThread(true);
+					connModel.setPublisher(procModel);
+					connModel.setPubName(portName);
+					connModel.setSubPortName(localName);
+					connModel.setSubName(taskName);
+					connModel.setSubscriber(task);
+					procModel.addConnection(connModel.getName(), connModel);
 				} else if (obj.getAllSource().getOwner() instanceof ThreadType
 						&& obj.getAllDestination().getOwner() instanceof ThreadType) {
 					// From thread to thread
@@ -866,7 +872,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				return;
 			}
 			String pubTypeName, pubPortName, subPortName, subTypeName, pubName, subName;
-			ComponentModel<TaskModel> pubModel = null, subModel = null;
+			DevOrProcModel pubModel = null, subModel = null;
 			SystemConnectionModel connModel = new SystemConnectionModel();
 			String channelDelay = null;
 			try {

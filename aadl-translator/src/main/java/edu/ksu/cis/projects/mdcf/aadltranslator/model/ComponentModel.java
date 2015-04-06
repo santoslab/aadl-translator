@@ -10,7 +10,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementExcept
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentType;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ProcessType;
 
-public abstract class ComponentModel <ChildType extends ComponentModel> {
+public abstract class ComponentModel <ChildType extends ComponentModel, ConnectionType extends ConnectionModel> {
 
 	/**
 	 * The type name of this component
@@ -34,9 +34,12 @@ public abstract class ComponentModel <ChildType extends ComponentModel> {
 	protected HashSet<PropagationModel> propagations;
 	protected HashSet<ErrorFlowModel> errorFlows;
 	
+	protected HashMap<String, ConnectionType> channels;
+	
 	public ComponentModel(){
 		ports = new HashMap<>();
 		children = new HashMap<>();
+		channels = new HashMap<>();
 	}
 	
 	public void addPropagation(PropagationModel propagation) throws DuplicateElementException {
@@ -56,7 +59,13 @@ public abstract class ComponentModel <ChildType extends ComponentModel> {
 	public abstract ChildType getChild(String name);
 	
 	public abstract HashMap<String, ChildType> getChildren();
+	
+	public abstract ConnectionType getChannelByName(String connectionName);
+	
+	public abstract HashMap<String, ConnectionType> getChannels();
 
+	public abstract void addConnection(String name, ConnectionType cm);
+	
 	public void setName(String name) {
 		this.name = name;
 	}
