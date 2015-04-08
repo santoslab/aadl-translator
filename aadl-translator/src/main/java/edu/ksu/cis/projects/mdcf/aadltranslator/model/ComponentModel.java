@@ -8,7 +8,6 @@ import com.google.common.collect.Maps;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentType;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ProcessType;
 
 public abstract class ComponentModel <ChildType extends ComponentModel, ConnectionType extends ConnectionModel> {
 
@@ -229,5 +228,67 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 		Map<String, ConnectionType> controlActions = Maps.filterValues(
 				channels, ModelUtil.controlActionFilter);
 		return Maps.filterValues(controlActions, ModelUtil.rangedChannelFilter);
+	}
+
+	public Map<String, ChildType> getSensors() {
+		return Maps.filterValues(children, ModelUtil.sensorFilter);
+	}
+
+	public Map<String, ChildType> getControllers() {
+		return Maps.filterValues(children, ModelUtil.controllerFilter);
+	}
+
+	public Map<String, ChildType> getActuators() {
+		return Maps.filterValues(children, ModelUtil.actuatorFilter);
+	}
+
+	public Map<String, ChildType> getControlledProcesses() {
+		return Maps.filterValues(children, ModelUtil.controlledProcessFilter);
+	}
+	
+	public void generateBoundaryDiagram() {
+		StringBuffer diagramSchematic = new StringBuffer();
+		diagramSchematic.append("Sensors:\n");
+		for(ChildType child : getSensors().values()){
+			diagramSchematic.append("\t");
+			diagramSchematic.append(child.getName());
+			diagramSchematic.append("\n");
+			for(ConnectionType conn : channels.values()){
+				if(conn.subscriber == child)
+					diagramSchematic.append("lol");
+				else if(conn.publisher == child){
+					diagramSchematic.append("\t\t(");
+					diagramSchematic.append(conn.getPubName());
+					diagramSchematic.append(".");
+					diagramSchematic.append(conn.getPubPortName());
+					diagramSchematic.append(")-");
+					diagramSchematic.append(conn.getName());
+					diagramSchematic.append("->(");
+					diagramSchematic.append(conn.getSubName());
+					diagramSchematic.append(".");
+					diagramSchematic.append(conn.getSubPortName());
+					diagramSchematic.append(")\n");
+				}
+			}
+		}
+		diagramSchematic.append("Controllers:\n");
+		for(ChildType child : getControllers().values()){
+			diagramSchematic.append("\t");
+			diagramSchematic.append(child.getName());
+			diagramSchematic.append("\n");
+		}
+		diagramSchematic.append("Actuators:\n");
+		for(ChildType child : getActuators().values()){
+			diagramSchematic.append("\t");
+			diagramSchematic.append(child.getName());
+			diagramSchematic.append("\n");
+		}
+		diagramSchematic.append("Controlled Processes:\n");
+		for(ChildType child : getControlledProcesses().values()){
+			diagramSchematic.append("\t");
+			diagramSchematic.append(child.getName());
+			diagramSchematic.append("\n");
+		}
+		System.out.println(diagramSchematic.toString());
 	}
 }

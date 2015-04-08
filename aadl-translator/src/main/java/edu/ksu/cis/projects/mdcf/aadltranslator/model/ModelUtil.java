@@ -104,4 +104,29 @@ public class ModelUtil {
 			return connection.getSubscriber().getComponentType() == ComponentType.ACTUATOR;
 		}
 	};
+	
+	public final static Predicate<ComponentModel> sensorFilter = new Predicate<ComponentModel>() {
+		public boolean apply(ComponentModel cm) {
+			return cm.componentType == ComponentType.SENSOR;
+		}
+	};
+	
+	public final static Predicate<ComponentModel> controllerFilter = new Predicate<ComponentModel>() {
+		public boolean apply(ComponentModel cm) {
+			return cm.componentType == ComponentType.CONTROLLER;
+		}
+	};
+	
+	public final static Predicate<ComponentModel> actuatorFilter = new Predicate<ComponentModel>() {
+		public boolean apply(ComponentModel cm) {
+			return cm.componentType == ComponentType.ACTUATOR;
+		}
+	};
+	
+	public final static Predicate<ComponentModel> controlledProcessFilter = new Predicate<ComponentModel>() {
+		public boolean apply(ComponentModel cm) {
+			return cm.componentType == ComponentType.CONTROLLEDPROCESS;
+		}
+	};
+
 }
