@@ -71,6 +71,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ConnectionModelHazar
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardBackgroundTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.view.HazardReportViewTests;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
@@ -97,6 +98,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 
 		// View tests
 		AppSuperClassViewTests.class,
+		HazardReportViewTests.class,
 })
 public class AllTests {
 	private static final Logger log = Logger

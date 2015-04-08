@@ -1,0 +1,9 @@
+## Unsafe Control Action Causes and Compensations
+
+#### spo2_to_display
+
+#### alarm_to_display
+* **NOTPROVIDING**: Bad SpO2
+	* Cause: The SpO2 values from the pulse oximeter are too high, so the alarm is missed
+	* Compensation: None
+
