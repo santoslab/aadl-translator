@@ -6,7 +6,7 @@ public class ModelUtil {
 	public static enum ProcessType {
 		PSEUDODEVICE, DISPLAY, LOGIC
 	};
-	
+
 	public static enum ComponentType {
 		SENSOR, ACTUATOR, CONTROLLER, CONTROLLEDPROCESS
 	};
@@ -19,7 +19,7 @@ public class ModelUtil {
 			false, null, null);
 	public final static PropagationModel FLOW_SINK = new PropagationModel(true,
 			null, null);
-	
+
 	public final static Predicate<DevOrProcModel> logicComponentFilter = new Predicate<DevOrProcModel>() {
 		public boolean apply(DevOrProcModel dopm) {
 			return (dopm instanceof ProcessModel);
@@ -94,14 +94,22 @@ public class ModelUtil {
 
 	public final static Predicate<ConnectionModel> rangedChannelFilter = new Predicate<ConnectionModel>() {
 		public boolean apply(ConnectionModel connection) {
-			return !(connection.getPublisher().getPortByName(connection.getPubPortName()).getType().equals("Object") || 
-					connection.getPublisher().getPortByName(connection.getPubPortName()).getType().equals("Boolean"));
+			return !(connection.getPublisher()
+					.getPortByName(connection.getPubPortName()).getType()
+					.equals("Object") || connection.getPublisher()
+					.getPortByName(connection.getPubPortName()).getType()
+					.equals("Boolean"));
 		}
 	};
 
 	public final static Predicate<ConnectionModel> controlActionFilter = new Predicate<ConnectionModel>() {
 		public boolean apply(ConnectionModel connection) {
-			return connection.getSubscriber().getComponentType() == ComponentType.ACTUATOR;
+			// TODO: We need to think harder about what's a control action --
+			// since threads (controllers) talk to their containing processes
+			// (controllers in the system view, actuators in the thread view) we
+			// may even need multi-role components, or per-view component roles.
+//			return connection.getSubscriber().getComponentType() == ComponentType.ACTUATOR;
+			return true;
 		}
 	};
 }

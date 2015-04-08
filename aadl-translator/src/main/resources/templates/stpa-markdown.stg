@@ -3,8 +3,7 @@ report(model) ::=<<
 <tblOfContents(model)>
 <background(model)>
 <preliminaries(model)>
-<ctrlActTbl(model)>
-<hazCtrlActs(model)>
+<componentLevels(model)>
 >>
 
 header(model) ::=<<
@@ -24,14 +23,16 @@ tblOfContents(model) ::=<<
 2. [Depth: 1](#depth-1)
 	1. [<model.name>](#<model.name; format="MarkdownLink">)
 		1. [Fundamentals](#fundamentals)
-		2. [System Boundaries and Control Structure](#system-boundaries-and-control-structure)
+		2. [Boundaries and Structure](#boundaries-and-structure)
 		3. [Unsafe Control Actions](#unsafe-control-actions)
 		4. [Causes and Compensations](#causes-and-compensations)
-<depth(model)>
+3. [Depth: 2](#depth-2)
+	<model.logicComponents.keys:{k | <tocDepth(model.logicComponents.(k), i)>
+}>
 >>
 
-<depth(model) ::=<<
-
+tocDepth(procModel, i) ::=<<
+<i>. [<procModel.name>](#<procModel.name; format="MarkdownLink">)	
 >>
 
 background(model) ::=<<
@@ -55,9 +56,6 @@ background(model) ::=<<
 preliminaries(model) ::=<<
 ## Fundamentals
 
-### System Boundaries
-![System Boundary](<model.hazardReportDiagrams.("SystemBoundary")>)
-
 ### Accident Levels
 <model.accidentLevels.keys:{k | <accidentLevel(model.accidentLevels.(k), i)>
 }>
@@ -70,11 +68,6 @@ preliminaries(model) ::=<<
 ### Safety Constraints
 <model.constraints.values:{v | <preliminary(v, i)>
 }>
-### Control Actions
-<model.controlActions.values:{v | <controlAction(v, i)>
-}>
-### Process Model
-![Process Model](<model.hazardReportDiagrams.("ProcessModel")>)
 
 >>
 
@@ -86,12 +79,35 @@ preliminary(prelim, i) ::=<<
 <i>. **<prelim.name>**: <prelim.description> [<prelim.parent.name>]
 >>
 
+componentLevels(model) ::=<<
+## Depth: 1
+
+<componentLevel(model)>
+## Depth: 2
+
+<model.logicComponents.keys:{k | <componentLevel(model.logicComponents.(k))>
+}>
+>>
+
+componentLevel(model) ::=<<
+### <model.name>
+
+#### Control Actions
+<model.controlActions.values:{v | <controlAction(v, i)>
+}>
+#### Boundaries and Structure
+![System Boundaries and Control Structure](<model.hazardReportDiagrams.("SystemBoundary")>)
+
+<ctrlActTbl(model)>
+<hazCtrlActs(model)>
+>>
+
 controlAction(ctrlAct, i) ::=<<
 <i>. <ctrlAct.name>: <ctrlAct.publisher.name> -> <ctrlAct.subscriber.name> (<ctrlAct.publisher.ports.(ctrlAct.pubPortName).type>) 
 >>
 
 ctrlActTbl(model) ::=<<
-## Unsafe Control Actions
+#### Unsafe Control Actions
 
 | <["Control Action", "Providing", "Not Providing", "Applied Too Long", "Stopped Too Soon", "Early", "Late"]:{g | <g> | }>
 |----------------|-----------|---------------|------------------|------------------|-------|------|
@@ -120,14 +136,14 @@ rngdCtrlActTblCell(lastOccurrence) ::=<<
  <lastOccurrence:{o|<o.hazard.name> (<o.title>)}; separator=", "> | >>
 
 hazCtrlActs(model) ::=<<
-## Unsafe Control Action Causes and Compensations
+#### Causes and Compensations
 
 <model.controlActions.values:{v | <hazControlAction(v)>
 }>
 >>
 
 hazControlAction(ctrlAct) ::=<<
-#### <ctrlAct.name>
+##### <ctrlAct.name>
 <ctrlAct.occurrences:{o | <occurrenceBlock(o)>
 }>
 >>

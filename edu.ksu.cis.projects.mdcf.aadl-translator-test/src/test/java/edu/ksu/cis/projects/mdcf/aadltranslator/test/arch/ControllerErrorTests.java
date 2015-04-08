@@ -54,7 +54,7 @@ public class ControllerErrorTests {
 		usedProperties.add("PulseOx_ForwardingNoThreadDeadline_Properties");
 		runArchTransTest("PulseOxNoThreadDeadline", "PulseOx_Forwarding_System");
 		assertEquals(
-				"Error at PulseOx_Forwarding_Logic.aadl:30: Thread deadline must either be set with Default_Thread_Deadline (at package level) or with Timing_Properties::Deadline (on individual thread)",
+				"Error at PulseOx_Forwarding_Logic.aadl:31: Thread deadline must either be set with Default_Thread_Deadline (at package level) or with Timing_Properties::Deadline (on individual thread)",
 				errorSB.toString().trim());
 	}
 
@@ -63,7 +63,7 @@ public class ControllerErrorTests {
 		usedProperties.add("PulseOx_ForwardingNoThreadDispatch_Properties");
 		runArchTransTest("PulseOxNoThreadDispatch", "PulseOx_Forwarding_System");
 		assertEquals(
-				"Error at PulseOx_Forwarding_Display.aadl:30: Thread dispatch type must either be set with Default_Thread_Dispatch (at package level) or with Thread_Properties::Dispatch_Protocol (on individual thread)",
+				"Error at PulseOx_Forwarding_Display.aadl:31: Thread dispatch type must either be set with Default_Thread_Dispatch (at package level) or with Thread_Properties::Dispatch_Protocol (on individual thread)",
 				errorSB.toString().trim());
 	}
 
@@ -72,7 +72,7 @@ public class ControllerErrorTests {
 		usedProperties.add("PulseOx_ForwardingNoThreadPeriod_Properties");
 		runArchTransTest("PulseOxNoThreadPeriod", "PulseOx_Forwarding_System");
 		assertEquals(
-				"Error at PulseOx_Forwarding_Logic.aadl:30: Thread period must either be set with Default_Thread_Period (at package level) or with Timing_Properties::Period (on individual thread)",
+				"Error at PulseOx_Forwarding_Logic.aadl:31: Thread period must either be set with Default_Thread_Period (at package level) or with Timing_Properties::Period (on individual thread)",
 				errorSB.toString().trim());
 	}
 
@@ -81,7 +81,7 @@ public class ControllerErrorTests {
 		usedProperties.add("PulseOx_ForwardingNoWCET_Properties");
 		runArchTransTest("PulseOxNoWCET", "PulseOx_Forwarding_System");
 		assertEquals(
-				"Error at PulseOx_Forwarding_Logic.aadl:30: Thread WCET must either be set with Default_Thread_WCET (at package level) or with Timing_Properties::Compute_Execution_Time (on individual thread)",
+				"Error at PulseOx_Forwarding_Logic.aadl:31: Thread WCET must either be set with Default_Thread_WCET (at package level) or with Timing_Properties::Compute_Execution_Time (on individual thread)",
 				errorSB.toString().trim());
 	}
 
@@ -90,7 +90,7 @@ public class ControllerErrorTests {
 		usedProperties.add("PulseOx_Forwarding_Properties");
 		runArchTransTest("PulseOxDuplicateSystem", "PulseOx_Forwarding_Duplicate_System");
 		assertEquals(
-				"Error at PulseOx_Forwarding_Duplicate_System.aadl:27: Got a system called Duplicate_System but I already have one called PulseOx_Forwarding_Duplicate_System",
+				"Error at PulseOx_Forwarding_Duplicate_System.aadl:29: Got a system called Duplicate_System but I already have one called PulseOx_Forwarding_Duplicate_System",
 				errorSB.toString().trim());
 	}
 
@@ -99,9 +99,9 @@ public class ControllerErrorTests {
 		usedProperties.add("PulseOx_ForwardingIntegerOverflow_Properties");
 		runArchTransTest("PulseOxIntegerOverflow", "PulseOx_Forwarding_System");
 		assertEquals(
-				"Error at PulseOx_Forwarding_Logic.aadl:30: Property Default_Thread_Period on element CheckSpO2Thread converts to 2.5E9 ms, which cannot be converted to an integer\n"
-						+ "Error at PulseOx_Forwarding_Logic.aadl:30: Property Default_Thread_Deadline on element CheckSpO2Thread converts to 2.5E9 ms, which cannot be converted to an integer\n"
-						+ "Error at PulseOx_Forwarding_Logic.aadl:30: Thread period must either be set with Default_Thread_Period (at package level) or with Timing_Properties::Period (on individual thread)",
+				"Error at PulseOx_Forwarding_Logic.aadl:31: Property Default_Thread_Period on element CheckSpO2Thread converts to 2.5E9 ms, which cannot be converted to an integer\n"
+						+ "Error at PulseOx_Forwarding_Logic.aadl:31: Property Default_Thread_Deadline on element CheckSpO2Thread converts to 2.5E9 ms, which cannot be converted to an integer\n"
+						+ "Error at PulseOx_Forwarding_Logic.aadl:31: Thread period must either be set with Default_Thread_Period (at package level) or with Timing_Properties::Period (on individual thread)",
 				errorSB.toString().trim());
 	}
 

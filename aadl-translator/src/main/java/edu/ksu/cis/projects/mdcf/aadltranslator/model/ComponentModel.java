@@ -224,6 +224,10 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	public Map<String, ConnectionType> getControlActions() {
 		return Maps.filterValues(channels, ModelUtil.controlActionFilter);
 	}
+	
+	public void setComponentType(String componentType){
+		this.componentType = ComponentType.valueOf(componentType.toUpperCase());
+	}
 
 	public Map<String, ConnectionType> getRangedControlActions() {
 		Map<String, ConnectionType> controlActions = Maps.filterValues(

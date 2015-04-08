@@ -5,7 +5,7 @@ with PulseOx_Forwarding_Types;
 	features
 		SpO2 : out event data port PulseOx_Forwarding_Types::SpO2;
 	properties
-		MAP_Properties::Component_Type => actuator;
+		MAP_Properties::Component_Type => sensor;
 	end ICEpoUseInterface;
 
 	device implementation ICEpoUseInterface.imp

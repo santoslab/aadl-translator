@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DeviceSubcomponent;
@@ -76,7 +77,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 	private enum TranslationTarget {
 		SYSTEM, PROCESS, DEVICE
-	}
+	};
+
+	private enum PropertyType {
+		ENUM, INT, RANGE_MIN, RANGE_MAX
+	};
 
 	private TranslationTarget target = null;
 	private SystemModel systemModel = null;
@@ -115,6 +120,13 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		@Override
 		public String caseSystemImplementation(SystemImplementation obj) {
 			sysImpl = obj;
+			componentModel = systemModel;
+			try {
+				getComponentType(obj);
+			} catch (MissingRequiredPropertyException e) {
+				handleException(obj, e);
+				return DONE;
+			}
 			return NOT_DONE;
 		}
 
@@ -144,7 +156,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		@Override
 		public String caseThreadType(ThreadType obj) {
 			lastElemProcessed = ElementType.THREAD;
-			handleThreadProperties(obj);
+			handleThreadProperties(obj,
+					(TaskModel) componentModel.getChild(obj.getName()));
 			return NOT_DONE;
 		}
 
@@ -185,16 +198,18 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					if (systemModel.hasDeviceType(obj.getName())) {
 						componentModel = systemModel.getDeviceByType(obj
 								.getName());
+						getComponentType(obj);
 					} else {
 						throw new UseBeforeDeclarationException(
 								"Attempted to define a device that wasn't declared as a system component");
 					}
-				} catch (UseBeforeDeclarationException e) {
+				} catch (UseBeforeDeclarationException
+						| MissingRequiredPropertyException e) {
 					handleException(obj, e);
 					return DONE;
 				}
 			} else if (target == TranslationTarget.DEVICE) {
-				// Translating just a device...
+				// Translating just a device
 				systemModel = new SystemModel();
 				systemModel.setName("Device_Stub_System");
 				if (handleNewDevice(obj) != null)
@@ -205,6 +220,16 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			lastElemProcessed = ElementType.DEVICE;
 			processEList(obj.getOwnedElements());
 			return NOT_DONE;
+		}
+
+		private void getComponentType(ComponentClassifier obj)
+				throws MissingRequiredPropertyException {
+			String componentType = checkCustomProperty(obj, "Component_Type",
+					PropertyType.ENUM);
+			if (componentType == null)
+				throw new MissingRequiredPropertyException(
+						"Components must specify their component type (eg Actuator, Sensor, Controller, or Controlled Process)");
+			componentModel.setComponentType(componentType);
 		}
 
 		@Override
@@ -319,8 +344,9 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				// TODO: This shouldn't be hit. Throw an error?
 			}
 			try {
+				getComponentType(obj);
 				String processType = checkCustomProperty(obj, "Process_Type",
-						"enum");
+						PropertyType.ENUM);
 				if (processType != null
 						&& processType.equalsIgnoreCase("logic")) {
 					pm.setDisplay(false);
@@ -331,7 +357,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					throw new PropertyOutOfRangeException(
 							"Processes must declare their component type to be either display or logic");
 				}
-			} catch (PropertyOutOfRangeException e) {
+			} catch (PropertyOutOfRangeException | MissingRequiredPropertyException e) {
 				handleException(obj, e);
 				return DONE;
 			}
@@ -386,10 +412,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 				minPeriod = handleOverridableProperty(obj,
 						"Default_Output_Rate", "MAP_Properties", "Output_Rate",
-						"range_min");
+						PropertyType.RANGE_MIN);
 				maxPeriod = handleOverridableProperty(obj,
 						"Default_Output_Rate", "MAP_Properties", "Output_Rate",
-						"range_max");
+						PropertyType.RANGE_MAX);
 
 				if (minPeriod == null || maxPeriod == null)
 					throw new MissingRequiredPropertyException(
@@ -586,21 +612,20 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 		}
 
-		private void handleThreadProperties(ThreadType obj) {
+		private void handleThreadProperties(ThreadType obj, TaskModel tm) {
 			try {
-				ProcessModel procModel = (ProcessModel) componentModel;
 				String trigType = handleOverridableProperty(obj,
 						"Default_Thread_Dispatch", "Thread_Properties",
-						"Dispatch_Protocol", "enum");
+						"Dispatch_Protocol", PropertyType.ENUM);
 				String period = handleOverridableProperty(obj,
 						"Default_Thread_Period", "Timing_Properties", "Period",
-						"int");
+						PropertyType.INT);
 				String deadline = handleOverridableProperty(obj,
 						"Default_Thread_Deadline", "Timing_Properties",
-						"Deadline", "int");
+						"Deadline", PropertyType.INT);
 				String wcet = handleOverridableProperty(obj,
 						"Default_Thread_WCET", "MAP_Properties",
-						"Worst_Case_Execution_Time", "int");
+						"Worst_Case_Execution_Time", PropertyType.INT);
 				if (trigType == null)
 					throw new MissingRequiredPropertyException(
 							"Thread dispatch type must either be set with Default_Thread_Dispatch (at package level) or with Thread_Properties::Dispatch_Protocol (on individual thread)");
@@ -614,25 +639,22 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					throw new MissingRequiredPropertyException(
 							"Thread WCET must either be set with Default_Thread_WCET (at package level) or with Timing_Properties::Compute_Execution_Time (on individual thread)");
 				else {
-					if (procModel.getChild(obj.getName()) == null) {
+					if (tm == null) {
 						throw new UseBeforeDeclarationException(
 								"Threads must be declared as subcomponents before being defined");
 					}
 					if (trigType.equalsIgnoreCase("sporadic")) {
-						procModel.getChild(obj.getName()).setSporadic(true);
+						tm.setSporadic(true);
 					} else if (trigType.equalsIgnoreCase("periodic")) {
-						procModel.getChild(obj.getName()).setSporadic(false);
+						tm.setSporadic(false);
 					} else {
 						throw new NotImplementedException(
 								"Thread dispatch must be either sporadic or periodic, instead got "
 										+ trigType);
 					}
-					procModel.getChild(obj.getName()).setPeriod(
-							Integer.valueOf(period));
-					procModel.getChild(obj.getName()).setDeadline(
-							Integer.valueOf(deadline));
-					procModel.getChild(obj.getName()).setWcet(
-							Integer.valueOf(wcet));
+					tm.setPeriod(Integer.valueOf(period));
+					tm.setDeadline(Integer.valueOf(deadline));
+					tm.setWcet(Integer.valueOf(wcet));
 				}
 			} catch (MissingRequiredPropertyException | NotImplementedException
 					| UseBeforeDeclarationException e) {
@@ -656,7 +678,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			((DeviceModel) dm).setParentName(systemModel.getName());
 			try {
 				String componentType = checkCustomProperty(obj,
-						"Component_Type", "enum");
+						"Component_Type", PropertyType.ENUM);
 				if (componentType == null)
 					throw new MissingRequiredPropertyException(
 							"Devices must declare their role with MAP_Properties::Component_Type");
@@ -694,7 +716,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		private String handleOverridableProperty(NamedElement obj,
 				String defaultName, String overridePropertySet,
-				String overrideName, String propType) {
+				String overrideName, PropertyType propType) {
 			Property prop = GetProperties.lookupPropertyDefinition(obj,
 					overridePropertySet, overrideName);
 			String ret = null;
@@ -714,8 +736,20 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			return ret;
 		}
 
+		/**
+		 * Returns the value of a custom (ie, non-library) property, or null if
+		 * no property is found
+		 * 
+		 * @param obj
+		 *            The element that may contain the property
+		 * @param propertyName
+		 *            The name of the property
+		 * @param propType
+		 *            The type of the property
+		 * @return The property value or null if the property isn't found
+		 */
 		private String checkCustomProperty(NamedElement obj,
-				String propertyName, String propType) {
+				String propertyName, PropertyType propType) {
 			String ret = null;
 			Property prop;
 			for (String propertySetName : propertySetNames) {
@@ -737,10 +771,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		private String handlePropertyValue(NamedElement obj, Property prop,
-				String propType) throws PropertyOutOfRangeException {
-			if (propType.equals("enum"))
+				PropertyType propType) throws PropertyOutOfRangeException {
+			if (propType == PropertyType.ENUM)
 				return PropertyUtils.getEnumLiteral(obj, prop).getName();
-			else if (propType.equals("int")) {
+			else if (propType == PropertyType.INT) {
 				// Should you ever need to get the unit of a property, this is
 				// how you can do it. This example needs a better home, but it
 				// took me so long to figure out that I can't just delete it.
@@ -753,20 +787,16 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						PropertyUtils.getScaledNumberValue(obj, prop,
 								GetProperties.findUnitLiteral(prop, "ms")),
 						obj, prop);
-			} else if (propType.equals("range_min")) {
+			} else if (propType == PropertyType.RANGE_MIN) {
 				return getStringFromScaledNumber(
 						PropertyUtils.getScaledRangeMinimum(obj, prop,
 								GetProperties.findUnitLiteral(prop, "ms")),
 						obj, prop);
-			} else if (propType.equals("range_max")) {
+			} else if (propType == PropertyType.RANGE_MAX) {
 				return getStringFromScaledNumber(
 						PropertyUtils.getScaledRangeMaximum(obj, prop,
 								GetProperties.findUnitLiteral(prop, "ms")),
 						obj, prop);
-			} else {
-				System.err
-						.println("HandlePropertyValue called with garbage propType: "
-								+ propType);
 			}
 			return null;
 		}
@@ -915,7 +945,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				}
 				channelDelay = handleOverridableProperty(obj,
 						"Default_Channel_Delay", "MAP_Properties",
-						"Channel_Delay", "int");
+						"Channel_Delay", PropertyType.INT);
 				if (channelDelay == null)
 					throw new MissingRequiredPropertyException(
 							"Missing required property 'Default_Channel_Delay'");

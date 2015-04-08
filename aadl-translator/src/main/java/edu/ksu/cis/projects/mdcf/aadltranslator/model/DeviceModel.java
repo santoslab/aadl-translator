@@ -15,10 +15,6 @@ public class DeviceModel extends DevOrProcModel {
 		processType = ProcessType.PSEUDODEVICE;
 	}
 	
-	public void setComponentType(String componentType){
-		this.componentType = ComponentType.valueOf(componentType.toUpperCase());
-	}
-	
 	public void addOutPortName(String inPortName, String outPortName){
 		inToOutPortNames.put(inPortName, outPortName);
 	}

@@ -1,8 +1,5 @@
 ## Fundamentals
 
-### System Boundaries
-![System Boundary](/Users/sam/git/aadl-translator/aadl-translator/src/main/resources/images/AppBoundary-Placeholder.png)
-
 ### Accident Levels
 1. **DeathOrInjury**: A human is killed or seriously injured.
 
@@ -17,9 +14,3 @@
 1. **ShowGoodInfo**: The app must accurately inform the display of the status of the patient's vital signs. [BadInfoDisplayed]
 2. **ShowAllAlarms**: The app must display all alarms that are clinically necessary. [MissedAlarm]
 
-### Control Actions
-1. spo2_to_display: ICEpoInterface -> PulseOx_Display_Process (Integer) 
-2. alarm_to_display: PulseOx_Logic_Process -> PulseOx_Display_Process (Object) 
-
-### Process Model
-![Process Model](/Users/sam/git/aadl-translator/aadl-translator/src/main/resources/images/ProcModel-Placeholder.png)

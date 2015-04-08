@@ -36,10 +36,8 @@ public class ProcessModel extends DevOrProcModel{
 	public void setDisplay(boolean display) {
 		if(display){
 			this.processType = ProcessType.DISPLAY;
-			this.componentType = ComponentType.ACTUATOR;
 		} else {
 			this.processType = ProcessType.LOGIC;
-			this.componentType = ComponentType.CONTROLLER;
 		}
 	}
 

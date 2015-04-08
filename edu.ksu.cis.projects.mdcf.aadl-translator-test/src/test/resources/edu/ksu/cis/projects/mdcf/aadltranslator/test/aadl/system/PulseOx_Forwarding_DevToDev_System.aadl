@@ -26,5 +26,7 @@ with PulseOx_Interface, PulseOx_UseSpO2_Interface, PulseOx_Forwarding_Logic, Pul
 		
 		-- From device to device
 		spo2_to_dev : port pulseOx.SpO2 -> poConsumer.SpO2;
+	properties
+		MAP_Properties::Component_Type => controller;
 	end PulseOx_Forwarding_DevToDev_System.imp;
 end PulseOx_Forwarding_DevToDev_System;

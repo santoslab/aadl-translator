@@ -62,6 +62,11 @@ public class HazardReportViewTests {
 	}
 	
 	@Test
+	public void testComponentLevelsSection() {
+		runTest("componentLevels", systemModel);
+	}
+	
+	@Test
 	public void testCtrlActTbl() {
 		runTest("ctrlActTbl", systemModel);
 	}

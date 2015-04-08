@@ -1,0 +1,89 @@
+## Depth: 1
+
+### PulseOx_Forwarding_System
+
+#### Control Actions
+1. spo2_to_logic: ICEpoInterface -> PulseOx_Logic_Process (Integer) 
+2. spo2_to_display: ICEpoInterface -> PulseOx_Display_Process (Integer) 
+3. alarm_to_display: PulseOx_Logic_Process -> PulseOx_Display_Process (Object) 
+
+#### Boundaries and Structure
+![System Boundaries and Control Structure](/Users/sam/git/aadl-translator/aadl-translator/src/main/resources/images/AppBoundary-Placeholder.png)
+
+#### Unsafe Control Actions
+
+| Control Action | Providing | Not Providing | Applied Too Long | Stopped Too Soon | Early | Late | 
+|----------------|-----------|---------------|------------------|------------------|-------|------|
+| [spo2_to_logic](#spo2_to_logic) |  |  |  |  |  |  | 
+| [spo2_to_display](#spo2_to_display) |  |  |  |  |  |  | 
+| [alarm_to_display](#alarm_to_display) |  |  (Bad SpO2) |  |  |  |  | 
+
+
+| Control Action | Value Too High | Value Too Low | 
+|----------------|----------------|---------------|
+| [spo2_to_logic](#spo2_to_logic) |  |  | 
+| [spo2_to_display](#spo2_to_display) |  |  | 
+
+
+#### Causes and Compensations
+
+##### spo2_to_logic
+
+##### spo2_to_display
+
+##### alarm_to_display
+* **NOTPROVIDING**: Bad SpO2
+	* Cause: The SpO2 values from the pulse oximeter are too high, so the alarm is missed
+	* Compensation: None
+
+
+## Depth: 2
+
+### PulseOx_Logic_Process
+
+#### Control Actions
+1. outgoing_alarm: CheckSpO2Thread -> PulseOx_Logic_Process () 
+
+#### Boundaries and Structure
+![System Boundaries and Control Structure]()
+
+#### Unsafe Control Actions
+
+| Control Action | Providing | Not Providing | Applied Too Long | Stopped Too Soon | Early | Late | 
+|----------------|-----------|---------------|------------------|------------------|-------|------|
+| [outgoing_alarm](#outgoing_alarm) |  |  |  |  |  |  | 
+
+
+| Control Action | Value Too High | Value Too Low | 
+|----------------|----------------|---------------|
+#### Causes and Compensations
+
+##### outgoing_alarm
+
+
+### PulseOx_Display_Process
+
+#### Control Actions
+1. incoming_spo2: PulseOx_Display_Process -> UpdateSpO2Thread () 
+2. incoming_alarm: PulseOx_Display_Process -> HandleAlarmThread () 
+
+#### Boundaries and Structure
+![System Boundaries and Control Structure]()
+
+#### Unsafe Control Actions
+
+| Control Action | Providing | Not Providing | Applied Too Long | Stopped Too Soon | Early | Late | 
+|----------------|-----------|---------------|------------------|------------------|-------|------|
+| [incoming_spo2](#incoming_spo2) |  |  |  |  |  |  | 
+| [incoming_alarm](#incoming_alarm) |  |  |  |  |  |  | 
+
+
+| Control Action | Value Too High | Value Too Low | 
+|----------------|----------------|---------------|
+#### Causes and Compensations
+
+##### incoming_spo2
+
+##### incoming_alarm
+
+
