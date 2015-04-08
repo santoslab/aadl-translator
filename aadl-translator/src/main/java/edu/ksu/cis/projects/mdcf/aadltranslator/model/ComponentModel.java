@@ -28,7 +28,7 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	protected HashMap<String, PortModel> ports;
 	
 	/**
-	 * Maps task name -> task model
+	 * Maps child name -> model
 	 */
 	protected HashMap<String, ChildType> children;
 	

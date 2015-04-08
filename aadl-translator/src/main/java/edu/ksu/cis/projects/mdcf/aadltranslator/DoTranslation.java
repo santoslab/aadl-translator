@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -49,16 +50,16 @@ import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.core.OsateCorePlugin;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
+import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.WriteOutputFiles.OutputFormat;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DevOrProcModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.preference.PreferenceConstants;
+import edu.ksu.cis.projects.mdcf.aadltranslator.util.MarkdownLinkRenderer;
 
 public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
@@ -89,6 +90,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	private final String TRANSLATE_ARCH_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate";
 	private final String TRANSLATE_HAZARDS_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate-hazards";
 	private final String TRANSLATE_DEVICE_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.device-aadl-translate";
+	private Object TranslatorUtil;
 
 	public HashSet<IFile> getUsedFiles() {
 		IncludesCalculator ic = new IncludesCalculator(
@@ -317,6 +319,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				"edu.ksu.cis.projects.mdcf.aadl-translator",
 				PreferenceConstants.P_PANDOCPATH, null, null);
 
+		stpa_markdownSTG.registerRenderer(String.class, MarkdownLinkRenderer.getInstance());
+		
 		String reportStr = stpa_markdownSTG.getInstanceOf("report")
 				.add("model", sysModel).render();
 		try {

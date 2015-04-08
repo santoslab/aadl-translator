@@ -70,6 +70,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIAADLSystemEr
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ConnectionModelHazardTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardBackgroundTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.util.MarkdownLinkRenderer;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.HazardReportViewTests;
 
@@ -426,6 +427,7 @@ public class AllTests {
 
 	public static void runWriterTest(String testName, Object model,
 			STGroup stg, boolean GENERATE_EXPECTED, String expectedDir) {
+		stg.registerRenderer(String.class, MarkdownLinkRenderer.getInstance());
 		URL expectedOutputUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID)
 				.getEntry(TEST_DIR + expectedDir + testName + ".txt");
 		String actualStr = stg.getInstanceOf(testName).add("model", model)
