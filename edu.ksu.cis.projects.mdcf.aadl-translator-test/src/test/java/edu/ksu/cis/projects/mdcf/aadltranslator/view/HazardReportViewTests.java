@@ -61,10 +61,11 @@ public class HazardReportViewTests {
 		runTest("tblOfContents", systemModel);
 	}
 	
-	@Test
-	public void testComponentLevelsSection() {
-		runTest("componentLevels", systemModel);
-	}
+	// This test is disabled since it generates build-dependent output, causing test failures.
+//	@Test
+//	public void testComponentLevelsSection() {
+//		runTest("componentLevels", systemModel);
+//	}
 	
 	@Test
 	public void testCtrlActTbl() {
