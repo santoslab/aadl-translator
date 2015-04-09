@@ -23,34 +23,12 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 	private String hazardReportContext;
 	private HashSet<AbbreviationModel> hazardReportAbbreviations;
 	private HashSet<String> hazardReportAssumptions;
-	private HashMap<String, String> hazardReportDiagrams;
 
 	public SystemModel() {
 		super();
 		typeToComponent = new HashMap<>();
 		hazardReportAbbreviations = new HashSet<>();
 		hazardReportAssumptions = new HashSet<>();
-		initHazardReportDiagrams();
-	}
-
-	private void initHazardReportDiagrams() {
-		hazardReportDiagrams = new HashMap<>();
-		URL imagesDirUrl = Platform.getBundle(
-				"edu.ksu.cis.projects.mdcf.aadl-translator").getEntry(
-				"src/main/resources/images/");
-		try {
-			File imagesDir = new File(FileLocator.toFileURL(imagesDirUrl)
-					.getPath());
-			File appBoundaryPH = new File(imagesDir,
-					"AppBoundary-Placeholder.png");
-			File procModelPH = new File(imagesDir, "ProcModel-Placeholder.png");
-			hazardReportDiagrams.put("SystemBoundary",
-					appBoundaryPH.getAbsolutePath());
-			hazardReportDiagrams.put("ProcessModel",
-					procModelPH.getAbsolutePath());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public String getHazardReportContext() {
@@ -124,9 +102,5 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 
 	public void addAssumption(String assumption) {
 		hazardReportAssumptions.add(assumption);
-	}
-
-	public HashMap<String, String> getHazardReportDiagrams() {
-		return hazardReportDiagrams;
 	}
 }

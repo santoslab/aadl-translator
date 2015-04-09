@@ -1,8 +1,14 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Platform;
 
 import com.google.common.collect.Maps;
 
@@ -57,11 +63,17 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	 */
 	protected HashMap<String, StpaPreliminaryModel> stpaPreliminaries;
 	
+	/**
+	 * Maps diagram name (eg: SystemBoundary) to file path
+	 */
+	private HashMap<String, String> hazardReportDiagrams;
+	
 	public ComponentModel(){
 		ports = new HashMap<>();
 		children = new HashMap<>();
 		channels = new HashMap<>();
 		stpaPreliminaries = new HashMap<String, StpaPreliminaryModel>();
+		initHazardReportDiagrams();
 	}
 	
 	public void addPropagation(PropagationModel propagation) throws DuplicateElementException {
@@ -233,5 +245,26 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 		Map<String, ConnectionType> controlActions = Maps.filterValues(
 				channels, ModelUtil.controlActionFilter);
 		return Maps.filterValues(controlActions, ModelUtil.rangedChannelFilter);
+	}
+	
+	private void initHazardReportDiagrams() {
+		hazardReportDiagrams = new HashMap<>();
+		URL imagesDirUrl = Platform.getBundle(
+				"edu.ksu.cis.projects.mdcf.aadl-translator").getEntry(
+				"src/main/resources/images/");
+		try {
+			File imagesDir = new File(FileLocator.toFileURL(imagesDirUrl)
+					.getPath());
+			File appBoundaryPH = new File(imagesDir,
+					"AppBoundary-Placeholder.png");
+			hazardReportDiagrams.put("SystemBoundary",
+					appBoundaryPH.getAbsolutePath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public HashMap<String, String> getHazardReportDiagrams() {
+		return hazardReportDiagrams;
 	}
 }

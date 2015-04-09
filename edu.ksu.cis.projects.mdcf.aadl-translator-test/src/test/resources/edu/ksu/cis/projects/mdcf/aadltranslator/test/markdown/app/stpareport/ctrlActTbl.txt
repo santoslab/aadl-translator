@@ -6,7 +6,6 @@
 | [spo2_to_display](#spo2_to_display) |  |  |  |  |  |  | 
 | [alarm_to_display](#alarm_to_display) |  |  (Bad SpO2) |  |  |  |  | 
 
-
 | Control Action | Value Too High | Value Too Low | 
 |----------------|----------------|---------------|
 | [spo2_to_logic](#spo2_to_logic) |  |  | 

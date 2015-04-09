@@ -92,9 +92,18 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 	public class TranslatorSwitch extends Aadl2Switch<String> {
 		/**
-		 * A reference to the "current" process model, stored for convenience
+		 * A reference to the "current" component model, stored for convenience
 		 */
 		private ComponentModel componentModel = null;
+		
+		/**
+		 * A reference to the current component's parent
+		 */
+		private ComponentModel parentModel = null;
+				
+		/**
+		 * The last element to have been processed
+		 */
 		private ElementType lastElemProcessed = ElementType.NONE;
 
 		@Override
@@ -156,8 +165,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		@Override
 		public String caseThreadType(ThreadType obj) {
 			lastElemProcessed = ElementType.THREAD;
-			handleThreadProperties(obj,
-					(TaskModel) componentModel.getChild(obj.getName()));
+			if(componentModel instanceof ProcessModel)
+				parentModel = componentModel;
+			componentModel = parentModel.getChild(obj.getName());
+			handleThreadProperties(obj, (TaskModel) componentModel);
+			processEList(obj.getOwnedElements());
 			return NOT_DONE;
 		}
 
@@ -377,12 +389,13 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					handleImplicitTask(obj); // Implicit task to handle incoming
 												// data
 				}
+			} else if (lastElemProcessed == ElementType.THREAD) {
+				handlePort(obj);
 			}
 			return NOT_DONE;
 		}
 
 		private void handlePort(Port obj) {
-			// if (lastElemProcessed == ElementType.PROCESS) {
 			String typeName = null, minPeriod = null, maxPeriod = null;
 			Property typeNameProp = null;
 			try {
@@ -447,7 +460,6 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				handleException(obj, e);
 				return;
 			}
-			// }
 		}
 
 		private void handleException(Element obj, Exception e) {
@@ -849,8 +861,9 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					connModel.setPublisher(task);
 					connModel.setPubName(taskName);
 					connModel.setPubPortName(localName);
-					connModel.setSubName(portName);
 					connModel.setSubscriber(procModel);
+					connModel.setSubName(procModel.getName());
+					connModel.setSubPortName(portName);
 					procModel.addConnection(connModel.getName(), connModel);
 				} else if (obj.getAllSource().getOwner() instanceof ProcessType
 						&& obj.getAllDestination().getOwner() instanceof ThreadType) {
@@ -870,10 +883,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					connModel.setName(obj.getName());
 					connModel.setProcessToThread(true);
 					connModel.setPublisher(procModel);
-					connModel.setPubName(portName);
-					connModel.setSubPortName(localName);
-					connModel.setSubName(taskName);
+					connModel.setPubName(procModel.getName());
+					connModel.setPubPortName(portName);
 					connModel.setSubscriber(task);
+					connModel.setSubName(taskName);
+					connModel.setSubPortName(localName);
 					procModel.addConnection(connModel.getName(), connModel);
 				} else if (obj.getAllSource().getOwner() instanceof ThreadType
 						&& obj.getAllDestination().getOwner() instanceof ThreadType) {

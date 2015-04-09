@@ -18,7 +18,6 @@
 | [spo2_to_display](#spo2_to_display) |  |  |  |  |  |  | 
 | [alarm_to_display](#alarm_to_display) |  |  (Bad SpO2) |  |  |  |  | 
 
-
 | Control Action | Value Too High | Value Too Low | 
 |----------------|----------------|---------------|
 | [spo2_to_logic](#spo2_to_logic) |  |  | 
@@ -42,10 +41,10 @@
 ### PulseOx_Logic_Process
 
 #### Control Actions
-1. outgoing_alarm: CheckSpO2Thread -> PulseOx_Logic_Process () 
+1. outgoing_alarm: CheckSpO2Thread -> PulseOx_Logic_Process (Object) 
 
 #### Boundaries and Structure
-![System Boundaries and Control Structure]()
+![System Boundaries and Control Structure](/Users/sam/git/aadl-translator/aadl-translator/src/main/resources/images/AppBoundary-Placeholder.png)
 
 #### Unsafe Control Actions
 
@@ -54,8 +53,6 @@
 | [outgoing_alarm](#outgoing_alarm) |  |  |  |  |  |  | 
 
 
-| Control Action | Value Too High | Value Too Low | 
-|----------------|----------------|---------------|
 #### Causes and Compensations
 
 ##### outgoing_alarm
@@ -64,11 +61,11 @@
 ### PulseOx_Display_Process
 
 #### Control Actions
-1. incoming_spo2: PulseOx_Display_Process -> UpdateSpO2Thread () 
-2. incoming_alarm: PulseOx_Display_Process -> HandleAlarmThread () 
+1. incoming_spo2: PulseOx_Display_Process -> UpdateSpO2Thread (Integer) 
+2. incoming_alarm: PulseOx_Display_Process -> HandleAlarmThread (Object) 
 
 #### Boundaries and Structure
-![System Boundaries and Control Structure]()
+![System Boundaries and Control Structure](/Users/sam/git/aadl-translator/aadl-translator/src/main/resources/images/AppBoundary-Placeholder.png)
 
 #### Unsafe Control Actions
 
@@ -77,9 +74,11 @@
 | [incoming_spo2](#incoming_spo2) |  |  |  |  |  |  | 
 | [incoming_alarm](#incoming_alarm) |  |  |  |  |  |  | 
 
-
 | Control Action | Value Too High | Value Too Low | 
 |----------------|----------------|---------------|
+| [incoming_spo2](#incoming_spo2) |  |  | 
+
+
 #### Causes and Compensations
 
 ##### incoming_spo2

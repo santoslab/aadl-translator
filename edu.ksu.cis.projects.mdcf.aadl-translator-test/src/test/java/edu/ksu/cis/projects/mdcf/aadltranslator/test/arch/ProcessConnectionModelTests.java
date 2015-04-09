@@ -59,12 +59,12 @@ public class ProcessConnectionModelTests {
 	
 	@Test
 	public void testPortConnectionSubscriberInfo() {
-		assertEquals(systemChannel.getSubName(), "DerivedAlarm");
-		assertEquals(isolatedChannel.getSubName(), "DerivedAlarm");
-		assertEquals(systemChannel.getSubscriber().getName(), "PulseOx_Logic_Process");
-		assertEquals(isolatedChannel.getSubscriber().getName(), "PulseOx_Logic_Process");
-		assertNull(systemChannel.getSubPortName());
-		assertNull(isolatedChannel.getSubPortName());
+		assertEquals("PulseOx_Logic_Process", systemChannel.getSubName());
+		assertEquals("PulseOx_Logic_Process", isolatedChannel.getSubName());
+		assertEquals("PulseOx_Logic_Process", systemChannel.getSubscriber().getName());
+		assertEquals("PulseOx_Logic_Process", isolatedChannel.getSubscriber().getName());
+		assertEquals("DerivedAlarm", systemChannel.getSubPortName());
+		assertEquals("DerivedAlarm", isolatedChannel.getSubPortName());
 	}
 	
 	@Test
