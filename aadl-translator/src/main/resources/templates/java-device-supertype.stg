@@ -184,49 +184,49 @@ exchangeInits(model) ::=<<
 >>
 
 getExchangeInit(ModelName, ParameterType, ExchangeName, SendPortName, RecvPortName) ::=<<
-		<ExchangeName>.receiver = new MdcfReceiverPort\<>(
-				"<RecvPortName>",
-				Request.class, address);
-		<ExchangeName>.receiver.getReceiver().registerMessageListener(
-				new <ExchangeName>_Listener());
-		<ExchangeName>.sender = new MdcfSenderPort\<>(
-				"<SendPortName>",
-				<ParameterType>.class, address);
+<ExchangeName>.receiver = new MdcfReceiverPort\<>(
+	"<RecvPortName>",
+	Request.class, address);
+<ExchangeName>.receiver.getReceiver().registerMessageListener(
+	new <ExchangeName>_Listener());
+<ExchangeName>.sender = new MdcfSenderPort\<>(
+	"<SendPortName>",
+	<ParameterType>.class, address);
 >>
 
 
 setExchangeInit(ModelName, ParameterType, ExchangeName, SendPortName, RecvPortName) ::=<<
-		<ExchangeName>.receiver = new MdcfReceiverPort\<>(
-				"<RecvPortName>",
-				<ParameterType>.class, address);
-		<ExchangeName>.receiver.getReceiver().registerMessageListener(
-				new <ExchangeName>_Listener());
-		<ExchangeName>.sender = new MdcfSenderPort\<>(
-				"<SendPortName>",
-				Confirmation.class, address);
+<ExchangeName>.receiver = new MdcfReceiverPort\<>(
+	"<RecvPortName>",
+	<ParameterType>.class, address);
+<ExchangeName>.receiver.getReceiver().registerMessageListener(
+	new <ExchangeName>_Listener());
+<ExchangeName>.sender = new MdcfSenderPort\<>(
+	"<SendPortName>",
+	Confirmation.class, address);
 >>
 
 periodicExchangeInit(ModelName, ParameterType, ExchangeName, SendPortName) ::=<<
-		<ExchangeName>.sender = new MdcfSenderPort\<>(
-				"<SendPortName>",
-				<ParameterType>.class, address);
+<ExchangeName>.sender = new MdcfSenderPort\<>(
+	"<SendPortName>",
+	<ParameterType>.class, address);
 >>
 
 sporadicExchangeInit(ModelName, ParameterType, ExchangeName, SendPortName) ::=<<
-		<ExchangeName>.sender = new MdcfSenderPort\<>(
-				"<SendPortName>",
-				<ParameterType>.class, address);
+<ExchangeName>.sender = new MdcfSenderPort\<>(
+	"<SendPortName>",
+	<ParameterType>.class, address);
 >>
 
 actionExchangeInit(ModelName, ExchangeName, SendPortName, RecvPortName) ::=<<
-		<ExchangeName>.receiver = new MdcfReceiverPort\<>(
-				"<RecvPortName>",
-				ActionRequest.class, address);
-		<ExchangeName>.receiver.getReceiver().registerMessageListener(
-				new <ExchangeName>_Listener());
-		<ExchangeName>.sender = new MdcfSenderPort\<>(
-				"<SendPortName>",
-				ActionResult.class, address);
+<ExchangeName>.receiver = new MdcfReceiverPort\<>(
+	"<RecvPortName>",
+	ActionRequest.class, address);
+<ExchangeName>.receiver.getReceiver().registerMessageListener(
+	new <ExchangeName>_Listener());
+<ExchangeName>.sender = new MdcfSenderPort\<>(
+	"<SendPortName>",
+	ActionResult.class, address);
 >>
 	
 	
@@ -263,18 +263,18 @@ subscriberChannelAssignmentHelper(subAssign, this.<exchName>.receiver);
 
 senderMethods(model) ::=<<
 <! Sender Method !>
-	<model.periodicExchangeModels.values:{exchangeModel | <senderPeriodicMethod(exchangeModel.ExchangeName, exchangeModel.SendMessageType, exchangeModel.parameterName)>}>	
-	<model.sporadicExchangeModels.values:{exchangeModel | <senderSporadicMethod(exchangeModel.ExchangeName, exchangeModel.SendMessageType, exchangeModel.parameterName)>}>												
+	<model.periodicExchangeModels.values:{exchangeModel | <senderPeriodicMethod(exchangeModel.ExchangeName, exchangeModel.SendMessageType, exchangeModel.parameterName)>}; separator="\n">	
+	<model.sporadicExchangeModels.values:{exchangeModel | <senderSporadicMethod(exchangeModel.ExchangeName, exchangeModel.SendMessageType, exchangeModel.parameterName)>}; separator="\n">												
 >>
 
 senderPeriodicMethod(OutportName, ParameterType, ParameterName) ::=<<
-	protected void send_Periodic_<ParameterName>(<ParameterType> value) {
+	protected void send_Periodic_<OutportName>(<ParameterType> value) {
 		this.<OutportName>.send(value);
 	}
 >>
 
 senderSporadicMethod(OutportName, ParameterType, ParameterName) ::=<<
-	protected void send_Sporadic_<ParameterName>(<ParameterType> value) {
+	protected void send_Sporadic_<OutportName>(<ParameterType> value) {
 		this.<OutportName>.send(value);
 	}
 >>

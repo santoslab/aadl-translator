@@ -16,15 +16,16 @@ public
 
 
 ------------------------------------------------------------------------------+
--- Sample generic payload data types.
+-- Exchange payload data types.
 ------------------------------------------------------------------------------+
 
--- Device status.
-data Status
-properties
-  MDCF_Data_Props::access_val => ICE_Security_Access_Read;    
-  MDCF_Data_Props::state_val => NotOk;  -- Can this be changed dynamically?    
-end Status;
+-- Virtual medical device status.
+data ICE_Status
+  properties
+    -- FIXME: Seems to be a port property.
+    MDCF_Data_Props::access_val => ICE_Security_Access_Read; 
+end ICE_Status;
+
 
 data ICE_VMD_Status extends ICE_Status
   properties
@@ -33,9 +34,35 @@ data ICE_VMD_Status extends ICE_Status
 end ICE_VMD_Status;
 
 
--- Limit violation alert.
-data LimitAlert
-end LimitAlert;
+-- Virtual medical device data.
+data ICE_Metric
+  properties
+    MDCF_Data_Props::MDC_ATTR_ID_PHYSIO => "";
+    MDCF_Data_Props::MDC_ATTR_UNIT_CODE => "";
+end ICE_Metric;
+
+
+data ICE_Numeric extends ICE_Metric
+  properties
+    -- FIXME: Not always a real; flexibly typed in Scala.
+    MDCF_Data_Props::num_range => 0.0 .. 100.0;
+    -- FIXME: Some kind of time stamp, but of what? What does DYN mean?
+    -- observedValue: ICE_NuObsValue = DYN
+end ICE_Numeric;
+
+
+data ICE_SpO2_Numeric extends ICE_Numeric
+  properties
+    MDCF_Data_Props::MDC_ATTR_ID_PHYSIO => "MDC_PULS_OXIM_SAT_O2";
+    MDCF_Data_Props::MDC_ATTR_UNIT_CODE => "MDC_DIM_PERCENT";
+end ICE_SpO2_Numeric;
+
+
+data ICE_PulseRate_Numeric  extends ICE_Numeric
+  properties
+    MDCF_Data_Props::MDC_ATTR_ID_PHYSIO => "MDC_PULS_OXIM_PULS_RATE";
+    MDCF_Data_Props::MDC_ATTR_UNIT_CODE => "MDC_DIM_BEAT_PER_MIN";
+end ICE_PulseRate_Numeric;
 
 
 ------------------------------------------------------------------------------+
@@ -193,6 +220,27 @@ data AlarmEmptyReservoir
 properties
   Data_Model::Data_Representation => Boolean;
 end AlarmEmptyReservoir;
+
+
+
+-- Alert.
+data Alert
+end Alert;
+
+
+-- Limit violation alert.
+data LimitAlert
+end LimitAlert;
+
+
+-- Request.
+data Request
+end Request;
+
+
+-- Setting.
+data Setting
+end Setting;
 
 
 end MDCF_Types;

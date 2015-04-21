@@ -67,6 +67,7 @@ DML_Port: record (
   Channel_Group: MDCF_Data_Props::ICE_Channel_Group;
   Comm_Role: MDCF_Comm_Props::MDCF_Comm_Role;
   Output_Rate: Time_Range;  -- TODO: This should come from MAP_Properties;
+  Model_Path: aadlstring;
 ) applies to (port);        --   But need an AADL type, and unit values.
 
 

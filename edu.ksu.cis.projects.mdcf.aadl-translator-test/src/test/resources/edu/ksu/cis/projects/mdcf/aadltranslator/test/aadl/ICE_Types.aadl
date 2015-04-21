@@ -17,6 +17,13 @@ public
 -- Sample payload data types.
 ------------------------------------------------------------------------------+
 
+-- FIXME: Data properties can't be accessed by name. These likely need to be records.
+-- EtCo2
+data ICE_EtCo2_Numeric
+properties
+  Data_Model::Integer_Range => 0 .. 100;
+end ICE_EtCo2_Numeric;
+
 -- SpO2
 data ICE_SpO2_Numeric
 properties
@@ -24,16 +31,28 @@ properties
 end ICE_SpO2_Numeric;
 
 
-data ICE_SpO2_Numeric_Alternate
-properties
-  Data_Model::Integer_Range => 0 .. 100;
-end ICE_SpO2_Numeric_Alternate;
-
-
 -- Pulse rate
-data ICE_Pulserate_Numeric
+data ICE_PulseRate_Numeric
 properties
   Data_Model::Integer_Range => 0 .. 100;
-end ICE_Pulserate_Numeric;
+end ICE_PulseRate_Numeric;
+
+
+data ICE_Setting
+properties
+  Data_Model::Integer_Range => 0 .. 100;
+end ICE_Setting;
+
+
+data ICE_Status
+end ICE_Status;
+
+
+data ICE_VMD_Status
+properties
+    Data_Model::Data_Representation => Enum;
+    Data_Model::Enumerators => ("OK","NOTOK");
+end ICE_VMD_Status;
+
 
 end ICE_Types;

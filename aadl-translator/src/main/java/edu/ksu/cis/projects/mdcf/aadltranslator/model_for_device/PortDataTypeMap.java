@@ -28,15 +28,19 @@ public class PortDataTypeMap {
 
 				{
 					put("MDCF_Types::Status", "String");
-					put("MDCF_Types::ICE_VMD_Status", "String");
+					put("ICE_Types::ICE_VMD_Status", "String");
+					put("ICE_Types::ICE_Status", "String");
+					put("ICE_Types::ICE_Setting", "Integer");
 
 					put("MDCF_Types::SpO2", "Integer");
 					put("ICE_Types::ICE_SpO2_Numeric", "Integer");
-
+					
 					put("MDCF_Types::EtCO2", "Integer");
+					put("ICE_Types::ICE_EtCo2_Numeric", "Integer");
+					
 					put("MDCF_Types::RespiratoryRate", "Integer");
 					put("MDCF_Types::PulseRate", "Integer");
-					put("ICE_Types::ICE_Pulserate_Numeric", "Integer");
+					put("ICE_Types::ICE_PulseRate_Numeric", "Integer");
 
 					put("MDCF_Types::BolusLoading", "Integer");
 					put("MDCF_Types::BolusDose", "Integer");

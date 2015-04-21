@@ -1,6 +1,7 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,6 +23,7 @@ import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.EventPort;
 import org.osate.aadl2.Feature;
+import org.osate.aadl2.FeatureGroup;
 import org.osate.aadl2.FeatureGroupType;
 import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ModalPropertyValue;
@@ -35,6 +37,8 @@ import org.osate.aadl2.RecordValue;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.SystemType;
+import org.osate.aadl2.impl.FeatureGroupImpl;
+import org.osate.aadl2.impl.FeatureGroupTypeImpl;
 import org.osate.aadl2.modelsupport.errorreporting.MarkerParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
@@ -45,7 +49,6 @@ import org.osate.aadl2.properties.PropertyAcc;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
-
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.ActionExchangeModel;
@@ -69,18 +72,20 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 	private ParseErrorReporterManager errorManager;
 	private DeviceComponentModel deviceComponentModel = null;
 	private String packageName;
-	private int systemCount = 0;
 	private String systemName = null;
-
+	private ArrayList<String> vmdTypeNames = new ArrayList<String>();
+	private HashMap<String, String> featureGroupNameToVMDName = new HashMap<String, String>();
 
 	public class TranslatorSwitch extends Aadl2Switch<String> {
 		@Override
 		public String caseAadlPackage(AadlPackage obj) {
 			packageName = obj.getFullName();
+			systemName = packageName;
+			deviceComponentModel.setName(systemName);
 			for (Element e : obj.getOwnedPublicSection().getOwnedElements()) {
 
 				if (e instanceof SystemType) {
-					if (((SystemType) e).getName().equals(packageName)) {
+					if (((SystemType) e).getName().endsWith("Device")) {
 						process(e);
 					}
 				} else if (e instanceof SystemImplementation) {
@@ -88,7 +93,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							.getName().split("\\.");
 
 					if (systemImplName.length > 0
-							&& systemImplName[0].equals(packageName)) {
+							&& systemImplName[0].endsWith("Device")) {
 						process(e);
 					}
 				} else if (e instanceof FeatureGroupType) {
@@ -108,23 +113,14 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 		@Override
 		public String caseSystemType(SystemType st){
-			// find system here..if there is more than one system then trigger error.
-			if (systemCount > 1) {
-				handleException(st, new Exception(
-						"Only one system is allowed in device AADL."));
-				return DONE;
-			} else if (!st.getName().equals(packageName)) {
-				handleException(st, new Exception(
-						"Mismatching name between the system and the package:"
-								+ st.getName() + "<->" + packageName));
-				return DONE;
-			} else {
-				log.log(Level.FINE,
-						"System Type Reading:" + st.getName());
-				systemName = st.getName();
-				systemCount++;
+			vmdTypeNames.add(st.getName());
+			EList<Feature> features = st.getOwnedFeatures();
+			if (!(st.getOwnedFeatures() == null || features.isEmpty())) {
+				for(Feature feature : features){
+					FeatureGroup fg = (FeatureGroup) feature;
+					featureGroupNameToVMDName.put(AadlUtil.getFeatureTypeName(fg.getFeatureType(), feature), st.getName());
+				}
 			}
-			deviceComponentModel.setName(st.getName());
 			return DONE;
 		}
 		
@@ -222,7 +218,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				    + "test:" + object.getNamespace().getFullName());*/
 /*			System.err.println("DML_PORT PROPERTIES\n"
 					+ getPortProperties(object));*/
-			
+
 			DML_Port_Properties dpp = getPortProperties(object);
 			switch(dpp.role) {
 			case "responder":
@@ -447,6 +443,11 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			em = exMethods.createExchangeModel(exchangeName, object);
 		}
 
+		Element element = object.getOwner();
+		if(element instanceof FeatureGroupType){
+			FeatureGroupType fgti = (FeatureGroupType) element;
+		}
+		
 		exMethods.populatePortProperty(em, object, dpp);
 		updateExchangeModel(exchangeName, em);
 		
@@ -570,14 +571,28 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 	}*/
 	
-	//TODO:
-	private String getCurrentProcessingVMDName() {
-		return systemName; //don't consider for multiple VMDs for now
+	private String getOwnedVMDName(Port object) {
+		Element element = object.getOwner();
+		if(element instanceof FeatureGroupType){
+			FeatureGroupType fgti = (FeatureGroupType) element;
+			return featureGroupNameToVMDName.get(fgti.getFullName());
+		} else {
+			return null;
+		}
+		
 	}
 	
-	//TODO:
 	public String extractParameterName(Port object) {
-		return object.getNamespace().getFullName();
+		if(object instanceof EventDataPort){
+			EventDataPort edp = (EventDataPort) object;//TODO
+			String dataType = AadlUtil.getSubcomponentTypeName(
+					edp.getDataFeatureClassifier(), object);
+			String fullName[] = dataType.split("::");
+			return fullName[1];
+		} else {
+			return null;
+		}
+			
 	}
 	
 	//TODO:
@@ -636,7 +651,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 		public ExchangeModel createExchangeModel(String exchangeName,
 				Port object) {
 			return new GetExchangeModel(extractParameterName(object),
-					systemName, getCurrentProcessingVMDName(), exchangeName);
+					systemName, getOwnedVMDName(object), exchangeName);
 		}
 
 		@Override
@@ -666,7 +681,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 		public ExchangeModel createExchangeModel(String exchangeName,
 				Port object) {
 			return new GetExchangeModel(extractParameterName(object),
-					systemName, getCurrentProcessingVMDName(), exchangeName);
+					systemName, getOwnedVMDName(object), exchangeName);
 		}
 
 		@Override
@@ -715,7 +730,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 		public ExchangeModel createExchangeModel(String exchangeName,
 				Port object) {
 			return new SetExchangeModel(extractParameterName(object),
-					systemName, getCurrentProcessingVMDName(), exchangeName);
+					systemName, getOwnedVMDName(object), exchangeName);
 		}
 
 		@Override
@@ -741,7 +756,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 		public ExchangeModel createExchangeModel(String exchangeName,
 				Port object) {
 			return new SetExchangeModel(extractParameterName(object),
-					systemName, getCurrentProcessingVMDName(), exchangeName);
+					systemName, getOwnedVMDName(object), exchangeName);
 		}
 
 		@Override
@@ -794,7 +809,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 		public ExchangeModel createExchangeModel(String exchangeName,
 				Port object) {
 				return new SporadicExchangeModel(extractParameterName(object),
-						systemName, getCurrentProcessingVMDName(),
+						systemName, getOwnedVMDName(object),
 						exchangeName);
 		}
 
@@ -846,7 +861,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				Port object) {
 			return new PeriodicExchangeModel(
 					extractParameterName(object),
-					systemName, getCurrentProcessingVMDName(),
+					systemName, getOwnedVMDName(object),
 					exchangeName);
 		}
 
@@ -899,7 +914,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				Port object) {
 			return new ActionExchangeModel(
 					extractActionName(object.getFullName()), systemName,
-					getCurrentProcessingVMDName(), exchangeName);
+					getOwnedVMDName(object), exchangeName);
 		}
 
 		@Override
@@ -931,7 +946,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				Port object) {
 			return new ActionExchangeModel(
 					extractActionName(object.getFullName()), systemName,
-					getCurrentProcessingVMDName(), exchangeName);
+					getOwnedVMDName(object), exchangeName);
 		}
 
 		@Override
