@@ -117,30 +117,35 @@ loadDeviceModel(mode) ::=<<
 
 exchangeFields(model) ::=<<
 <! Exchange Fields Initialization !>
-	<model.getExchangeModels.values:{exchangeModel | <getExchangeField(model.name, exchangeModel.SendMessageType, exchangeModel.exchangeName)>}; separator="\n">
-	<model.setExchangeModels.values:{exchangeModel | <setExchangeField(model.name, exchangeModel.SendMessageType, exchangeModel.exchangeName)>}; separator="\n">
-	<model.periodicExchangeModels.values:{exchangeModel | <periodicExchangeField(model.name, exchangeModel.SendMessageType, exchangeModel.exchangeName)>}; separator="\n">
-	<model.sporadicExchangeModels.values:{exchangeModel | <sporadicExchangeField(model.naem, exchangeModel.SendMessageType, exchangeModel.exchangeName)>}; separator="\n">
-	<model.actionExchangeModels.values:{exchangeModel | <actionExchangeField(model.name, exchangeModel.exchangeName)>}; separator="\n">
+	<model.getExchangeModels.values:{exchangeModel | <getExchangeField(model.name, exchangeModel.SendMessageType, exchangeModel.exchangeName, exchangeModel.ExchangeModelPath)>}; separator="\n">
+	<model.setExchangeModels.values:{exchangeModel | <setExchangeField(model.name, exchangeModel.SendMessageType, exchangeModel.exchangeName, exchangeModel.ExchangeModelPath)>}; separator="\n">
+	<model.periodicExchangeModels.values:{exchangeModel | <periodicExchangeField(model.name, exchangeModel.SendMessageType, exchangeModel.exchangeName, exchangeModel.ExchangeModelPath)>}; separator="\n">
+	<model.sporadicExchangeModels.values:{exchangeModel | <sporadicExchangeField(model.naem, exchangeModel.SendMessageType, exchangeModel.exchangeName, exchangeModel.ExchangeModelPath)>}; separator="\n">
+	<model.actionExchangeModels.values:{exchangeModel | <actionExchangeField(model.name, exchangeModel.exchangeName, exchangeModel.ExchangeModelPath)>}; separator="\n">
 >>
 
-getExchangeField(ModelName, ParameterType, ExchangeName) ::=<<
+getExchangeField(ModelName, ParameterType, ExchangeName, ModelPath) ::=<<
+	//<ModelPath>
 	<ModelName>GetExchange\<Request, <ParameterType>\> <ExchangeName> = new <ModelName>GetExchange\<>();
 >>
 
-setExchangeField(ModelName, ParameterType, ExchangeName) ::=<<
+setExchangeField(ModelName, ParameterType, ExchangeName, ModelPath) ::=<<
+	//<ModelPath>
 	<ModelName>SetExchange\<<ParameterType>, Confirmation> <ExchangeName> = new <ModelName>SetExchange\<>();
 >>
 
-periodicExchangeField(ModelName, ParameterType, ExchangeName) ::=<<
+periodicExchangeField(ModelName, ParameterType, ExchangeName, ModelPath) ::=<<
+	//<ModelPath>
 	<ModelName>PeriodicExchange\<<ParameterType>\> <ExchangeName> = new <ModelName>PeriodicExchange\<>();
 >>
 
-sporadicExchangeField(ModelName, ParameterType, ExchangeName) ::=<<
+sporadicExchangeField(ModelName, ParameterType, ExchangeName, ModelPath) ::=<<
+	//<ModelPath>
 	<ModelName>SporadicExchange\<<ParameterType>\> <ExchangeName> = new <ModelName>SporadicExchange\<>();
 >>
 
-actionExchangeField(ModelName, ExchangeName) ::=<<
+actionExchangeField(ModelName, ExchangeName, ModelPath) ::=<<
+	//<ModelPath>
 	<ModelName>ActionExchange\<ActionRequest, ActionResult> <ExchangeName> = new <ModelName>ActionExchange\<>();	
 >>
 

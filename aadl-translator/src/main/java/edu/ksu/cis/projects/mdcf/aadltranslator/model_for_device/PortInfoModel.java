@@ -13,10 +13,13 @@ public class PortInfoModel {
 	private int maxSeparationInterval;
 	private int separationInterval;
 	
-	public PortInfoModel(PortDirection inOut, String portName) {
+	private String port_model_path;
+	
+	public PortInfoModel(PortDirection inOut, String portName, String port_model_path) {
 		super();
 		this.inOut = inOut;
 		this.portName = portName;
+		this.port_model_path = port_model_path;
 	}
 	
 	public PortDirection getInOut() {
@@ -94,6 +97,10 @@ public class PortInfoModel {
 	 */
 	public void setSeparationInterval(int separationInterval) {
 		this.separationInterval = separationInterval;
+	}
+	
+	public String getPortModelPath(){
+		return this.port_model_path;
 	}
 
 	public String printPortProperties() {

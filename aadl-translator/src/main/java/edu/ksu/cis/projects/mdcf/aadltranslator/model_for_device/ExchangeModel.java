@@ -32,6 +32,10 @@ public abstract class ExchangeModel {
 		return exchangeName;
 	}
 
+	public String getExchangeModelPath(){
+		return this.outPortInfo.getPortModelPath();
+	}
+	
 	public void setExchangeName(String exchangeName) {
 		this.exchangeName = exchangeName;
 	}

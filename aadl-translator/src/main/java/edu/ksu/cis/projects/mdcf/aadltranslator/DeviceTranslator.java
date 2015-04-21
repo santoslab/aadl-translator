@@ -484,15 +484,17 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 		String role = "";
 		int min = 0;
 		int max = 0;
+		String model_path = "";
 
 		public DML_Port_Properties() {
 
 		}
 
-		public DML_Port_Properties(String role, int min, int max) {
+		public DML_Port_Properties(String role, int min, int max, String model_path) {
 			this.role = role;
 			this.min = min;
 			this.max = max;
+			this.model_path = model_path;
 		}
 
 		public String toString() {
@@ -519,13 +521,17 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				.getRecordFieldValue(rvi, "Comm_Role");
 		RangeValue output_rate = (RangeValue) PropertyUtils
 				.getRecordFieldValue(rvi, "Output_Rate");
-
+		StringLiteral model_path = (StringLiteral) PropertyUtils
+				.getRecordFieldValue(rvi, "Model_Path");
+		System.err.println("Model_Path:" + model_path);
+		
 		return new DML_Port_Properties(
 				convertNamedValueToEnumerationLiteralString(comm_role),
 				(int) ((IntegerLiteral) output_rate.getMinimumValue())
 						.getValue(),
 				(int) ((IntegerLiteral) output_rate.getMaximumValue())
-						.getValue());
+						.getValue(),
+				model_path==null ? "Path Info Not Available" : model_path.getValue());
 	}
 
 	private String convertNamedValueToEnumerationLiteralString(NamedValue nv) {
@@ -584,7 +590,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 	
 	public String extractParameterName(Port object) {
 		if(object instanceof EventDataPort){
-			EventDataPort edp = (EventDataPort) object;//TODO
+			EventDataPort edp = (EventDataPort) object;
 			String dataType = AadlUtil.getSubcomponentTypeName(
 					edp.getDataFeatureClassifier(), object);
 			String fullName[] = dataType.split("::");
@@ -659,7 +665,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			PortInfoModel portInfo = em.getInPortInfo();
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.In,
-						getPortName(object));
+						getPortName(object), dpp.model_path);
 				portInfo.setMaxSeparationInterval(dpp.max);
 				portInfo.setMinSeparationInterval(dpp.min);
 				
@@ -689,11 +695,11 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			PortInfoModel portInfo = em.getOutPortInfo();
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.Out,
-						getPortName(object));
+						getPortName(object), dpp.model_path);
 
 				// process data type
 				if(object instanceof EventDataPort){
-					EventDataPort edp = (EventDataPort) object; //TODO
+					EventDataPort edp = (EventDataPort) object; 
 					String dataType = AadlUtil.getSubcomponentTypeName(
 						edp.getDataFeatureClassifier(), object);
 					if (!dataType.equals("")) {
@@ -738,7 +744,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			PortInfoModel portInfo = em.getOutPortInfo();
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.Out,
-						getPortName(object));
+						getPortName(object), dpp.model_path);
 				em.setOutPortInfo(portInfo);
 			} else {
 				handleException(object,
@@ -765,14 +771,14 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.In,
-						getPortName(object));
+						getPortName(object), dpp.model_path);
 
 				portInfo.setMaxSeparationInterval(dpp.max);
 				portInfo.setMinSeparationInterval(dpp.min);
 
 				// process data type
 				if(object instanceof EventDataPort){
-					EventDataPort edp = (EventDataPort) object; //TODO
+					EventDataPort edp = (EventDataPort) object; 
 					String dataType = AadlUtil.getSubcomponentTypeName(
 							edp.getDataFeatureClassifier(), object);
 					if (!dataType.equals("")) {
@@ -818,7 +824,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			PortInfoModel portInfo = em.getOutPortInfo();
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.Out,
-						getPortName(object));
+						getPortName(object), dpp.model_path);
 				em.setOutPortInfo(portInfo);
 			} else {
 				handleException(object,
@@ -830,7 +836,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 			// process data type
 			if(object instanceof EventDataPort){
-				EventDataPort edp = (EventDataPort) object; //TODO
+				EventDataPort edp = (EventDataPort) object; 
 				String dataType = AadlUtil.getSubcomponentTypeName(
 						edp.getDataFeatureClassifier(), object);
 				if (!dataType.equals("")) {
@@ -849,7 +855,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				}
 			}
 			
-			portInfo.setSeparationInterval(dpp.min);//TODO
+			portInfo.setSeparationInterval(dpp.min);
 		}
 		
 	}
@@ -870,7 +876,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			PortInfoModel portInfo = em.getOutPortInfo();
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.Out,
-						getPortName(object));
+						getPortName(object), dpp.model_path);
 				em.setOutPortInfo(portInfo);
 			} else {
 				handleException(object,
@@ -882,7 +888,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 			// process data type
 			if(object instanceof EventDataPort){
-				EventDataPort edp = (EventDataPort) object;//TODO
+				EventDataPort edp = (EventDataPort) object;
 				String dataType = AadlUtil.getSubcomponentTypeName(
 						edp.getDataFeatureClassifier(), object);
 				if (!dataType.equals("")) {
@@ -922,7 +928,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			PortInfoModel portInfo = em.getInPortInfo();
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.In,
-						getPortName(object));
+						getPortName(object), dpp.model_path);
 
 				portInfo.setMaxSeparationInterval(dpp.max);
 				portInfo.setMinSeparationInterval(dpp.min);
@@ -954,7 +960,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			PortInfoModel portInfo = em.getOutPortInfo();
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.Out,
-						getPortName(object));
+						getPortName(object), dpp.model_path);
 				em.setOutPortInfo(portInfo);
 			} else {
 				handleException(object,
