@@ -1,8 +1,5 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;

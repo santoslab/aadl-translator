@@ -37,8 +37,6 @@ import org.osate.aadl2.RecordValue;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.SystemType;
-import org.osate.aadl2.impl.FeatureGroupImpl;
-import org.osate.aadl2.impl.FeatureGroupTypeImpl;
 import org.osate.aadl2.modelsupport.errorreporting.MarkerParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
@@ -182,8 +180,8 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						ModalPropertyValue physioProperty = pa.getOwnedValues()
 								.get(0);
 						if (physioProperty.getOwnedValue() instanceof StringLiteral) {
-							StringLiteral sl = (StringLiteral) physioProperty
-									.getOwnedValue();
+//							StringLiteral sl = (StringLiteral) physioProperty
+//									.getOwnedValue();
 //							System.err.println("MDC_ATTR_ID_PHYSIO:"
 //									+ sl.getValue());
 						}
@@ -191,8 +189,8 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 						ModalPropertyValue unitProperty = pa.getOwnedValues()
 								.get(0);
 						if (unitProperty.getOwnedValue() instanceof StringLiteral) {
-							StringLiteral sl = (StringLiteral) unitProperty
-									.getOwnedValue();
+//							StringLiteral sl = (StringLiteral) unitProperty
+//									.getOwnedValue();
 /*							System.err.println("MDC_ATTR_UNIT_CODE:"
 									+ sl.getValue());*/
 						}
@@ -443,11 +441,6 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			em = exMethods.createExchangeModel(exchangeName, object);
 		}
 
-		Element element = object.getOwner();
-		if(element instanceof FeatureGroupType){
-			FeatureGroupType fgti = (FeatureGroupType) element;
-		}
-		
 		exMethods.populatePortProperty(em, object, dpp);
 		updateExchangeModel(exchangeName, em);
 		
@@ -523,7 +516,6 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				.getRecordFieldValue(rvi, "Output_Rate");
 		StringLiteral model_path = (StringLiteral) PropertyUtils
 				.getRecordFieldValue(rvi, "Model_Path");
-		System.err.println("Model_Path:" + model_path);
 		
 		return new DML_Port_Properties(
 				convertNamedValueToEnumerationLiteralString(comm_role),
@@ -610,46 +602,46 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 				fullPortName.length() - suffix.length());
 	}
 	
-	private int getMaxSeperationIntervalFromRange(EventDataPort object) {
-		RangeValue rv = getSeperationIntervalRange(object);
-		if (rv != null) {
-			IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
+//	private int getMaxSeperationIntervalFromRange(EventDataPort object) {
+//		RangeValue rv = getSeperationIntervalRange(object);
+//		if (rv != null) {
+//			IntegerLiteral max = (IntegerLiteral) rv.getMaximumValue();
+//
+//			log.log(Level.FINE, "Seperation Interval Max " + max.getValue());
+//
+//			return (int) max.getValue();
+//		} else {
+//			// TODO: if it is mandatory, process error
+//			return 0;
+//		}
+//
+//	}
 
-			log.log(Level.FINE, "Seperation Interval Max " + max.getValue());
-
-			return (int) max.getValue();
-		} else {
-			// TODO: if it is mandatory, process error
-			return 0;
-		}
-
-	}
-
-	private int getMinSeperationIntervalFromRange(EventDataPort object) {
-		RangeValue rv = getSeperationIntervalRange(object);
-		if (rv != null) {
-			IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
-			log.log(Level.FINE, "Seperation Interval Min " + min.getValue());
-			return (int) min.getValue();
-		} else {
-			// TODO: if it is mandatory, process error
-			return 0;
-		}
-	}
-	
-	private RangeValue getSeperationIntervalRange(EventDataPort object) {
-		Property pr = GetProperties.lookupPropertyDefinition(object,
-				"MDCF_Comm_Props", "separation_interval_range");
-		if (pr == null)
-			return null;
-
-		PropertyAcc pa = object.getPropertyValue(pr);
-		ModalPropertyValue mpv = pa.first().getOwnedValues().get(0);
-		if (mpv.getOwnedValue() instanceof RangeValue) {
-			return (RangeValue) mpv.getOwnedValue();
-		} else
-			return null;
-	}
+//	private int getMinSeperationIntervalFromRange(EventDataPort object) {
+//		RangeValue rv = getSeperationIntervalRange(object);
+//		if (rv != null) {
+//			IntegerLiteral min = (IntegerLiteral) rv.getMinimumValue();
+//			log.log(Level.FINE, "Seperation Interval Min " + min.getValue());
+//			return (int) min.getValue();
+//		} else {
+//			// TODO: if it is mandatory, process error
+//			return 0;
+//		}
+//	}
+//	
+//	private RangeValue getSeperationIntervalRange(EventDataPort object) {
+//		Property pr = GetProperties.lookupPropertyDefinition(object,
+//				"MDCF_Comm_Props", "separation_interval_range");
+//		if (pr == null)
+//			return null;
+//
+//		PropertyAcc pa = object.getPropertyValue(pr);
+//		ModalPropertyValue mpv = pa.first().getOwnedValues().get(0);
+//		if (mpv.getOwnedValue() instanceof RangeValue) {
+//			return (RangeValue) mpv.getOwnedValue();
+//		} else
+//			return null;
+//	}
 	
 	class GetRequestExchangeMethods implements ExchangeMethods{
 
