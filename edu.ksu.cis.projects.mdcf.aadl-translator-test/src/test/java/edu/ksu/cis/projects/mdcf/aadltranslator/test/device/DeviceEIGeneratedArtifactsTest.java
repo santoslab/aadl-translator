@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.DoTranslationOfflineTest;
+//import edu.ksu.cis.projects.mdcf.aadltranslator.DoTranslationOfflineTest;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
@@ -70,8 +70,8 @@ public class DeviceEIGeneratedArtifactsTest {
 	@Test
 	public void testPulseOx() {
 		deviceComponentModel = AllTests.runDeviceTransTest("PulseOx", "PulseOx");
-		//DoTranslationOfflineTest doTranslationTest = new DoTranslationOfflineTest();
-		//System.err.println(doTranslationTest.buildDeviceSuperType(deviceComponentModel));
+//		DoTranslationOfflineTest doTranslationTest = new DoTranslationOfflineTest();
+//		System.err.println(doTranslationTest.buildDeviceSuperType(deviceComponentModel));
 		assertTrue(true);
 	}
 }
