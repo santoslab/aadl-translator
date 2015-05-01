@@ -44,9 +44,9 @@ public final class ErrorTranslator {
 
 		// If our classifier doesn't have an EMV2 block, then it doesn't have
 		// occurrences so we can just stop now
-		if(EMV2Util.getOwnEMV2Subclause(cl) == null)
+		if (EMV2Util.getOwnEMV2Subclause(cl) == null)
 			return;
-		
+
 		try {
 			for (PropertyAssociation pa : EMV2Util.getOwnEMV2Subclause(cl)
 					.getProperties()) {
@@ -80,10 +80,13 @@ public final class ErrorTranslator {
 				// Constraint
 				nv = ((NamedValue) PropertyUtils.getRecordFieldValue(rv,
 						"ViolatedConstraint"));
-				PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
-				pc = (PropertyConstant) nv.getNamedValue();
-				cm = systemModel.getConstraintByName(pc.getName());
-
+				if (nv != null) {
+					// Constraints are optional, typically they aren't used for
+					// non-hazardous / non-applicable occurrences
+					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
+					pc = (PropertyConstant) nv.getNamedValue();
+					cm = systemModel.getConstraintByName(pc.getName());
+				}
 				// Title
 				title = ((StringLiteral) PropertyUtils.getRecordFieldValue(rv,
 						"Title")).getValue();
@@ -102,9 +105,13 @@ public final class ErrorTranslator {
 				// ErrorType
 				ReferenceValue reva = (ReferenceValue) PropertyUtils
 						.getRecordFieldValue(cause, "ErrorType");
-				ContainmentPathElement cpe = (ContainmentPathElement) reva
-						.getContainmentPathElements().get(0);
-				errorType = errorTypes.get(cpe.getNamedElement().getName());
+				if (reva != null) {
+					// ErrorTypes are optional, typically they aren't used for
+					// non-hazardous / non-applicable occurrences
+					ContainmentPathElement cpe = (ContainmentPathElement) reva
+							.getContainmentPathElements().get(0);
+					errorType = errorTypes.get(cpe.getNamedElement().getName());
+				}
 
 				// Compensation
 				compensation = ((StringLiteral) PropertyUtils
@@ -116,9 +123,6 @@ public final class ErrorTranslator {
 				if (keyword == null) {
 					throw new MissingRequiredPropertyException(
 							"Got an occurrence property missing the required subproperty \"Kind\"");
-				} else if (cm == null) {
-					throw new MissingRequiredPropertyException(
-							"Got an occurrence property missing the required subproperty \"ViolatedConstraint\"");
 				} else if (title.equals("$UNSET$")) {
 					throw new MissingRequiredPropertyException(
 							"Got an occurrence property missing the required subproperty \"Title\"");
@@ -128,9 +132,6 @@ public final class ErrorTranslator {
 				} else if (compensation.equals("$UNSET$")) {
 					throw new MissingRequiredPropertyException(
 							"Got an occurrence property missing the required subproperty \"Compensation\"");
-				} else if (errorType == null) {
-					throw new MissingRequiredPropertyException(
-							"Got an occurrence property missing the required subproperty \"ErrorType\"");
 				}
 
 				// Create model

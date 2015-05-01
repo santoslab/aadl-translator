@@ -29,11 +29,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.osate.core.test.Aadl2UiInjectorProvider;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.xtext.junit4.InjectWith;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -75,6 +77,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.HazardReportViewTests;
 
 @RunWith(Suite.class)
+//@InjectWith(typeof(Aadl2UiInjectorProvider)) Look into this, could remove 10s wait time
 @Suite.SuiteClasses({
 		// Model Tests
 		SystemModelTests.class,
