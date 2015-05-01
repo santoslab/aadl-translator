@@ -92,7 +92,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 		// Device EI tests
 		// Disabled by Sam, 11/8/14 -- all tests in this class just assume(true)
 //		DeviceEIGeneratedArtifactsTest.class,
-		DeviceEIAADLSystemErrorTest.class,
+//		DeviceEIAADLSystemErrorTest.class,
 
 		// View tests
 		AppSuperClassViewTests.class,
