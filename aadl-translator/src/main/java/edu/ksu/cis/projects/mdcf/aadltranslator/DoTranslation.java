@@ -183,10 +183,10 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 			hazardAnalysis.setErrorTypes(errors);
 			hazardAnalysis.setSystemModel(archTranslator.getSystemModel());
-			hazardAnalysis.parseOccurrences(archTranslator
+			hazardAnalysis.parseEMV2(archTranslator
 					.getSystemImplementation());
 			for(ProcessImplementation process : archTranslator.getProcessImplementations()){
-				hazardAnalysis.parseOccurrences(process);
+				hazardAnalysis.parseEMV2(process);
 			}
 
 			IProject proj = targetFile.getProject();

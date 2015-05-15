@@ -371,7 +371,7 @@ public class AllTests {
 		}
 
 		hazardAnalysis.setSystemModel(stats.getSystemModel());
-		hazardAnalysis.parseOccurrences(stats.getSystemImplementation());
+		hazardAnalysis.parseEMV2(stats.getSystemImplementation());
 
 		return stats.getSystemModel();
 	}
