@@ -1,0 +1,2 @@
+  private MdcfReceiverPort<Integer> SpO2ReceiverPort; 
+  private MdcfSenderPort<Object> DerivedAlarmSenderPort; 
