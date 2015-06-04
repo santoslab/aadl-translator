@@ -5,8 +5,8 @@ import mdcf.channelservice.common.MdcfMessage;
 
 public class <model.name> extends <model.name>SuperType {
 
-  public <model.name>(String GUID) {
-    super(GUID);
+  public <model.name>(String GUID, String host) {
+    super(GUID, host);
   }
 
   @Override

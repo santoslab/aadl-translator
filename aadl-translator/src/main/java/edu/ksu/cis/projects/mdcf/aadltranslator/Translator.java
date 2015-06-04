@@ -596,7 +596,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				tm.setPeriod(period);
 				tm.setDeadline(deadline);
 				tm.setWcet(wcet);
-				tm.setTrigPortInfo(dm.getInPortNames().get(obj.getName()), dm
+				String trigPortName = dm.getInPortNames().get(obj.getName());
+				if(trigPortName == null)
+					trigPortName = dm.getInPortNames().get("Raw"+obj.getName());
+				tm.setTrigPortInfo(trigPortName, dm
 						.getPortByName(obj.getName()).getType(), obj.getName(),
 						false);
 			} catch (DuplicateElementException | NotImplementedException e) {
@@ -606,22 +609,41 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		private void handleImplicitPort(Port obj) {
-			PortModel in_pm = new PortModel();
-			PortModel out_pm = componentModel.getPortByName(obj.getName());
-			in_pm.setName("Raw" + out_pm.getName());
-			in_pm.setType(out_pm.getType());
-			in_pm.setMinPeriod(out_pm.getMinPeriod());
-			in_pm.setMaxPeriod(out_pm.getMaxPeriod());
-			in_pm.setSubscribe(!out_pm.isSubscribe());
-			in_pm.setCategory(out_pm.getCategory());
-			try {
-				componentModel.addPort(in_pm);
-				((DeviceModel) componentModel).addOutPortName(in_pm.getName(),
-						out_pm.getName());
-			} catch (DuplicateElementException e) {
-				handleException(obj, e);
-				return;
+			if(obj.isIn()){
+				PortModel in_pm = componentModel.getPortByName(obj.getName());
+				PortModel out_pm = new PortModel();
+				out_pm.setName("Raw" + in_pm.getName());
+				out_pm.setType(in_pm.getType());
+				out_pm.setMinPeriod(in_pm.getMinPeriod());
+				out_pm.setMaxPeriod(in_pm.getMaxPeriod());
+				out_pm.setSubscribe(!in_pm.isSubscribe());
+				out_pm.setCategory(in_pm.getCategory());
+				try {
+					componentModel.addPort(out_pm);
+					((DeviceModel) componentModel).addOutPortName(in_pm.getName(), out_pm.getName());
+				} catch (DuplicateElementException e) {
+					handleException(obj, e);
+					return;
+				}
+			} else {
+				PortModel in_pm = new PortModel();
+				PortModel out_pm = componentModel.getPortByName(obj.getName());
+				in_pm.setName("Raw" + out_pm.getName());
+				in_pm.setType(out_pm.getType());
+				in_pm.setMinPeriod(out_pm.getMinPeriod());
+				in_pm.setMaxPeriod(out_pm.getMaxPeriod());
+				in_pm.setSubscribe(!out_pm.isSubscribe());
+				in_pm.setCategory(out_pm.getCategory());
+				try {
+					componentModel.addPort(in_pm);
+					((DeviceModel) componentModel).addOutPortName(in_pm.getName(),
+							out_pm.getName());
+				} catch (DuplicateElementException e) {
+					handleException(obj, e);
+					return;
+				}
 			}
+			
 		}
 
 		private void handleThreadProperties(ThreadType obj, TaskModel tm) {

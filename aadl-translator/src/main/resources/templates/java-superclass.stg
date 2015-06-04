@@ -188,11 +188,11 @@ private void set<name>(<type> val){
 
 constructor(model) ::=<<
 <if(model.pseudoDevice)>
-public <model.name>(String GUID) {
+public <model.name>(String GUID, String host) {
 <else>
-public <model.name>SuperType(String GUID) {
+public <model.name>SuperType(String GUID, String host) {
 <endif>
-  super(GUID, "<model.name>");
+  super(GUID, "<model.name>", host);
   taskInstanceMap = new HashMap\<>();
   receiverPortMap = new HashMap\<>();
   <model.children.keys:{k |<taskInstanceMapEntry(k)>
@@ -209,13 +209,13 @@ taskInstanceMap.put(<exchName>Task.class.getSimpleName(), new <exchName>Task());
 >>
 
 portDeclarations(model) ::=<<
-  <model.ports.values:{v |<portDeclarations(v)>}>
+  <model.ports.values:{v |<portDeclaration(v)>}>
 >>
 
 portDeclaration(port) ::=<<
 <if(port.subscribe)>
-private MdcfReceiverPort\<<port.type>\> <port.name>ReceiverPort = new MdcfReceiverPort\<>("<port.name>In", <port.type>.class);<else>
-private MdcfSenderPort\<<port.type>\> <port.name>SenderPort = new MdcfSenderPort\<>("<port.name>Out", <port.type>.class);<endif> 
+private MdcfReceiverPort\<<port.type>\> <port.name>ReceiverPort;<else>
+private MdcfSenderPort\<<port.type>\> <port.name>SenderPort;<endif> 
 >>
 
 headerAndFields(model) ::=<<
