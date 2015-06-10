@@ -667,7 +667,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			dm.setSystemName(systemModel.getName());
 			try {
 				String componentType = checkCustomProperty(obj, "Component_Type", "enum");
-				dm.setComponentType(componentType);
+				if(componentType != null)
+					dm.setComponentType(componentType);
 				systemModel.addDevice(dm.getName(), dm);
 				componentModel = dm;
 			} catch (DuplicateElementException e) {
