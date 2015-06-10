@@ -125,15 +125,4 @@ public class ControllerErrorTests {
 				"Error at PulseOx_Forwarding_DevToDev_System.aadl:28: Device to device connections are not yet allowed.",
 				errorSB.toString().trim());
 	}
-
-	@Test
-	public void testTypelessDev() {
-		usedProperties.add("PulseOx_Forwarding_Properties");
-		usedDevices.add("Typeless_PulseOx_Interface");
-		runArchTransTest("TypelessPulseOx",
-				"PulseOx_Forwarding_TypelessPO_System");
-		assertEquals(
-				"Error at PulseOx_Forwarding_TypelessPO_System.aadl:13: Devices must declare their role with MAP_Properties::Component_Type",
-				errorSB.toString().trim());
-	}
 }
