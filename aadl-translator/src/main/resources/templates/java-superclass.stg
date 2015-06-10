@@ -215,7 +215,7 @@ portDeclarations(model) ::=<<
 portDeclaration(port) ::=<<
 <if(port.subscribe)>
 private MdcfReceiverPort\<<port.type>\> <port.name>ReceiverPort;<else>
-private MdcfSenderPort\<<port.type>\> <port.name>SenderPort;<endif> 
+protected MdcfSenderPort\<<port.type>\> <port.name>SenderPort;<endif> 
 >>
 
 headerAndFields(model) ::=<<
