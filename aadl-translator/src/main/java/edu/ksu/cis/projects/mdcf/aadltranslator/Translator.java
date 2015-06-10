@@ -708,10 +708,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			} else {
 				// TODO: This should never happen... handle it?
 			}
-
 			((DeviceModel) dm).setParentName(systemModel.getName());
 			try {
 				String componentType = checkCustomProperty(obj, "Component_Type", PropertyType.ENUM);
+				if(componentType != null)
+					dm.setComponentType(componentType);
 				dm.setComponentType(componentType);
 				systemModel.addChild(dm.getName(), dm);
 				componentModel = dm;
