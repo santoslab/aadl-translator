@@ -711,16 +711,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 			((DeviceModel) dm).setParentName(systemModel.getName());
 			try {
-				String componentType = checkCustomProperty(obj,
-						"Component_Type", PropertyType.ENUM);
-				if (componentType == null)
-					throw new MissingRequiredPropertyException(
-							"Devices must declare their role with MAP_Properties::Component_Type");
+				String componentType = checkCustomProperty(obj, "Component_Type", PropertyType.ENUM);
 				dm.setComponentType(componentType);
 				systemModel.addChild(dm.getName(), dm);
 				componentModel = dm;
-			} catch (DuplicateElementException
-					| MissingRequiredPropertyException e) {
+			} catch (DuplicateElementException e) {
 				handleException(obj, e);
 				return DONE;
 			}
