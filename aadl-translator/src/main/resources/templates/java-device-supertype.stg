@@ -66,6 +66,8 @@ import mdcf.device.exchanges.SporadicExchange;
 import mdcf.device.exchanges.ActionExchange;
 import mdcf.device.exchanges.PeriodicExchange;
 import mdcf.messagebus.config.Constants;
+import mdcf.device.RangeAlert;
+import mdcf.device.Range;
 >>
 
 

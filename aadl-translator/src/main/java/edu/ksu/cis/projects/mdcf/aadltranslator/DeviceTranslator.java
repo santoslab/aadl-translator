@@ -83,7 +83,8 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			for (Element e : obj.getOwnedPublicSection().getOwnedElements()) {
 
 				if (e instanceof SystemType) {
-					if (((SystemType) e).getName().endsWith("Device")) {
+					//if (((SystemType) e).getName().endsWith("Device")) {
+					if (!((SystemType) e).getName().contains("Channels")) {
 						process(e);
 					}
 				} else if (e instanceof SystemImplementation) {
@@ -91,7 +92,8 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 							.getName().split("\\.");
 
 					if (systemImplName.length > 0
-							&& systemImplName[0].endsWith("Device")) {
+					//		&& systemImplName[0].endsWith("Device")) {
+							&& !systemImplName[0].contains("Channels")) {
 						process(e);
 					}
 				} else if (e instanceof FeatureGroupType) {
@@ -512,16 +514,18 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 		NamedValue comm_role = (NamedValue) PropertyUtils
 				.getRecordFieldValue(rvi, "Comm_Role");
-		RangeValue output_rate = (RangeValue) PropertyUtils
-				.getRecordFieldValue(rvi, "Output_Rate");
+//		RangeValue output_rate = (RangeValue) PropertyUtils
+//				.getRecordFieldValue(rvi, "Output_Rate");
+		RangeValue separation_interval = (RangeValue) PropertyUtils
+				.getRecordFieldValue(rvi, "Separation_Interval");
 		StringLiteral model_path = (StringLiteral) PropertyUtils
 				.getRecordFieldValue(rvi, "Model_Path");
 		
 		return new DML_Port_Properties(
 				convertNamedValueToEnumerationLiteralString(comm_role),
-				(int) ((IntegerLiteral) output_rate.getMinimumValue())
+				(int) ((IntegerLiteral) separation_interval.getMinimumValue())
 						.getValue(),
-				(int) ((IntegerLiteral) output_rate.getMaximumValue())
+				(int) ((IntegerLiteral) separation_interval.getMaximumValue())
 						.getValue(),
 				model_path==null ? "Path Info Not Available" : model_path.getValue());
 	}

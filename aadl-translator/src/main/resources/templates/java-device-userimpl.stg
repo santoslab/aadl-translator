@@ -2,6 +2,8 @@ userimpl(model) ::=<<
 package mdcf.device.$model.name$;
 
 import mdcf.device.common.messages.Confirmation.Status;
+import mdcf.device.RangeAlert;
+import mdcf.device.Range;
 
 public class $model.name$ extends $model.name$SuperType {
 
