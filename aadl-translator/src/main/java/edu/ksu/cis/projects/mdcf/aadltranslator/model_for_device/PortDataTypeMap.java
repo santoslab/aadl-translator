@@ -11,8 +11,14 @@ public class PortDataTypeMap {
 
 			{
 				put("Integer", "new Integer(0)");
+				put("Float", "new Float(0.0f)");
 				put("String", "\"\"");
 				put("Boolean", "new Boolean(false)");
+				put("RangeFloat", "new RangeFloat(0.0f,0.0f)");
+				put("RangeInteger", "new RangeFloat(0,0)");
+				put("RangeAlertFloat", "new RangeAlertFloat(0.0f,0.0f)");
+				put("RangeAlertInteger", "new RangeAlertFloat(0,0)");
+
 			}});
 	
 	public static String getJavaTypeDefaultValueString(String type){
@@ -29,16 +35,16 @@ public class PortDataTypeMap {
 				{
 					put("ICE_Types::ICE_VMD_Status", "String");
 					put("ICE_Types::ICE_Status", "String");
-					put("ICE_Types::ICE_Setting", "Integer");
+					put("ICE_Types::ICE_Setting", "Float");
 
-					put("ICE_Types::ICE_SpO2_Numeric", "Integer");
-					put("ICE_Types::ICE_PulseRate_Numeric", "Integer");
-					put("ICE_Types::ICE_EtCo2_Numeric", "Integer");
-					put("ICE_Types::ICE_RespiratoryRate_Numeric", "Integer");
+					put("ICE_Types::ICE_SpO2_Numeric", "Float");
+					put("ICE_Types::ICE_PulseRate_Numeric", "Float");
+					put("ICE_Types::ICE_EtCo2_Numeric", "Float");
+					put("ICE_Types::ICE_RespiratoryRate_Numeric", "Float");
 					
-					put("ICE_Types::ICE_BloodPressure_Mean_Numeric", "Integer");
-					put("ICE_Types::ICE_BloodPressure_Diastolic_Numeric", "Integer");
-					put("ICE_Types::ICE_BloodPressure_Systolic_Numeric", "Integer");
+					put("ICE_Types::ICE_BloodPressure_Mean_Numeric", "Float");
+					put("ICE_Types::ICE_BloodPressure_Diastolic_Numeric", "Float");
+					put("ICE_Types::ICE_BloodPressure_Systolic_Numeric", "Float");
 
 					
 					put("ICE_Types::PCAF_Warning_Below_VTBI_Soft_Limit", "Integer");
@@ -124,6 +130,7 @@ public class PortDataTypeMap {
 					put("ICE_Types::ICE_PCAF_OperationalMode_Status", "Integer");
 					put("ICE_Types::ICE_PCAF_CalculatedFluidPressure_Status", "Integer");
 					put("ICE_Types::ICE_PCAF_MeasuredFluidPressure_Status", "Integer");
+					put("ICE_Types::ICE_PCAF_LockoutTimer_Status", "Integer");
 
 					put("ICE_Types::ICE_PCAF_OperationalStatus_Status", "Integer");
 					put("ICE_Types::ICE_PCAF_VolumeInfusedActualTotal_Status", "Integer");
@@ -143,7 +150,9 @@ public class PortDataTypeMap {
 					put("ICE_Types::ICE_SimplePCA_PumpState_Status", "Integer");
 					put("ICE_Types::ICE_SimplePCA_LoadingBolus_Setting", "Integer");
 
-			
+					put("ICE_Types::ICE_FloatRangeValueAlert", "RangeAlertFloat");
+					put("ICE_Types::ICE_FloatRangeSetting", "RangeFloat");
+
 
 					put("MDCF_Types::BolusLoading", "Integer");
 					put("MDCF_Types::BolusDose", "Integer");
