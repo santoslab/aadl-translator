@@ -34,6 +34,6 @@ public class ActionExchangeModel extends ExchangeModel {
 	}
 	
 	public int getMaxSeparationInterval(){
-		return this.inPortInfo.getMinSeparationInterval();
+		return this.inPortInfo.getMaxSeparationInterval();
 	}
 }

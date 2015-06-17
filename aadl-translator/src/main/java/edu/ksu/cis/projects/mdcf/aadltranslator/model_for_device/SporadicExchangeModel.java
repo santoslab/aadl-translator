@@ -24,4 +24,12 @@ public class SporadicExchangeModel extends ExchangeModel {
 	public String getSendMessageType(){
 		return this.outPortInfo.getMessageType();
 	}
+	
+	public int getMinSeparationInterval(){
+		return this.outPortInfo.getMinSeparationInterval();
+	}
+	
+	public int getMaxSeparationInterval(){
+		return this.outPortInfo.getMaxSeparationInterval();
+	}
 }
