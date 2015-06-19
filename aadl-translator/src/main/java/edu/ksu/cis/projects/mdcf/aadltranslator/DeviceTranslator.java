@@ -465,14 +465,35 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 		String[] split_pieces = fullPortName.split("_");
 		String suffix = "_" + split_pieces[split_pieces.length - 1];
 
-		return object.getNamespace().getFullName() + "_"
-				+ fullPortName.substring(0,
-						fullPortName.length() - suffix.length())
-				+ "_" + dpp.role;
+//		return object.getNamespace().getFullName() + "_"
+//				+ fullPortName.substring(0,
+//						fullPortName.length() - suffix.length())
+//				+ "_" + dpp.role;
+		
+		return packageName + "_"
+		+ fullPortName.substring(0,
+				fullPortName.length() - suffix.length())
+		+ "_" + dpp.role;
 	}
 	
-	private String getPortName(Port object) {
-		return object.getNamespace().getFullName() + "_" + object.getFullName();
+	private String getPortName(Port object, DML_Port_Properties dpp) {
+		//return object.getNamespace().getFullName() + "_" + object.getFullName();
+		String fullPortName = object.getFullName();
+		String[] split_pieces = fullPortName.split("_");
+		String suffix = "_" + split_pieces[split_pieces.length - 1];
+		
+		String suffix_removed = fullPortName.substring(0,fullPortName.length() - suffix.length());
+		String new_suffix = "";
+		if(suffix.equals("_in")){
+			new_suffix = "_recv_port";
+		} else if(suffix.equals("_out")){
+			if(dpp.role.equals("publisher"))
+				new_suffix = "_port";
+			else
+				new_suffix = "_send_port";
+		}
+		
+		return packageName + "_" + suffix_removed + new_suffix;
 	}
 	
 	class DML_Port_Properties {
@@ -661,7 +682,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			PortInfoModel portInfo = em.getInPortInfo();
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.In,
-						getPortName(object), dpp.model_path);
+						getPortName(object, dpp), dpp.model_path);
 				portInfo.setMaxSeparationInterval(dpp.max);
 				portInfo.setMinSeparationInterval(dpp.min);
 				
@@ -691,7 +712,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			PortInfoModel portInfo = em.getOutPortInfo();
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.Out,
-						getPortName(object), dpp.model_path);
+						getPortName(object, dpp), dpp.model_path);
 
 				// process data type
 				if(object instanceof EventDataPort){
@@ -740,7 +761,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			PortInfoModel portInfo = em.getOutPortInfo();
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.Out,
-						getPortName(object), dpp.model_path);
+						getPortName(object, dpp), dpp.model_path);
 				em.setOutPortInfo(portInfo);
 			} else {
 				handleException(object,
@@ -767,7 +788,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.In,
-						getPortName(object), dpp.model_path);
+						getPortName(object, dpp), dpp.model_path);
 
 				portInfo.setMaxSeparationInterval(dpp.max);
 				portInfo.setMinSeparationInterval(dpp.min);
@@ -820,7 +841,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			PortInfoModel portInfo = em.getOutPortInfo();
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.Out,
-						getPortName(object), dpp.model_path);
+						getPortName(object, dpp), dpp.model_path);
 				em.setOutPortInfo(portInfo);
 			} else {
 				handleException(object,
@@ -872,7 +893,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			PortInfoModel portInfo = em.getOutPortInfo();
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.Out,
-						getPortName(object), dpp.model_path);
+						getPortName(object, dpp), dpp.model_path);
 				em.setOutPortInfo(portInfo);
 			} else {
 				handleException(object,
@@ -924,7 +945,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			PortInfoModel portInfo = em.getInPortInfo();
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.In,
-						getPortName(object), dpp.model_path);
+						getPortName(object, dpp), dpp.model_path);
 
 				portInfo.setMaxSeparationInterval(dpp.max);
 				portInfo.setMinSeparationInterval(dpp.min);
@@ -956,7 +977,7 @@ public class DeviceTranslator extends AadlProcessingSwitchWithProgress {
 			PortInfoModel portInfo = em.getOutPortInfo();
 			if (portInfo == null) {
 				portInfo = new PortInfoModel(PortDirection.Out,
-						getPortName(object), dpp.model_path);
+						getPortName(object, dpp), dpp.model_path);
 				em.setOutPortInfo(portInfo);
 			} else {
 				handleException(object,
