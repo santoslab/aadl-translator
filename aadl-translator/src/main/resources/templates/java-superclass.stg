@@ -195,9 +195,16 @@ public <model.name>SuperType(String GUID, String host) {
   super(GUID, "<model.name>", host);
   taskInstanceMap = new HashMap\<>();
   receiverPortMap = new HashMap\<>();
-  <model.tasks.keys:{k |<taskInstanceMapEntry(k)>
+  <model.ports.values:{v |<initPort(v)>
+  }><model.tasks.keys:{k |<taskInstanceMapEntry(k)>
   }><model.receivePorts.keys:{k |<receiverPortMapEntry(k)>
   }>}
+>>
+
+initPort(port) ::=<<
+<if(port.subscribe)>
+<port.name>ReceiverPort = new MdcfReceiverPort\<<port.type>\>("<port.name>In", <port.type>.class, host);<else>
+<port.name>SenderPort = new MdcfSenderPort\<<port.type>\>("<port.name>Out", <port.type>.class, host);<endif> 
 >>
 
 receiverPortMapEntry(exchName) ::=<<
