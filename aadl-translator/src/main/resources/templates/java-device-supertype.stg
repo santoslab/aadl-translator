@@ -37,13 +37,76 @@ class(model) ::=<<
 	// ///////////////////////////////////////////////////////////////////////////
 	<exchangesClass(model)>
 }
+
+class Interface {
+	static void setUpConsoleWindow() {
+		//Do this so devices show in dock and can see output
+		JFrame frame = new JFrame("Nonin Pulse Ox Device");
+		frame.setSize(500, 300);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JTextArea txtConsole = new JTextArea();
+		txtConsole.setAutoscrolls(true);
+		txtConsole.setSize(500, 300);
+		txtConsole.setEditable(false);
+		txtConsole.setLineWrap(true);
+		DefaultCaret caret = (DefaultCaret)txtConsole.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		PrintStream out = new PrintStream( new TextAreaOutputStream( txtConsole ) );
+		System.setOut( out );
+		System.setErr( out );
+
+		JScrollPane scroll = new JScrollPane (txtConsole, 
+				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scroll.setAutoscrolls(true);
+		frame.add(scroll);
+		frame.setVisible (true);
+	}
+}
+class TextAreaOutputStream extends OutputStream {
+	private JTextArea textControl;
+
+	/**
+	 * Creates a new instance of TextAreaOutputStream which writes
+	 * to the specified instance of javax.swing.JTextArea control.
+	 *
+	 * @param control   A reference to the javax.swing.JTextArea
+	 *                  control to which the output must be redirected
+	 *                  to.
+	 */
+	public TextAreaOutputStream( JTextArea control ) {
+		textControl = control;
+	}
+
+	/**
+	 * Writes the specified byte as a character to the
+	 * javax.swing.JTextArea.
+	 *
+	 * @param   b   The byte to be written as character to the
+	 *              JTextArea.
+	 */
+	public void write( int b ) throws IOException {
+		// append the data as characters to the JTextArea control
+		textControl.append( String.valueOf( ( char )b ) );
+	}  
+}
 >>
 
 packageAndImports(model) ::=<<
 package mdcf.device.<model.name>;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.text.DefaultCaret;
+
 import com.google.common.io.CharStreams;
 
 import mdcf.channelservice.common.IMdcfMessageListener;
@@ -55,6 +118,7 @@ import mdcf.core.ctypes.device.DeviceComponent;
 import mdcf.core.ctypes.device.factory.common.IDeviceModel;
 import mdcf.core.messagetypes.devicemgmt.PubChannelAssignmentMsg;
 import mdcf.core.messagetypes.devicemgmt.SubChannelAssignmentMsg;
+import mdcf.debug.DebugMsg;
 import mdcf.device.common.messages.Request;
 import mdcf.device.common.messages.ActionRequest;
 import mdcf.device.common.messages.ActionResult;
@@ -84,6 +148,15 @@ loadDeviceModel(mode) ::=<<
 			readDML("<model.name>.dml.xml"));
 
 	public static void main(String[] args) {
+			String address = JOptionPane.showInputDialog(
+					null, "Enter the MDCF address:", Constants.getHostAddress());
+			
+			SwingUtilities.invokeLater(new Runnable() {
+	            public void run() {
+	            	Interface.setUpConsoleWindow();
+	            }
+	        });
+			DebugMsg.logInfo("Connecting to :" + address);
 			<model.name>SuperType dev = new <model.name>(Constants.getHostAddress());
 			dev.connectToNetworkController();
 	}
