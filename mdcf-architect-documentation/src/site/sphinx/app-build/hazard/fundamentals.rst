@@ -1,4 +1,4 @@
-.. include:: ../util/substitution.rst
+.. include:: ../../util/substitution.rst
 .. default-domain:: aadl
 .. _hazard-analysis-fundamentals:
 
@@ -203,8 +203,8 @@ Abbreviations
 -------------
 
 KVO
-	Keep Vein Open: A minimal rate (of drug administration) 
-	
+	Keep Vein Open: A minimal rate (of drug administration)
+
 Fundamentals
 ============
 

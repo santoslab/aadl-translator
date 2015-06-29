@@ -4,7 +4,13 @@
 
 .. |Update Site URL| replace:: *http://santoslab.org/pub/mdcf-architect/updatesite/*
 
+.. |ICE| replace:: `ICE <http://www.mdpnp.org/mdice.html>`__
+
 .. |MDCF| replace:: `MDCF <http://mdcf.santos.cis.ksu.edu/>`__
+
+.. |AADL| replace:: `AADL <https://wiki.sei.cmu.edu/aadl/index.php/Main_Page>`__
+
+.. |DML| replace:: `DML <http://mdcf.github.io/doc/dms/>`__
 
 .. |SEHC14 publication| replace:: `SEHC14 publication <http://samprocter.com/wp-content/uploads/2014/06/sehc14-aadl-for-map-apps.pdf>`__
 
@@ -12,11 +18,11 @@
 
 .. |EPL| replace:: `Eclipse Public License <http://www.eclipse.org/legal/epl-v10.html>`__
 
-.. |cog_go icon| image:: /tools/images/cog_go.png
+.. |cog_go icon| image:: /app-build/tools/images/cog_go.png
 
-.. |cog_error icon| image:: /tools/images/cog_error.png
+.. |cog_error icon| image:: /app-build/tools/images/cog_error.png
 
-.. |report_go icon| image:: /tools/images/report_go.png
+.. |report_go icon| image:: /app-build/tools/images/report_go.png
 
 .. |AADL book| replace:: `AADL book <http://books.google.com/books/about/Model_Based_Engineering_with_AADL.html?id=T_nOltBoX64C>`__
 

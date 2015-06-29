@@ -1,5 +1,6 @@
-.. include:: ../util/substitution.rst
+.. include:: ../../util/substitution.rst
 .. default-domain:: aadl
+.. _aadl-app-translator:
 
 #############################
 The MDCF-Architect Translator

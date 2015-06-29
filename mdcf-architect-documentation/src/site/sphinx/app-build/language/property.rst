@@ -1,4 +1,4 @@
-.. include:: ../util/substitution.rst
+.. include:: ../../util/substitution.rst
 .. default-domain:: aadl
 .. _aadl-properties-data:
 
@@ -98,7 +98,7 @@ Process Properties
    :example: ``display``
    
 Device Properties
-==================
+=================
 
 .. property:: component-type
 
@@ -111,7 +111,7 @@ Device Properties
    :example: ``sensor``
 
 Data Properties
-==================
+===============
 
 .. property:: data-representation
 

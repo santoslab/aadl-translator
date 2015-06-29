@@ -1,4 +1,4 @@
-.. include:: ../util/substitution.rst
+.. include:: ../../util/substitution.rst
 .. default-domain:: aadl
 
 ######################
@@ -41,7 +41,7 @@ Translation
 ***********
 
 Device components translate to the "pseudo devices" which are java classes that represent all the functionality requested from a certain device. These pseudo-devices are full logic components (equivalent to MDCF Architect :construct:`processes<process>`) complete with component configuration (*DeviceName*.compsig.xml) specifications.
-   
+
 .. literalinclude:: snippets/device.java
 	:language: java
 	:linenos:

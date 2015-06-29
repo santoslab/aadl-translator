@@ -1,4 +1,4 @@
-.. include:: ../util/substitution.rst
+.. include:: ../../util/substitution.rst
 .. default-domain:: aadl
 .. _hazard-analysis-components:
 
@@ -16,17 +16,17 @@ Error types are faults that are specific to the app being constructed.  They can
 
 Here's an example of the EMv2 error hierarchy used in our example app:
 
-+--------------------+----------------------+------------------+
-| Error Library Type | MAP Error Type       | App Error Type   |
-+====================+======================+==================+
-| LateDelivery       | LatePhysioDataError  | SpO2ValueLate    |
-+--------------------+----------------------+------------------+
-| IncorrectValue     | WrongPhysioDataError | SpO2ValueHigh    |
-+--------------------+----------------------+------------------+
-| N/A                | PhysioDeviceFailure  | NoSpO2Data       |
-+--------------------+----------------------+------------------+
-| N/A                | N/A                  | MissedAlarm      |
-+--------------------+----------------------+------------------+
++--------------------+----------------------+----------------+
+| Error Library Type | MAP Error Type       | App Error Type |
++====================+======================+================+
+| LateDelivery       | LatePhysioDataError  | SpO2ValueLate  |
++--------------------+----------------------+----------------+
+| IncorrectValue     | WrongPhysioDataError | SpO2ValueHigh  |
++--------------------+----------------------+----------------+
+| N/A                | PhysioDeviceFailure  | NoSpO2Data     |
++--------------------+----------------------+----------------+
+| N/A                | N/A                  | MissedAlarm    |
++--------------------+----------------------+----------------+
 
 .. construct:: error type
 

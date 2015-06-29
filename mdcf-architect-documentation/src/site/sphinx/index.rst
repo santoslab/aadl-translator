@@ -5,7 +5,6 @@
 
 .. include:: util/substitution.rst
 
-##########################################
 Welcome to MDCF Architect's documentation!
 ##########################################
 
@@ -14,24 +13,27 @@ Welcome to MDCF Architect's documentation!
 :organization: `SAnToS Laboratory <http://santoslab.org>`_, `Kansas State University <http://k-state.edu>`_
 :last updated: |today| (`changes <https://github.com/santoslab/aadl-translator/commits/master>`_)
 
-******************
-The MDCF Architect
-******************
+Modeling with MDCF Architect
+****************************
 
-The MDCF Architect is an `open source <https://github.com/santoslab/aadl-translator>`_ plugin for the |OSATE2| distribution of Eclipse that supports the development of `Medical Application Platform <http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=6197383&tag=1>`_ Apps. It operates on a :ref:`subset of AADL<aadl-subset-overview>`, and provides automatic translation to |MDCF| compatible, executable code. It also supports :ref:`hazard analysis annotations<hazard-analysis-overview>`, from which a hazard analysis report can be automatically generated.
+The MDCF Architect is a toolset for the development of physiometric devices and
+controller applications for
+`Medical Application Platforms <http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=6197383&tag=1>`_
+(MAPs). Tooling supports the automatic translation of |DML| models of such
+device and app components into |AADL| models, and from there into |MDCF|
+compatible, executable code as well as the generation of hazard analysis reports.
 
-********
 Contents
 ********
 
 .. toctree::
-	:titlesonly:
-	:includehidden:
-	:maxdepth: 2
+   :titlesonly:
+   :includehidden:
+   :maxdepth: 1
 
-	tools/translator.rst
-	language/overview.rst
-	hazard/overview.rst
+   app-build/guide
+   dev-build/guide
+   dml-build/guide
 
 
 .. admonition:: Acknowledgements
