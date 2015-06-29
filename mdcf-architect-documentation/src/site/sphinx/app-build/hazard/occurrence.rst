@@ -1,4 +1,4 @@
-.. include:: ../util/substitution.rst
+.. include:: ../../util/substitution.rst
 .. default-domain:: aadl
 .. _hazard-analysis-occurrence:
 
@@ -57,21 +57,21 @@ Unsafe Control Actions
 
 The occurrence properties (and supporting fundamentals) are used to generate tables of unsafe control actions.  There are two tables created: the first looks at all :construct:`port connections<portconnection>` (which are the system's control actions and feedback messages) as simple events, and documents how they could fail:
 
-+------------------+-----------------+------------------------+------------------+------------------+-------+------+
-| Control Action   | Providing       | Not providing          | Applied Too Long | Stopped Too Soon | Early | Late |
-+==================+=================+========================+==================+==================+=======+======+
-| spo2_to_display  |                 |                        |                  |                  |       |      |
-+------------------+-----------------+------------------------+------------------+------------------+-------+------+
-| alarm_to_display |                 | MissedAlarm (Bad SpO2) |                  |                  |       |      |
-+------------------+-----------------+------------------------+------------------+------------------+-------+------+
++------------------+-----------+------------------------+------------------+------------------+-------+------+
+| Control Action   | Providing | Not providing          | Applied Too Long | Stopped Too Soon | Early | Late |
++==================+===========+========================+==================+==================+=======+======+
+| spo2_to_display  |           |                        |                  |                  |       |      |
++------------------+-----------+------------------------+------------------+------------------+-------+------+
+| alarm_to_display |           | MissedAlarm (Bad SpO2) |                  |                  |       |      |
++------------------+-----------+------------------------+------------------+------------------+-------+------+
 
 The second table looks at port connections with ranged types (eg, integers and floats) and documents how they could fail:
 
-+----------------+----------------------------+---------------+
-| Control Action | Value Too High             | Value Too Low |
-+================+============================+===============+
-| spo2_to_display| BadInfoDisplayed (BadSpO2) |               |
-+----------------+----------------------------+---------------+
++-----------------+----------------------------+---------------+
+| Control Action  | Value Too High             | Value Too Low |
++=================+============================+===============+
+| spo2_to_display | BadInfoDisplayed (BadSpO2) |               |
++-----------------+----------------------------+---------------+
 
 Causes and Compensations
 ========================

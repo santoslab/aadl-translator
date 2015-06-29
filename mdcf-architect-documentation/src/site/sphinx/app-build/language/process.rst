@@ -1,4 +1,4 @@
-.. include:: ../util/substitution.rst
+.. include:: ../../util/substitution.rst
 .. default-domain:: aadl
 .. _aadl-process-component:
 
@@ -67,7 +67,7 @@ Translation
 ***********
 
 Process components translate to two java classes (a user-modifiable class and a supertype that hides MDCF-specific implementation details) that contain one or more :construct:`tasks<thread>`, which communicate with one another via shared state. That is, communication within one process is done via shared state, communication between two processes (or a process and a device) is done via :construct:`port connections<portconnection>`, which are realized as messages sent across the underlying middleware.
-   
+
 .. literalinclude:: snippets/process.java
 	:language: java
 	:linenos:
