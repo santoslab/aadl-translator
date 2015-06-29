@@ -1,0 +1,30 @@
+package PulseOx_Forwarding_Logic
+public
+with PulseOx_Forwarding_Types, MAP_Properties;
+
+	process PulseOx_Logic_Process
+	features
+		SpO2 : in data port PulseOx_Forwarding_Types::SpO2;
+		DerivedAlarm : out event port;
+	properties
+		MAP_Properties::Component_Type => logic;
+	end PulseOx_Logic_Process;
+
+	process implementation PulseOx_Logic_Process.imp
+	subcomponents
+		CheckSpO2Thread : thread CheckSpO2Thread.imp;
+	connections
+		outgoing_alarm : port CheckSpO2Thread.Alarm -> DerivedAlarm;
+	end PulseOx_Logic_Process.imp;
+	
+	thread CheckSpO2Thread
+	features
+		Alarm : out event port;
+	properties
+		Thread_Properties::Dispatch_Protocol => Periodic;
+	end CheckSpO2Thread;
+	
+	thread implementation CheckSpO2Thread.imp
+	end CheckSpO2Thread.imp;
+	
+end PulseOx_Forwarding_Logic;
