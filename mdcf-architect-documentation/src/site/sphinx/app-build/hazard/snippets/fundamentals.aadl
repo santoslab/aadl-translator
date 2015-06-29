@@ -1,0 +1,50 @@
+property set PulseOx_Forwarding_Error_Properties is
+with EMV2, MAP_Error_Properties;
+
+	TheContext : constant MAP_Error_Properties::Context => 
+		"Clinicians want to view physiological parameters on a display not physically connected to a physiological monitor.";
+		
+	NoAlarms : constant MAP_Error_Properties::Assumption =>
+		"There are no alarms that need forwarding.";
+		
+	KVO : constant MAP_Error_Properties::Abbreviation => [
+		Full => "Keep Vein Open";
+		Definition => "A minimal rate (of drug administration)";
+	];
+
+	DeathOrInjury : constant MAP_Error_Properties::Accident_Level => [
+		Level => 1;
+		Description => "A human is killed or seriously injured.";
+	];
+	
+	PatientHarmed : constant MAP_Error_Properties::Accident => [
+		Number => 1;
+		Description => "Patient is killed or seriously injured.";
+		Level => PulseOx_Forwarding_Error_Properties::DeathOrInjury;
+	];
+	
+	BadInfoDisplayed : constant MAP_Error_Properties::Hazard => [
+		Number => 1;
+		Description => "Incorrect information is sent to the display.";
+		Accident => PulseOx_Forwarding_Error_Properties::PatientHarmed;
+	];
+	
+	MissedAlarm : constant MAP_Error_Properties::Hazard => [
+		Number => 2;
+		Description => "An alarm that should be displayed is not.";
+		Accident => PulseOx_Forwarding_Error_Properties::PatientHarmed;
+	];
+	
+	ShowGoodInfo : constant MAP_Error_Properties::Constraint => [
+		Number => 1;
+		Description => "The app must accurately inform the display of the status of the patient's vital signs.";
+		Hazard => PulseOx_Forwarding_Error_Properties::BadInfoDisplayed;
+	];
+	
+	ShowAllAlarms : constant MAP_Error_Properties::Constraint => [
+		Number => 2;
+		Description => "The app must display all alarms that are clinically necessary.";
+		Hazard => PulseOx_Forwarding_Error_Properties::MissedAlarm;
+	];
+	
+end PulseOx_Forwarding_Error_Properties;
