@@ -41,3 +41,5 @@
 .. |prop data-representation| replace:: The representation of this datatype.
 
 .. |prop component-type| replace:: Whether this device is an ``actuator`` or ``sensor``
+
+.. |prop exchange-name| replace:: The name of the exchange that this port is a part of.

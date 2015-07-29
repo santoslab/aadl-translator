@@ -70,6 +70,16 @@ Port Properties
    :type: Time range
    :context: :construct:`port`
    :example: ``100 ms .. 300 ms``
+   
+.. property:: exchange-name
+
+	|prop exchange-name| Note that this is ignored on all non-:construct:`device` ports. This property is essentially a tag created by the code generator that produces the device interface to the binding algorithm that operates on the generated Java code. It is not intended to be user-modifiable.
+	
+   :default name: N/A
+   :override: MAP_Properties::Exchange_Name
+   :type: AADLString
+   :context: :construct:`port`
+   :example: ``spo2_per``
 
 Port Connection Properties
 ==========================
