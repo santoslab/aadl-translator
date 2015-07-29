@@ -2,8 +2,7 @@
   <mdcf.core.app.Channel>
     <chanName>$PLACEHOLDER$</chanName>
     <pubName>$PLACEHOLDER$</pubName>
-    <subName>SpO2In</subName>
-    <exchangeName>spo2_per</exchangeName>
+    <subName>RawSpO2In</subName>
     <pubComp>
       <name>$PLACEHOLDER$</name>
       <type>$PLACEHOLDER$</type>
@@ -19,7 +18,7 @@
   <mdcf.core.app.Channel>
     <chanName>$PLACEHOLDER$</chanName>
     <pubName>SpO2Out</pubName>
-    <subName>SpO2</subName>
+    <subName>SpO2In</subName>
     <pubComp>
       <name>pulseOx</name>
       <type>ICEpoInterface</type>
@@ -36,8 +35,7 @@
   <mdcf.core.app.Channel>
     <chanName>$PLACEHOLDER$</chanName>
     <pubName>$PLACEHOLDER$</pubName>
-    <subName>SpO2In</subName>
-    <exchangeName>spo2_per</exchangeName>
+    <subName>RawSpO2In</subName>
     <pubComp>
       <name>$PLACEHOLDER$</name>
       <type>$PLACEHOLDER$</type>
@@ -53,7 +51,7 @@
   <mdcf.core.app.Channel>
     <chanName>$PLACEHOLDER$</chanName>
     <pubName>SpO2Out</pubName>
-    <subName>SpO2</subName>
+    <subName>SpO2In</subName>
     <pubComp>
       <name>pulseOx</name>
       <type>ICEpoInterface</type>
@@ -69,8 +67,8 @@
 
   <mdcf.core.app.Channel>
     <chanName>$PLACEHOLDER$</chanName>
-    <pubName>DerivedAlarm</pubName>
-    <subName>DerivedAlarm</subName>
+    <pubName>DerivedAlarmOut</pubName>
+    <subName>DerivedAlarmIn</subName>
     <pubComp>
       <name>appLogic</name>
       <type>PulseOx_Logic_Process</type>
