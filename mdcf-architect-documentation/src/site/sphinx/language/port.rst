@@ -17,7 +17,9 @@ Properties, Contexts and Directions
 	Ports are typed, directed constructs over which a component can communicate with other components.
 	
 	:property OutputRate: |prop output-rate|
+	:property ExchangeName: |prop exchange-name|
 	:type OutputRate: :property:`MAP_Properties::Output_Rate<output-rate>`
+	:type ExchangeName: :property:`MAP_Properties::Exchange_Name<exchange-name>`
 	:context Device: A device port can communicate (via the underlying messaging service) with :construct:`process` elements in the app.
 	:context Process: A process port can communicate (via the underlying messaging service) with :construct:`process` and :construct:`device` elements in the app.
 	:context Thread: A thread port can communicate with :construct:`process` ports. Message arrival on an ``in`` process port that a thread port is bound to will cause the enclosing thread to be dispatched with the arriving message's payload as a parameter. ``out`` thread ports are a commitment to send messages on the bound process port.
@@ -30,8 +32,9 @@ Properties, Contexts and Directions
 	:trigger-type data: Message arrival must not be handled but will rather cause a predictably-named field to be updated. Messages have a payload of the port's type. Thread ports cannot have a ``data`` trigger.
 	
 .. note::
-	Triggers on ``out`` ports, while required by AADL, are ignored for MDCF Architect translation.
-
+	1. The ExchangeName property is ignored on ports not attached to devices.
+	2. Triggers on ``out`` ports, while required by AADL, are ignored for MDCF Architect translation.
+	
 .. construct:: port connection
 
 	Port connections are typed, directed links between ports. They are defined in the construct that contains the communicating components, eg, the parent defines the port connections for the children.
