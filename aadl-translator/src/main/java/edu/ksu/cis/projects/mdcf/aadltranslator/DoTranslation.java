@@ -166,7 +166,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		// 2) Get the list of files used in the model we're translating
 		HashSet<IFile> usedFiles = this.getUsedFiles();
 
-		// 3) Filter out the property sts
+		// 3) Filter out the property sets
 		filterPropertySets(rs, archTranslator, usedFiles);
 
 		// 4) Initialize the error reporter

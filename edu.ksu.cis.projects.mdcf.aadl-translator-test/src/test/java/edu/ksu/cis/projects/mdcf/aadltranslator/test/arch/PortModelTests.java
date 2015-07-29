@@ -74,4 +74,11 @@ public class PortModelTests {
 		assertEquals("DerivedAlarm", procSendPort.getName());
 		assertEquals("SpO2", procRecvPort.getName());
 	}
+	
+	@Test
+	public void testTraitValName(){
+		assertEquals("spo2_per", devSendPort.getTraitValName());
+		assertEquals(null, procSendPort.getTraitValName());
+		assertEquals(null, procRecvPort.getTraitValName());
+	}
 }

@@ -80,7 +80,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	};
 
 	private enum PropertyType {
-		ENUM, INT, RANGE_MIN, RANGE_MAX
+		ENUM, INT, RANGE_MIN, RANGE_MAX, STRING
 	};
 
 	private TranslationTarget target = null;
@@ -91,18 +91,23 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	private HashSet<ProcessImplementation> procImpls = new HashSet<>();
 
 	public class TranslatorSwitch extends Aadl2Switch<String> {
+		
 		/**
 		 * A reference to the "current" component model, stored for convenience
 		 */
 		private ComponentModel componentModel = null;
 		
 		/**
+<<<<<<< HEAD
 		 * A reference to the current component's parent
 		 */
 		private ComponentModel parentModel = null;
 				
 		/**
 		 * The last element to have been processed
+=======
+		 * A reference to the type of the last element processed
+>>>>>>> 2221eb7... Add support in the model for TraitVal's associated with ports
 		 */
 		private ElementType lastElemProcessed = ElementType.NONE;
 
@@ -387,7 +392,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				if (!cancelled()) {
 					handleImplicitPort(obj); // Implicit "in" port from device
 					handleImplicitTask(obj); // Implicit task to handle incoming
-												// data
+											 // data
 				}
 			} else if (lastElemProcessed == ElementType.THREAD) {
 				handlePort(obj);
@@ -396,7 +401,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		private void handlePort(Port obj) {
-			String typeName = null, minPeriod = null, maxPeriod = null;
+			String typeName = null, minPeriod = null, maxPeriod = null, traitValName = null;
 			Property typeNameProp = null;
 			try {
 
@@ -434,11 +439,14 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					throw new MissingRequiredPropertyException(
 							"Missing the required output rate specification.");
 
+				traitValName = checkCustomProperty(obj, "SourceTraitVal", PropertyType.STRING);
+				
 				PortModel pm = new PortModel();
 				pm.setName(obj.getName());
 				pm.setType(typeName);
 				pm.setMinPeriod(Integer.valueOf(minPeriod));
 				pm.setMaxPeriod(Integer.valueOf(maxPeriod));
+				pm.setTraitValName(traitValName);
 				if (obj.getDirection() == DirectionType.IN) {
 					pm.setSubscribe(true);
 				} else if (obj.getDirection() == DirectionType.OUT) {
@@ -461,7 +469,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				return;
 			}
 		}
-
+		
 		private void handleException(Element obj, Exception e) {
 			INode node = NodeModelUtils.findActualNodeFor(obj);
 			IResource file = OsateResourceUtil.convertToIResource(obj
@@ -827,6 +835,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						PropertyUtils.getScaledRangeMaximum(obj, prop,
 								GetProperties.findUnitLiteral(prop, "ms")),
 						obj, prop);
+			} else if (propType == PropertyType.STRING) {
+				return PropertyUtils.getStringValue(obj, prop);
+			} else {
+				System.err
+						.println("HandlePropertyValue called with garbage propType: "
+								+ propType);
 			}
 			return null;
 		}
@@ -933,10 +947,18 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				handleException(obj, e);
 				return;
 			}
-			String pubTypeName, pubPortName, subPortName, subTypeName, pubName, subName;
+
+			String pubTypeName, pubPortName, subPortName, subTypeName, pubName, subName, traitValName;
 			DevOrProcModel pubModel = null, subModel = null;
 			SystemConnectionModel connModel = new SystemConnectionModel();
+
 			String channelDelay = null;
+			
+			pubName = obj.getAllSourceContext().getName();
+			subName = obj.getAllDestinationContext().getName();
+			pubPortName = obj.getAllSource().getName();
+			subPortName = obj.getAllDestination().getName();
+			
 			try {
 				if ((obj.getAllSource().getOwner() instanceof DeviceType)
 						&& (obj.getAllDestination().getOwner() instanceof ProcessType)) {
@@ -986,10 +1008,6 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				return;
 			}
 
-			pubName = obj.getAllSourceContext().getName();
-			subName = obj.getAllDestinationContext().getName();
-			pubPortName = obj.getAllSource().getName();
-			subPortName = obj.getAllDestination().getName();
 			connModel.setPublisher(pubModel);
 			connModel.setSubscriber(subModel);
 			connModel.setPubName(pubName);
