@@ -393,7 +393,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 		appName = stats.getSystemModel().getName();
 		appSpecContents = midas_appspecSTG.getInstanceOf("appspec")
-				.add("system", stats.getSystemModel()).render();
+				.add("model", stats.getSystemModel()).render();
 		
 		// Write the files
 		if (stats.notCancelled()) {

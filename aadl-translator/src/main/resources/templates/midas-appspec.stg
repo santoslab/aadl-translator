@@ -78,6 +78,7 @@ deviceSubscribedChannel(chan) ::=<<
   <chanName>$PLACEHOLDER$</chanName>
   <pubName>#chan.pubPortName#Out</pubName>
   <subName>Raw#chan.subPortName#In</subName>
+  <exchangeName>#chan.exchangeName#</exchangeName>
   <pubComp>
     <name>#chan.pubName#</name>
     <type>#chan.publisher.name#</type>
@@ -117,6 +118,7 @@ devicePublishedChannel(chan) ::=<<
   <chanName>$PLACEHOLDER$</chanName>
   <pubName>$PLACEHOLDER$</pubName>
   <subName>Raw#chan.pubPortName#In</subName>
+  <exchangeName>#chan.exchangeName#</exchangeName>
   <pubComp>
     <name>$PLACEHOLDER$</name>
     <type>$PLACEHOLDER$</type>

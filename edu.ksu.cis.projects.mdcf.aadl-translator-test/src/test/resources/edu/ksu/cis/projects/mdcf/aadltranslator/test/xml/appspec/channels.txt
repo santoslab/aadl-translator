@@ -3,6 +3,7 @@
     <chanName>$PLACEHOLDER$</chanName>
     <pubName>$PLACEHOLDER$</pubName>
     <subName>RawSpO2In</subName>
+    <exchangeName>spo2_per</exchangeName>
     <pubComp>
       <name>$PLACEHOLDER$</name>
       <type>$PLACEHOLDER$</type>
@@ -36,6 +37,7 @@
     <chanName>$PLACEHOLDER$</chanName>
     <pubName>$PLACEHOLDER$</pubName>
     <subName>RawSpO2In</subName>
+    <exchangeName>spo2_per</exchangeName>
     <pubComp>
       <name>$PLACEHOLDER$</name>
       <type>$PLACEHOLDER$</type>
