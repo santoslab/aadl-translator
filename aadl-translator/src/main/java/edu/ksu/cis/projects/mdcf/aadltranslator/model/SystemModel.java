@@ -3,14 +3,17 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 
@@ -260,5 +263,31 @@ public class SystemModel {
 
 	public HashMap<String, String> getHazardReportDiagrams() {
 		return hazardReportDiagrams;
+	}
+	
+	public Collection<ConnectionModel> getUniqueDevicePublishedChannels(){
+		Set<ConnectionModel> chanSet = new HashSet<>(channels.values());
+		chanSet = Sets.filter(chanSet, ModelUtil.devicePublishedFilter);
+		
+		// Get a set that's distinct based on publishing identity 
+		// (publisher component name + publisher port name)
+		HashMap<String, ConnectionModel> chanMap = new HashMap<String, ConnectionModel>();
+		for(ConnectionModel cm : chanSet) {
+			chanMap.put(cm.getPubName().concat(cm.getPubPortName()), cm);
+		}
+		return chanMap.values();
+	}
+	
+	public Collection<ConnectionModel> getUniqueDeviceSubscribedChannels(){
+		Set<ConnectionModel> chanSet = new HashSet<>(channels.values());
+		chanSet = Sets.filter(chanSet, ModelUtil.deviceSubscribedFilter);
+		
+		// Get a set that's distinct based on subscriber identity 
+		// (subscriber component name + subscriber port name)
+		HashMap<String, ConnectionModel> chanMap = new HashMap<String, ConnectionModel>();
+		for(ConnectionModel cm : chanSet) {
+			chanMap.put(cm.getSubName().concat(cm.getSubPortName()), cm);
+		}
+		return chanMap.values();
 	}
 }

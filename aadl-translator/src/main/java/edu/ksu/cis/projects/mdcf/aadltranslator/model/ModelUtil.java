@@ -98,4 +98,16 @@ public class ModelUtil {
 			return connection.getSubscriber().getComponentType() == ComponentType.ACTUATOR;
 		}
 	};
+	
+	public final static Predicate<ConnectionModel> devicePublishedFilter = new Predicate<ConnectionModel>() {
+		public boolean apply(ConnectionModel connection) {
+			return connection.isDevicePublished();
+		}
+	};
+	
+	public final static Predicate<ConnectionModel> deviceSubscribedFilter = new Predicate<ConnectionModel>() {
+		public boolean apply(ConnectionModel connection) {
+			return connection.isDeviceSubscribed();
+		}
+	};
 }
