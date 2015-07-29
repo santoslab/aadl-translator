@@ -31,8 +31,8 @@ virtualComponent(name, component) ::=<<
 
 channels(model) ::=<<
 <channels>
-  #model.uniqueDevicePublishedChannels:{c |#deviceToPseudoDevChannel(c)#}#
-  #model.uniqueDeviceSubscribedChannels:{c |#pseudoDevToDeviceChannel(c)#}#
+  #model.uniqueDevicePublishedChannels.values:{c |#deviceToPseudoDevChannel(c)#}#
+  #model.uniqueDeviceSubscribedChannels.values:{c |#pseudoDevToDeviceChannel(c)#}#
   #model.channels.values:{c |#channel(c)#}#
 </channels>
 >>
