@@ -31,19 +31,16 @@ virtualComponent(name, component) ::=<<
 
 channels(model) ::=<<
 <channels>
-  #model.channels.values:{c |#channel(c)#
-  }#
+  #model.uniqueDevicePublishedChannels:{c |#deviceToPseudoDevChannel(c)#}#
+  #model.uniqueDeviceSubscribedChannels:{c |#pseudoDevToDeviceChannel(c)#}#
+  #model.channels.values:{c |#channel(c)#}#
 </channels>
 >>
 
 channel(chan) ::=<<
-#if(chan.devicePublished)#
-#devicePublishedChannel(chan)#
-#elseif (chan.deviceSubscribed)#
-#deviceSubscribedChannel(chan)#
-#else#
-#processToProcessChannel(chan)#
-#endif#
+#if(chan.devicePublished)##pseudoDevToAppComponentChannel(chan)#
+#elseif (chan.deviceSubscribed)##appComponentToPseudoDevChannel(chan)#
+#else##processToProcessChannel(chan)##endif#
 >>
 
 processToProcessChannel(chan) ::=<<
@@ -73,12 +70,11 @@ processToProcessChannel(chan) ::=<<
 </mdcf.core.app.Channel>
 >>
 
-deviceSubscribedChannel(chan) ::=<<
+appComponentToPseudoDevChannel(chan) ::=<<
 <mdcf.core.app.Channel>
   <chanName>$PLACEHOLDER$</chanName>
   <pubName>#chan.pubPortName#Out</pubName>
   <subName>Raw#chan.subPortName#In</subName>
-  <exchangeName>#chan.exchangeName#</exchangeName>
   <pubComp>
     <name>#chan.pubName#</name>
     <type>#chan.publisher.name#</type>
@@ -95,10 +91,14 @@ deviceSubscribedChannel(chan) ::=<<
   </subComp>
   <channelDelay>#chan.channelDelay#</channelDelay>
 </mdcf.core.app.Channel>
+>>
+
+pseudoDevToDeviceChannel(chan) ::=<<
 <mdcf.core.app.Channel>
   <chanName>$PLACEHOLDER$</chanName>
   <pubName>#chan.pubPortName#Out</pubName>
   <subName>$PLACEHOLDER$</subName>
+  <exchangeName>#chan.exchangeName#</exchangeName>  
   <pubComp>
     <name>#chan.subName#</name>
     <type>#chan.subscriber.name#</type>
@@ -113,7 +113,7 @@ deviceSubscribedChannel(chan) ::=<<
 </mdcf.core.app.Channel>
 >>
 
-devicePublishedChannel(chan) ::=<<
+deviceToPseudoDevChannel(chan) ::=<<
 <mdcf.core.app.Channel>
   <chanName>$PLACEHOLDER$</chanName>
   <pubName>$PLACEHOLDER$</pubName>
@@ -131,6 +131,9 @@ devicePublishedChannel(chan) ::=<<
   </subComp>
   <channelDelay>#chan.channelDelay#</channelDelay>
 </mdcf.core.app.Channel>
+>>
+
+pseudoDevToAppComponentChannel(chan) ::=<<
 <mdcf.core.app.Channel>
   <chanName>$PLACEHOLDER$</chanName>
   <pubName>#chan.pubPortName#Out</pubName>

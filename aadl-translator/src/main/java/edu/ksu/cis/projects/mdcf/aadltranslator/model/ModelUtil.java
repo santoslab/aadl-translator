@@ -112,4 +112,16 @@ public class ModelUtil {
 			return true;
 		}
 	};
+	
+	public final static Predicate<ConnectionModel> devicePublishedFilter = new Predicate<ConnectionModel>() {
+		public boolean apply(ConnectionModel connection) {
+			return connection.publisher instanceof DeviceModel;
+		}
+	};
+	
+	public final static Predicate<ConnectionModel> deviceSubscribedFilter = new Predicate<ConnectionModel>() {
+		public boolean apply(ConnectionModel connection) {
+			return connection.subscriber instanceof DeviceModel;
+		}
+	};
 }

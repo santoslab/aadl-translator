@@ -66,7 +66,7 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	/**
 	 * Maps diagram name (eg: SystemBoundary) to file path
 	 */
-	private HashMap<String, String> hazardReportDiagrams;
+	protected HashMap<String, String> hazardReportDiagrams;
 	
 	public ComponentModel(){
 		ports = new HashMap<>();
