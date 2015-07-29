@@ -33,7 +33,6 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.DefaultAnnexLibrary;
-import org.osate.aadl2.Device;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
@@ -383,7 +382,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 		appName = stats.getSystemModel().getName();
 		appSpecContents = midas_appspecSTG.getInstanceOf("appspec")
-				.add("system", stats.getSystemModel()).render();
+				.add("model", stats.getSystemModel()).render();
 		
 		// Write the files
 		if (stats.notCancelled()) {

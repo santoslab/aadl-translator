@@ -352,7 +352,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		private void handlePort(Port obj) {
 			// if (lastElemProcessed == ElementType.PROCESS) {
-			String typeName = null, minPeriod = null, maxPeriod = null, traitValName = null;
+			String typeName = null, minPeriod = null, maxPeriod = null, exchangeName = null;
 			Property typeNameProp = null;
 			try {
 
@@ -390,14 +390,14 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					throw new MissingRequiredPropertyException(
 							"Missing the required output rate specification.");
 
-				traitValName = checkCustomProperty(obj, "SourceTraitVal", "string");
+				exchangeName = checkCustomProperty(obj, "Exchange_Name", "string");
 				
 				PortModel pm = new PortModel();
 				pm.setName(obj.getName());
 				pm.setType(typeName);
 				pm.setMinPeriod(Integer.valueOf(minPeriod));
 				pm.setMaxPeriod(Integer.valueOf(maxPeriod));
-				pm.setTraitValName(traitValName);
+				pm.setExchangeName(exchangeName);
 				if (obj.getDirection() == DirectionType.IN) {
 					pm.setSubscribe(true);
 				} else if (obj.getDirection() == DirectionType.OUT) {
@@ -857,7 +857,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				return;
 			}
 			String pubTypeName, pubPortName, subPortName, subTypeName, pubName,
-				subName, traitValName;
+				subName;
 			ComponentModel pubModel = null, subModel = null;
 			ConnectionModel connModel = new ConnectionModel();
 			String channelDelay = null;

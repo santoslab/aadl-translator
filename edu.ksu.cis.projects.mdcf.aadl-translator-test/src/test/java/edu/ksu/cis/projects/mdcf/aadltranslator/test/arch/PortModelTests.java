@@ -76,9 +76,9 @@ public class PortModelTests {
 	}
 	
 	@Test
-	public void testTraitValName(){
-		assertEquals("spo2_per", devSendPort.getTraitValName());
-		assertEquals(null, procSendPort.getTraitValName());
-		assertEquals(null, procRecvPort.getTraitValName());
+	public void testExchangeName(){
+		assertEquals("spo2_per", devSendPort.getExchangeName());
+		assertEquals(null, procSendPort.getExchangeName());
+		assertEquals(null, procRecvPort.getExchangeName());
 	}
 }

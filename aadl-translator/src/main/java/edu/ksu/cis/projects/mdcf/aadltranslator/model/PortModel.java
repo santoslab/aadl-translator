@@ -9,7 +9,7 @@ public class PortModel {
 	private String type;
 	private int minPeriod;
 	private int maxPeriod;
-	private String traitValName;
+	private String exchangeName;
 
 	public String getName() {
 		return name;
@@ -55,8 +55,8 @@ public class PortModel {
 		return maxPeriod;
 	}
 	
-	public String getTraitValName() {
-		return traitValName;
+	public String getExchangeName() {
+		return exchangeName;
 	}
 	
 	public void setName(String portName) {
@@ -87,7 +87,7 @@ public class PortModel {
 		this.category = category;
 	}
 
-	public void setTraitValName(String traitValName) {
-		this.traitValName = traitValName;
+	public void setExchangeName(String exchangeName) {
+		this.exchangeName = exchangeName;
 	}
 }

@@ -15,8 +15,6 @@ import org.junit.Test;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
