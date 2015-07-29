@@ -3,7 +3,6 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -111,7 +110,7 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 		return hazardReportDiagrams;
 	}
 	
-	public Collection<ConnectionModel> getUniqueDevicePublishedChannels(){
+	public HashMap<String, ConnectionModel> getUniqueDevicePublishedChannels(){
 		Set<SystemConnectionModel> chanSet = new HashSet<>(channels.values());
 		chanSet = Sets.filter(chanSet, ModelUtil.devicePublishedFilter);
 		
@@ -121,10 +120,10 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 		for(ConnectionModel cm : chanSet) {
 			chanMap.put(cm.getPubName().concat(cm.getPubPortName()), cm);
 		}
-		return chanMap.values();
+		return chanMap;
 	}
 	
-	public Collection<ConnectionModel> getUniqueDeviceSubscribedChannels(){
+	public HashMap<String, ConnectionModel> getUniqueDeviceSubscribedChannels(){
 		Set<SystemConnectionModel> chanSet = new HashSet<>(channels.values());
 		chanSet = Sets.filter(chanSet, ModelUtil.deviceSubscribedFilter);
 		
@@ -134,6 +133,6 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 		for(ConnectionModel cm : chanSet) {
 			chanMap.put(cm.getSubName().concat(cm.getSubPortName()), cm);
 		}
-		return chanMap.values();
+		return chanMap;
 	}
 }
