@@ -1,0 +1,18 @@
+<components>
+  <mdcf.core.app.VirtualComponent>
+    <name>appLogic</name>
+    <type>PulseOx_Logic_Process</type>
+    <role>Logic</role>
+  </mdcf.core.app.VirtualComponent> 
+  <mdcf.core.app.VirtualComponent>
+    <name>appDisplay</name>
+    <type>PulseOx_Display_Process</type>
+    <role>AppPanel</role>
+  </mdcf.core.app.VirtualComponent> 
+  <mdcf.core.app.VirtualComponent>
+    <name>ICEpoInterface</name>
+    <type>ICEpoInterface</type>
+    <role>Logic</role>
+  </mdcf.core.app.VirtualComponent> 
+
+</components>

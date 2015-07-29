@@ -1,18 +1,18 @@
-appspec(system) ::=<<
+appspec(model) ::=<<
 <mdcf.core.app.AppSpec>
-  #appName(system)#
-  #components(system)#
-  #channels(system)#
+  #appName(model)#
+  #components(model)#
+  #channels(model)#
 </mdcf.core.app.AppSpec>
 >>
 
-appName(system) ::=<<
-<appName>#system.name#</appName>
+appName(model) ::=<<
+<appName>#model.name#</appName>
 >>
 
-components(system) ::=<<
+components(model) ::=<<
 <components>
-  #system.logicAndDevices.keys:{k |#virtualComponent(k, system.logicAndDevices.(k))#
+  #model.logicAndDevices.keys:{k |#virtualComponent(k, model.logicAndDevices.(k))#
   }#
 </components>
 >>
@@ -29,9 +29,9 @@ virtualComponent(name, component) ::=<<
 </mdcf.core.app.VirtualComponent> 
 >>
 
-channels(system) ::=<<
+channels(model) ::=<<
 <channels>
-  #system.channels.values:{c |#channel(c)#
+  #model.channels.values:{c |#channel(c)#
   }#
 </channels>
 >>
