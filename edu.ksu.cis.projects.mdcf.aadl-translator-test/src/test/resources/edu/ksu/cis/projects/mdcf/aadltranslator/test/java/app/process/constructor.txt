@@ -2,8 +2,8 @@ public PulseOx_Logic_ProcessSuperType(String GUID, String host) {
   super(GUID, "PulseOx_Logic_Process", host);
   taskInstanceMap = new HashMap<>();
   receiverPortMap = new HashMap<>();
-  SpO2ReceiverPort = new MdcfReceiverPort<Integer>("SpO2In", Integer.class, host); 
-  DerivedAlarmSenderPort = new MdcfSenderPort<Object>("DerivedAlarmOut", Object.class, host); 
+  SpO2ReceiverPort = new MdcfReceiverPort<Integer>("SpO2", Integer.class, host); 
+  DerivedAlarmSenderPort = new MdcfSenderPort<Object>("DerivedAlarm", Object.class, host); 
 taskInstanceMap.put(CheckSpO2ThreadTask.class.getSimpleName(), new CheckSpO2ThreadTask());
   receiverPortMap.put(SpO2ReceiverPort.getName(), SpO2ReceiverPort);
 }

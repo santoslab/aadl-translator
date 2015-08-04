@@ -203,8 +203,8 @@ public <model.name>SuperType(String GUID, String host) {
 
 initPort(port) ::=<<
 <if(port.subscribe)>
-<port.name>ReceiverPort = new MdcfReceiverPort\<<port.type>\>("<port.name>In", <port.type>.class, host);<else>
-<port.name>SenderPort = new MdcfSenderPort\<<port.type>\>("<port.name>Out", <port.type>.class, host);<endif> 
+<port.name>ReceiverPort = new MdcfReceiverPort\<<port.type>\>("<port.name>", <port.type>.class, host);<else>
+<port.name>SenderPort = new MdcfSenderPort\<<port.type>\>("<port.name>", <port.type>.class, host);<endif> 
 >>
 
 receiverPortMapEntry(exchName) ::=<<

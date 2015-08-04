@@ -16,15 +16,12 @@ typeTasksAndPorts(model) ::=<<
 
 port(port) ::=<<
 <entry>
-  $if(port.subscribe)$
-  <string>$port.name$In</string>
+  <string>$port.name$</string>
   <mdcf.core.ctypes.PortSignature>
-    <portName>$port.name$In</portName>
+    <portName>$port.name$</portName>
+  $if(port.subscribe)$
     <portDirection>SUBSCRIBE</portDirection>
   $else$
-  <string>$port.name$Out</string>
-  <mdcf.core.ctypes.PortSignature>
-    <portName>$port.name$Out</portName>
     <portDirection>PUBLISH</portDirection>
   $endif$
     <minPeriod>$port.minPeriod$</minPeriod>
@@ -38,7 +35,7 @@ task(task) ::=<<
 <mdcf.core.ctypes.TaskSignature>
   $if(task.sporadic)$
   <type>PORT_SPORADIC</type>
-  <trigPortName>$task.trigPortName$In</trigPortName>
+  <trigPortName>$task.trigPortName$</trigPortName>
   <periodMs><!-- Placeholder value: Sporadic 
   task's periods are derived from their 
   triggering port -->-1</periodMs>

@@ -32,7 +32,7 @@ public class PortModelTests {
 		SystemModel systemModel = AllTests.runArchTransTest("PulseOx", "PulseOx_Forwarding_System");
 		DeviceModel deviceModel = systemModel.getDeviceByType("ICEpoInterface");
 		ProcessModel processModel = systemModel.getProcessByType("PulseOx_Logic_Process");
-		devSendPort = deviceModel.getSendPorts().get("SpO2");
+		devSendPort = deviceModel.getSendPorts().get("SpO2Out");
 		procSendPort = processModel.getSendPorts().get("DerivedAlarm");
 		procRecvPort = processModel.getReceivePorts().get("SpO2");
 	}
@@ -71,7 +71,7 @@ public class PortModelTests {
 
 	@Test
 	public void testPortName() {
-		assertEquals("SpO2", devSendPort.getName());
+		assertEquals("SpO2Out", devSendPort.getName());
 		assertEquals("DerivedAlarm", procSendPort.getName());
 		assertEquals("SpO2", procRecvPort.getName());
 	}

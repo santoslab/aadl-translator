@@ -604,12 +604,9 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				tm.setPeriod(period);
 				tm.setDeadline(deadline);
 				tm.setWcet(wcet);
-				String trigPortName = dm.getInPortNames().get(obj.getName());
-				if(trigPortName == null)
-					trigPortName = dm.getInPortNames().get("Raw"+obj.getName());
-				tm.setTrigPortInfo(trigPortName, dm
-						.getPortByName(obj.getName()).getType(), obj.getName(),
-						false);
+				String portName = obj.getName() + "Out";
+				String trigPortName = dm.getInPortNames().get(portName);
+				tm.setTrigPortInfo(trigPortName, dm.getPortByName(portName).getType(), portName, false);
 			} catch (DuplicateElementException | NotImplementedException e) {
 				handleException(obj, e);
 				return;
@@ -617,40 +614,30 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		private void handleImplicitPort(Port obj) {
-			if(obj.isIn()){
-				PortModel in_pm = componentModel.getPortByName(obj.getName());
-				PortModel out_pm = new PortModel();
-				out_pm.setName("Raw" + in_pm.getName());
-				out_pm.setType(in_pm.getType());
-				out_pm.setMinPeriod(in_pm.getMinPeriod());
-				out_pm.setMaxPeriod(in_pm.getMaxPeriod());
-				out_pm.setSubscribe(!in_pm.isSubscribe());
-				out_pm.setCategory(in_pm.getCategory());
-				try {
-					componentModel.addPort(out_pm);
-					((DeviceModel) componentModel).addOutPortName(in_pm.getName(), out_pm.getName());
-				} catch (DuplicateElementException e) {
-					handleException(obj, e);
-					return;
-				}
-			} else {
-				PortModel in_pm = new PortModel();
-				PortModel out_pm = componentModel.getPortByName(obj.getName());
-				in_pm.setName("Raw" + out_pm.getName());
-				in_pm.setType(out_pm.getType());
-				in_pm.setMinPeriod(out_pm.getMinPeriod());
-				in_pm.setMaxPeriod(out_pm.getMaxPeriod());
-				in_pm.setSubscribe(!out_pm.isSubscribe());
-				in_pm.setCategory(out_pm.getCategory());
-				try {
-					componentModel.addPort(in_pm);
-					((DeviceModel) componentModel).addOutPortName(in_pm.getName(),
-							out_pm.getName());
-				} catch (DuplicateElementException e) {
-					handleException(obj, e);
-					return;
-				}
-			}
+//			if(obj.isIn()){
+//				PortModel in_pm = componentModel.getPortByName(obj.getName());
+//				PortModel out_pm = new PortModel();
+//				
+//				out_pm.setName(in_pm.getName());
+//				out_pm.setType(in_pm.getType());
+//				out_pm.setMinPeriod(in_pm.getMinPeriod());
+//				out_pm.setMaxPeriod(in_pm.getMaxPeriod());
+//				out_pm.setSubscribe(!in_pm.isSubscribe());
+//				out_pm.setCategory(in_pm.getCategory());
+//				out_pm.setExchangeName(in_pm.getExchangeName());
+//				((DeviceModel)componentModel).addPort(out_pm);
+//			} else {
+//				PortModel in_pm = new PortModel();
+//				PortModel out_pm = componentModel.getPortByName(obj.getName());
+//				
+//				in_pm.setName(out_pm.getName());
+//				in_pm.setType(out_pm.getType());
+//				in_pm.setMinPeriod(out_pm.getMinPeriod());
+//				in_pm.setMaxPeriod(out_pm.getMaxPeriod());
+//				in_pm.setSubscribe(!out_pm.isSubscribe());
+//				in_pm.setCategory(out_pm.getCategory());
+//				((DeviceModel)componentModel).addPort(in_pm);
+//			}
 			
 		}
 
@@ -721,8 +708,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				String componentType = checkCustomProperty(obj, "Component_Type", PropertyType.ENUM);
 				if(componentType != null)
 					dm.setComponentType(componentType);
-				dm.setComponentType(componentType);
 				systemModel.addChild(dm.getName(), dm);
+
 				componentModel = dm;
 			} catch (DuplicateElementException e) {
 				handleException(obj, e);
