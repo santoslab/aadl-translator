@@ -10,7 +10,7 @@
     <role>AppPanel</role>
   </mdcf.core.app.VirtualComponent> 
   <mdcf.core.app.VirtualComponent>
-    <name>ICEpoInterface</name>
+    <name>pulseOx</name>
     <type>ICEpoInterface</type>
     <role>Logic</role>
   </mdcf.core.app.VirtualComponent> 

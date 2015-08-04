@@ -147,9 +147,9 @@ public class ConnectionModel {
 	public String getExchangeName() {
 		// Note: This method assumes device <-> device connections are disallowed
 		if(devicePublished)
-			return this.publisher.getPortByName(pubPortName).getExchangeName();
+			return this.publisher.getPortByName(pubPortName+"Out").getExchangeName();
 		else if(deviceSubscribed)
-			return this.subscriber.getPortByName(subPortName).getExchangeName();
+			return this.subscriber.getPortByName(subPortName+"In").getExchangeName();
 		else
 			return null;
 	}

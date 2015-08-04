@@ -52,8 +52,8 @@ public class DeviceModelTests {
 	public void testDeviceSendPortExists() {
 		assertEquals(1, deviceModelStandalone.getSendPorts().size());
 		assertEquals(1, deviceModelFromSystem.getSendPorts().size());
-		assertNotNull(deviceModelFromSystem.getSendPorts().get("SpO2"));
-		assertNotNull(deviceModelStandalone.getSendPorts().get("SpO2"));
+		assertNotNull(deviceModelFromSystem.getSendPorts().get("SpO2Out"));
+		assertNotNull(deviceModelStandalone.getSendPorts().get("SpO2Out"));
 	}
 	
 	@Test
