@@ -18,6 +18,8 @@ public class PortDataTypeMap {
 				put("RangeInteger", "new RangeFloat(0,0)");
 				put("RangeAlertFloat", "new RangeAlertFloat(0.0f,0.0f)");
 				put("RangeAlertInteger", "new RangeAlertFloat(0,0)");
+				put("Spo2AndTimeStamp", "new Spo2AndTimeStamp(0)");
+				put("PulserateAndTimeStamp", "new PulserateAndTimeStamp(0)");
 
 			}});
 	
@@ -37,8 +39,8 @@ public class PortDataTypeMap {
 					put("ICE_Types::ICE_Status", "String");
 					put("ICE_Types::ICE_Setting", "Float");
 
-					put("ICE_Types::ICE_SpO2_Numeric", "Float");
-					put("ICE_Types::ICE_PulseRate_Numeric", "Float");
+					put("ICE_Types::ICE_SpO2_Numeric", "Spo2AndTimeStamp");
+					put("ICE_Types::ICE_PulseRate_Numeric", "PulserateAndTimeStamp");
 					put("ICE_Types::ICE_EtCo2_Numeric", "Float");
 					put("ICE_Types::ICE_RespiratoryRate_Numeric", "Float");
 					

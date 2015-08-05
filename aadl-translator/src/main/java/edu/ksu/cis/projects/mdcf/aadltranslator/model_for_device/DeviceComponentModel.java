@@ -1,6 +1,7 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -109,7 +110,15 @@ public class DeviceComponentModel {
 				(Map<String, ExchangeModel>) Maps.filterValues(exchangeModels, ModelUtil.sporadicExchangeFilter), 
 				ModelUtil.transformToSporadicExchangeModel);
 		
-		for(ExchangeModel em : getExchangeModels.values()){
+		populateReceiveSendPortNames(getExchangeModels.values());
+		populateReceiveSendPortNames(setExchangeModels.values());
+		populateReceiveSendPortNames(actionExchangeModels.values());
+		populateReceiveSendPortNames(periodicExchangeModels.values());
+		populateReceiveSendPortNames(sporadicExchangeModels.values());		
+	}
+	
+	public <T extends ExchangeModel> void populateReceiveSendPortNames(Collection<T> cem){
+		for(T em : cem){
 			if(em.inPortInfo != null)
 				this.receivePortNames.add(em.getExchangeName());
 			if(em.outPortInfo != null)

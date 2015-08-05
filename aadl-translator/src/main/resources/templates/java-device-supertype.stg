@@ -132,6 +132,8 @@ import mdcf.device.exchanges.PeriodicExchange;
 import mdcf.messagebus.config.Constants;
 import mdcf.device.RangeAlertFloat;
 import mdcf.device.RangeFloat;
+import mdcf.device.pulseOx.messages.PulserateAndTimeStamp;
+import mdcf.device.pulseOx.messages.Spo2AndTimeStamp;
 >>
 
 
