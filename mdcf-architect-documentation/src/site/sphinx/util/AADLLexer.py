@@ -96,6 +96,8 @@ class AADLLexer(RegexLexer):
             (class_iden_rex, bygroups(Name.Class, Punctuation, Name.Entity)),
             (r'(' + iden_rex + r')(\s+)(->|<-|<->)(\s+)('+ iden_rex + r')', bygroups(Name.Variable, Whitespace, Operator, Whitespace, Name.Variable)),
             (iden_rex, Name.Function),
+            (r'({)(\s+)', bygroups(Punctuation, Whitespace), 'property-constant-declaration'),
+            (r'}', Punctuation),
             terminator_tuple, 
         ],
         'applies-to' : [
