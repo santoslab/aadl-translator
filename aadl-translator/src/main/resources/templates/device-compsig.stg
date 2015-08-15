@@ -128,7 +128,7 @@ get_recv_port(SEND_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME) ::= <<
         <minPeriod>$MIN_SEPARATION_TIME$</minPeriod>
         <maxPeriod>$MAX_SEPARATION_TIME$</maxPeriod>
         <portDirection>PUBLISH</portDirection>
-        <portType>ActionRequest</portType>
+        <portType>Object</portType>
       </mdcf.core.ctypes.PortSignature>
     </entry>
  >>
@@ -141,7 +141,7 @@ get_recv_port(SEND_PORT_NAME, MIN_SEPARATION_TIME, MAX_SEPARATION_TIME) ::= <<
         <minPeriod>$MIN_SEPARATION_TIME$</minPeriod>
         <maxPeriod>$MAX_SEPARATION_TIME$</maxPeriod>
         <portDirection>SUBSCRIBE</portDirection>
-        <portType>ActionResult</portType>
+        <portType>Object</portType>
       </mdcf.core.ctypes.PortSignature>
     </entry>
  >>

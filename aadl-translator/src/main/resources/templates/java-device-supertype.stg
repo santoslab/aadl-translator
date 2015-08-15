@@ -120,8 +120,6 @@ import mdcf.core.messagetypes.devicemgmt.PubChannelAssignmentMsg;
 import mdcf.core.messagetypes.devicemgmt.SubChannelAssignmentMsg;
 import mdcf.debug.DebugMsg;
 import mdcf.device.common.messages.Request;
-import mdcf.device.common.messages.ActionRequest;
-import mdcf.device.common.messages.ActionResult;
 import mdcf.device.common.messages.Confirmation;
 import mdcf.device.common.messages.Confirmation.Status;
 import mdcf.device.exchanges.GetExchange;
@@ -132,8 +130,6 @@ import mdcf.device.exchanges.PeriodicExchange;
 import mdcf.messagebus.config.Constants;
 import mdcf.device.RangeAlertFloat;
 import mdcf.device.RangeFloat;
-import mdcf.device.pulseOx.messages.PulserateAndTimeStamp;
-import mdcf.device.pulseOx.messages.Spo2AndTimeStamp;
 >>
 
 
@@ -223,7 +219,7 @@ sporadicExchangeField(ModelName, ParameterType, ExchangeName, ModelPath) ::=<<
 
 actionExchangeField(ModelName, ExchangeName, ModelPath) ::=<<
 	//<ModelPath>
-	<ModelName>ActionExchange\<ActionRequest, ActionResult> <ExchangeName> = new <ModelName>ActionExchange\<>();	
+	<ModelName>ActionExchange\<Object, Object> <ExchangeName> = new <ModelName>ActionExchange\<>();	
 >>
 
 constructor(model) ::=<<
@@ -303,12 +299,12 @@ sporadicExchangeInit(ModelName, ParameterType, ExchangeName, SendPortName) ::=<<
 actionExchangeInit(ModelName, ExchangeName, SendPortName, RecvPortName) ::=<<
 <ExchangeName>.receiver = new MdcfReceiverPort\<>(
 	"<RecvPortName>",
-	ActionRequest.class, address);
+	Object.class, address);
 <ExchangeName>.receiver.getReceiver().registerMessageListener(
 	new <ExchangeName>_Listener());
 <ExchangeName>.sender = new MdcfSenderPort\<>(
 	"<SendPortName>",
-	ActionResult.class, address);
+	Object.class, address);
 >>
 	
 	
@@ -429,8 +425,7 @@ actionListenerClass(ActionName, ExchangeName) ::=<<
 		public void onMessage(MdcfMessage message){
 			boolean result = action<ActionName>();
 			<ExchangeName>
-			.send(new ActionResult(result ? ActionResult.Status.OK
-					: ActionResult.Status.NOTOK));						
+			.send(new Object());						
 		}
 	}
 >>

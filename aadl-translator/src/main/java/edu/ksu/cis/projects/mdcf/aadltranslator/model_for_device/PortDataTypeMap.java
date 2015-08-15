@@ -37,16 +37,16 @@ public class PortDataTypeMap {
 				{
 					put("ICE_Types::ICE_VMD_Status", "String");
 					put("ICE_Types::ICE_Status", "String");
-					put("ICE_Types::ICE_Setting", "Float");
+					put("ICE_Types::ICE_Setting", "Integer");
 
-					put("ICE_Types::ICE_SpO2_Numeric", "Spo2AndTimeStamp");
-					put("ICE_Types::ICE_PulseRate_Numeric", "PulserateAndTimeStamp");
-					put("ICE_Types::ICE_EtCo2_Numeric", "Float");
-					put("ICE_Types::ICE_RespiratoryRate_Numeric", "Float");
+					put("ICE_Types::ICE_SpO2_Numeric", "Integer");
+					put("ICE_Types::ICE_PulseRate_Numeric", "Integer");
+					put("ICE_Types::ICE_EtCo2_Numeric", "Integer");
+					put("ICE_Types::ICE_RespiratoryRate_Numeric", "Integer");
 					
-					put("ICE_Types::ICE_BloodPressure_Mean_Numeric", "Float");
-					put("ICE_Types::ICE_BloodPressure_Diastolic_Numeric", "Float");
-					put("ICE_Types::ICE_BloodPressure_Systolic_Numeric", "Float");
+					put("ICE_Types::ICE_BloodPressure_Mean_Numeric", "Integer");
+					put("ICE_Types::ICE_BloodPressure_Diastolic_Numeric", "Integer");
+					put("ICE_Types::ICE_BloodPressure_Systolic_Numeric", "Integer");
 
 					
 					put("ICE_Types::PCAF_Warning_Below_VTBI_Soft_Limit", "Integer");
@@ -140,14 +140,14 @@ public class PortDataTypeMap {
 					put("ICE_Types::ICE_PCAF_UsingBatteryPower_Status", "Integer");
 					put("ICE_Types::ICE_PCAF_UpstreamFlow_Status", "Integer");
 					put("ICE_Types::ICE_PCAF_DownstreamFlow_Status", "Integer");
-					put("ICE_Types::ICE_PCAF_Start_Action", "Integer");
-					put("ICE_Types::ICE_PCAF_Pause_Action", "Integer");
-					put("ICE_Types::ICE_PCAF_Stop_Action", "Integer");
-					put("ICE_Types::ICE_PCAF_Prime_Action", "Integer");
-					put("ICE_Types::ICE_PCAF_ResetAdministrationSession_Action", "Integer");
-					put("ICE_Types::ICE_PCAF_ResetVolumeInfusedActualTotal_Action", "Integer");
-					put("ICE_Types::ICE_PCAF_PatientBolus_Action", "Integer");
-					put("ICE_Types::ICE_PCAF_SquareBolus_Action", "Integer");
+					put("ICE_Types::ICE_PCAF_Start_Action", "Object");
+					put("ICE_Types::ICE_PCAF_Pause_Action", "Object");
+					put("ICE_Types::ICE_PCAF_Stop_Action", "Object");
+					put("ICE_Types::ICE_PCAF_Prime_Action", "Object");
+					put("ICE_Types::ICE_PCAF_ResetAdministrationSession_Action", "Object");
+					put("ICE_Types::ICE_PCAF_ResetVolumeInfusedActualTotal_Action", "Object");
+					put("ICE_Types::ICE_PCAF_PatientBolus_Action", "Object");
+					put("ICE_Types::ICE_PCAF_SquareBolus_Action", "Object");
 					put("ICE_Types::ICE_SimplePCA_LockOutTimer_Status", "Integer");
 					put("ICE_Types::ICE_SimplePCA_PumpState_Status", "Integer");
 					put("ICE_Types::ICE_SimplePCA_LoadingBolus_Setting", "Integer");
