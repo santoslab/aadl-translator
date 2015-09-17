@@ -18,9 +18,9 @@ The Device Modeling Language
 The MDCF Architect is centered around |AADL| with the intent of leveraging the
 analysis capabilities of its associated tooling. Unfortunately, AADL is a
 complex language, and its descriptive powers can easily get an MAP component
-designer into trouble. So, rather than modeling components in AADL, with MDCF
-Architect, designers may choose to model in a more constrained, medical device
-modeling language.
+designer into trouble. So, rather than modeling medical components directly in
+AADL, with MDCF Architect, designers may choose to model in an easier to use,
+by virtue of being more constrained, medical device modeling language.
 
 By being domain specific, |DML| directly supports the
 building of components that conform to the |ICE| standard for
@@ -45,4 +45,5 @@ Contents
    :maxdepth: 2
 
    language/dml
+   language/mapping
    tools/xdml
