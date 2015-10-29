@@ -61,16 +61,17 @@ public class ProcessModelTests {
 	
 	@Test
 	public void testProcessContainedTasks() {
-		assertEquals(1, logicModel.getTasks().size());
+		// 1 explicit periodic task + 1 implicit sporadic task for the data port
+		assertEquals(2, logicModel.getTasks().size()); 
 		assertNotNull(logicModel.getTasks().get("CheckSpO2Thread"));
-		assertEquals(1, processOnlyProcessModel.getTasks().size());
+		assertEquals(2, processOnlyProcessModel.getTasks().size());
 		assertNotNull(processOnlyProcessModel.getTasks().get("CheckSpO2Thread"));
 	}
 	
 	@Test
 	public void testProcessSporadicTasks() {
-		assertEquals(0, logicModel.getSporadicTasks().size());
-		assertEquals(0, processOnlyProcessModel.getSporadicTasks().size());
+		assertEquals(1, logicModel.getSporadicTasks().size());
+		assertEquals(1, processOnlyProcessModel.getSporadicTasks().size());
 	}
 	
 	@Test
