@@ -108,8 +108,7 @@ public final class ErrorTranslator {
 			// Title
 			title = ((StringLiteral) PropertyUtils.getRecordFieldValue(rv,
 					"Title")).getValue();
-			title = title.substring(1, title.length() - 1);
-
+			
 			// Cause
 			cause = ((RecordValueImpl) PropertyUtils.getRecordFieldValue(
 					rv, "Cause"));
@@ -117,8 +116,6 @@ public final class ErrorTranslator {
 			// Description
 			description = ((StringLiteral) PropertyUtils
 					.getRecordFieldValue(cause, "Description")).getValue();
-			description = description
-					.substring(1, description.length() - 1);
 
 			// ErrorType
 			ReferenceValue reva = (ReferenceValue) PropertyUtils
@@ -134,8 +131,6 @@ public final class ErrorTranslator {
 			// Compensation
 			compensation = ((StringLiteral) PropertyUtils
 					.getRecordFieldValue(rv, "Compensation")).getValue();
-			compensation = compensation.substring(1,
-					compensation.length() - 1);
 
 			// Anything missing?
 			if (keyword == null) {

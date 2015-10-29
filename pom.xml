@@ -9,10 +9,10 @@
 	<packaging>pom</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<tycho.version>0.21.0</tycho.version>
-		<eclipse-repo.url>http://download.eclipse.org/releases/luna/</eclipse-repo.url>
-	<osate-repo.url>http://www.aadl.info/aadl/osate/stable/2.1.0/update-site/</osate-repo.url>
-		<!--osate-repo.url>http://www.aadl.info/aadl/osate/testing/update-site/</osate-repo.url -->
+		<tycho.version>0.23.0</tycho.version>
+		<eclipse-repo.url>http://download.eclipse.org/releases/mars/</eclipse-repo.url>
+	<!--osate-repo.url>http://www.aadl.info/aadl/osate/stable/2.1.2/update-site/</osate-repo.url-->
+		<osate-repo.url>http://www.aadl.info/aadl/osate/testing/update-site/</osate-repo.url>
 		<osate.version>[0.0.0,3.0.0)</osate.version>
 		<aadl-translator.version>[0.0.0,2.0.0)</aadl-translator.version>
 		<code-coverage.ratio>0.00</code-coverage.ratio>

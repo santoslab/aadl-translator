@@ -389,9 +389,14 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				handlePort(obj);
 			} else if (lastElemProcessed == ElementType.DEVICE) {
 				handlePort(obj); // Explicit "out" port
-				if (!cancelled()) {
-					handleImplicitPort(obj); // Implicit "in" port from device
-					handleImplicitTask(obj); // Implicit task to handle incoming
+//<<<<<<< HEAD
+//				if (!cancelled()) {
+//					handleImplicitPort(obj); // Implicit "in" port from device
+//					handleImplicitTask(obj); // Implicit task to handle incoming
+//=======
+				if(!cancelled()){
+					handlePseudoDeviceImplicitTask(obj); // Implicit task to handle incoming
+//>>>>>>> 30c8490... Bug fixes and build tweaks
 											 // data
 				}
 			} else if (lastElemProcessed == ElementType.THREAD) {
@@ -459,6 +464,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					pm.setEventData();
 				} else if (obj.getCategory() == PortCategory.DATA) {
 					pm.setData();
+					handleDataPortImplicitTask(pm.getName(), pm.getType(), obj);
 				} else if (obj.getCategory() == PortCategory.EVENT) {
 					pm.setEvent();
 				}
@@ -589,7 +595,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 		 */
 
-		private void handleImplicitTask(Port obj) {
+		private void handlePseudoDeviceImplicitTask(Port obj) {
 			TaskModel tm;
 			String taskName = obj.getName() + "Task";
 			DeviceModel dm = (DeviceModel) componentModel;
@@ -612,33 +618,27 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				return;
 			}
 		}
-
-		private void handleImplicitPort(Port obj) {
-//			if(obj.isIn()){
-//				PortModel in_pm = componentModel.getPortByName(obj.getName());
-//				PortModel out_pm = new PortModel();
-//				
-//				out_pm.setName(in_pm.getName());
-//				out_pm.setType(in_pm.getType());
-//				out_pm.setMinPeriod(in_pm.getMinPeriod());
-//				out_pm.setMaxPeriod(in_pm.getMaxPeriod());
-//				out_pm.setSubscribe(!in_pm.isSubscribe());
-//				out_pm.setCategory(in_pm.getCategory());
-//				out_pm.setExchangeName(in_pm.getExchangeName());
-//				((DeviceModel)componentModel).addPort(out_pm);
-//			} else {
-//				PortModel in_pm = new PortModel();
-//				PortModel out_pm = componentModel.getPortByName(obj.getName());
-//				
-//				in_pm.setName(out_pm.getName());
-//				in_pm.setType(out_pm.getType());
-//				in_pm.setMinPeriod(out_pm.getMinPeriod());
-//				in_pm.setMaxPeriod(out_pm.getMaxPeriod());
-//				in_pm.setSubscribe(!out_pm.isSubscribe());
-//				in_pm.setCategory(out_pm.getCategory());
-//				((DeviceModel)componentModel).addPort(in_pm);
-//			}
-			
+		
+		private void handleDataPortImplicitTask(String portName, String portType, Port obj) {
+			TaskModel tm = null;
+			String taskName = portName + "Task";
+			ProcessModel pm = (ProcessModel) componentModel;
+			// Default values; period is set to -1 since these tasks are all
+			// sporadic
+			// TODO: Read these from plugin preferences?
+			int period = -1, deadline = 50, wcet = 5;
+			try {
+				pm.addChild(taskName, tm);
+				tm = pm.getChild(taskName);
+				tm.setSporadic(true);
+				tm.setPeriod(period);
+				tm.setDeadline(deadline);
+				tm.setWcet(wcet);
+				tm.setTrigPortInfo(portName, portType, portName, false);
+			} catch (DuplicateElementException | NotImplementedException e) {
+				handleException(obj, e);
+				return;
+			}
 		}
 
 		private void handleThreadProperties(ThreadType obj, TaskModel tm) {
