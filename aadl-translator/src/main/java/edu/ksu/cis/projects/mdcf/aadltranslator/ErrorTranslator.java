@@ -47,6 +47,10 @@ public final class ErrorTranslator {
 		
 		ErrorModelSubclause emv2 = EMV2Util.getOwnEMV2Subclause(cl);
 		
+		// No EMv2 block means we can quit now
+		if(emv2 == null)
+			return;
+		
 		try {
 			parseOccurrences(emv2);
 			parseErrorFlows(emv2);
