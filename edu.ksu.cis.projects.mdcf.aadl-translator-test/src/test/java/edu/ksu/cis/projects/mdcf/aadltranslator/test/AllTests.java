@@ -72,11 +72,8 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIAADLSystemEr
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ConnectionModelHazardTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardBackgroundTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesTests;
-<<<<<<< HEAD
 import edu.ksu.cis.projects.mdcf.aadltranslator.util.MarkdownLinkRenderer;
-=======
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSpecViewTests;
->>>>>>> 6b8756e... Add AppSpec view tests in preparation for TraitVal addition
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.HazardReportViewTests;
 
