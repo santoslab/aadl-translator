@@ -98,16 +98,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		private ComponentModel componentModel = null;
 		
 		/**
-<<<<<<< HEAD
 		 * A reference to the current component's parent
 		 */
 		private ComponentModel parentModel = null;
 				
 		/**
-		 * The last element to have been processed
-=======
 		 * A reference to the type of the last element processed
->>>>>>> 2221eb7... Add support in the model for TraitVal's associated with ports
 		 */
 		private ElementType lastElemProcessed = ElementType.NONE;
 
@@ -708,7 +704,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				String componentType = checkCustomProperty(obj, "Component_Type", PropertyType.ENUM);
 				if(componentType != null)
 					dm.setComponentType(componentType);
-				systemModel.addChild(dm.getName(), dm);
+				systemModel.addChild(obj.getName(), dm);
 
 				componentModel = dm;
 			} catch (DuplicateElementException e) {
