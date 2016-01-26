@@ -620,8 +620,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 		
 		private void handleDataPortImplicitTask(String portName, String portType, Port obj) {
-			TaskModel tm = null;
 			String taskName = portName + "Task";
+			TaskModel tm = new TaskModel(taskName);
 			ProcessModel pm = (ProcessModel) componentModel;
 			// Default values; period is set to -1 since these tasks are all
 			// sporadic
