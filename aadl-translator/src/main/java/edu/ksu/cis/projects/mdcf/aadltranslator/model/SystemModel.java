@@ -109,10 +109,6 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 	public void addAssumption(String assumption) {
 		hazardReportAssumptions.add(assumption);
 	}
-
-	public HashMap<String, String> getHazardReportDiagrams() {
-		return hazardReportDiagrams;
-	}
 	
 	public HashMap<String, ConnectionModel> getUniqueDevicePublishedChannels(){
 		Set<SystemConnectionModel> chanSet = new HashSet<>(channels.values());

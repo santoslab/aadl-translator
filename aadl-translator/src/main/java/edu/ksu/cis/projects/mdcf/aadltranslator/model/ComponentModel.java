@@ -253,7 +253,7 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 				"src/main/resources/images/");
 		try {
 			File imagesDir = new File(FileLocator.toFileURL(imagesDirUrl)
-					.toURI());
+					.toURI().normalize());
 			File appBoundaryPH = new File(imagesDir,
 					"AppBoundary-Placeholder.png");
 			hazardReportDiagrams.put("SystemBoundary",

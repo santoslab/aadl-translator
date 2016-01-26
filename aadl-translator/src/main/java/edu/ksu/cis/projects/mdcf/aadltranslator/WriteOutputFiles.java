@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.net.URI;
+import java.nio.file.Paths;
 
 public class WriteOutputFiles {
 
@@ -32,7 +33,7 @@ public class WriteOutputFiles {
 			break;
 		case HTML:
 			args.add("--to=html5");
-			args.add("--include-in-header=" + uri.getPath());
+			args.add("--include-in-header=" + Paths.get(uri.normalize()));
 			args.add("--self-contained");
 			args.add("--smart");
 			args.add("--output=" + reportDirectory + "/reports/" + reportName + ".html");
