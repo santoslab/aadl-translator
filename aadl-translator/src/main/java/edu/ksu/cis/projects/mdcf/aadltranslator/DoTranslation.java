@@ -2,6 +2,7 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -337,8 +338,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 													"edu.ksu.cis.projects.mdcf.aadl-translator")
 													.getEntry(
 															"src/main/resources/styles/default.html"))
-									.getPath());
-		} catch (IOException e) {
+									.toURI());
+		} catch (IOException | URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -210,14 +211,12 @@ public class AllTests {
 		File aadlSystemDir = null;
 		File aadlDeviceDir = null;
 		try {
-			aadlDir = new File(FileLocator.toFileURL(aadlDirUrl).getPath());
+			aadlDir = new File(FileLocator.toFileURL(aadlDirUrl).toURI());
 			aadlPropertysetsDir = new File(FileLocator.toFileURL(
-					aadlPropertysetsDirUrl).getPath());
-			aadlSystemDir = new File(FileLocator.toFileURL(aadlSystemDirUrl)
-					.getPath());
-			aadlDeviceDir = new File(FileLocator.toFileURL(aadlDeviceDirUrl)
-					.getPath());
-		} catch (IOException e) {
+					aadlPropertysetsDirUrl).toURI());
+			aadlSystemDir = new File(FileLocator.toFileURL(aadlSystemDirUrl).toURI());
+			aadlDeviceDir = new File(FileLocator.toFileURL(aadlDeviceDirUrl).toURI());
+		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
 		initFiles(packagesFolder, propertySetsFolder, aadlDir, targetableFiles);
@@ -440,16 +439,15 @@ public class AllTests {
 		String expectedStr = null;
 		try {
 			if (GENERATE_EXPECTED) {
-				Files.write(Paths.get(FileLocator.toFileURL(expectedOutputUrl)
-						.getPath()), actualStr.getBytes());
+				Files.write(Paths.get(FileLocator.toFileURL(expectedOutputUrl).toURI()), actualStr.getBytes());
 				expectedStr = actualStr;
 				fail("Test was run in generate expected mode!");
 			} else {
 				expectedStr = new String(
 						Files.readAllBytes(Paths.get(FileLocator.toFileURL(
-								expectedOutputUrl).getPath())));
+								expectedOutputUrl).toURI())));
 			}
-		} catch (IOException e) {
+		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
 		assertEquals(expectedStr, actualStr);

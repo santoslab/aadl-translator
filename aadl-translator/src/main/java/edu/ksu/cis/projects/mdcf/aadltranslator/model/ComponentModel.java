@@ -2,6 +2,7 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -242,9 +243,7 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	}
 
 	public Map<String, ConnectionType> getRangedControlActions() {
-		Map<String, ConnectionType> controlActions = Maps.filterValues(
-				channels, ModelUtil.controlActionFilter);
-		return Maps.filterValues(controlActions, ModelUtil.rangedChannelFilter);
+		return Maps.filterValues(getControlActions(), ModelUtil.rangedChannelFilter);
 	}
 	
 	private void initHazardReportDiagrams() {
@@ -254,12 +253,12 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 				"src/main/resources/images/");
 		try {
 			File imagesDir = new File(FileLocator.toFileURL(imagesDirUrl)
-					.getPath());
+					.toURI());
 			File appBoundaryPH = new File(imagesDir,
 					"AppBoundary-Placeholder.png");
 			hazardReportDiagrams.put("SystemBoundary",
 					appBoundaryPH.getAbsolutePath());
-		} catch (IOException e) {
+		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
 	}

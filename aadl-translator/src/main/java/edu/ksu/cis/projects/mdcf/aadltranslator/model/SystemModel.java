@@ -88,6 +88,10 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 		return ret;
 	}
 	
+	public HashMap<String, DevOrProcModel> getLogicAndDevices() {
+		return children;
+	}
+	
 	public boolean hasProcessType(String typeName) {
 		return (typeToComponent.containsKey(typeName) && (typeToComponent
 				.get(typeName) instanceof ProcessModel));

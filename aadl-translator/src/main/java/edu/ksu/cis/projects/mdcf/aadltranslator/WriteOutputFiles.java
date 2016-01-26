@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import java.net.URI;
+
 public class WriteOutputFiles {
 
 	public enum OutputFormat {
@@ -14,7 +16,7 @@ public class WriteOutputFiles {
 
 	public static void writeHazardReport(String reportText,
 			String reportDirectory, String reportName, OutputFormat fmt,
-			String pandocPath, String stylePath) {
+			String pandocPath, java.net.URI uri) {
 		createDir(reportDirectory + "/reports");
 		writeStrToFile(reportText, reportDirectory + "/reports/" + reportName + ".md");
 		ArrayList<String> args = new ArrayList<>();
@@ -30,7 +32,7 @@ public class WriteOutputFiles {
 			break;
 		case HTML:
 			args.add("--to=html5");
-			args.add("--include-in-header=" + stylePath);
+			args.add("--include-in-header=" + uri.getPath());
 			args.add("--self-contained");
 			args.add("--smart");
 			args.add("--output=" + reportDirectory + "/reports/" + reportName + ".html");

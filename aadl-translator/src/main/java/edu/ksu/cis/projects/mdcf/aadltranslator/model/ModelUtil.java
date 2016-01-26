@@ -94,11 +94,17 @@ public class ModelUtil {
 
 	public final static Predicate<ConnectionModel> rangedChannelFilter = new Predicate<ConnectionModel>() {
 		public boolean apply(ConnectionModel connection) {
-			return !(connection.getPublisher()
-					.getPortByName(connection.getPubPortName()).getType()
-					.equals("Object") || connection.getPublisher()
-					.getPortByName(connection.getPubPortName()).getType()
-					.equals("Boolean"));
+			
+			// Out is appended to the port name for some ports by the string
+			// templates, so we have to check both
+			// TODO: It should probably not be this way -- Out should always be
+			// added by either the view or the controller, not both 
+			PortModel pubPort = connection.getPublisher().getPortByName(connection.getPubPortName() + "Out");
+			if(pubPort == null)
+				pubPort = connection.getPublisher().getPortByName(connection.getPubPortName());
+			String type = pubPort.getType();
+			
+			return !(type.equals("Object") || type.equals("Boolean"));
 		}
 	};
 
