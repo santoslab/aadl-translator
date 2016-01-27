@@ -3,6 +3,8 @@ report(model) ::=<<
 <tblOfContents(model)>
 <background(model)>
 <fundamentals(model)>
+<decomposition(model)>
+<propagationsAndTransformations(model)>
 >>
 
 header(model) ::=<<
@@ -26,11 +28,9 @@ tblOfContents(model) ::=<<
 	4. [Safety Constraints](#safety-constraints)
 3. [Decomposition](#decomposition)
 	1. [Control Structure](#control-structure)
-	2. Components
-		<model.children.keys:{k | <elementTocEntry(k)>
-}>	3. Connections
-		<model.channels.keys:{k | <elementTocEntry(k)>
-}>4. [Propagations and Transformations](#propagations-and-transformations)
+	2. [Components](#components)
+	3. [Connections](#connections)
+4. [Propagations and Transformations](#propagations-and-transformations)
 
 >>
 
@@ -67,6 +67,29 @@ fundamentals(model) ::=<<
 ### Safety Constraints
 <model.constraints.values:{v | <preliminary(v, i)>
 }>
+
+>>
+
+decomposition(model) ::=<<
+## Decomposition
+
+### Control Structure
+
+### Components
+
+<model.children.keys:{k | <elementTocEntry(k)>
+}>
+
+### Connections
+
+<model.channels.keys:{k | <elementTocEntry(k)>
+}>
+
+>>
+
+propagationsAndTransformations(model) ::=<<
+
+## Propagations and Transformations
 
 >>
 
