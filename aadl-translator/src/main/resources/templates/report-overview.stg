@@ -25,10 +25,12 @@ tblOfContents(model) ::=<<
 	3. [Hazards](#hazards)
 	4. [Safety Constraints](#safety-constraints)
 3. [Decomposition](#decomposition)
-	#. [Control Structure](#control-structure)
-	<model.children.keys:{k | <componentTocEntry(k)>
-}>
-4. [Propagations and Transformations](#propagations-and-transformations)
+	1. [Control Structure](#control-structure)
+	2. Components
+		<model.children.keys:{k | <elementTocEntry(k)>
+}>	3. Connections
+		<model.channels.keys:{k | <elementTocEntry(k)>
+}>4. [Propagations and Transformations](#propagations-and-transformations)
 
 >>
 
@@ -78,6 +80,6 @@ preliminary(prelim, i) ::=<<
 	
 	* <e>}><else><endif> >>
 	
-componentTocEntry(compName) ::=<<
-#. [<compName>](<compName; format="MarkdownInterLink">)
+elementTocEntry(elemName) ::=<<
+#. [<elemName>](<elemName; format="MarkdownInterLink">)
 >>
