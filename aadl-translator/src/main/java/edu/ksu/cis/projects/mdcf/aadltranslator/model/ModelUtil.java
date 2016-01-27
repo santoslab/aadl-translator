@@ -88,8 +88,10 @@ public class ModelUtil {
 
 	public final static Predicate<ConnectionModel> rangedChannelFilter = new Predicate<ConnectionModel>() {
 		public boolean apply(ConnectionModel connection) {
-			return !(connection.getPublisher().getPortByName(connection.getPubPortName()).getType().equals("Object") || 
-					connection.getPublisher().getPortByName(connection.getPubPortName()).getType().equals("Boolean"));
+			PortModel pm = connection.getPublisher().getPortByName(connection.getPubPortName());
+			if(pm == null)
+				pm = connection.getPublisher().getPortByName(connection.getPubPortName() + "Out");
+			return !(pm.getType().equals("Object") || pm.getType().equals("Boolean"));
 		}
 	};
 
