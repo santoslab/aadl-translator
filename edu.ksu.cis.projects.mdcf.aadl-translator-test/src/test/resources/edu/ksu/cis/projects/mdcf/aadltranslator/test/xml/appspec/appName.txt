@@ -1,1 +1,1 @@
-<appName>PulseOx_Forwarding_System</appName>
+<appName>TestProject</appName>
