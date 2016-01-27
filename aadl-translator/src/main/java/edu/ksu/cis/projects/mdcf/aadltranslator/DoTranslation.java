@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Locale;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -51,7 +50,6 @@ import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.core.OsateCorePlugin;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
-import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
@@ -170,7 +168,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		// 6) Set the system name to the package name 
 		updatePackageName(archTranslator.getSystemModel(), targetFile.getProject().getName());
 		
-		// 5.1) If selected, build the in-memory hazard analysis model
+		// 6.1) If selected, build the in-memory hazard analysis model
 		if (mode == Mode.HAZARD_ANALYSIS) {
 			ErrorTranslator hazardAnalysis = new ErrorTranslator();
 			HashSet<ErrorType> errors = getErrorTypes(rs, usedFiles);
@@ -199,10 +197,10 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			writeHazardReport(archTranslator.getSystemModel());
 		}
 
-		// 6) Write the generated files
+		// 7) Write the generated files
 		writeOutput(archTranslator);
 
-		// 7) Shut down the progress monitor
+		// 8) Shut down the progress monitor
 		wrapUpProgressMonitor(monitor);
 	}
 

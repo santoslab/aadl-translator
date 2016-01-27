@@ -21,7 +21,7 @@ tblOfContents(model) ::=<<
 	2. [Assumptions](#assumptions)
 	3. [Abbreviations](#abbreviations)
 2. [Depth: 1](#depth-1)
-	1. [<model.name>](#<model.name; format="MarkdownLink">)
+	1. [<model.name>](<model.name; format="MarkdownIntraLink">)
 		1. [Fundamentals](#fundamentals)
 		2. [Boundaries and Structure](#boundaries-and-structure)
 		3. [Unsafe Control Actions](#unsafe-control-actions)
@@ -32,7 +32,7 @@ tblOfContents(model) ::=<<
 >>
 
 tocDepth(procModel, i) ::=<<
-<i>. [<procModel.name>](#<procModel.name; format="MarkdownLink">)	
+<i>. [<procModel.name>](<procModel.name; format="MarkdownIntraLink">)	
 >>
 
 background(model) ::=<<

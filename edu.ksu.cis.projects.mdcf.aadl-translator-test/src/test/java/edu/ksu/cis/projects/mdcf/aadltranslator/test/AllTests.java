@@ -77,6 +77,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesT
 import edu.ksu.cis.projects.mdcf.aadltranslator.util.MarkdownLinkRenderer;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSpecViewTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.view.STRendererTests;
 
 @RunWith(Suite.class)
 //@InjectWith(typeof(Aadl2UiInjectorProvider)) Look into this, could remove 10s wait time
@@ -105,6 +106,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 		// View tests
 		AppSuperClassViewTests.class,
 		AppSpecViewTests.class,
+		STRendererTests.class,
 })
 public class AllTests {
 	private static final Logger log = Logger

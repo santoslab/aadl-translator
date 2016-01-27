@@ -8,7 +8,7 @@ public class ModelUtil {
 	};
 
 	public static enum ComponentType {
-		SENSOR, ACTUATOR, CONTROLLER, CONTROLLEDPROCESS
+		SENSOR, ACTUATOR, CONTROLLER, CONTROLLEDPROCESS, AGGREGATION, TOP
 	};
 
 	public static enum Keyword {
