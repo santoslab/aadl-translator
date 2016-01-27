@@ -1,9 +1,25 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class StpaPreliminaryModel {
 	protected String name;
 	protected String description;
 	protected StpaPreliminaryModel parent;
+	protected List<String> explanations;
+	
+	public StpaPreliminaryModel(){
+		explanations = new ArrayList<>();
+	}
+	
+	public void addExplanation(String explanation){
+		explanations.add(explanation);
+	}
+	
+	public List<String> getExplanations(){
+		return explanations;
+	}
 	
 	public String getName() {
 		return name;

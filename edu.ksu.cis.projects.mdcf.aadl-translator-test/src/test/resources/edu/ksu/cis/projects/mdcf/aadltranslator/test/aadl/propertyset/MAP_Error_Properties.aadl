@@ -21,24 +21,35 @@ Abbreviation : type record (
 Accident_Level : type record (
 	Level : aadlinteger;
 	Description: aadlstring;
+	Explanations : list of aadlstring;
 );
 
 Accident : type record (
-	Number : aadlinteger;
 	Description : aadlstring;
-	Level : MAP_Error_Properties::Accident_Level; 
+	Level : MAP_Error_Properties::Accident_Level;
+	Explanations : list of aadlstring;
 );
 
 Hazard: type record (
-	Number : aadlinteger;
 	Description : aadlstring;
 	Accident : MAP_Error_Properties::Accident;
+	HazardousFactor : aadlstring;
+	SystemElement : reference (device, process);
+	SystemElementState : aadlstring;
+	EnvironmentElement : reference (abstract);
+	EnvironmentElementState : aadlstring;
+	Explanations : list of aadlstring;
 );
 
 Constraint: type record (
-	Number : aadlinteger;
 	Description : aadlstring;
-	Hazard : MAP_Error_Properties::Hazard;	
+	Hazard : MAP_Error_Properties::Hazard;
+	HazardousFactor : aadlstring;
+	SystemElement : reference (device, process);
+	SystemElementState : aadlstring;
+	EnvironmentElement : reference (abstract);
+	EnvironmentElementState : aadlstring;
+	Explanations : list of aadlstring;
 );
 
 -- ============================ --

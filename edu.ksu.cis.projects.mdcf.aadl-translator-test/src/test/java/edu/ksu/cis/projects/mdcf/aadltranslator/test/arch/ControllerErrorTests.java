@@ -87,10 +87,14 @@ public class ControllerErrorTests {
 
 	@Test
 	public void testDuplicateSystem() {
+		// So eventually we want to support duplicate systems, and as a result
+		// of some preliminary changes, the system name is not known until after
+		// processing, so the error message looks a little weird here (null is
+		// used as a system name).
 		usedProperties.add("PulseOx_Forwarding_Properties");
 		runArchTransTest("PulseOxDuplicateSystem", "PulseOx_Forwarding_Duplicate_System");
 		assertEquals(
-				"Error at PulseOx_Forwarding_Duplicate_System.aadl:29: Got a system called Duplicate_System but I already have one called PulseOx_Forwarding_Duplicate_System",
+				"Error at PulseOx_Forwarding_Duplicate_System.aadl:29: Got a system called Duplicate_System but I already have one called null",
 				errorSB.toString().trim());
 	}
 

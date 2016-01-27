@@ -59,6 +59,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.ErrorTranslator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.IncludesCalculator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFactory;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.DevOrProcModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ControllerErrorTests;
@@ -76,7 +77,6 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesT
 import edu.ksu.cis.projects.mdcf.aadltranslator.util.MarkdownLinkRenderer;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSpecViewTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
-import edu.ksu.cis.projects.mdcf.aadltranslator.view.HazardReportViewTests;
 
 @RunWith(Suite.class)
 //@InjectWith(typeof(Aadl2UiInjectorProvider)) Look into this, could remove 10s wait time
@@ -104,7 +104,6 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.HazardReportViewTests;
 
 		// View tests
 		AppSuperClassViewTests.class,
-		HazardReportViewTests.class,
 		AppSpecViewTests.class,
 })
 public class AllTests {
@@ -294,6 +293,11 @@ public class AllTests {
 				OsateResourceUtil.getResourceURI((IResource) inputFile), true);
 		Element target = (Element) res.getContents().get(0);
 		stats.process(target);
+		String appName = inputFile.getProject().getName();
+		stats.getSystemModel().setName(appName);
+		for(DevOrProcModel dopm : stats.getSystemModel().getChildren().values()){
+			dopm.setParentName(appName);
+		}
 		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
 				.toString());
 		
@@ -339,6 +343,11 @@ public class AllTests {
 				OsateResourceUtil.getResourceURI((IResource) inputFile), true);
 		Element target = (Element) res.getContents().get(0);
 		stats.process(target);
+		String appName = inputFile.getProject().getName();
+		stats.getSystemModel().setName(appName);
+		for(DevOrProcModel dopm : stats.getSystemModel().getChildren().values()){
+			dopm.setParentName(appName);
+		}
 		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
 				.toString());
 

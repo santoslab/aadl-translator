@@ -20,6 +20,7 @@ import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.IntegerLiteral;
+import org.osate.aadl2.ListValue;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.Port;
@@ -30,6 +31,7 @@ import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyConstant;
+import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.RecordValue;
 import org.osate.aadl2.StringLiteral;
@@ -66,6 +68,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.HazardModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.StpaPreliminaryModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
@@ -121,7 +124,6 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			SimpleDateFormat sdf = new SimpleDateFormat(
 					"MMMM d, yyyy 'at' h:mm a");
 			systemModel = new SystemModel();
-			systemModel.setName(obj.getName());
 			systemModel.setTimestamp(sdf.format(new Date()));
 			lastElemProcessed = ElementType.SYSTEM;
 			return NOT_DONE;
@@ -264,6 +266,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					}
 					AccidentLevelModel alm = new AccidentLevelModel();
 					alm.setNumber((int) il.getValue());
+					handleExplanations(rv,alm);
 					alm.setName(obj.getName());
 					alm.setDescription(sl.getValue());
 					systemModel.addAccidentLevel(alm);
@@ -293,6 +296,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 							.getRecordFieldValue(rv, "Level");
 					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
 					AccidentModel am = new AccidentModel();
+					handleExplanations(rv, am);
 					am.setName(obj.getName());
 					am.setDescription(sl.getValue());
 					am.setParent(systemModel.getAccidentLevelByName(pc
@@ -306,6 +310,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 							.getRecordFieldValue(rv, "Accident");
 					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
 					HazardModel hm = new HazardModel();
+					handleExplanations(rv, hm);
 					hm.setName(obj.getName());
 					hm.setDescription(sl.getValue());
 					hm.setParent(systemModel.getAccidentByName(pc.getName()));
@@ -318,6 +323,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 							.getRecordFieldValue(rv, "Hazard");
 					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
 					ConstraintModel cm = new ConstraintModel();
+					handleExplanations(rv, cm);
 					cm.setName(obj.getName());
 					cm.setDescription(sl.getValue());
 					cm.setParent(systemModel.getHazardByName(pc.getName()));
@@ -1000,6 +1006,18 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			connModel.setChannelDelay(Integer.valueOf(channelDelay));
 			connModel.setName(obj.getName());
 			systemModel.addConnection(obj.getName(), connModel);
+		}
+		
+		private void handleExplanations(RecordValue rv, StpaPreliminaryModel spm){
+			ListValue lv = (ListValue) PropertyUtils.getRecordFieldValue(rv, "Explanations");
+			
+			if(lv == null){
+				return;
+			}
+			
+			for(PropertyExpression pe : lv.getOwnedListElements()){
+				spm.addExplanation(((StringLiteral)pe).getValue());
+			}
 		}
 
 		/*-

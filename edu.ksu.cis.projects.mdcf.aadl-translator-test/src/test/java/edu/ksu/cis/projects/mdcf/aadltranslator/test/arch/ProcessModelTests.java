@@ -118,8 +118,8 @@ public class ProcessModelTests {
 	
 	@Test
 	public void testProcessSystemName() {
-		assertEquals("PulseOx_Forwarding_System", logicModel.getParentName());
-		assertEquals("Process_Stub_System", processOnlyProcessModel.getParentName());
+		assertEquals("TestProject", logicModel.getParentName());
+		assertEquals("TestProject", processOnlyProcessModel.getParentName());
 	}
 	
 	@Test

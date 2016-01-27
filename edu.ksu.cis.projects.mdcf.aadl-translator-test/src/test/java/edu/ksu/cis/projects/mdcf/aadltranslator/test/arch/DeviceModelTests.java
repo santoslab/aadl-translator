@@ -66,8 +66,8 @@ public class DeviceModelTests {
 	
 	@Test
 	public void testProcessSystemName() {
-		assertEquals("PulseOx_Forwarding_System", deviceModelFromSystem.getParentName());
-		assertEquals("Device_Stub_System", deviceModelStandalone.getParentName());
+		assertEquals("TestProject", deviceModelFromSystem.getParentName());
+		assertEquals("TestProject", deviceModelStandalone.getParentName());
 	}
 	
 }

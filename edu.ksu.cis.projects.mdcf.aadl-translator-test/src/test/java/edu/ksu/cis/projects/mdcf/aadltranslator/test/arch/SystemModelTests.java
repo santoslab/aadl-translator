@@ -49,6 +49,6 @@ public class SystemModelTests {
 	
 	@Test
 	public void testSystemName() { 
-		assertEquals("PulseOx_Forwarding_System", systemModel.getName());
+		assertEquals("TestProject", systemModel.getName());
 	}
 }
