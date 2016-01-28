@@ -2,6 +2,9 @@ report(model, name, timestamp) ::=<<
 <header(name, timestamp)>
 <tblOfContents()>
 <fundamentals(model, name)>
+<decomposition(model)>
+<propagationsAndTransformations(model)>
+<unsafeInteractions(model)>
 >>
 
 header(name, timestamp) ::=<<
@@ -40,8 +43,43 @@ fundamentals(model, name) ::=<<
 }>* Predecessor Link Names:
 	<model.receivePorts.keys:{k | <linkName(k, model.receivePorts.(k))>
 }>* Classification: <model.componentTypeAsString>
+
+>>
+
+decomposition(model) ::=<<
+## Decomposition
+
+### Control Structure
+
+### Components
+
+<model.children.keys:{k | <elementTocEntry(k)>
+}>
+### Connections
+
+<model.channels.keys:{k | <elementTocEntry(k)>
+}>
+>>
+
+propagationsAndTransformations(model) ::=<<
+
+## Propagations and Transformations
+
+>>
+
+unsafeInteractions(model) ::=<<
+
+## Unsafe Interactions
+
+### Successor Dangers
+
+
 >>
 
 linkName(name, model) ::=<<
 * <name> (<model.type>)
+>>
+
+elementTocEntry(elemName) ::=<<
+#. [<elemName>](<elemName; format="MarkdownInterLink">)
 >>
