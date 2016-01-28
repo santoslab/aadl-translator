@@ -17,7 +17,7 @@ public class WriteOutputFiles {
 
 	public static void writeHazardReport(String reportText,
 			String reportDirectory, String reportName, OutputFormat fmt,
-			String pandocPath, java.net.URI uri) {
+			String pandocPath, URI headerPath) {
 		createDir(reportDirectory + "/reports");
 		writeStrToFile(reportText, reportDirectory + "/reports/" + reportName + ".md");
 		ArrayList<String> args = new ArrayList<>();
@@ -33,7 +33,7 @@ public class WriteOutputFiles {
 			break;
 		case HTML:
 			args.add("--to=html5");
-			args.add("--include-in-header=" + Paths.get(uri.normalize()));
+			args.add("--include-in-header=" + Paths.get(headerPath.normalize()));
 			args.add("--self-contained");
 			args.add("--smart");
 			args.add("--output=" + reportDirectory + "/reports/" + reportName + ".html");

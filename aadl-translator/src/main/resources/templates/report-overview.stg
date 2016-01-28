@@ -1,6 +1,6 @@
 report(model) ::=<<
 <header(model)>
-<tblOfContents(model)>
+<tblOfContents()>
 <background(model)>
 <fundamentals(model)>
 <decomposition(model)>
@@ -14,7 +14,7 @@ header(model) ::=<<
 
 >>
 
-tblOfContents(model) ::=<<
+tblOfContents() ::=<<
 ## Table of Contents
 
 1. [Background](#background)

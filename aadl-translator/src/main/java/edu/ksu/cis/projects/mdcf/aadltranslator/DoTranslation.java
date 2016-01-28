@@ -2,6 +2,7 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,6 +55,7 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.WriteOutputFiles.OutputFormat;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DevOrProcModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
@@ -71,6 +73,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	private final STGroup midas_compsigSTG = new STGroupFile("src/main/resources/templates/midas-compsig.stg");
 	private final STGroup midas_appspecSTG = new STGroupFile("src/main/resources/templates/midas-appspec.stg");
 	private final STGroup report_overview = new STGroupFile("src/main/resources/templates/report-overview.stg");
+	private final STGroup report_element = new STGroupFile("src/main/resources/templates/report-element.stg");
 
 	private final STGroup java_device_supertypeSTG = new STGroupFile(
 			"src/main/resources/templates/java-device-supertype.stg");
@@ -165,9 +168,9 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		// 5) Build the in-memory system model
 		processFiles(monitor, rs, archTranslator, usedFiles, targetFile, parseErrManager);
 
-		// 6) Set the system name to the package name 
+		// 6) Set the system name to the package name
 		updatePackageName(archTranslator.getSystemModel(), targetFile.getProject().getName());
-		
+
 		// 6.1) If selected, build the in-memory hazard analysis model
 		if (mode == Mode.HAZARD_ANALYSIS) {
 			ErrorTranslator hazardAnalysis = new ErrorTranslator();
@@ -206,7 +209,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 	private void updatePackageName(SystemModel systemModel, String name) {
 		systemModel.setName(name);
-		for(DevOrProcModel dopm : systemModel.getChildren().values()){
+		for (DevOrProcModel dopm : systemModel.getChildren().values()) {
 			dopm.setParentName(name);
 		}
 	}
@@ -291,6 +294,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	}
 
 	private void writeHazardReport(SystemModel sysModel) {
+		// Filename -> file contents
+		HashMap<String, String> elementReports = new HashMap<>();
 
 		IPreferencesService service = Platform.getPreferencesService();
 		String appDevDirectory = service.getString("edu.ksu.cis.projects.mdcf.aadl-translator",
@@ -301,16 +306,27 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				PreferenceConstants.P_PANDOCPATH, null, null);
 
 		report_overview.registerRenderer(String.class, MarkdownLinkRenderer.getInstance());
+		report_element.registerRenderer(String.class, MarkdownLinkRenderer.getInstance());
 
-		String reportStr = report_overview.getInstanceOf("report").add("model", sysModel).render();
+		String overview = report_overview.getInstanceOf("report").add("model", sysModel).render();
+
+		// We just use one element for testing, this will need to be expanded to
+		// a full DFS later
+		ComponentModel cm = sysModel.getChild("appLogic");
+		String elem_report = report_element.getInstanceOf("report").add("model", cm)
+				.add("name", "appLogic")
+				.add("timestamp", sysModel.getTimestamp()).render();
+		elementReports.put("appLogic", elem_report);
+
 		try {
-			WriteOutputFiles
-					.writeHazardReport(reportStr,
-							appDevDirectory, sysModel
-									.getName(),
-							OutputFormat.valueOf(fmtStr), pandocPath,
-							FileLocator.toFileURL(Platform.getBundle("edu.ksu.cis.projects.mdcf.aadl-translator")
-									.getEntry("src/main/resources/styles/default.html")).toURI());
+			URI reportHeaderURI = FileLocator.toFileURL(Platform.getBundle("edu.ksu.cis.projects.mdcf.aadl-translator")
+					.getEntry("src/main/resources/styles/default.html")).toURI();
+			WriteOutputFiles.writeHazardReport(overview, appDevDirectory, sysModel.getName(),
+					OutputFormat.valueOf(fmtStr), pandocPath, reportHeaderURI);
+			for (String elemName : elementReports.keySet()) {
+				WriteOutputFiles.writeHazardReport(elementReports.get(elemName), appDevDirectory, elemName,
+						OutputFormat.valueOf(fmtStr), pandocPath, reportHeaderURI);
+			}
 		} catch (IOException | URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

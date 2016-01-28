@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import org.apache.commons.lang.WordUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 
@@ -169,6 +170,10 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 
 	public ComponentType getComponentType() {
 		return this.componentType;
+	}
+
+	public String getComponentTypeAsString() {
+		return WordUtils.capitalize(this.componentType.toString().toLowerCase());
 	}
 	
 	public void addAccidentLevel(AccidentLevelModel alm)
