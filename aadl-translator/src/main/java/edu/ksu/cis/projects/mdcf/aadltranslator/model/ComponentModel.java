@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,11 +15,8 @@ import org.apache.commons.lang.WordUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 
-import com.google.common.collect.Maps;
-
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentType;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ProcessType;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentLevelModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ConstraintModel;
@@ -142,23 +140,38 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	}
 	
 	public Map<String, PortModel> getReceivePorts() {
-		return Maps.filterValues(ports, ModelUtil.receivePortFilter);
+		return ports.entrySet()
+				.stream()
+				.filter(p -> p.getValue().isSubscribe())
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 	
 	public Map<String, PortModel> getReceiveEventDataPorts() {
-		return Maps.filterValues(ports, ModelUtil.receiveEventDataPortFilter);
+		return ports.entrySet()
+				.stream()
+				.filter(p -> p.getValue().isSubscribe() && p.getValue().isEventData())
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 	
 	public Map<String, PortModel> getReceiveEventPorts() {
-		return Maps.filterValues(ports, ModelUtil.receiveEventPortFilter);
+		return ports.entrySet()
+				.stream()
+				.filter(p -> p.getValue().isSubscribe() && p.getValue().isEvent())
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 	
 	public Map<String, PortModel> getReceiveDataPorts() {
-		return Maps.filterValues(ports, ModelUtil.receiveDataPortFilter);
+		return ports.entrySet()
+				.stream()
+				.filter(p -> p.getValue().isSubscribe() && p.getValue().isData())
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 	
 	public Map<String, PortModel> getSendPorts() {
-		return Maps.filterValues(ports, ModelUtil.sendPortFilter);
+		return ports.entrySet()
+				.stream()
+				.filter(p -> !p.getValue().isSubscribe())
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 	
 	public String getParentName() {
@@ -204,20 +217,31 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	}
 
 	public Map<String, StpaPreliminaryModel> getAccidentLevels() {
-		return Maps.filterValues(stpaPreliminaries,
-				ModelUtil.accidentLevelFilter);
+		return stpaPreliminaries.entrySet()
+				.stream()
+				.filter(p -> p.getValue() instanceof AccidentLevelModel)
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 
 	public Map<String, StpaPreliminaryModel> getAccidents() {
-		return Maps.filterValues(stpaPreliminaries, ModelUtil.accidentFilter);
+		return stpaPreliminaries.entrySet()
+				.stream()
+				.filter(p -> p.getValue() instanceof AccidentModel)
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 
 	public Map<String, StpaPreliminaryModel> getHazards() {
-		return Maps.filterValues(stpaPreliminaries, ModelUtil.hazardFilter);
+		return stpaPreliminaries.entrySet()
+				.stream()
+				.filter(p -> p.getValue() instanceof HazardModel)
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 
 	public Map<String, StpaPreliminaryModel> getConstraints() {
-		return Maps.filterValues(stpaPreliminaries, ModelUtil.constraintFilter);
+		return stpaPreliminaries.entrySet()
+				.stream()
+				.filter(p -> p.getValue() instanceof ConstraintModel)
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 
 	public AccidentModel getAccidentByName(String name) {
@@ -245,7 +269,15 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	}
 	
 	public Map<String, ConnectionType> getControlActions() {
-		return Maps.filterValues(channels, ModelUtil.controlActionFilter);
+		// TODO: We need to think harder about what's a control action --
+		// since threads (controllers) talk to their containing processes
+		// (controllers in the system view, actuators in the thread view) we
+		// may even need multi-role components, or per-view component roles.
+//		return channels.entrySet()
+//				.stream()
+//				.filter(p -> true)
+//				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+		return channels;
 	}
 	
 	public void setComponentType(String componentType){
@@ -253,7 +285,20 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	}
 
 	public Map<String, ConnectionType> getRangedControlActions() {
-		return Maps.filterValues(getControlActions(), ModelUtil.rangedChannelFilter);
+		return getControlActions().entrySet()
+				.stream()
+				.filter(p -> isRangedControlAction(p))
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+	}
+	
+	private boolean isRangedControlAction(Entry<String, ConnectionType> p){
+		ConnectionType connection = p.getValue();
+		PortModel pubPort = connection.getPublisher().getPortByName(connection.getPubPortName() + "Out");
+		if(pubPort == null)
+			pubPort = connection.getPublisher().getPortByName(connection.getPubPortName());
+		String type = pubPort.getType();
+		
+		return !(type.equals("Object") || type.equals("Boolean"));
 	}
 	
 	private void initHazardReportDiagrams() {
@@ -282,6 +327,9 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	}
 	
 	public Set<PropagationModel> getOutPropagations() {
-		return propagations.stream().filter(pm -> pm.isOut()).collect(Collectors.toSet());
+		return propagations
+				.stream()
+				.filter(pm -> pm.isOut())
+				.collect(Collectors.toSet());
 	}
 }

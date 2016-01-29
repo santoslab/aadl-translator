@@ -85,7 +85,6 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	private final String TRANSLATE_ARCH_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate";
 	private final String TRANSLATE_HAZARDS_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate-hazards";
 	private final String TRANSLATE_DEVICE_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.device-aadl-translate";
-	private Object TranslatorUtil;
 
 	public HashSet<IFile> getUsedFiles() {
 		IncludesCalculator ic = new IncludesCalculator(new NullProgressMonitor());
@@ -309,7 +308,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 		// We just use one element for testing, this will need to be expanded to
 		// a full DFS later
-		ComponentModel cm = sysModel.getChild("appLogic");
+		ComponentModel<?, ?> cm = sysModel.getChild("appLogic");
 		String elem_report = report_element.getInstanceOf("report").add("model", cm)
 				.add("name", "appLogic")
 				.add("timestamp", sysModel.getTimestamp()).render();

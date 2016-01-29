@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -92,6 +91,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	private ArrayList<String> propertySetNames = new ArrayList<>();
 	private ParseErrorReporterManager errorManager;
 	public SystemImplementation sysImpl;
+	@SuppressWarnings("rawtypes")
 	private Map<ComponentModel, ComponentClassifier> children = new HashMap<>();
 
 	public class TranslatorSwitch extends Aadl2Switch<String> {
@@ -99,11 +99,13 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		/**
 		 * A reference to the "current" component model, stored for convenience
 		 */
+		@SuppressWarnings("rawtypes")
 		private ComponentModel componentModel = null;
 
 		/**
 		 * A reference to the current component's parent
 		 */
+		@SuppressWarnings("rawtypes")
 		private ComponentModel parentModel = null;
 
 		/**
@@ -1109,6 +1111,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		return sysImpl;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public Map<ComponentModel, ComponentClassifier> getChildren() {
 		return children;
 	}

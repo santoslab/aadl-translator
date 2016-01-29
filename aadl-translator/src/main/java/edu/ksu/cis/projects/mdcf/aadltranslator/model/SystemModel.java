@@ -1,18 +1,10 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Platform;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.util.stream.Collectors;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AbbreviationModel;
@@ -81,7 +73,11 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 	}
 
 	public HashMap<String, ProcessModel> getLogicComponents() {
-		HashMap<String, DevOrProcModel> preCast = new HashMap<>(Maps.filterValues(children, ModelUtil.logicComponentFilter));
+		Map<String, DevOrProcModel> preCast = children.entrySet()
+				.stream()
+				.filter(p -> p.getValue() instanceof ProcessModel)
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+		
 		HashMap<String, ProcessModel> ret = new HashMap<>();
 		for(String elemName : preCast.keySet()){
 			ret.put(elemName, (ProcessModel) preCast.get(elemName));
@@ -112,8 +108,10 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 	}
 	
 	public HashMap<String, ConnectionModel> getUniqueDevicePublishedChannels(){
-		Set<SystemConnectionModel> chanSet = new HashSet<>(channels.values());
-		chanSet = Sets.filter(chanSet, ModelUtil.devicePublishedFilter);
+		Set<SystemConnectionModel> chanSet = channels.values()
+				.stream()
+				.filter(cs -> cs.publisher instanceof DeviceModel)
+				.collect(Collectors.toSet());
 		
 		// Get a set that's distinct based on publishing identity 
 		// (publisher component name + publisher port name)
@@ -125,8 +123,10 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 	}
 	
 	public HashMap<String, ConnectionModel> getUniqueDeviceSubscribedChannels(){
-		Set<SystemConnectionModel> chanSet = new HashSet<>(channels.values());
-		chanSet = Sets.filter(chanSet, ModelUtil.deviceSubscribedFilter);
+		Set<SystemConnectionModel> chanSet = channels.values()
+				.stream()
+				.filter(cs -> cs.subscriber instanceof DeviceModel)
+				.collect(Collectors.toSet());
 		
 		// Get a set that's distinct based on subscriber identity 
 		// (subscriber component name + subscriber port name)

@@ -1,8 +1,7 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 import java.util.Map;
-
-import com.google.common.collect.Maps;
+import java.util.stream.Collectors;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ProcessType;
 
@@ -27,10 +26,16 @@ public class DevOrProcModel extends ComponentModel<TaskModel, ProcessConnectionM
 	}
 	
 	public Map<String, TaskModel> getSporadicTasks() {
-		return Maps.filterValues(this.getChildren(), ModelUtil.sporadicTaskFilter);
+		return children.entrySet()
+				.stream()
+				.filter(p -> p.getValue().isSporadic())
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 	
 	public Map<String, TaskModel> getPeriodicTasks() {
-		return Maps.filterValues(this.getChildren(), ModelUtil.periodicTaskFilter);
-	}	
+		return children.entrySet()
+				.stream()
+				.filter(p -> !p.getValue().isSporadic())
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+	}
 }

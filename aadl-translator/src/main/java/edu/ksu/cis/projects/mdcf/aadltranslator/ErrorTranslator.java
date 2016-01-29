@@ -49,7 +49,7 @@ public final class ErrorTranslator {
 		});
 	}
 
-	public void parseEMV2(ComponentModel model, ComponentClassifier cl) {
+	public void parseEMV2(ComponentModel<?, ?> model, ComponentClassifier cl) {
 
 		// If our classifier doesn't have an EMV2 block, then it doesn't have
 		// occurrences so we can just stop now
@@ -71,7 +71,7 @@ public final class ErrorTranslator {
 		}
 	}
 
-	private void parsePropagations(ComponentModel model, ErrorModelSubclause emv2) {
+	private void parsePropagations(ComponentModel<?, ?> model, ErrorModelSubclause emv2) {
 		PropagationModel propModel;
 		PortModel portModel;
 		Set<ErrorTypeModel> errors;
@@ -207,7 +207,7 @@ public final class ErrorTranslator {
 		}
 	}
 	
-	private PortModel resolvePortModel(ComponentModel model, String portName, boolean isIn){
+	private PortModel resolvePortModel(ComponentModel<?, ?> model, String portName, boolean isIn){
 		PortModel pm = model.getPortByName(portName);
 		
 		// Ideally we'll just have the portname as planned
@@ -230,7 +230,6 @@ public final class ErrorTranslator {
 	private Set<ErrorTypeModel> tokenSetToTypes(List<TypeToken> typeTokens) {
 		HashSet<ErrorTypeModel> ret = new HashSet<>();
 		for(TypeToken tok : typeTokens){
-			Set<ErrorTypeModel> types = new HashSet<ErrorTypeModel>();
 			// Guaranteed to only have one since we don't consider type sets
 			ret.add(new ErrorTypeModel(tok.getType().iterator().next().getName()));
 		}
