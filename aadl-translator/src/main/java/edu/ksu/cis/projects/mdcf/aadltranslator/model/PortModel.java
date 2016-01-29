@@ -10,6 +10,7 @@ public class PortModel {
 	private int minPeriod;
 	private int maxPeriod;
 	private String exchangeName;
+	private String containingComponentName;
 
 	public String getName() {
 		return name;
@@ -89,5 +90,13 @@ public class PortModel {
 
 	public void setExchangeName(String exchangeName) {
 		this.exchangeName = exchangeName;
+	}
+
+	public void setContainingComponentName(String containingComponentName) {
+		this.containingComponentName = containingComponentName;
+	}
+	
+	public String getContainingComponentName() {
+		return containingComponentName;
 	}
 }

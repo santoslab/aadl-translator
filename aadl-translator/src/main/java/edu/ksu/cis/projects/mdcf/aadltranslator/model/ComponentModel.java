@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.WordUtils;
 import org.eclipse.core.runtime.FileLocator;
@@ -278,5 +279,9 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 
 	public Set<PropagationModel> getPropagations() {
 		return propagations;
+	}
+	
+	public Set<PropagationModel> getOutPropagations() {
+		return propagations.stream().filter(pm -> pm.isOut()).collect(Collectors.toSet());
 	}
 }

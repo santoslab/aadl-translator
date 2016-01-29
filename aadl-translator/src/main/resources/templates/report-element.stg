@@ -73,6 +73,8 @@ unsafeInteractions(model) ::=<<
 
 ### Successor Dangers
 
+<model.outPropagations:{p | <succDanger(p)>
+}>
 
 >>
 
@@ -82,4 +84,8 @@ linkName(name, model) ::=<<
 
 elementTocEntry(elemName) ::=<<
 #. [<elemName>](<elemName; format="MarkdownInterLink">)
+>>
+
+succDanger(propModel) ::=<<
+* <propModel.port.containingComponentName>.<propModel.port.name>: {<propModel.errors:{e | <e.name>}; separator=",">}
 >>

@@ -417,6 +417,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 				PortModel pm = new PortModel();
 				pm.setName(obj.getName());
+				pm.setContainingComponentName(obj.getContainingClassifier().getName());
 				pm.setType(typeName);
 				pm.setMinPeriod(Integer.valueOf(minPeriod));
 				pm.setMaxPeriod(Integer.valueOf(maxPeriod));

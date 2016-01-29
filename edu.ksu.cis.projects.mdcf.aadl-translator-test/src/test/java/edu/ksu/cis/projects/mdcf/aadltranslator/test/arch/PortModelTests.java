@@ -93,4 +93,11 @@ public class PortModelTests {
 		//assertEquals(null, procSendPort.getExchangeName());
 		//assertEquals(null, procRecvPort.getExchangeName());
 	}
+	
+	@Test
+	public void testContainingComponentTypeName(){
+		assertEquals("ICEpoInterface", devSendPort.getContainingComponentName());
+		assertEquals("PulseOx_Logic_Process", procSendPort.getContainingComponentName());
+		assertEquals("PulseOx_Logic_Process", procRecvPort.getContainingComponentName());
+	}
 }
