@@ -2,9 +2,12 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ContainmentPathElement;
+import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.PropertyAssociation;
@@ -15,30 +18,41 @@ import org.osate.aadl2.impl.PortConnectionImpl;
 import org.osate.aadl2.impl.RecordValueImpl;
 import org.osate.aadl2.impl.SystemImplementationImpl;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorModelSubclause;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPropagation;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorTypes;
+import org.osate.xtext.aadl2.errormodel.errorModel.TypeSet;
+import org.osate.xtext.aadl2.errormodel.errorModel.TypeToken;
 import org.osate.xtext.aadl2.errormodel.util.EMV2Util;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.MissingRequiredPropertyException;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ConstraintModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ErrorTypeModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.Keyword;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.OccurrenceModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ConstraintModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypesModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.OccurrenceModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 
 public final class ErrorTranslator {
 
 	private HashMap<String, ErrorTypeModel> errorTypes;
 	private SystemModel systemModel;
 
-	public void setErrorTypes(HashSet<ErrorType> errors) {
+	public void setErrorType(HashSet<ErrorType> errors) {
 		errorTypes = new HashMap<>();
-		for (ErrorType et : errors) {
+		
+		errors.forEach((et) -> {
 			errorTypes.put(et.getName(), new ErrorTypeModel(et.getName()));
-		}
+		});
 	}
 
-	public void parseEMV2(ComponentClassifier cl) {
+	public void parseEMV2(ComponentModel model, ComponentClassifier cl) {
 
 		// If our classifier doesn't have an EMV2 block, then it doesn't have
 		// occurrences so we can just stop now
@@ -48,27 +62,59 @@ public final class ErrorTranslator {
 		ErrorModelSubclause emv2 = EMV2Util.getOwnEMV2Subclause(cl);
 		
 		// No EMv2 block means we can quit now
-		if(emv2 == null)
+		if(emv2 == null){
 			return;
+		}
 		
 		try {
 			parseOccurrences(emv2);
-			parseErrorFlows(emv2);
+			parsePropagations(model, emv2);
 		} catch (MissingRequiredPropertyException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void parseErrorFlows(ErrorModelSubclause emv2) {
-		
+	private void parsePropagations(ComponentModel model, ErrorModelSubclause emv2) {
+		PropagationModel propModel;
+		PortModel portModel;
+		Set<ErrorTypesModel> errors;
+		boolean isIn = true;
+		String portName;
+		for(ErrorPropagation eProp : emv2.getPropagations()){
+			if(eProp.getDirection() == DirectionType.IN){
+				isIn = true;
+			} else if (eProp.getDirection() == DirectionType.OUT){
+				isIn = false;
+			} else {
+				// Direction == INOUT
+				System.err.println("Inout propagation discovered!");
+			}
+			
+			errors = tokenSetToTypes(eProp.getTypeSet().getTypeTokens());
+			
+			portName = eProp.getFeatureorPPRef().getFeatureorPP().getName();
+			portModel = resolvePortModel(model, portName, isIn);
+						
+			propModel = new PropagationModel(isIn, errors, portModel);
+			
+			try {
+				model.addPropagation(propModel);
+			} catch (DuplicateElementException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
-	
+
 	private void parseOccurrences(ErrorModelSubclause emv2)
 			throws MissingRequiredPropertyException {
 		RecordValueImpl rv;
 		String connectionName, connErrorName;
 		for (PropertyAssociation pa : emv2.getProperties()) {
 			// Setup
+			if(!(pa.getOwnedValues().get(0).getOwnedValue() instanceof RecordValueImpl)){
+				continue;
+			}
 			rv = ((RecordValueImpl) pa.getOwnedValues().get(0)
 					.getOwnedValue());
 			if (!(pa.getAppliesTos().iterator().next()
@@ -162,6 +208,38 @@ public final class ErrorTranslator {
 
 			// TODO: Put in event chain trace
 		}
+	}
+	
+	private PortModel resolvePortModel(ComponentModel model, String portName, boolean isIn){
+		PortModel pm = model.getPortByName(portName);
+		
+		// Ideally we'll just have the portname as planned
+		if (pm != null){
+			return pm;
+		} else if (model instanceof DeviceModel) {
+			// Since devices get turned into pseudodevices, with both in and out
+			// ports, we only want the propagation to map to the port that
+			// interacts with our system
+			if(isIn){
+				return model.getPortByName(portName + "In");
+			} else {
+				return model.getPortByName(portName + "Out");
+			}
+		}
+			
+		return null;
+	}
+	
+	private Set<ErrorTypesModel> tokenSetToTypes(List<TypeToken> typeTokens) {
+		HashSet<ErrorTypesModel> ret = new HashSet<>();
+		for(TypeToken tok : typeTokens){
+			Set<ErrorTypeModel> types = new HashSet<ErrorTypeModel>();
+			tok.getType().forEach((errType) -> {
+				types.add(errorTypes.get(errType.getName()));
+			});
+			ret.add(new ErrorTypesModel(types));
+		}
+		return ret;
 	}
 
 	public void setSystemModel(SystemModel systemModel) {

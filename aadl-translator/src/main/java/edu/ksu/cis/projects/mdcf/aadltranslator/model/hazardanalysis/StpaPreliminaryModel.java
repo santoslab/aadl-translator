@@ -1,4 +1,4 @@
-package edu.ksu.cis.projects.mdcf.aadltranslator.model;
+package edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -15,6 +15,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AbbreviationModel;
 
 public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnectionModel>{
 

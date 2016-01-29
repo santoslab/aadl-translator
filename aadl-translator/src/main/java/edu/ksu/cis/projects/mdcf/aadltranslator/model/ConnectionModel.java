@@ -3,6 +3,8 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.OccurrenceModel;
+
 public class ConnectionModel {
 	protected ComponentModel publisher;
 	protected ComponentModel subscriber;

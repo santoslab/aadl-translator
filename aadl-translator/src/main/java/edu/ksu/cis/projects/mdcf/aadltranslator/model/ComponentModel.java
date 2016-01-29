@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.WordUtils;
 import org.eclipse.core.runtime.FileLocator;
@@ -17,6 +18,13 @@ import com.google.common.collect.Maps;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentType;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ProcessType;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentLevelModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ConstraintModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorFlowModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.HazardModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.StpaPreliminaryModel;
 
 public abstract class ComponentModel <ChildType extends ComponentModel, ConnectionType extends ConnectionModel> {
 
@@ -33,12 +41,12 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	/**
 	 * Maps port name -> port model
 	 */
-	protected HashMap<String, PortModel> ports;
+	protected HashMap<String, PortModel> ports = new HashMap<>();
 	
 	/**
 	 * Maps child name -> model
 	 */
-	protected HashMap<String, ChildType> children;
+	protected HashMap<String, ChildType> children = new HashMap<>();
 	
 	/**
 	 * The role this component plays in its parent's decomposition
@@ -48,22 +56,22 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	/**
 	 * Error propagations entering and leaving this component
 	 */
-	protected HashSet<PropagationModel> propagations;
+	protected Set<PropagationModel> propagations = new HashSet<>();
 	
 	/**
 	 * Error flows starting, ending, or moving through this component
 	 */
-	protected HashSet<ErrorFlowModel> errorFlows;
+	protected Set<ErrorFlowModel> errorFlows = new HashSet<>();
 	
 	/**
 	 * Connections between this component's (immediate) children
 	 */
-	protected HashMap<String, ConnectionType> channels;
+	protected HashMap<String, ConnectionType> channels = new HashMap<>();
 
 	/**
 	 * Maps element name -> element model
 	 */
-	protected HashMap<String, StpaPreliminaryModel> stpaPreliminaries;
+	protected HashMap<String, StpaPreliminaryModel> stpaPreliminaries = new HashMap<>();
 	
 	/**
 	 * Maps diagram name (eg: SystemBoundary) to file path
@@ -71,10 +79,6 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	protected HashMap<String, String> hazardReportDiagrams;
 	
 	public ComponentModel(){
-		ports = new HashMap<>();
-		children = new HashMap<>();
-		channels = new HashMap<>();
-		stpaPreliminaries = new HashMap<String, StpaPreliminaryModel>();
 		initHazardReportDiagrams();
 	}
 	
@@ -270,5 +274,9 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	
 	public HashMap<String, String> getHazardReportDiagrams() {
 		return hazardReportDiagrams;
+	}
+
+	public Set<PropagationModel> getPropagations() {
+		return propagations;
 	}
 }

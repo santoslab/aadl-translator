@@ -3,7 +3,8 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
@@ -57,21 +58,21 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.MissingRequiredPropert
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.PropertyOutOfRangeException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.UseBeforeDeclarationException;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.AbbreviationModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.AccidentLevelModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.AccidentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ConstraintModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DevOrProcModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.HazardModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.StpaPreliminaryModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AbbreviationModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentLevelModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ConstraintModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.HazardModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.StpaPreliminaryModel;
 
 public final class Translator extends AadlProcessingSwitchWithProgress {
 	private enum ElementType {
@@ -91,20 +92,20 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	private ArrayList<String> propertySetNames = new ArrayList<>();
 	private ParseErrorReporterManager errorManager;
 	public SystemImplementation sysImpl;
-	private HashSet<ProcessImplementation> procImpls = new HashSet<>();
+	private Map<ComponentModel, ComponentClassifier> children = new HashMap<>();
 
 	public class TranslatorSwitch extends Aadl2Switch<String> {
-		
+
 		/**
 		 * A reference to the "current" component model, stored for convenience
 		 */
 		private ComponentModel componentModel = null;
-		
+
 		/**
 		 * A reference to the current component's parent
 		 */
 		private ComponentModel parentModel = null;
-				
+
 		/**
 		 * A reference to the type of the last element processed
 		 */
@@ -114,15 +115,13 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		public String caseSystem(org.osate.aadl2.System obj) {
 			try {
 				if (systemModel != null)
-					throw new NotImplementedException("Got a system called "
-							+ obj.getName() + " but I already have one called "
-							+ systemModel.getName());
+					throw new NotImplementedException("Got a system called " + obj.getName()
+							+ " but I already have one called " + systemModel.getName());
 			} catch (NotImplementedException e) {
 				handleException(obj, e);
 				return DONE;
 			}
-			SimpleDateFormat sdf = new SimpleDateFormat(
-					"MMMM d, yyyy 'at' h:mm a");
+			SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy 'at' h:mm a");
 			systemModel = new SystemModel();
 			systemModel.setTimestamp(sdf.format(new Date()));
 			lastElemProcessed = ElementType.SYSTEM;
@@ -144,7 +143,6 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		@Override
 		public String caseProcessImplementation(ProcessImplementation obj) {
-			procImpls.add(obj);
 			return NOT_DONE;
 		}
 
@@ -152,12 +150,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		public String caseThreadSubcomponent(ThreadSubcomponent obj) {
 			try {
 				if (componentModel instanceof ProcessModel)
-					((ProcessModel) componentModel).addChild(obj.getName(),
-							new TaskModel(obj.getName()));
+					((ProcessModel) componentModel).addChild(obj.getName(), new TaskModel(obj.getName()));
 				else
 					throw new CoreException(
-							"Trying to add thread to non-process component "
-									+ componentModel.getName());
+							"Trying to add thread to non-process component " + componentModel.getName());
 			} catch (DuplicateElementException | CoreException e) {
 				handleException(obj, e);
 				return DONE;
@@ -168,9 +164,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		@Override
 		public String caseThreadType(ThreadType obj) {
 			lastElemProcessed = ElementType.THREAD;
-			if(componentModel instanceof ProcessModel)
+			if (componentModel instanceof ProcessModel)
 				parentModel = componentModel;
 			componentModel = parentModel.getChild(obj.getName());
+			children.put(componentModel, obj);
 			handleThreadProperties(obj, (TaskModel) componentModel);
 			processEList(obj.getOwnedElements());
 			return NOT_DONE;
@@ -211,15 +208,14 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			if (target == TranslationTarget.SYSTEM) {
 				try {
 					if (systemModel.hasDeviceType(obj.getName())) {
-						componentModel = systemModel.getDeviceByType(obj
-								.getName());
+						componentModel = systemModel.getDeviceByType(obj.getName());
 						getComponentType(obj);
 					} else {
 						throw new UseBeforeDeclarationException(
 								"Attempted to define a device that wasn't declared as a system component");
 					}
-				} catch (UseBeforeDeclarationException
-						| MissingRequiredPropertyException e) {
+					children.put(componentModel, obj);
+				} catch (UseBeforeDeclarationException | MissingRequiredPropertyException e) {
 					handleException(obj, e);
 					return DONE;
 				}
@@ -227,8 +223,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				// Translating just a device
 				systemModel = new SystemModel();
 				systemModel.setName("Device_Stub_System");
-				if (handleNewDevice(obj) != null)
+				if (handleNewDevice(obj) != null) {
 					return DONE;
+				}
+				children.put(systemModel.getDeviceByType(obj.getName()), obj);
 			} else {
 				// TODO: This shouldn't be hit. Throw an error?
 			}
@@ -237,10 +235,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			return NOT_DONE;
 		}
 
-		private void getComponentType(ComponentClassifier obj)
-				throws MissingRequiredPropertyException {
-			String componentType = checkCustomProperty(obj, "Component_Type",
-					PropertyType.ENUM);
+		private void getComponentType(ComponentClassifier obj) throws MissingRequiredPropertyException {
+			String componentType = checkCustomProperty(obj, "Component_Type", PropertyType.ENUM);
 			if (componentType == null)
 				throw new MissingRequiredPropertyException(
 						"Components must specify their component type (eg Actuator, Sensor, Controller, or Controlled Process)");
@@ -250,23 +246,18 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		@Override
 		public String casePropertyConstant(PropertyConstant obj) {
 			try {
-				if (obj.getPropertyType() == null
-						|| obj.getPropertyType().getName() == null) {
+				if (obj.getPropertyType() == null || obj.getPropertyType().getName() == null) {
 					return NOT_DONE;
-				} else if (obj.getPropertyType().getName()
-						.equals("Accident_Level")) {
+				} else if (obj.getPropertyType().getName().equals("Accident_Level")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral sl = (StringLiteral) PropertyUtils
-							.getRecordFieldValue(rv, "Description");
-					IntegerLiteral il = ((IntegerLiteral) PropertyUtils
-							.getRecordFieldValue(rv, "Level"));
+					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
+					IntegerLiteral il = ((IntegerLiteral) PropertyUtils.getRecordFieldValue(rv, "Level"));
 					if (il.getValue() > Integer.MAX_VALUE) {
-						throw new PropertyOutOfRangeException(
-								"Accident levels must be less than 2,147,483,647");
+						throw new PropertyOutOfRangeException("Accident levels must be less than 2,147,483,647");
 					}
 					AccidentLevelModel alm = new AccidentLevelModel();
 					alm.setNumber((int) il.getValue());
-					handleExplanations(rv,alm);
+					handleExplanations(rv, alm);
 					alm.setName(obj.getName());
 					alm.setDescription(sl.getValue());
 					systemModel.addAccidentLevel(alm);
@@ -276,13 +267,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				} else if (obj.getPropertyType().getName().equals("Assumption")) {
 					StringLiteral sl = (StringLiteral) obj.getConstantValue();
 					systemModel.addAssumption(sl.getValue());
-				} else if (obj.getPropertyType().getName()
-						.equals("Abbreviation")) {
+				} else if (obj.getPropertyType().getName().equals("Abbreviation")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral fullSL = (StringLiteral) PropertyUtils
-							.getRecordFieldValue(rv, "Full");
-					StringLiteral defSL = (StringLiteral) PropertyUtils
-							.getRecordFieldValue(rv, "Definition");
+					StringLiteral fullSL = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Full");
+					StringLiteral defSL = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Definition");
 					AbbreviationModel am = new AbbreviationModel();
 					am.setName(obj.getName());
 					am.setFull(fullSL.getValue());
@@ -290,24 +278,19 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					systemModel.addAbbreviation(am);
 				} else if (obj.getPropertyType().getName().equals("Accident")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral sl = (StringLiteral) PropertyUtils
-							.getRecordFieldValue(rv, "Description");
-					NamedValue nv = (NamedValue) PropertyUtils
-							.getRecordFieldValue(rv, "Level");
+					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
+					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Level");
 					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
 					AccidentModel am = new AccidentModel();
 					handleExplanations(rv, am);
 					am.setName(obj.getName());
 					am.setDescription(sl.getValue());
-					am.setParent(systemModel.getAccidentLevelByName(pc
-							.getName()));
+					am.setParent(systemModel.getAccidentLevelByName(pc.getName()));
 					systemModel.addAccident(am);
 				} else if (obj.getPropertyType().getName().equals("Hazard")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral sl = (StringLiteral) PropertyUtils
-							.getRecordFieldValue(rv, "Description");
-					NamedValue nv = (NamedValue) PropertyUtils
-							.getRecordFieldValue(rv, "Accident");
+					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
+					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Accident");
 					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
 					HazardModel hm = new HazardModel();
 					handleExplanations(rv, hm);
@@ -317,10 +300,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					systemModel.addHazard(hm);
 				} else if (obj.getPropertyType().getName().equals("Constraint")) {
 					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral sl = (StringLiteral) PropertyUtils
-							.getRecordFieldValue(rv, "Description");
-					NamedValue nv = (NamedValue) PropertyUtils
-							.getRecordFieldValue(rv, "Hazard");
+					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
+					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Hazard");
 					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
 					ConstraintModel cm = new ConstraintModel();
 					handleExplanations(rv, cm);
@@ -341,8 +322,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			if (target == TranslationTarget.SYSTEM) {
 				try {
 					if (systemModel.hasProcessType(obj.getName())) {
-						componentModel = systemModel.getProcessByType(obj
-								.getName());
+						componentModel = systemModel.getProcessByType(obj.getName());
 						pm = systemModel.getProcessByType(obj.getName());
 					} else {
 						throw new UseBeforeDeclarationException(
@@ -352,6 +332,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					handleException(obj, e);
 					return DONE;
 				}
+				children.put(componentModel, obj);
 			} else if (target == TranslationTarget.PROCESS) {
 				// Translating just a process...
 				systemModel = new SystemModel();
@@ -359,18 +340,16 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				if (handleNewProcess(obj) != null)
 					return DONE;
 				pm = systemModel.getProcessByType(obj.getName());
+				children.put(pm, obj);
 			} else {
 				// TODO: This shouldn't be hit. Throw an error?
 			}
 			try {
 				getComponentType(obj);
-				String processType = checkCustomProperty(obj, "Process_Type",
-						PropertyType.ENUM);
-				if (processType != null
-						&& processType.equalsIgnoreCase("logic")) {
+				String processType = checkCustomProperty(obj, "Process_Type", PropertyType.ENUM);
+				if (processType != null && processType.equalsIgnoreCase("logic")) {
 					pm.setDisplay(false);
-				} else if (processType != null
-						&& processType.equalsIgnoreCase("display")) {
+				} else if (processType != null && processType.equalsIgnoreCase("display")) {
 					pm.setDisplay(true);
 				} else {
 					throw new PropertyOutOfRangeException(
@@ -391,15 +370,9 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				handlePort(obj);
 			} else if (lastElemProcessed == ElementType.DEVICE) {
 				handlePort(obj); // Explicit "out" port
-//<<<<<<< HEAD
-//				if (!cancelled()) {
-//					handleImplicitPort(obj); // Implicit "in" port from device
-//					handleImplicitTask(obj); // Implicit task to handle incoming
-//=======
-				if(!cancelled()){
-					handlePseudoDeviceImplicitTask(obj); // Implicit task to handle incoming
-//>>>>>>> 30c8490... Bug fixes and build tweaks
-											 // data
+				if (!cancelled()) {
+					handlePseudoDeviceImplicitTask(obj); // Implicit task to
+													// handle incoming data
 				}
 			} else if (lastElemProcessed == ElementType.THREAD) {
 				handlePort(obj);
@@ -414,40 +387,34 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 				if (obj.getCategory() == PortCategory.EVENT_DATA) {
 					typeNameProp = GetProperties.lookupPropertyDefinition(
-							((EventDataPort) obj).getDataFeatureClassifier(),
-							DataModel._NAME, DataModel.Data_Representation);
+							((EventDataPort) obj).getDataFeatureClassifier(), DataModel._NAME,
+							DataModel.Data_Representation);
 				} else if (obj.getCategory() == PortCategory.DATA) {
-					typeNameProp = GetProperties.lookupPropertyDefinition(
-							((DataPort) obj).getDataFeatureClassifier(),
+					typeNameProp = GetProperties.lookupPropertyDefinition(((DataPort) obj).getDataFeatureClassifier(),
 							DataModel._NAME, DataModel.Data_Representation);
 				} else if (obj.getCategory() == PortCategory.EVENT) {
 					// Do nothing, we have an event port
 				}
 				try {
 					if (typeNameProp != null) {
-						typeName = getJavaType(PropertyUtils.getEnumLiteral(
-								obj, typeNameProp).getName());
+						typeName = getJavaType(PropertyUtils.getEnumLiteral(obj, typeNameProp).getName());
 					} else {
 						typeName = getJavaType(null);
 					}
 				} catch (PropertyNotPresentException e) {
-					throw new MissingRequiredPropertyException(
-							"Missing the required data representation");
+					throw new MissingRequiredPropertyException("Missing the required data representation");
 				}
 
-				minPeriod = handleOverridableProperty(obj,
-						"Default_Output_Rate", "MAP_Properties", "Output_Rate",
+				minPeriod = handleOverridableProperty(obj, "Default_Output_Rate", "MAP_Properties", "Output_Rate",
 						PropertyType.RANGE_MIN);
-				maxPeriod = handleOverridableProperty(obj,
-						"Default_Output_Rate", "MAP_Properties", "Output_Rate",
+				maxPeriod = handleOverridableProperty(obj, "Default_Output_Rate", "MAP_Properties", "Output_Rate",
 						PropertyType.RANGE_MAX);
 
 				if (minPeriod == null || maxPeriod == null)
-					throw new MissingRequiredPropertyException(
-							"Missing the required output rate specification.");
+					throw new MissingRequiredPropertyException("Missing the required output rate specification.");
 
 				exchangeName = checkCustomProperty(obj, "Exchange_Name", PropertyType.STRING);
-				
+
 				PortModel pm = new PortModel();
 				pm.setName(obj.getName());
 				pm.setType(typeName);
@@ -459,8 +426,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				} else if (obj.getDirection() == DirectionType.OUT) {
 					pm.setSubscribe(false);
 				} else {
-					throw new NotImplementedException(
-							"Ports must be either in nor out");
+					throw new NotImplementedException("Ports must be either in nor out");
 				}
 				if (obj.getCategory() == PortCategory.EVENT_DATA) {
 					pm.setEventData();
@@ -471,23 +437,19 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					pm.setEvent();
 				}
 				componentModel.addPort(pm);
-			} catch (NotImplementedException | MissingRequiredPropertyException
-					| DuplicateElementException e) {
+			} catch (NotImplementedException | MissingRequiredPropertyException | DuplicateElementException e) {
 				handleException(obj, e);
 				return;
 			}
 		}
-		
+
 		private void handleException(Element obj, Exception e) {
 			INode node = NodeModelUtils.findActualNodeFor(obj);
-			IResource file = OsateResourceUtil.convertToIResource(obj
-					.eResource());
+			IResource file = OsateResourceUtil.convertToIResource(obj.eResource());
 			ParseErrorReporter errReporter = errorManager.getReporter(file);
 			if (errReporter instanceof MarkerParseErrorReporter)
-				((MarkerParseErrorReporter) errReporter).setContextResource(obj
-						.eResource());
-			errReporter.error(obj.eResource().getURI().lastSegment(),
-					node.getStartLine(), e.getMessage());
+				((MarkerParseErrorReporter) errReporter).setContextResource(obj.eResource());
+			errReporter.error(obj.eResource().getURI().lastSegment(), node.getStartLine(), e.getMessage());
 			cancelTraversal();
 		}
 
@@ -504,12 +466,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		private String getJavaType(String name) throws NotImplementedException {
 			if (name == null) {
 				return "Object";
-			} else if (name.equals("Integer") || name.equals("Double")
-					|| name.equals("Boolean")) {
+			} else if (name.equals("Integer") || name.equals("Double") || name.equals("Boolean")) {
 				return name;
 			} else {
-				throw new NotImplementedException(
-						"No java equivalent for type " + name);
+				throw new NotImplementedException("No java equivalent for type " + name);
 			}
 		}
 
@@ -570,10 +530,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			if (!obj.getOwnedSubcomponents().isEmpty())
 				processEList(obj.getOwnedSubcomponents());
 			if (obj instanceof ThreadImplementation
-					&& !((((ThreadImplementation) obj)
-							.getOwnedSubprogramCallSequences()).isEmpty()))
-				processEList(((ThreadImplementation) obj)
-						.getOwnedSubprogramCallSequences());
+					&& !((((ThreadImplementation) obj).getOwnedSubprogramCallSequences()).isEmpty()))
+				processEList(((ThreadImplementation) obj).getOwnedSubprogramCallSequences());
 			if (!obj.getOwnedConnections().isEmpty())
 				processEList(obj.getOwnedConnections());
 			if (!obj.getOwnedPropertyAssociations().isEmpty())
@@ -620,7 +578,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				return;
 			}
 		}
-		
+
 		private void handleDataPortImplicitTask(String portName, String portType, Port obj) {
 			String taskName = portName + "Task";
 			TaskModel tm = new TaskModel(taskName);
@@ -645,17 +603,13 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		private void handleThreadProperties(ThreadType obj, TaskModel tm) {
 			try {
-				String trigType = handleOverridableProperty(obj,
-						"Default_Thread_Dispatch", "Thread_Properties",
+				String trigType = handleOverridableProperty(obj, "Default_Thread_Dispatch", "Thread_Properties",
 						"Dispatch_Protocol", PropertyType.ENUM);
-				String period = handleOverridableProperty(obj,
-						"Default_Thread_Period", "Timing_Properties", "Period",
+				String period = handleOverridableProperty(obj, "Default_Thread_Period", "Timing_Properties", "Period",
 						PropertyType.INT);
-				String deadline = handleOverridableProperty(obj,
-						"Default_Thread_Deadline", "Timing_Properties",
+				String deadline = handleOverridableProperty(obj, "Default_Thread_Deadline", "Timing_Properties",
 						"Deadline", PropertyType.INT);
-				String wcet = handleOverridableProperty(obj,
-						"Default_Thread_WCET", "MAP_Properties",
+				String wcet = handleOverridableProperty(obj, "Default_Thread_WCET", "MAP_Properties",
 						"Worst_Case_Execution_Time", PropertyType.INT);
 				if (trigType == null)
 					throw new MissingRequiredPropertyException(
@@ -680,15 +634,13 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						tm.setSporadic(false);
 					} else {
 						throw new NotImplementedException(
-								"Thread dispatch must be either sporadic or periodic, instead got "
-										+ trigType);
+								"Thread dispatch must be either sporadic or periodic, instead got " + trigType);
 					}
 					tm.setPeriod(Integer.valueOf(period));
 					tm.setDeadline(Integer.valueOf(deadline));
 					tm.setWcet(Integer.valueOf(wcet));
 				}
-			} catch (MissingRequiredPropertyException | NotImplementedException
-					| UseBeforeDeclarationException e) {
+			} catch (MissingRequiredPropertyException | NotImplementedException | UseBeforeDeclarationException e) {
 				handleException(obj, e);
 				return;
 			}
@@ -700,15 +652,14 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			if (obj instanceof DeviceType) {
 				dm.setName(obj.getName());
 			} else if (obj instanceof DeviceSubcomponent) {
-				dm.setName(((DeviceSubcomponent) obj).getComponentType()
-						.getName());
+				dm.setName(((DeviceSubcomponent) obj).getComponentType().getName());
 			} else {
 				// TODO: This should never happen... handle it?
 			}
 			((DeviceModel) dm).setParentName(systemModel.getName());
 			try {
 				String componentType = checkCustomProperty(obj, "Component_Type", PropertyType.ENUM);
-				if(componentType != null)
+				if (componentType != null)
 					dm.setComponentType(componentType);
 				systemModel.addChild(obj.getName(), dm);
 
@@ -725,8 +676,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			if (obj instanceof ProcessType) {
 				pm.setName(obj.getName());
 			} else if (obj instanceof ProcessSubcomponent) {
-				pm.setName(((ProcessSubcomponent) obj).getComponentType()
-						.getName());
+				pm.setName(((ProcessSubcomponent) obj).getComponentType().getName());
 			} else {
 				// TODO: This should never happen... handle it?
 			}
@@ -741,11 +691,9 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			return NOT_DONE;
 		}
 
-		private String handleOverridableProperty(NamedElement obj,
-				String defaultName, String overridePropertySet,
+		private String handleOverridableProperty(NamedElement obj, String defaultName, String overridePropertySet,
 				String overrideName, PropertyType propType) {
-			Property prop = GetProperties.lookupPropertyDefinition(obj,
-					overridePropertySet, overrideName);
+			Property prop = GetProperties.lookupPropertyDefinition(obj, overridePropertySet, overrideName);
 			String ret = null;
 
 			// This try / catch (and the nested one in the for loop) are here
@@ -775,14 +723,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 *            The type of the property
 		 * @return The property value or null if the property isn't found
 		 */
-		private String checkCustomProperty(NamedElement obj,
-				String propertyName, PropertyType propType) {
+		private String checkCustomProperty(NamedElement obj, String propertyName, PropertyType propType) {
 			String ret = null;
 			Property prop;
 			for (String propertySetName : propertySetNames) {
 				try {
-					prop = GetProperties.lookupPropertyDefinition(obj,
-							propertySetName, propertyName);
+					prop = GetProperties.lookupPropertyDefinition(obj, propertySetName, propertyName);
 					if (prop == null)
 						continue;
 					else
@@ -797,8 +743,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			return ret;
 		}
 
-		private String handlePropertyValue(NamedElement obj, Property prop,
-				PropertyType propType) throws PropertyOutOfRangeException {
+		private String handlePropertyValue(NamedElement obj, Property prop, PropertyType propType)
+				throws PropertyOutOfRangeException {
 			if (propType == PropertyType.ENUM)
 				return PropertyUtils.getEnumLiteral(obj, prop).getName();
 			else if (propType == PropertyType.INT) {
@@ -811,38 +757,31 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				// nv.getUnit()
 
 				return getStringFromScaledNumber(
-						PropertyUtils.getScaledNumberValue(obj, prop,
-								GetProperties.findUnitLiteral(prop, "ms")),
-						obj, prop);
+						PropertyUtils.getScaledNumberValue(obj, prop, GetProperties.findUnitLiteral(prop, "ms")), obj,
+						prop);
 			} else if (propType == PropertyType.RANGE_MIN) {
 				return getStringFromScaledNumber(
-						PropertyUtils.getScaledRangeMinimum(obj, prop,
-								GetProperties.findUnitLiteral(prop, "ms")),
-						obj, prop);
+						PropertyUtils.getScaledRangeMinimum(obj, prop, GetProperties.findUnitLiteral(prop, "ms")), obj,
+						prop);
 			} else if (propType == PropertyType.RANGE_MAX) {
 				return getStringFromScaledNumber(
-						PropertyUtils.getScaledRangeMaximum(obj, prop,
-								GetProperties.findUnitLiteral(prop, "ms")),
-						obj, prop);
+						PropertyUtils.getScaledRangeMaximum(obj, prop, GetProperties.findUnitLiteral(prop, "ms")), obj,
+						prop);
 			} else if (propType == PropertyType.STRING) {
 				return PropertyUtils.getStringValue(obj, prop);
 			} else {
-				System.err
-						.println("HandlePropertyValue called with garbage propType: "
-								+ propType);
+				System.err.println("HandlePropertyValue called with garbage propType: " + propType);
 			}
 			return null;
 		}
 
-		private String getStringFromScaledNumber(double num, NamedElement obj,
-				Property prop) throws PropertyOutOfRangeException {
+		private String getStringFromScaledNumber(double num, NamedElement obj, Property prop)
+				throws PropertyOutOfRangeException {
 			if (num == (int) Math.rint(num))
 				return String.valueOf((int) Math.rint(num));
 			else
-				throw new PropertyOutOfRangeException("Property "
-						+ prop.getName() + " on element " + obj.getName()
-						+ " converts to " + num
-						+ " ms, which cannot be converted to an integer");
+				throw new PropertyOutOfRangeException("Property " + prop.getName() + " on element " + obj.getName()
+						+ " converts to " + num + " ms, which cannot be converted to an integer");
 		}
 
 		/*-
@@ -870,8 +809,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				if (obj.getAllSource().getOwner() instanceof ThreadType
 						&& obj.getAllDestination().getOwner() instanceof ProcessType) {
 					// From thread to process
-					taskName = ((ThreadType) obj.getAllSource().getOwner())
-							.getName();
+					taskName = ((ThreadType) obj.getAllSource().getOwner()).getName();
 					localName = obj.getAllSource().getName();
 					portName = obj.getAllDestination().getName();
 					portType = procModel.getPortByName(portName).getType();
@@ -890,16 +828,13 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						&& obj.getAllDestination().getOwner() instanceof ThreadType) {
 					// From process to thread
 					boolean eventTriggered;
-					taskName = ((ThreadType) obj.getAllDestination().getOwner())
-							.getName();
+					taskName = ((ThreadType) obj.getAllDestination().getOwner()).getName();
 					localName = obj.getAllDestination().getName();
 					portName = obj.getAllSource().getName();
 					task = procModel.getChild(taskName);
-					eventTriggered = procModel.getPortByName(portName)
-							.isEvent();
+					eventTriggered = procModel.getPortByName(portName).isEvent();
 					portType = procModel.getPortByName(portName).getType();
-					task.setTrigPortInfo(portName, portType, localName,
-							eventTriggered);
+					task.setTrigPortInfo(portName, portType, localName, eventTriggered);
 
 					connModel.setName(obj.getName());
 					connModel.setProcessToThread(true);
@@ -913,8 +848,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				} else if (obj.getAllSource().getOwner() instanceof ThreadType
 						&& obj.getAllDestination().getOwner() instanceof ThreadType) {
 					// From thread to thread
-					throw new NotImplementedException(
-							"Thread <--> thread communication is handled via shared state");
+					throw new NotImplementedException("Thread <--> thread communication is handled via shared state");
 				} else if (obj.getAllSource().getOwner() instanceof ThreadType
 						&& obj.getAllDestination().getOwner() instanceof ThreadType) {
 					// From process port to other process port
@@ -930,8 +864,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		private void handleSystemPortConnection(PortConnection obj) {
 			try {
 				if (obj.isBidirectional())
-					throw new NotImplementedException(
-							"Bidirectional ports are not yet allowed.");
+					throw new NotImplementedException("Bidirectional ports are not yet allowed.");
 			} catch (NotImplementedException e) {
 				handleException(obj, e);
 				return;
@@ -942,20 +875,18 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			SystemConnectionModel connModel = new SystemConnectionModel();
 
 			String channelDelay = null;
-			
+
 			pubName = obj.getAllSourceContext().getName();
 			subName = obj.getAllDestinationContext().getName();
 			pubPortName = obj.getAllSource().getName();
 			subPortName = obj.getAllDestination().getName();
-			
+
 			try {
 				if ((obj.getAllSource().getOwner() instanceof DeviceType)
 						&& (obj.getAllDestination().getOwner() instanceof ProcessType)) {
 					// From device to process
-					pubTypeName = ((DeviceType) obj.getAllSource().getOwner())
-							.getName();
-					subTypeName = ((ProcessType) obj.getAllDestination()
-							.getOwner()).getName();
+					pubTypeName = ((DeviceType) obj.getAllSource().getOwner()).getName();
+					subTypeName = ((ProcessType) obj.getAllDestination().getOwner()).getName();
 					pubModel = systemModel.getDeviceByType(pubTypeName);
 					subModel = systemModel.getProcessByType(subTypeName);
 					connModel.setDevicePublished(true);
@@ -963,10 +894,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				} else if ((obj.getAllSource().getOwner() instanceof ProcessType)
 						&& (obj.getAllDestination().getOwner() instanceof DeviceType)) {
 					// From process to device
-					pubTypeName = ((ProcessType) obj.getAllSource().getOwner())
-							.getName();
-					subTypeName = ((DeviceType) obj.getAllDestination()
-							.getOwner()).getName();
+					pubTypeName = ((ProcessType) obj.getAllSource().getOwner()).getName();
+					subTypeName = ((DeviceType) obj.getAllDestination().getOwner()).getName();
 					pubModel = systemModel.getProcessByType(pubTypeName);
 					subModel = systemModel.getDeviceByType(subTypeName);
 					connModel.setDevicePublished(false);
@@ -974,24 +903,19 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				} else if ((obj.getAllSource().getOwner() instanceof ProcessType)
 						&& (obj.getAllDestination().getOwner() instanceof ProcessType)) {
 					// From process to process
-					pubTypeName = ((ProcessType) obj.getAllSource().getOwner())
-							.getName();
-					subTypeName = ((ProcessType) obj.getAllDestination()
-							.getOwner()).getName();
+					pubTypeName = ((ProcessType) obj.getAllSource().getOwner()).getName();
+					subTypeName = ((ProcessType) obj.getAllDestination().getOwner()).getName();
 					pubModel = systemModel.getProcessByType(pubTypeName);
 					subModel = systemModel.getProcessByType(subTypeName);
 					connModel.setDevicePublished(false);
 					connModel.setDeviceSubscribed(false);
 				} else {
-					throw new NotImplementedException(
-							"Device to device connections are not yet allowed.");
+					throw new NotImplementedException("Device to device connections are not yet allowed.");
 				}
-				channelDelay = handleOverridableProperty(obj,
-						"Default_Channel_Delay", "MAP_Properties",
+				channelDelay = handleOverridableProperty(obj, "Default_Channel_Delay", "MAP_Properties",
 						"Channel_Delay", PropertyType.INT);
 				if (channelDelay == null)
-					throw new MissingRequiredPropertyException(
-							"Missing required property 'Default_Channel_Delay'");
+					throw new MissingRequiredPropertyException("Missing required property 'Default_Channel_Delay'");
 			} catch (NotImplementedException | MissingRequiredPropertyException e) {
 				handleException(obj, e);
 				return;
@@ -1007,16 +931,16 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			connModel.setName(obj.getName());
 			systemModel.addConnection(obj.getName(), connModel);
 		}
-		
-		private void handleExplanations(RecordValue rv, StpaPreliminaryModel spm){
+
+		private void handleExplanations(RecordValue rv, StpaPreliminaryModel spm) {
 			ListValue lv = (ListValue) PropertyUtils.getRecordFieldValue(rv, "Explanations");
-			
-			if(lv == null){
+
+			if (lv == null) {
 				return;
 			}
-			
-			for(PropertyExpression pe : lv.getOwnedListElements()){
-				spm.addExplanation(((StringLiteral)pe).getValue());
+
+			for (PropertyExpression pe : lv.getOwnedListElements()) {
+				spm.addExplanation(((StringLiteral) pe).getValue());
 			}
 		}
 
@@ -1039,7 +963,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				handleException(obj, e);
 				return;
 			}
-
+		
 			// A passed parameter: From thread to method
 			if (obj.getAllSource().getOwner() instanceof ThreadType) {
 				formalParam = obj.getAllDestination().getName();
@@ -1184,8 +1108,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		return sysImpl;
 	}
 
-	public Set<ProcessImplementation> getProcessImplementations() {
-		return procImpls;
+	public Map<ComponentModel, ComponentClassifier> getChildren() {
+		return children;
 	}
 
 	public String getTarget() {

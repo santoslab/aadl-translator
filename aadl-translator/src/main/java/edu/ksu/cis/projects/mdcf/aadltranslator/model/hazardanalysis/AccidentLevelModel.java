@@ -1,4 +1,4 @@
-package edu.ksu.cis.projects.mdcf.aadltranslator.model;
+package edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis;
 
 public class AccidentLevelModel extends StpaPreliminaryModel {
 	protected int number;

@@ -2,6 +2,13 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 import com.google.common.base.Predicate;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentLevelModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ConstraintModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.HazardModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.StpaPreliminaryModel;
+
 public class ModelUtil {
 	public static enum ProcessType {
 		PSEUDODEVICE, DISPLAY, LOGIC

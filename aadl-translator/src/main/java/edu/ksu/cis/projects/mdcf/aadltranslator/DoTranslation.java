@@ -36,7 +36,6 @@ import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.Element;
-import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.modelsupport.errorreporting.LogParseErrorReporter;
@@ -174,14 +173,12 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		// 6.1) If selected, build the in-memory hazard analysis model
 		if (mode == Mode.HAZARD_ANALYSIS) {
 			ErrorTranslator hazardAnalysis = new ErrorTranslator();
-			HashSet<ErrorType> errors = getErrorTypes(rs, usedFiles);
+			HashSet<ErrorType> errors = getErrorType(rs, usedFiles);
 
-			hazardAnalysis.setErrorTypes(errors);
+			hazardAnalysis.setErrorType(errors);
 			hazardAnalysis.setSystemModel(archTranslator.getSystemModel());
-			hazardAnalysis.parseEMV2(archTranslator.getSystemImplementation());
-			for (ProcessImplementation process : archTranslator.getProcessImplementations()) {
-				hazardAnalysis.parseEMV2(process);
-			}
+			hazardAnalysis.parseEMV2(archTranslator.getSystemModel(), archTranslator.getSystemImplementation());
+			archTranslator.getChildren().forEach((model, classifier) -> hazardAnalysis.parseEMV2(model, classifier));
 
 			IProject proj = targetFile.getProject();
 			if (proj.getFolder("diagrams").exists()) {
@@ -508,7 +505,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		return systemFile;
 	}
 
-	private HashSet<ErrorType> getErrorTypes(ResourceSet rs, HashSet<IFile> usedFiles) {
+	private HashSet<ErrorType> getErrorType(ResourceSet rs, HashSet<IFile> usedFiles) {
 		HashSet<ErrorType> retSet = new HashSet<>();
 		for (IFile f : usedFiles) {
 			Resource res = rs.getResource(OsateResourceUtil.getResourceURI((IResource) f), true);
@@ -524,6 +521,9 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				DefaultAnnexLibrary defaultAnnexLibrary = (DefaultAnnexLibrary) annexLibrary;
 				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary.getParsedAnnexLibrary();
 				retSet.addAll(emImpl.getTypes());
+				if(!emImpl.getTypesets().isEmpty()){
+					System.err.println("Sets of rrror types are not supported");
+				}
 			}
 		}
 		return retSet;
