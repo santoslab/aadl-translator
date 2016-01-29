@@ -16,7 +16,6 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypesModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
@@ -85,23 +84,19 @@ public class PropagationModelTests {
 	@Test
 	public void testPropagationErrorTypes() {
 		assertEquals(1, dmProp.getErrors().size());
-		assertEquals(1, dmProp.getErrors().iterator().next().getTypes().size());
-		assertEquals("SpO2ValueHigh", dmProp.getErrors().iterator().next().getTypes().iterator().next().getName());
+		assertEquals("SpO2ValueHigh", dmProp.getErrors().iterator().next().getName());
 
 		assertEquals(1, pmProp1.getErrors().size());
-		assertEquals(1, pmProp1.getErrors().iterator().next().getTypes().size());
-		assertEquals("SpO2ValueHigh", pmProp1.getErrors().iterator().next().getTypes().iterator().next().getName());
+		assertEquals("SpO2ValueHigh", pmProp1.getErrors().iterator().next().getName());
 		
 		assertEquals(1, pmProp2.getErrors().size());
-		assertEquals(1, pmProp2.getErrors().iterator().next().getTypes().size());
-		assertEquals("MissedAlarm", pmProp2.getErrors().iterator().next().getTypes().iterator().next().getName());
+		assertEquals("MissedAlarm", pmProp2.getErrors().iterator().next().getName());
 		
-		TreeSet<ErrorTypesModel> p3Set = new TreeSet<>(pmProp3.getErrors());
-		Iterator<ErrorTypesModel> p3Iter = p3Set.iterator();		
+		TreeSet<ErrorTypeModel> p3Set = new TreeSet<>(pmProp3.getErrors());
+		Iterator<ErrorTypeModel> p3Iter = p3Set.iterator();		
 		
 		assertEquals(2, pmProp3.getErrors().size());
-		assertEquals("ExtraTypeOne", p3Iter.next().getTypes().iterator().next().getName());
-		assertEquals("ExtraTypeTwo", p3Iter.next().getTypes().iterator().next().getName());
-		
+		assertEquals("ExtraTypeOne", p3Iter.next().getName());
+		assertEquals("ExtraTypeTwo", p3Iter.next().getName());		
 	}
 }

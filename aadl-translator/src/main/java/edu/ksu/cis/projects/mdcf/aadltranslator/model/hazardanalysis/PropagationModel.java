@@ -17,10 +17,10 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
  */
 public class PropagationModel implements Comparable<PropagationModel>{
 	private boolean in;
-	private Set<ErrorTypesModel> errors;
+	private Set<ErrorTypeModel> errors;
 	private PortModel port;
 	
-	public PropagationModel(boolean in, Set<ErrorTypesModel> errors, PortModel port) {
+	public PropagationModel(boolean in, Set<ErrorTypeModel> errors, PortModel port) {
 		this.in = in;
 		this.errors = errors;
 		this.port = port;
@@ -42,11 +42,11 @@ public class PropagationModel implements Comparable<PropagationModel>{
 		this.in = false;
 	}
 
-	public Set<ErrorTypesModel> getErrors() {
+	public Set<ErrorTypeModel> getErrors() {
 		return errors;
 	}
 
-	public void setErrors(Set<ErrorTypesModel> errors) {
+	public void setErrors(Set<ErrorTypeModel> errors) {
 		this.errors = errors;
 	}
 
@@ -75,14 +75,14 @@ public class PropagationModel implements Comparable<PropagationModel>{
 				return 1;
 			}
 		} else {
-			TreeSet<ErrorTypesModel> myErrors = new TreeSet<>();
-			TreeSet<ErrorTypesModel> yourErrors = new TreeSet<>();
+			TreeSet<ErrorTypeModel> myErrors = new TreeSet<>();
+			TreeSet<ErrorTypeModel> yourErrors = new TreeSet<>();
 			myErrors.addAll(errors);
 			yourErrors.addAll(theirPropModel.getErrors());
-			Iterator<ErrorTypesModel> myIter = myErrors.iterator();
-			Iterator<ErrorTypesModel> yourIter = yourErrors.iterator();
-			ErrorTypesModel myModel;
-			ErrorTypesModel yourModel;
+			Iterator<ErrorTypeModel> myIter = myErrors.iterator();
+			Iterator<ErrorTypeModel> yourIter = yourErrors.iterator();
+			ErrorTypeModel myModel;
+			ErrorTypeModel yourModel;
 			int comparisonResult;
 			while(myIter.hasNext()){
 				myModel = myIter.next();

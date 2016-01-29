@@ -20,8 +20,6 @@ import org.osate.aadl2.impl.SystemImplementationImpl;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorModelSubclause;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPropagation;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
-import org.osate.xtext.aadl2.errormodel.errorModel.ErrorTypes;
-import org.osate.xtext.aadl2.errormodel.errorModel.TypeSet;
 import org.osate.xtext.aadl2.errormodel.errorModel.TypeToken;
 import org.osate.xtext.aadl2.errormodel.util.EMV2Util;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
@@ -35,7 +33,6 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ConstraintModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypesModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.OccurrenceModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 
@@ -77,7 +74,7 @@ public final class ErrorTranslator {
 	private void parsePropagations(ComponentModel model, ErrorModelSubclause emv2) {
 		PropagationModel propModel;
 		PortModel portModel;
-		Set<ErrorTypesModel> errors;
+		Set<ErrorTypeModel> errors;
 		boolean isIn = true;
 		String portName;
 		for(ErrorPropagation eProp : emv2.getPropagations()){
@@ -230,14 +227,12 @@ public final class ErrorTranslator {
 		return null;
 	}
 	
-	private Set<ErrorTypesModel> tokenSetToTypes(List<TypeToken> typeTokens) {
-		HashSet<ErrorTypesModel> ret = new HashSet<>();
+	private Set<ErrorTypeModel> tokenSetToTypes(List<TypeToken> typeTokens) {
+		HashSet<ErrorTypeModel> ret = new HashSet<>();
 		for(TypeToken tok : typeTokens){
 			Set<ErrorTypeModel> types = new HashSet<ErrorTypeModel>();
-			tok.getType().forEach((errType) -> {
-				types.add(errorTypes.get(errType.getName()));
-			});
-			ret.add(new ErrorTypesModel(types));
+			// Guaranteed to only have one since we don't consider type sets
+			ret.add(new ErrorTypeModel(tok.getType().iterator().next().getName()));
 		}
 		return ret;
 	}
