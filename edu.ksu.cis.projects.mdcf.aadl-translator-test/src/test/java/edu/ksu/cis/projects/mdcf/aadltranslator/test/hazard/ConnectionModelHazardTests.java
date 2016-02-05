@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.Keyword;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.OccurrenceModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.OccurrenceModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 

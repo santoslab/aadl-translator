@@ -1,14 +1,35 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.util.ArrayList;
-import java.util.logging.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
-import org.osate.aadl2.*;
+import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.AbstractNamedValue;
+import org.osate.aadl2.AbstractSubcomponent;
+import org.osate.aadl2.AbstractType;
+import org.osate.aadl2.Element;
+import org.osate.aadl2.EnumerationLiteral;
+import org.osate.aadl2.EventDataPort;
+import org.osate.aadl2.IntegerLiteral;
+import org.osate.aadl2.ListValue;
+import org.osate.aadl2.ModalPropertyValue;
+import org.osate.aadl2.NamedValue;
+import org.osate.aadl2.Port;
+import org.osate.aadl2.PortCategory;
+import org.osate.aadl2.Property;
+import org.osate.aadl2.PropertyAssociation;
+import org.osate.aadl2.PropertyExpression;
+import org.osate.aadl2.RangeValue;
+import org.osate.aadl2.RecordValue;
+import org.osate.aadl2.StringLiteral;
+import org.osate.aadl2.SystemImplementation;
+import org.osate.aadl2.SystemType;
 import org.osate.aadl2.modelsupport.errorreporting.MarkerParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;

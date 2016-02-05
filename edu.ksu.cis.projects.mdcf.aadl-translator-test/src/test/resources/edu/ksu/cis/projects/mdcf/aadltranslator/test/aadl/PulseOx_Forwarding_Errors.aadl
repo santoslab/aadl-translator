@@ -8,6 +8,11 @@ annex EMV2
 	SpO2ValueHigh : type extends MAP_Errors::WrongPhysioDataError;
 	
 	MissedAlarm : type extends MAP_Errors::WrongInfoDisplayedError;
+	
+	-- Meaningless error types used for testing
+	ExtraTypeOne : type;
+	ExtraTypeTwo : type;
+	
 	end types;
 **};
 

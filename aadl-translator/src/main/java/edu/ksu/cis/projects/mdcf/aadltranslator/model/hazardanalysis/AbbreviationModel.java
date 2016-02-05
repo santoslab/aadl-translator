@@ -1,4 +1,4 @@
-package edu.ksu.cis.projects.mdcf.aadltranslator.model;
+package edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis;
 
 public class AbbreviationModel {
 	private String name;

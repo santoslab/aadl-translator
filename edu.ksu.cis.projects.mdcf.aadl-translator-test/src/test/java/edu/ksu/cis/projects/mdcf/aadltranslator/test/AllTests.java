@@ -74,14 +74,16 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIAADLSystemEr
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ConnectionModelHazardTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardBackgroundTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.PropagationModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.util.MarkdownLinkRenderer;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSpecViewTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.view.STRendererTests;
 
 @RunWith(Suite.class)
 //@InjectWith(typeof(Aadl2UiInjectorProvider)) Look into this, could remove 10s wait time
 @Suite.SuiteClasses({
-		// Model Tests
+		// Architecture Model tests
 		SystemModelTests.class,
 		DeviceModelTests.class,
 		ProcessModelTests.class,
@@ -90,9 +92,11 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 		SystemConnectionModelTests.class,
 		ProcessConnectionModelTests.class,
 
+		// Hazard Analysis Model tests
 		ConnectionModelHazardTests.class,
 		HazardPreliminariesTests.class,
 		HazardBackgroundTests.class,
+		PropagationModelTests.class,
 
 		// Error-handling tests
 		ControllerErrorTests.class,
@@ -105,6 +109,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 		// View tests
 		AppSuperClassViewTests.class,
 		AppSpecViewTests.class,
+		STRendererTests.class,
 })
 public class AllTests {
 	private static final Logger log = Logger
@@ -376,12 +381,13 @@ public class AllTests {
 						.getParsedAnnexLibrary();
 				HashSet<ErrorType> errors = new HashSet<ErrorType>(
 						emImpl.getTypes());
-				hazardAnalysis.setErrorTypes(errors);
+				hazardAnalysis.setErrorType(errors);
 			}
 		}
 
 		hazardAnalysis.setSystemModel(stats.getSystemModel());
-		hazardAnalysis.parseEMV2(stats.getSystemImplementation());
+		hazardAnalysis.parseEMV2(stats.getSystemModel(), stats.getSystemImplementation());
+		stats.getChildren().forEach((model, classifier) -> hazardAnalysis.parseEMV2(model, classifier));
 
 		return stats.getSystemModel();
 	}

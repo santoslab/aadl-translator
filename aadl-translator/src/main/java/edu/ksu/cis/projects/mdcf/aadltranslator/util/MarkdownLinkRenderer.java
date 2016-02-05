@@ -30,13 +30,20 @@ public class MarkdownLinkRenderer implements AttributeRenderer {
 		// o will be a String
 		String ret = (String) o;
 		
-		if(formatString == null || !formatString.equals("MarkdownLink"))
+		if(formatString == null) {
 			return ret;
+		} 			
 		
 		ret = ret.toLowerCase();
 		ret = ret.replace(' ', '-');
 		ret = ret.replace(":", "");
 
+		if (formatString.equals("MarkdownInterLink")) {
+			ret += ".html";
+		} else if (formatString.equals("MarkdownIntraLink")) {
+			ret = "#" + ret;
+		}
+		
 		return ret;
 	}
 }

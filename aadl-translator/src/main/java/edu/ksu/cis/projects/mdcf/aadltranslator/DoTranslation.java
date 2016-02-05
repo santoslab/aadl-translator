@@ -2,10 +2,10 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Locale;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -36,7 +36,6 @@ import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.Element;
-import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.modelsupport.errorreporting.LogParseErrorReporter;
@@ -51,11 +50,11 @@ import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.core.OsateCorePlugin;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
-import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.WriteOutputFiles.OutputFormat;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DevOrProcModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
@@ -73,6 +72,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	private final STGroup midas_compsigSTG = new STGroupFile("src/main/resources/templates/midas-compsig.stg");
 	private final STGroup midas_appspecSTG = new STGroupFile("src/main/resources/templates/midas-appspec.stg");
 	private final STGroup report_overview = new STGroupFile("src/main/resources/templates/report-overview.stg");
+	private final STGroup report_element = new STGroupFile("src/main/resources/templates/report-element.stg");
 
 	private final STGroup java_device_supertypeSTG = new STGroupFile(
 			"src/main/resources/templates/java-device-supertype.stg");
@@ -85,7 +85,6 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	private final String TRANSLATE_ARCH_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate";
 	private final String TRANSLATE_HAZARDS_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.translate-hazards";
 	private final String TRANSLATE_DEVICE_COMMAND_ID = "edu.ksu.cis.projects.mdcf.aadl-translator.device-aadl-translate";
-	private Object TranslatorUtil;
 
 	public HashSet<IFile> getUsedFiles() {
 		IncludesCalculator ic = new IncludesCalculator(new NullProgressMonitor());
@@ -167,20 +166,18 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		// 5) Build the in-memory system model
 		processFiles(monitor, rs, archTranslator, usedFiles, targetFile, parseErrManager);
 
-		// 6) Set the system name to the package name 
+		// 6) Set the system name to the package name
 		updatePackageName(archTranslator.getSystemModel(), targetFile.getProject().getName());
-		
-		// 5.1) If selected, build the in-memory hazard analysis model
+
+		// 6.1) If selected, build the in-memory hazard analysis model
 		if (mode == Mode.HAZARD_ANALYSIS) {
 			ErrorTranslator hazardAnalysis = new ErrorTranslator();
-			HashSet<ErrorType> errors = getErrorTypes(rs, usedFiles);
+			HashSet<ErrorType> errors = getErrorType(rs, usedFiles);
 
-			hazardAnalysis.setErrorTypes(errors);
+			hazardAnalysis.setErrorType(errors);
 			hazardAnalysis.setSystemModel(archTranslator.getSystemModel());
-			hazardAnalysis.parseEMV2(archTranslator.getSystemImplementation());
-			for (ProcessImplementation process : archTranslator.getProcessImplementations()) {
-				hazardAnalysis.parseEMV2(process);
-			}
+			hazardAnalysis.parseEMV2(archTranslator.getSystemModel(), archTranslator.getSystemImplementation());
+			archTranslator.getChildren().forEach((model, classifier) -> hazardAnalysis.parseEMV2(model, classifier));
 
 			IProject proj = targetFile.getProject();
 			if (proj.getFolder("diagrams").exists()) {
@@ -199,16 +196,16 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			writeHazardReport(archTranslator.getSystemModel());
 		}
 
-		// 6) Write the generated files
+		// 7) Write the generated files
 		writeOutput(archTranslator);
 
-		// 7) Shut down the progress monitor
+		// 8) Shut down the progress monitor
 		wrapUpProgressMonitor(monitor);
 	}
 
 	private void updatePackageName(SystemModel systemModel, String name) {
 		systemModel.setName(name);
-		for(DevOrProcModel dopm : systemModel.getChildren().values()){
+		for (DevOrProcModel dopm : systemModel.getChildren().values()) {
 			dopm.setParentName(name);
 		}
 	}
@@ -293,6 +290,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	}
 
 	private void writeHazardReport(SystemModel sysModel) {
+		// Filename -> file contents
+		HashMap<String, String> elementReports = new HashMap<>();
 
 		IPreferencesService service = Platform.getPreferencesService();
 		String appDevDirectory = service.getString("edu.ksu.cis.projects.mdcf.aadl-translator",
@@ -303,16 +302,27 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				PreferenceConstants.P_PANDOCPATH, null, null);
 
 		report_overview.registerRenderer(String.class, MarkdownLinkRenderer.getInstance());
+		report_element.registerRenderer(String.class, MarkdownLinkRenderer.getInstance());
 
-		String reportStr = report_overview.getInstanceOf("report").add("model", sysModel).render();
+		String overview = report_overview.getInstanceOf("report").add("model", sysModel).render();
+
+		// We just use one element for testing, this will need to be expanded to
+		// a full DFS later
+		ComponentModel<?, ?> cm = sysModel.getChild("appLogic");
+		String elem_report = report_element.getInstanceOf("report").add("model", cm)
+				.add("name", "appLogic")
+				.add("timestamp", sysModel.getTimestamp()).render();
+		elementReports.put("appLogic", elem_report);
+
 		try {
-			WriteOutputFiles
-					.writeHazardReport(reportStr,
-							appDevDirectory, sysModel
-									.getName(),
-							OutputFormat.valueOf(fmtStr), pandocPath,
-							FileLocator.toFileURL(Platform.getBundle("edu.ksu.cis.projects.mdcf.aadl-translator")
-									.getEntry("src/main/resources/styles/default.html")).toURI());
+			URI reportHeaderURI = FileLocator.toFileURL(Platform.getBundle("edu.ksu.cis.projects.mdcf.aadl-translator")
+					.getEntry("src/main/resources/styles/default.html")).toURI();
+			WriteOutputFiles.writeHazardReport(overview, appDevDirectory, sysModel.getName(),
+					OutputFormat.valueOf(fmtStr), pandocPath, reportHeaderURI);
+			for (String elemName : elementReports.keySet()) {
+				WriteOutputFiles.writeHazardReport(elementReports.get(elemName), appDevDirectory, elemName,
+						OutputFormat.valueOf(fmtStr), pandocPath, reportHeaderURI);
+			}
 		} catch (IOException | URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -494,7 +504,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		return systemFile;
 	}
 
-	private HashSet<ErrorType> getErrorTypes(ResourceSet rs, HashSet<IFile> usedFiles) {
+	private HashSet<ErrorType> getErrorType(ResourceSet rs, HashSet<IFile> usedFiles) {
 		HashSet<ErrorType> retSet = new HashSet<>();
 		for (IFile f : usedFiles) {
 			Resource res = rs.getResource(OsateResourceUtil.getResourceURI((IResource) f), true);
@@ -510,6 +520,9 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				DefaultAnnexLibrary defaultAnnexLibrary = (DefaultAnnexLibrary) annexLibrary;
 				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary.getParsedAnnexLibrary();
 				retSet.addAll(emImpl.getTypes());
+				if(!emImpl.getTypesets().isEmpty()){
+					System.err.println("Sets of rrror types are not supported");
+				}
 			}
 		}
 		return retSet;

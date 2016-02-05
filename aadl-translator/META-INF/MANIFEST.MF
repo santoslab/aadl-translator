@@ -32,4 +32,5 @@ Require-Bundle: org.osate.aadl2,
  org.osate.xtext.aadl2.errormodel.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: org.apache.commons.lang
 
