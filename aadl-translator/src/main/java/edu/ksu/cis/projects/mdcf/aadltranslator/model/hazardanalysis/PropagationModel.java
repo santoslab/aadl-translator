@@ -17,34 +17,14 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ManifestationTyp
  *
  */
 public class PropagationModel implements Comparable<PropagationModel>{	
-	private boolean in;
 	private Set<ErrorTypeModel> errors;
-	private PortModel port;
 	private ManifestationType manifestation;
 
-	public PropagationModel(boolean in, Set<ErrorTypeModel> errors, PortModel port, String manifestationStr) {
-		this.in = in;
+	public PropagationModel(Set<ErrorTypeModel> errors, String manifestationStr) {
 		this.errors = errors;
-		this.port = port;
 		if(manifestationStr != null) {
 			this.manifestation = ManifestationType.valueOf(manifestationStr.toUpperCase());
 		}
-	}
-
-	public boolean isIn() {
-		return in;
-	}
-
-	public void setIn() {
-		this.in = true;
-	}
-
-	public boolean isOut() {
-		return !in;
-	}
-
-	public void setOut() {
-		this.in = false;
 	}
 
 	public Set<ErrorTypeModel> getErrors() {
@@ -54,26 +34,10 @@ public class PropagationModel implements Comparable<PropagationModel>{
 	public void setErrors(Set<ErrorTypeModel> errors) {
 		this.errors = errors;
 	}
-
-	public PortModel getPort() {
-		return port;
-	}
-
-	public void setPort(PortModel port) {
-		this.port = port;
-	}
-
+	
 	@Override
 	public int compareTo(PropagationModel theirPropModel) {
-		if(in != theirPropModel.isIn()){
-			if(in){
-				return -1;
-			} else {
-				return 1;
-			}
-		} else if(!(port.getName().equals(theirPropModel.getPort().getName()))) {
-			return port.getName().compareTo(theirPropModel.getPort().getName());
-		} else if(errors.size() != theirPropModel.getErrors().size()) {
+		if(errors.size() != theirPropModel.getErrors().size()) {
 			if(errors.size() < theirPropModel.getErrors().size()){
 				return -1;
 			} else {

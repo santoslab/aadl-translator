@@ -568,11 +568,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		private void handlePropagations(ComponentClassifier obj) {
-			String manifestationStr;
+			String manifestationStr, portName;
 			PortModel portModel;
 			PropagationModel propModel;
 			Set<ErrorTypeModel> errorTypes;
-			boolean isIn;
 
 			// Why can't I just get all the error propagations at once?
 			Set<ErrorPropagation> eProps = new HashSet<>();
@@ -582,23 +581,28 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				return;
 			for (ErrorPropagation eProp : eProps) {
 				errorTypes = new HashSet<>();
-				if (eProp.getDirection() == DirectionType.IN) {
-					isIn = true;
-					manifestationStr = null;
-				} else {
-					isIn = false;
-					manifestationStr = getPropagationManifestation(eProp);
-				}
 				for (TypeToken tt : eProp.getTypeSet().getTypeTokens()) {
 					// We assume that there are no pre-defined sets of error
 					// types allowed ie, only allow ad-hoc, anonymous sets
 					// created in propagations
 					errorTypes.add(systemModel.getErrorTypeModelByName(tt.getType().get(0).getName()));
 				}
-				portModel = componentModel.getPortByName(eProp.getFeatureorPPRef().getFeatureorPP().getFullName());
-				propModel = new PropagationModel(isIn, errorTypes, portModel, manifestationStr);
+				
+				portName = eProp.getFeatureorPPRef().getFeatureorPP().getFullName();
+				if (eProp.getDirection() == DirectionType.IN) {
+					manifestationStr = getPropagationManifestation(eProp);
+					portModel = resolvePortModel(componentModel, portName, true);
+				} else {
+					manifestationStr = null;
+					portModel = resolvePortModel(componentModel, portName, false);
+				}
+				propModel = new PropagationModel(errorTypes, manifestationStr);
 				try {
-					componentModel.addPropagation(propModel);
+					if (eProp.getDirection() == DirectionType.IN) {
+						portModel.addInPropagation(propModel);
+					} else {
+						portModel.setOutPropagation(propModel);
+					}					
 				} catch (DuplicateElementException e) {
 					handleException(obj, e);
 					return;
@@ -1170,6 +1174,26 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				handleSystemPortConnection(obj);
 			}
 			return NOT_DONE;
+		}
+		
+		private PortModel resolvePortModel(ComponentModel<?, ?> model, String portName, boolean isIn){
+			PortModel pm = model.getPortByName(portName);
+			
+			// Ideally we'll just have the portname as planned
+			if (pm != null){
+				return pm;
+			} else if (model instanceof DeviceModel) {
+				// Since devices get turned into pseudodevices, with both in and out
+				// ports, we only want the propagation to map to the port that
+				// interacts with our system
+				if(isIn){
+					return model.getPortByName(portName + "In");
+				} else {
+					return model.getPortByName(portName + "Out");
+				}
+			}
+				
+			return null;
 		}
 	}
 

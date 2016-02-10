@@ -53,11 +53,6 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	protected ComponentType componentType;
 	
 	/**
-	 * Error propagations entering and leaving this component
-	 */
-	protected Set<PropagationModel> propagations = new HashSet<>();
-	
-	/**
 	 * Error flows starting, ending, or moving through this component
 	 */
 	protected Set<ErrorFlowModel> errorFlows = new HashSet<>();
@@ -79,12 +74,6 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	
 	public ComponentModel(){
 		initHazardReportDiagrams();
-	}
-	
-	public void addPropagation(PropagationModel propagation) throws DuplicateElementException {
-		if(propagations.contains(propagation))
-			throw new DuplicateElementException("Component model propagations must be unique");
-		propagations.add(propagation);
 	}
 	
 	public void addErrorFlow(ErrorFlowModel errorFlow) throws DuplicateElementException {
@@ -320,16 +309,5 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	
 	public HashMap<String, String> getHazardReportDiagrams() {
 		return hazardReportDiagrams;
-	}
-
-	public Set<PropagationModel> getPropagations() {
-		return propagations;
-	}
-	
-	public Set<PropagationModel> getOutPropagations() {
-		return propagations
-				.stream()
-				.filter(pm -> pm.isOut())
-				.collect(Collectors.toSet());
 	}
 }

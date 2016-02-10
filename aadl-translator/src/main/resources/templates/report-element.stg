@@ -73,7 +73,12 @@ unsafeInteractions(model) ::=<<
 
 ### Successor Dangers
 
-<model.outPropagations:{p | <succDanger(p)>
+<model.sendPorts.values:{p | <succDanger(p)>
+}>
+
+### Manifestations
+
+<model.receivePorts.values:{p | <manifestations(p)>
 }>
 
 >>
@@ -86,6 +91,16 @@ elementTocEntry(elemName) ::=<<
 #. [<elemName>](<elemName; format="MarkdownInterLink">)
 >>
 
-succDanger(propModel) ::=<<
-* <propModel.port.containingComponentName>.<propModel.port.name>: {<propModel.errors:{e | <e.name>}; separator=",">}
+succDanger(portModel) ::=<<
+* <portModel.name>: {<portModel.outPropagation.errors:{e | <e.name>}; separator=",">}
+>>
+
+manifestations(portModel) ::=<<
+* <portModel.name> 
+<portModel.inPropagations:{p | <manifestation(p)>
+}>
+>>
+
+manifestation(propModel) ::=<<
+	* **<propModel.manifestation>** -- <propModel.port.name> {<propModel.errors:{e | <e.name>}; separator=",">}
 >>

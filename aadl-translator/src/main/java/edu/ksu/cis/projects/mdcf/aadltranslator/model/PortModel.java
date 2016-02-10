@@ -1,6 +1,13 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.osate.aadl2.PortCategory;
+
+import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 
 public class PortModel {	
 	private String name;
@@ -11,7 +18,17 @@ public class PortModel {
 	private int maxPeriod;
 	private String exchangeName;
 	private String containingComponentName;
+	
+	/**
+	 * Error propagations entering this port
+	 */
+	private Set<PropagationModel> inPropagations = new HashSet<>();
 
+	/**
+	 * The propagation of errors out of this port
+	 */
+	private PropagationModel outPropagation = null;
+	
 	public String getName() {
 		return name;
 	}
@@ -98,5 +115,25 @@ public class PortModel {
 	
 	public String getContainingComponentName() {
 		return containingComponentName;
+	}
+	
+	public void addInPropagation(PropagationModel propagation) throws DuplicateElementException {
+		if(inPropagations.contains(propagation))
+			throw new DuplicateElementException("Incoming model propagations must be unique");
+		inPropagations.add(propagation);
+	}
+	
+	public PropagationModel getOutPropagation() {
+		return outPropagation;
+	}
+	
+	public Set<PropagationModel> getInPropagations() {
+		return inPropagations;
+	}
+	
+	public void setOutPropagation(PropagationModel pm) throws DuplicateElementException{
+		if(outPropagation != null)
+			throw new DuplicateElementException("Ports can only have one propagation");
+		outPropagation = pm;
 	}
 }
