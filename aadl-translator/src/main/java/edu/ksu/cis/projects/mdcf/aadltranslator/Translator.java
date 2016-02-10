@@ -5,18 +5,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ContainedNamedElement;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DeviceSubcomponent;
 import org.osate.aadl2.DeviceType;
@@ -51,9 +52,12 @@ import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitchWithProgr
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.properties.PropertyNotPresentException;
 import org.osate.aadl2.util.Aadl2Switch;
+import org.osate.aadl2.util.Aadl2Util;
 import org.osate.contribution.sei.names.DataModel;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPropagation;
-import org.osate.xtext.aadl2.errormodel.errorModel.PropagationPoint;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
+import org.osate.xtext.aadl2.errormodel.errorModel.TypeToken;
+import org.osate.xtext.aadl2.errormodel.util.EMV2Properties;
 import org.osate.xtext.aadl2.errormodel.util.EMV2Util;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
@@ -77,7 +81,9 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.Abbreviatio
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentLevelModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ConstraintModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.HazardModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.StpaPreliminaryModel;
 
 public final class Translator extends AadlProcessingSwitchWithProgress {
@@ -100,6 +106,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	public SystemImplementation sysImpl;
 	@SuppressWarnings("rawtypes")
 	private Map<ComponentModel, ComponentClassifier> children = new HashMap<>();
+
+	/**
+	 * Error type name -> model
+	 */
+	private Map<String, ErrorTypeModel> errorTypeModels = new HashMap<>();
 
 	public class TranslatorSwitch extends Aadl2Switch<String> {
 
@@ -133,6 +144,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy 'at' h:mm a");
 			systemModel = new SystemModel();
 			systemModel.setTimestamp(sdf.format(new Date()));
+			systemModel.setErrorTypes(errorTypeModels);
 			lastElemProcessed = ElementType.SYSTEM;
 			return NOT_DONE;
 		}
@@ -381,7 +393,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				handlePort(obj); // Explicit "out" port
 				if (!cancelled()) {
 					handlePseudoDeviceImplicitTask(obj); // Implicit task to
-													// handle incoming data
+					// handle incoming data
 				}
 			} else if (lastElemProcessed == ElementType.THREAD) {
 				handlePort(obj);
@@ -550,15 +562,73 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		@Override
-		public String caseClassifier(Classifier obj){
-//			obj.getContainingClassifier();
-			List<ErrorPropagation> props = EMV2Util.getExtendsEMV2Subclause(obj).getPropagations();
-			if(!props.isEmpty()){
-				int six = 7;
-			}
+		public String caseComponentClassifier(ComponentClassifier obj) {
+			handlePropagations(obj);
 			return NOT_DONE;
 		}
-		
+
+		private void handlePropagations(ComponentClassifier obj) {
+			String manifestationStr;
+			PortModel portModel;
+			PropagationModel propModel;
+			Set<ErrorTypeModel> errorTypes;
+			boolean isIn;
+
+			// Why can't I just get all the error propagations at once?
+			Set<ErrorPropagation> eProps = new HashSet<>();
+			eProps.addAll(EMV2Util.getAllErrorPropagations(obj, DirectionType.IN));
+			eProps.addAll(EMV2Util.getAllErrorPropagations(obj, DirectionType.OUT));
+			if (eProps.isEmpty())
+				return;
+			for (ErrorPropagation eProp : eProps) {
+				errorTypes = new HashSet<>();
+				if (eProp.getDirection() == DirectionType.IN) {
+					isIn = true;
+					manifestationStr = null;
+				} else {
+					isIn = false;
+					manifestationStr = getPropagationManifestation(eProp);
+				}
+				for (TypeToken tt : eProp.getTypeSet().getTypeTokens()) {
+					// We assume that there are no pre-defined sets of error
+					// types allowed ie, only allow ad-hoc, anonymous sets
+					// created in propagations
+					errorTypes.add(systemModel.getErrorTypeModelByName(tt.getType().get(0).getName()));
+				}
+				portModel = componentModel.getPortByName(eProp.getFeatureorPPRef().getFeatureorPP().getFullName());
+				propModel = new PropagationModel(isIn, errorTypes, portModel, manifestationStr);
+				try {
+					componentModel.addPropagation(propModel);
+				} catch (DuplicateElementException e) {
+					handleException(obj, e);
+					return;
+				}
+			}
+		}
+
+		private String getPropagationManifestation(ErrorPropagation eProp) {
+			String manifestationStr;
+			List<ContainedNamedElement> propVal;
+			try {
+				eProp.getPropertyValues("MAP_Error_Properties", "Manifestation");
+				Property property = Aadl2Util.lookupPropertyDefinition(eProp, "MAP_Error_Properties", "Manifestation");
+
+				// getProperty throws a NPE if the property doesn't exist and I
+				// cannot for the life of me figure out how to check for it
+				// without just calling the function itself...
+				propVal = EMV2Properties.getProperty(property.getQualifiedName(),
+						eProp.getFeatureorPPRef().getFeatureorPP().getContainingClassifier(), eProp, null);
+
+				// You can't have multiple propagation points with one property,
+				// so we can safely get the first element
+				manifestationStr = EMV2Properties.getEnumerationOrIntegerPropertyConstantPropertyValue(
+						EMV2Properties.getPropertyValue(propVal.get(0)));
+			} catch (NullPointerException e) {
+				return null;
+			}
+			return manifestationStr;
+		}
+
 		@Override
 		public String caseSubprogramType(SubprogramType obj) {
 			lastElemProcessed = ElementType.SUBPROGRAM;
@@ -1139,5 +1209,15 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 	public void setTarget(String target) {
 		this.target = TranslationTarget.valueOf(target.toUpperCase());
+	}
+
+	public void setErrorTypes(HashSet<ErrorType> errorTypes) {
+		for (ErrorType et : errorTypes) {
+			handleErrorType(et);
+		}
+	}
+
+	private void handleErrorType(ErrorType et) {
+		errorTypeModels.put(et.getName(), new ErrorTypeModel(et.getName()));
 	}
 }

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AbbreviationModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
 
 public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnectionModel>{
 
@@ -18,6 +19,11 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 	private String hazardReportContext;
 	private HashSet<AbbreviationModel> hazardReportAbbreviations;
 	private HashSet<String> hazardReportAssumptions;
+
+	/**
+	 * Error type name -> model
+	 */
+	private Map<String, ErrorTypeModel> errorTypeModels;
 
 	public SystemModel() {
 		super();
@@ -135,5 +141,17 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 			chanMap.put(cm.getSubName().concat(cm.getSubPortName()), cm);
 		}
 		return chanMap;
+	}
+
+	public void setErrorTypes(Map<String, ErrorTypeModel> errorTypeModels) {
+		this.errorTypeModels = errorTypeModels;
+	}
+	
+	public Map<String, ErrorTypeModel> getErrorTypes(){
+		return errorTypeModels;
+	}
+	
+	public ErrorTypeModel getErrorTypeModelByName(String name){
+		return errorTypeModels.get(name);
 	}
 }

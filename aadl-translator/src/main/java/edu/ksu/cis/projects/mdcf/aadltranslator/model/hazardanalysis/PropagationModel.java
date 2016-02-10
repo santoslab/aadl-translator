@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ManifestationType;
 
 /**
  * This class models EMv2 propagations.
@@ -15,15 +16,19 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
  * @author Sam
  *
  */
-public class PropagationModel implements Comparable<PropagationModel>{
+public class PropagationModel implements Comparable<PropagationModel>{	
 	private boolean in;
 	private Set<ErrorTypeModel> errors;
 	private PortModel port;
-	
-	public PropagationModel(boolean in, Set<ErrorTypeModel> errors, PortModel port) {
+	private ManifestationType manifestation;
+
+	public PropagationModel(boolean in, Set<ErrorTypeModel> errors, PortModel port, String manifestationStr) {
 		this.in = in;
 		this.errors = errors;
 		this.port = port;
+		if(manifestationStr != null) {
+			this.manifestation = ManifestationType.valueOf(manifestationStr.toUpperCase());
+		}
 	}
 
 	public boolean isIn() {
@@ -94,6 +99,10 @@ public class PropagationModel implements Comparable<PropagationModel>{
 			}
 		}
 		return 0;
+	}
+	
+	public String getManifestation() {
+		return manifestation.toString();
 	}
 	
 }

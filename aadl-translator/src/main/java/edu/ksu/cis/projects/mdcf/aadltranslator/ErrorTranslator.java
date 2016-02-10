@@ -65,43 +65,43 @@ public final class ErrorTranslator {
 		
 		try {
 			parseOccurrences(emv2);
-			parsePropagations(model, emv2);
+//			parsePropagations(model, emv2);
 		} catch (MissingRequiredPropertyException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void parsePropagations(ComponentModel<?, ?> model, ErrorModelSubclause emv2) {
-		PropagationModel propModel;
-		PortModel portModel;
-		Set<ErrorTypeModel> errors;
-		boolean isIn = true;
-		String portName;
-		for(ErrorPropagation eProp : emv2.getPropagations()){
-			if(eProp.getDirection() == DirectionType.IN){
-				isIn = true;
-			} else if (eProp.getDirection() == DirectionType.OUT){
-				isIn = false;
-			} else {
-				// Direction == INOUT
-				System.err.println("Inout propagation discovered!");
-			}
-			
-			errors = tokenSetToTypes(eProp.getTypeSet().getTypeTokens());
-			
-			portName = eProp.getFeatureorPPRef().getFeatureorPP().getName();
-			portModel = resolvePortModel(model, portName, isIn);
-						
-			propModel = new PropagationModel(isIn, errors, portModel);
-			
-			try {
-				model.addPropagation(propModel);
-			} catch (DuplicateElementException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
+//	private void parsePropagations(ComponentModel<?, ?> model, ErrorModelSubclause emv2) {
+//		PropagationModel propModel;
+//		PortModel portModel;
+//		Set<ErrorTypeModel> errors;
+//		boolean isIn = true;
+//		String portName;
+//		for(ErrorPropagation eProp : emv2.getPropagations()){
+//			if(eProp.getDirection() == DirectionType.IN){
+//				isIn = true;
+//			} else if (eProp.getDirection() == DirectionType.OUT){
+//				isIn = false;
+//			} else {
+//				// Direction == INOUT
+//				System.err.println("Inout propagation discovered!");
+//			}
+//			
+//			errors = tokenSetToTypes(eProp.getTypeSet().getTypeTokens());
+//			
+//			portName = eProp.getFeatureorPPRef().getFeatureorPP().getName();
+//			portModel = resolvePortModel(model, portName, isIn);
+//						
+//			propModel = new PropagationModel(isIn, errors, portModel);
+//			
+//			try {
+//				model.addPropagation(propModel);
+//			} catch (DuplicateElementException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 
 	private void parseOccurrences(ErrorModelSubclause emv2)
 			throws MissingRequiredPropertyException {

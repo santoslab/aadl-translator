@@ -157,8 +157,9 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		// 2) Get the list of files used in the model we're translating
 		HashSet<IFile> usedFiles = this.getUsedFiles();
 
-		// 3) Filter out the property sets
+		// 3) Filter out the property sets, initialize the list of error types
 		filterPropertySets(rs, archTranslator, usedFiles);
+		archTranslator.setErrorTypes(getErrorTypes(rs, usedFiles));
 
 		// 4) Initialize the error reporter
 		ParseErrorReporterManager parseErrManager = initErrManager(archTranslator);
@@ -171,13 +172,13 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 		// 6.1) If selected, build the in-memory hazard analysis model
 		if (mode == Mode.HAZARD_ANALYSIS) {
-			ErrorTranslator hazardAnalysis = new ErrorTranslator();
-			HashSet<ErrorType> errors = getErrorType(rs, usedFiles);
+//			ErrorTranslator hazardAnalysis = new ErrorTranslator();
+//			HashSet<ErrorType> errors = getErrorTypes(rs, usedFiles);
 
-			hazardAnalysis.setErrorType(errors);
-			hazardAnalysis.setSystemModel(archTranslator.getSystemModel());
-			hazardAnalysis.parseEMV2(archTranslator.getSystemModel(), archTranslator.getSystemImplementation());
-			archTranslator.getChildren().forEach((model, classifier) -> hazardAnalysis.parseEMV2(model, classifier));
+//			hazardAnalysis.setErrorType(errors);
+//			hazardAnalysis.setSystemModel(archTranslator.getSystemModel());
+//			hazardAnalysis.parseEMV2(archTranslator.getSystemModel(), archTranslator.getSystemImplementation());
+//			archTranslator.getChildren().forEach((model, classifier) -> hazardAnalysis.parseEMV2(model, classifier));
 
 			IProject proj = targetFile.getProject();
 			if (proj.getFolder("diagrams").exists()) {
@@ -504,7 +505,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		return systemFile;
 	}
 
-	private HashSet<ErrorType> getErrorType(ResourceSet rs, HashSet<IFile> usedFiles) {
+	private HashSet<ErrorType> getErrorTypes(ResourceSet rs, HashSet<IFile> usedFiles) {
 		HashSet<ErrorType> retSet = new HashSet<>();
 		for (IFile f : usedFiles) {
 			Resource res = rs.getResource(OsateResourceUtil.getResourceURI((IResource) f), true);
