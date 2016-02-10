@@ -2,15 +2,19 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.DataPort;
@@ -48,10 +52,12 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.properties.PropertyNotPresentException;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.contribution.sei.names.DataModel;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPropagation;
+import org.osate.xtext.aadl2.errormodel.errorModel.PropagationPoint;
+import org.osate.xtext.aadl2.errormodel.util.EMV2Util;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.TranslatorUtil.PropertyType;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.CoreException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.MissingRequiredPropertyException;
@@ -81,6 +87,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 	private enum TranslationTarget {
 		SYSTEM, PROCESS, DEVICE
+	};
+
+	private enum PropertyType {
+		ENUM, INT, RANGE_MIN, RANGE_MAX, STRING
 	};
 
 	private TranslationTarget target = null;
@@ -235,7 +245,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		private void getComponentType(ComponentClassifier obj) throws MissingRequiredPropertyException {
-			String componentType = TranslatorUtil.checkCustomProperty(obj, "Component_Type", propertySetNames, PropertyType.ENUM, this);
+			String componentType = checkCustomProperty(obj, "Component_Type", PropertyType.ENUM);
 			if (componentType == null)
 				throw new MissingRequiredPropertyException(
 						"Components must specify their component type (eg Actuator, Sensor, Controller, or Controlled Process)");
@@ -345,7 +355,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 			try {
 				getComponentType(obj);
-				String processType = TranslatorUtil.checkCustomProperty(obj, "Process_Type", propertySetNames, PropertyType.ENUM, this);
+				String processType = checkCustomProperty(obj, "Process_Type", PropertyType.ENUM);
 				if (processType != null && processType.equalsIgnoreCase("logic")) {
 					pm.setDisplay(false);
 				} else if (processType != null && processType.equalsIgnoreCase("display")) {
@@ -412,7 +422,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				if (minPeriod == null || maxPeriod == null)
 					throw new MissingRequiredPropertyException("Missing the required output rate specification.");
 
-				exchangeName = TranslatorUtil.checkCustomProperty(obj, "Exchange_Name", propertySetNames, PropertyType.STRING, this);
+				exchangeName = checkCustomProperty(obj, "Exchange_Name", PropertyType.STRING);
 
 				PortModel pm = new PortModel();
 				pm.setName(obj.getName());
@@ -443,7 +453,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 		}
 
-		public void handleException(Element obj, Exception e) {
+		private void handleException(Element obj, Exception e) {
 			INode node = NodeModelUtils.findActualNodeFor(obj);
 			IResource file = OsateResourceUtil.convertToIResource(obj.eResource());
 			ParseErrorReporter errReporter = errorManager.getReporter(file);
@@ -539,6 +549,16 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			return DONE;
 		}
 
+		@Override
+		public String caseClassifier(Classifier obj){
+//			obj.getContainingClassifier();
+			List<ErrorPropagation> props = EMV2Util.getExtendsEMV2Subclause(obj).getPropagations();
+			if(!props.isEmpty()){
+				int six = 7;
+			}
+			return NOT_DONE;
+		}
+		
 		@Override
 		public String caseSubprogramType(SubprogramType obj) {
 			lastElemProcessed = ElementType.SUBPROGRAM;
@@ -658,7 +678,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 			((DeviceModel) dm).setParentName(systemModel.getName());
 			try {
-				String componentType = TranslatorUtil.checkCustomProperty(obj, "Component_Type", propertySetNames, PropertyType.ENUM, this);
+				String componentType = checkCustomProperty(obj, "Component_Type", PropertyType.ENUM);
 				if (componentType != null)
 					dm.setComponentType(componentType);
 				systemModel.addChild(obj.getName(), dm);
@@ -701,14 +721,87 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			// have to just try and check for a PropertyNotPresentException,
 			// which makes for super clumsy code.
 			try {
-				ret = TranslatorUtil.handlePropertyValue(obj, prop, propType);
+				ret = handlePropertyValue(obj, prop, propType);
 			} catch (PropertyNotPresentException e) {
-				ret = TranslatorUtil.checkCustomProperty(obj, defaultName, propertySetNames, propType, this);
+				ret = checkCustomProperty(obj, defaultName, propType);
 			} catch (PropertyOutOfRangeException e) {
 				handleException(obj, e);
 				return null;
 			}
 			return ret;
+		}
+
+		/**
+		 * Returns the value of a custom (ie, non-library) property, or null if
+		 * no property is found
+		 * 
+		 * @param obj
+		 *            The element that may contain the property
+		 * @param propertyName
+		 *            The name of the property
+		 * @param propType
+		 *            The type of the property
+		 * @return The property value or null if the property isn't found
+		 */
+		private String checkCustomProperty(NamedElement obj, String propertyName, PropertyType propType) {
+			String ret = null;
+			Property prop;
+			for (String propertySetName : propertySetNames) {
+				try {
+					prop = GetProperties.lookupPropertyDefinition(obj, propertySetName, propertyName);
+					if (prop == null)
+						continue;
+					else
+						ret = handlePropertyValue(obj, prop, propType);
+				} catch (PropertyOutOfRangeException e) {
+					handleException(obj, e);
+					return null;
+				} catch (PropertyNotPresentException e) {
+					return null;
+				}
+			}
+			return ret;
+		}
+
+		private String handlePropertyValue(NamedElement obj, Property prop, PropertyType propType)
+				throws PropertyOutOfRangeException {
+			if (propType == PropertyType.ENUM)
+				return PropertyUtils.getEnumLiteral(obj, prop).getName();
+			else if (propType == PropertyType.INT) {
+				// Should you ever need to get the unit of a property, this is
+				// how you can do it. This example needs a better home, but it
+				// took me so long to figure out that I can't just delete it.
+				//
+				// NumberValue nv =
+				// (NumberValue)PropertyUtils.getSimplePropertyValue(obj, prop);
+				// nv.getUnit()
+
+				return getStringFromScaledNumber(
+						PropertyUtils.getScaledNumberValue(obj, prop, GetProperties.findUnitLiteral(prop, "ms")), obj,
+						prop);
+			} else if (propType == PropertyType.RANGE_MIN) {
+				return getStringFromScaledNumber(
+						PropertyUtils.getScaledRangeMinimum(obj, prop, GetProperties.findUnitLiteral(prop, "ms")), obj,
+						prop);
+			} else if (propType == PropertyType.RANGE_MAX) {
+				return getStringFromScaledNumber(
+						PropertyUtils.getScaledRangeMaximum(obj, prop, GetProperties.findUnitLiteral(prop, "ms")), obj,
+						prop);
+			} else if (propType == PropertyType.STRING) {
+				return PropertyUtils.getStringValue(obj, prop);
+			} else {
+				System.err.println("HandlePropertyValue called with garbage propType: " + propType);
+			}
+			return null;
+		}
+
+		private String getStringFromScaledNumber(double num, NamedElement obj, Property prop)
+				throws PropertyOutOfRangeException {
+			if (num == (int) Math.rint(num))
+				return String.valueOf((int) Math.rint(num));
+			else
+				throw new PropertyOutOfRangeException("Property " + prop.getName() + " on element " + obj.getName()
+						+ " converts to " + num + " ms, which cannot be converted to an integer");
 		}
 
 		/*-
