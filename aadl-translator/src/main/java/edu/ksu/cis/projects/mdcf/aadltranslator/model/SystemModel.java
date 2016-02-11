@@ -152,6 +152,11 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 	}
 	
 	public ErrorTypeModel getErrorTypeModelByName(String name){
+		if(errorTypeModels == null){
+			// This will happen if there is no error type information at all
+			// We don't want to require that, so we just return null
+			return null;
+		}
 		return errorTypeModels.get(name);
 	}
 }

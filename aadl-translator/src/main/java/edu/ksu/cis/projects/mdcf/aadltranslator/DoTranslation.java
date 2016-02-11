@@ -522,7 +522,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary.getParsedAnnexLibrary();
 				retSet.addAll(emImpl.getTypes());
 				if(!emImpl.getTypesets().isEmpty()){
-					System.err.println("Sets of rrror types are not supported");
+					System.err.println("Sets of error types are not supported");
 				}
 			}
 		}

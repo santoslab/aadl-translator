@@ -282,7 +282,8 @@ public class AllTests {
 
 	public static SystemModel runArchTransTest(final String testName,
 			final String systemName) {
-		IFile inputFile = targetableFiles.get(systemName);
+		IFile inputFile = targetableFiles.get(systemName);		
+		HashSet<IFile> supportingFiles = getSupportingFiles(inputFile);
 		Translator stats = new Translator(new NullProgressMonitor());
 
 		configureTranslator(inputFile, stats);
@@ -297,6 +298,8 @@ public class AllTests {
 		Resource res = resourceSet.getResource(
 				OsateResourceUtil.getResourceURI((IResource) inputFile), true);
 		Element target = (Element) res.getContents().get(0);
+		
+		stats.setErrorTypes(getErrorTypes(resourceSet, supportingFiles));
 		stats.process(target);
 		String appName = inputFile.getProject().getName();
 		stats.getSystemModel().setName(appName);
@@ -305,8 +308,6 @@ public class AllTests {
 		}
 		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
 				.toString());
-		
-		HashSet<IFile> supportingFiles = getSupportingFiles(inputFile);
 	
 		for (IFile supportingFile : supportingFiles) {
 			res = resourceSet.getResource(OsateResourceUtil
@@ -347,6 +348,11 @@ public class AllTests {
 		Resource res = resourceSet.getResource(
 				OsateResourceUtil.getResourceURI((IResource) inputFile), true);
 		Element target = (Element) res.getContents().get(0);
+
+		HashSet<IFile> supportingFiles = getSupportingFiles(inputFile);
+		
+		stats.setErrorTypes(getErrorTypes(resourceSet, supportingFiles));
+		
 		stats.process(target);
 		String appName = inputFile.getProject().getName();
 		stats.getSystemModel().setName(appName);
@@ -356,7 +362,7 @@ public class AllTests {
 		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
 				.toString());
 
-		HashSet<IFile> supportingFiles = getSupportingFiles(inputFile);
+//		HashSet<IFile> supportingFiles = getSupportingFiles(inputFile);
 		
 		ErrorTranslator hazardAnalysis = new ErrorTranslator();
 
@@ -474,6 +480,30 @@ public class AllTests {
 				OsateResourceUtil.getResourceURI((IResource) file), true);
 		Element target = (Element) res.getContents().get(0);
 		return target;
+	}
+	
+	private static HashSet<ErrorType> getErrorTypes(ResourceSet rs, HashSet<IFile> usedFiles) {
+		HashSet<ErrorType> retSet = new HashSet<>();
+		for (IFile f : usedFiles) {
+			Resource res = rs.getResource(OsateResourceUtil.getResourceURI((IResource) f), true);
+			Element target = (Element) res.getContents().get(0);
+			if ((target instanceof PropertySet)) {
+				continue;
+			}
+			AadlPackage pack = (AadlPackage) target;
+			PublicPackageSection sect = pack.getPublicSection();
+			if (sect.getOwnedAnnexLibraries().size() > 0
+					&& sect.getOwnedAnnexLibraries().get(0).getName().equals("EMV2")) {
+				AnnexLibrary annexLibrary = sect.getOwnedAnnexLibraries().get(0);
+				DefaultAnnexLibrary defaultAnnexLibrary = (DefaultAnnexLibrary) annexLibrary;
+				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary.getParsedAnnexLibrary();
+				retSet.addAll(emImpl.getTypes());
+				if(!emImpl.getTypesets().isEmpty()){
+					System.err.println("Sets of error types are not supported");
+				}
+			}
+		}
+		return retSet;
 	}
 
 }

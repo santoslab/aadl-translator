@@ -72,4 +72,14 @@ Occurrence : record (
 	Compensation : aadlstring;
 ) applies to (port connection, {emv2}**connection error source);
 
+ManifestationType : type enumeration(
+	Content, ContentHigh, ContentLow,
+	Halted,
+	Erratic,
+	TimingEarly, TimingLate,
+	ClearText
+);
+
+Manifestation : MAP_Error_Properties::ManifestationType applies to ({emv2}**error propagation);
+
 end MAP_Error_Properties;

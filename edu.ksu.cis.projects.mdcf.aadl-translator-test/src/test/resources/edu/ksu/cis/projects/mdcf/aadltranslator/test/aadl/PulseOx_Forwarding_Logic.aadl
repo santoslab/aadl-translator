@@ -1,6 +1,6 @@
 package PulseOx_Forwarding_Logic
 public
-with PulseOx_Forwarding_Types, MAP_Properties, PulseOx_Forwarding_Properties;
+with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_Forwarding_Properties;
 
 	process PulseOx_Logic_Process
 	features
@@ -15,12 +15,13 @@ with PulseOx_Forwarding_Types, MAP_Properties, PulseOx_Forwarding_Properties;
 		error propagations
 			SpO2 : in propagation {SpO2ValueHigh};
 			
-			DerivedAlarm : out propagation {MissedAlarm};
-			DerivedAlarm : out propagation {ExtraTypeOne, ExtraTypeTwo};
+			DerivedAlarm : out propagation {MissedAlarm, ExtraTypeOne, ExtraTypeTwo};
 			
 			flows
 				HighSpO2LeadsToOD : error path SpO2{SpO2ValueHigh} -> DerivedAlarm{MissedAlarm};
 		end propagations;
+		properties
+			MAP_Error_Properties::Manifestation => ContentHigh applies to SpO2;
 	**};
 	end PulseOx_Logic_Process;
 

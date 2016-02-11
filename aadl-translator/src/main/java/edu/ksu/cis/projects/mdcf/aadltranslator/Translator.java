@@ -572,6 +572,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			PortModel portModel;
 			PropagationModel propModel;
 			Set<ErrorTypeModel> errorTypes;
+			ErrorTypeModel etm;
 
 			// Why can't I just get all the error propagations at once?
 			Set<ErrorPropagation> eProps = new HashSet<>();
@@ -585,7 +586,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					// We assume that there are no pre-defined sets of error
 					// types allowed ie, only allow ad-hoc, anonymous sets
 					// created in propagations
-					errorTypes.add(systemModel.getErrorTypeModelByName(tt.getType().get(0).getName()));
+					etm = systemModel.getErrorTypeModelByName(tt.getType().get(0).getName());
+					if(etm != null) {
+						errorTypes.add(etm);
+					}
 				}
 				
 				portName = eProp.getFeatureorPPRef().getFeatureorPP().getFullName();
@@ -595,6 +599,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				} else {
 					manifestationStr = null;
 					portModel = resolvePortModel(componentModel, portName, false);
+				}
+				if(portModel == null){
+					// If we're here, something is wrong and an error should have been logged already.
+					// We bail out to avoid an NPE -- the error log should reflect the root exception
+					return;
 				}
 				propModel = new PropagationModel(errorTypes, manifestationStr);
 				try {
@@ -614,7 +623,6 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			String manifestationStr;
 			List<ContainedNamedElement> propVal;
 			try {
-				eProp.getPropertyValues("MAP_Error_Properties", "Manifestation");
 				Property property = Aadl2Util.lookupPropertyDefinition(eProp, "MAP_Error_Properties", "Manifestation");
 
 				// getProperty throws a NPE if the property doesn't exist and I

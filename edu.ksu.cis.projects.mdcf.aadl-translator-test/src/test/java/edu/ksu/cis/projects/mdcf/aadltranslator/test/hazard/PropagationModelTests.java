@@ -3,9 +3,10 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard;
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.initComplete;
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.usedProperties;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Iterator;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.junit.AfterClass;
@@ -20,12 +21,9 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.Propagation
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
 public class PropagationModelTests {
-
-	private static DeviceModel deviceModel;
-	private static ProcessModel processModel;
-	private static PropagationModel pmProp1;
-	private static PropagationModel pmProp2;
-	private static PropagationModel pmProp3;
+	
+	private static Set<PropagationModel> pmInProps;
+	private static PropagationModel pmOutProp;
 	private static PropagationModel dmProp;
 
 	@BeforeClass
@@ -37,23 +35,13 @@ public class PropagationModelTests {
 		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 		
 		SystemModel systemModel = AllTests.runHazardTransTest("PulseOx", "PulseOx_Forwarding_System");
-		deviceModel = systemModel.getDeviceByType("ICEpoInterface");
-		processModel = systemModel.getProcessByType("PulseOx_Logic_Process");
+		DeviceModel deviceModel = systemModel.getDeviceByType("ICEpoInterface");
+		ProcessModel processModel = systemModel.getProcessByType("PulseOx_Logic_Process");
 		
-
-		dmProp = deviceModel.getPropagations().iterator().next();
+		dmProp = deviceModel.getSendPorts().values().iterator().next().getOutPropagation();
 		
-		// We need a predictable ordering for testing, so we sort the set
-		TreeSet<PropagationModel> procPropSet = new TreeSet<>();
-		procPropSet.addAll(processModel.getPropagations());
-		Iterator<PropagationModel> iter = procPropSet.iterator();
-		pmProp1 = iter.next();
-		if(pmProp1 != null){
-			pmProp2 = iter.next();
-		}
-		if(pmProp2 != null){
-			pmProp3 = iter.next();
-		}
+		pmInProps = processModel.getReceivePorts().values().iterator().next().getInPropagations();
+		pmOutProp = processModel.getSendPorts().values().iterator().next().getOutPropagation();
 	}
 	
 	@AfterClass
@@ -63,22 +51,15 @@ public class PropagationModelTests {
 
 	@Test
 	public void testPropagationExists() {
-		assertEquals(1, deviceModel.getPropagations().size());
-		assertEquals(3, processModel.getPropagations().size());
+		assertNotNull(dmProp);
+		assertNotNull(pmInProps);
+		assertEquals(1, pmInProps.size());
+		assertNotNull(pmOutProp);
 	}
 	
 	@Test
-	public void testPropagationDirection() {
-		assertTrue(dmProp.isOut());
-		assertTrue(pmProp1.isIn());
-		assertTrue(pmProp2.isOut());
-	}
-	
-	@Test
-	public void testPropagationPort() {
-		assertEquals("SpO2Out", dmProp.getPort().getName());
-		assertEquals("SpO2", pmProp1.getPort().getName());
-		assertEquals("DerivedAlarm", pmProp2.getPort().getName());
+	public void testManifestation() {
+		assertEquals("CONTENTHIGH", pmInProps.iterator().next().getManifestation());
 	}
 	
 	@Test
@@ -86,17 +67,14 @@ public class PropagationModelTests {
 		assertEquals(1, dmProp.getErrors().size());
 		assertEquals("SpO2ValueHigh", dmProp.getErrors().iterator().next().getName());
 
-		assertEquals(1, pmProp1.getErrors().size());
-		assertEquals("SpO2ValueHigh", pmProp1.getErrors().iterator().next().getName());
+		assertEquals(1, pmInProps.iterator().next().getErrors().size());
+		assertEquals("SpO2ValueHigh", pmInProps.iterator().next().getErrors().iterator().next().getName());
 		
-		assertEquals(1, pmProp2.getErrors().size());
-		assertEquals("MissedAlarm", pmProp2.getErrors().iterator().next().getName());
-		
-		TreeSet<ErrorTypeModel> p3Set = new TreeSet<>(pmProp3.getErrors());
-		Iterator<ErrorTypeModel> p3Iter = p3Set.iterator();		
-		
-		assertEquals(2, pmProp3.getErrors().size());
-		assertEquals("ExtraTypeOne", p3Iter.next().getName());
-		assertEquals("ExtraTypeTwo", p3Iter.next().getName());		
+		assertEquals(3, pmOutProp.getErrors().size());
+		TreeSet<ErrorTypeModel> pmOutProps = new TreeSet<>(pmOutProp.getErrors());
+		Iterator<ErrorTypeModel> iter = pmOutProps.iterator();
+		assertEquals("ExtraTypeOne", iter.next().getName());
+		assertEquals("ExtraTypeTwo", iter.next().getName());
+		assertEquals("MissedAlarm", iter.next().getName());		
 	}
 }
