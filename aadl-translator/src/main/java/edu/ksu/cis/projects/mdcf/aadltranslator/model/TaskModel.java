@@ -7,15 +7,17 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementExcept
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 
 public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
-	/**
-	 * The name of the triggering port
-	 */
-	private String trigPortName;
-
-	/**
-	 * The type of the triggering port
-	 */
-	private String trigPortType;
+//	/**
+//	 * The name of the triggering port
+//	 */
+//	private String trigPortName;
+//
+//	/**
+//	 * The type of the triggering port
+//	 */
+//	private String trigPortType;
+	
+	private PortModel trigPort = null;
 
 	/**
 	 * The name that the task uses to refer to the value that arrives via the
@@ -48,11 +50,11 @@ public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
 	 */
 	private boolean sporadic;
 
-	/**
-	 * Whether or not this task is triggered by an event (ie, a message without
-	 * a payload)
-	 */
-	private boolean eventTriggered;
+//	/**
+//	 * Whether or not this task is triggered by an event (ie, a message without
+//	 * a payload)
+//	 */
+//	private boolean eventTriggered;
 
 	/**
 	 * This task's worst case execution time
@@ -79,24 +81,34 @@ public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
 		callSequence = new ArrayList<>();
 		// methodParameters = new HashMap<>();
 		// methodNames = new HashMap<>();
-		trigPortName = null;
+//		trigPortName = null;
 		this.name = name;
 	}
 
-	public void setTrigPortInfo(String portName, String portType,
-			String localName, boolean isEventTriggered)
-			throws NotImplementedException {
-		if (this.trigPortName == null) {
-			trigPortName = portName;
-			trigPortType = portType;
-			trigPortLocalName = localName;
-			eventTriggered = isEventTriggered;
+	public void setTrigPort(PortModel port) throws NotImplementedException{
+		if(this.trigPort == null){
+			this.trigPort = port;
 		} else {
 			throw new NotImplementedException("The task" + name
-					+ " with triggering port " + this.trigPortName
-					+ " tried to add a second port named " + trigPortName);
+					+ " with triggering port " + this.trigPort.getName()
+					+ " tried to add a second port named " + port.getName());
 		}
 	}
+	
+//	public void setTrigPortInfo(String portName, String portType,
+//			String localName, boolean isEventTriggered)
+//			throws NotImplementedException {
+//		if (this.trigPortName == null) {
+//			trigPortName = portName;
+//			trigPortType = portType;
+//			trigPortLocalName = localName;
+//			eventTriggered = isEventTriggered;
+//		} else {
+//			throw new NotImplementedException("The task" + name
+//					+ " with triggering port " + this.trigPortName
+//					+ " tried to add a second port named " + trigPortName);
+//		}
+//	}
 
 	public void addIncGlobal(VariableModel vm) {
 		incomingGlobals.add(vm);
@@ -141,11 +153,13 @@ public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
 	}
 	
 	public String getTrigPortName() {
-		return trigPortName;
+//		return trigPortName;
+		return trigPort.getName();
 	}
 
 	public String getTrigPortType() {
-		return trigPortType;
+//		return trigPortType;
+		return trigPort.getType();
 	}
 
 	public String getTrigPortLocalName() {
@@ -195,20 +209,32 @@ public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
 	}
 	 */
 
-	public boolean isEventTriggered() {
-		return eventTriggered;
-	}
-
-	public void setEventTriggered(boolean eventTriggered) {
-		this.eventTriggered = eventTriggered;
+//	public boolean isEventTriggered() {
+//		return eventTriggered;
+//	}
+//
+//	public void setEventTriggered(boolean eventTriggered) {
+//		this.eventTriggered = eventTriggered;
+//	}
+	
+	public PortModel getTrigPort(){
+		return trigPort;
 	}
 
 	public boolean isSporadic() {
 		return sporadic;
 	}
+	
+	public boolean isPeriodic() {
+		return !sporadic;
+	}
 
 	public void setSporadic(boolean sporadic) {
 		this.sporadic = sporadic;
+	}
+	
+	public void setTrigPortLocalName(String name) {
+		trigPortLocalName = name;
 	}
 	
 	/*-

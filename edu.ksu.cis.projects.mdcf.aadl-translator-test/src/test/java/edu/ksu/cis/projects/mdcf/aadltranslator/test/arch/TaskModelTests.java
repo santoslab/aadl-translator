@@ -5,6 +5,7 @@ import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.usedPropert
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.AfterClass;
@@ -19,8 +20,8 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
 public class TaskModelTests {
 
-	private static TaskModel CheckSpO2Thread, UpdateSpO2Thread,
-			HandleAlarmThread, PseudoDevThread;
+	private static TaskModel checkSpO2Thread, updateSpO2Thread,
+			handleAlarmThread, pseudoDevThread;
 
 	@BeforeClass
 	public static void initialize() {
@@ -35,10 +36,10 @@ public class TaskModelTests {
 		ProcessModel displayProcess = systemModel
 				.getProcessByType("PulseOx_Display_Process");
 		DeviceModel deviceModel = systemModel.getDeviceByType("ICEpoInterface");
-		CheckSpO2Thread = logicProcess.getChild("CheckSpO2Thread");
-		UpdateSpO2Thread = displayProcess.getChild("UpdateSpO2Thread");
-		HandleAlarmThread = displayProcess.getChild("HandleAlarmThread");
-		PseudoDevThread = deviceModel.getChild("SpO2Task");
+		checkSpO2Thread = logicProcess.getChild("CheckSpO2Thread");
+		updateSpO2Thread = displayProcess.getChild("UpdateSpO2Thread");
+		handleAlarmThread = displayProcess.getChild("HandleAlarmThread");
+		pseudoDevThread = deviceModel.getChild("SpO2Task");
 	}
 
 	@AfterClass
@@ -48,90 +49,108 @@ public class TaskModelTests {
 
 	@Test
 	public void testTasksExist() {
-		assertNotNull(CheckSpO2Thread);
-		assertNotNull(UpdateSpO2Thread);
-		assertNotNull(HandleAlarmThread);
-		assertNotNull(PseudoDevThread);
+		assertNotNull(checkSpO2Thread);
+		assertNotNull(updateSpO2Thread);
+		assertNotNull(handleAlarmThread);
+		assertNotNull(pseudoDevThread);
 	}
 
 	@Test
 	public void testTaskCallSequence() {
-		assertEquals(0, CheckSpO2Thread.getCallSequence().size());
-		assertEquals(0, UpdateSpO2Thread.getCallSequence().size());
-		assertEquals(0, HandleAlarmThread.getCallSequence().size());
-		assertEquals(0, PseudoDevThread.getCallSequence().size());
+		assertEquals(0, checkSpO2Thread.getCallSequence().size());
+		assertEquals(0, updateSpO2Thread.getCallSequence().size());
+		assertEquals(0, handleAlarmThread.getCallSequence().size());
+		assertEquals(0, pseudoDevThread.getCallSequence().size());
 	}
 
 	@Test
 	public void testTaskDefaultDeadline() {
-		assertEquals(50, CheckSpO2Thread.getDeadline());
-		assertEquals(50, UpdateSpO2Thread.getDeadline());
-		assertEquals(50, PseudoDevThread.getDeadline());
+		assertEquals(50, checkSpO2Thread.getDeadline());
+		assertEquals(50, updateSpO2Thread.getDeadline());
+		assertEquals(50, pseudoDevThread.getDeadline());
 	}
 
 	@Test
 	public void testTaskOverrideDeadline() {
-		assertEquals(75, HandleAlarmThread.getDeadline());
+		assertEquals(75, handleAlarmThread.getDeadline());
 	}
 
 	@Test
 	public void testDefaultPeriod() {
-		assertEquals(50, CheckSpO2Thread.getPeriod());
-		assertEquals(50, UpdateSpO2Thread.getPeriod());
-		assertEquals(-1, PseudoDevThread.getPeriod());
+		assertEquals(50, checkSpO2Thread.getPeriod());
+		assertEquals(50, updateSpO2Thread.getPeriod());
+		assertEquals(-1, pseudoDevThread.getPeriod());
 	}
 
 	@Test
 	public void testTaskOverridePeriod() {
-		assertEquals(95, HandleAlarmThread.getPeriod());
+		assertEquals(95, handleAlarmThread.getPeriod());
 	}
 
 	@Test
 	public void testTaskDefaultWCET() {
-		assertEquals(5, CheckSpO2Thread.getWcet());
-		assertEquals(5, UpdateSpO2Thread.getWcet());
-		assertEquals(5, PseudoDevThread.getWcet());
+		assertEquals(5, checkSpO2Thread.getWcet());
+		assertEquals(5, updateSpO2Thread.getWcet());
+		assertEquals(5, pseudoDevThread.getWcet());
 	}
 
 	@Test
 	public void testTaskOverrideWCET() {
-		assertEquals(7, HandleAlarmThread.getWcet());
+		assertEquals(7, handleAlarmThread.getWcet());
 	}
 
 	@Test
 	public void testTaskTrigPortInfo() {
-		assertEquals("Integer", UpdateSpO2Thread.getTrigPortType());
-		assertEquals("SpO2", UpdateSpO2Thread.getTrigPortName());
-		assertEquals("SpO2", UpdateSpO2Thread.getTrigPortLocalName());
+		assertEquals("Integer", updateSpO2Thread.getTrigPortType());
+		assertEquals("SpO2", updateSpO2Thread.getTrigPortName());
+		assertEquals("SpO2", updateSpO2Thread.getTrigPortLocalName());
 	}
 
 	@Test
 	public void testTaskIncomingGlobals() {
-		assertEquals(0, CheckSpO2Thread.getIncomingGlobals().size());
-		assertEquals(0, HandleAlarmThread.getIncomingGlobals().size());
-		assertEquals(0, UpdateSpO2Thread.getIncomingGlobals().size());
+		assertEquals(0, checkSpO2Thread.getIncomingGlobals().size());
+		assertEquals(0, handleAlarmThread.getIncomingGlobals().size());
+		assertEquals(0, updateSpO2Thread.getIncomingGlobals().size());
 	}
 
 	@Test
 	public void testTaskOutgoingGlobals() {
-		assertEquals(0, CheckSpO2Thread.getOutgoingGlobals().size());
-		assertEquals(0, HandleAlarmThread.getOutgoingGlobals().size());
-		assertEquals(0, UpdateSpO2Thread.getOutgoingGlobals().size());
+		assertEquals(0, checkSpO2Thread.getOutgoingGlobals().size());
+		assertEquals(0, handleAlarmThread.getOutgoingGlobals().size());
+		assertEquals(0, updateSpO2Thread.getOutgoingGlobals().size());
 	}
 
 	@Test
-	public void testTaskIsEventTriggered() {
-		assertFalse(CheckSpO2Thread.isEventTriggered());
-		assertTrue(HandleAlarmThread.isEventTriggered());
-		assertFalse(UpdateSpO2Thread.isEventTriggered());
-		assertFalse(PseudoDevThread.isEventTriggered());
+	public void testTaskTriggerIsEvent() {
+		assertTrue(handleAlarmThread.getTrigPort().isEvent());
+		assertFalse(updateSpO2Thread.getTrigPort().isEvent());
+		assertFalse(pseudoDevThread.getTrigPort().isEvent());
+	}
+	
+	@Test
+	public void testTaskTriggerIsEventData() {
+		assertFalse(handleAlarmThread.getTrigPort().isEventData());
+		assertTrue(updateSpO2Thread.getTrigPort().isEventData());
+		assertTrue(pseudoDevThread.getTrigPort().isEventData());
+	}
+	
+	@Test
+	public void testTaskTriggerIsData() {
+		assertFalse(handleAlarmThread.getTrigPort().isData());
+		assertFalse(updateSpO2Thread.getTrigPort().isData());
+		assertFalse(pseudoDevThread.getTrigPort().isData());
 	}
 
+	@Test
+	public void testNoTriggerPort(){
+		assertNull(checkSpO2Thread.getTrigPort());
+	}
+	
 	@Test
 	public void testTaskIsSporadic() {
-		assertFalse(CheckSpO2Thread.isSporadic());
-		assertTrue(HandleAlarmThread.isSporadic());
-		assertTrue(UpdateSpO2Thread.isSporadic());
-		assertTrue(PseudoDevThread.isSporadic());
+		assertFalse(checkSpO2Thread.isSporadic());
+		assertTrue(handleAlarmThread.isSporadic());
+		assertTrue(updateSpO2Thread.isSporadic());
+		assertTrue(pseudoDevThread.isSporadic());
 	}
 }

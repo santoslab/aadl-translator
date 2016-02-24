@@ -431,9 +431,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				maxPeriod = handleOverridableProperty(obj, "Default_Output_Rate", "MAP_Properties", "Output_Rate",
 						PropertyType.RANGE_MAX);
 
-				if (minPeriod == null || maxPeriod == null)
+				if (minPeriod == null || maxPeriod == null){
 					throw new MissingRequiredPropertyException("Missing the required output rate specification.");
-
+				}
+				
 				exchangeName = checkCustomProperty(obj, "Exchange_Name", PropertyType.STRING);
 
 				PortModel pm = new PortModel();
@@ -454,7 +455,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					pm.setEventData();
 				} else if (obj.getCategory() == PortCategory.DATA) {
 					pm.setData();
-					handleDataPortImplicitTask(pm.getName(), pm.getType(), obj);
+					handleDataPortImplicitTask(pm, obj);
 				} else if (obj.getCategory() == PortCategory.EVENT) {
 					pm.setEvent();
 				}
@@ -675,37 +676,34 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				tm.setDeadline(deadline);
 				tm.setWcet(wcet);
 				String portName = obj.getName() + "Out";
-				String trigPortName = dm.getInPortNames().get(portName);
-				tm.setTrigPortInfo(trigPortName, dm.getPortByName(portName).getType(), portName, false);
+//				tm.setTrigPortInfo(trigPortName, dm.getPortByName(portName).getType(), portName, false);
+				tm.setTrigPortLocalName(portName);
+				tm.setTrigPort(dm.getPortByName(portName));
 			} catch (DuplicateElementException | NotImplementedException e) {
 				handleException(obj, e);
 				return;
 			}
 		}
 
-		private void handleDataPortImplicitTask(String portName, String portType, Port obj) {
-			String taskName = portName + "Task";
+		private void handleDataPortImplicitTask(PortModel portModel, Port obj) throws NotImplementedException, DuplicateElementException {
+			String taskName = portModel.getName() + "Task";
 			TaskModel tm = new TaskModel(taskName);
 			// Default values; period is set to -1 since these tasks are all
 			// sporadic
 			// TODO: Read these from plugin preferences?
 			int period = -1, deadline = 50, wcet = 5;
-			try {
-				if(componentModel instanceof DeviceModel){
-					throw new NotImplementedException("Incoming device ports must be event or event data.");
-				}
-				ProcessModel pm = (ProcessModel) componentModel;
-				pm.addChild(taskName, tm);
-				tm = pm.getChild(taskName);
-				tm.setSporadic(true);
-				tm.setPeriod(period);
-				tm.setDeadline(deadline);
-				tm.setWcet(wcet);
-				tm.setTrigPortInfo(portName, portType, portName, false);
-			} catch (DuplicateElementException | NotImplementedException e) {
-				handleException(obj, e);
-				return;
+			if(componentModel instanceof DeviceModel){
+				throw new NotImplementedException("Incoming device ports must be event or event data.");
 			}
+			ProcessModel pm = (ProcessModel) componentModel;
+			pm.addChild(taskName, tm);
+			tm = pm.getChild(taskName);
+			tm.setSporadic(true);
+			tm.setPeriod(period);
+			tm.setDeadline(deadline);
+			tm.setWcet(wcet);
+			tm.setTrigPortLocalName(portModel.getName());
+			tm.setTrigPort(portModel);
 		}
 
 		private void handleThreadProperties(ThreadType obj, TaskModel tm) {
@@ -934,14 +932,13 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				} else if (obj.getAllSource().getOwner() instanceof ProcessType
 						&& obj.getAllDestination().getOwner() instanceof ThreadType) {
 					// From process to thread
-					boolean eventTriggered;
 					taskName = ((ThreadType) obj.getAllDestination().getOwner()).getName();
 					localName = obj.getAllDestination().getName();
 					portName = obj.getAllSource().getName();
 					task = procModel.getChild(taskName);
-					eventTriggered = procModel.getPortByName(portName).isEvent();
 					portType = procModel.getPortByName(portName).getType();
-					task.setTrigPortInfo(portName, portType, localName, eventTriggered);
+					task.setTrigPort(procModel.getPortByName(portName));
+					task.setTrigPortLocalName(localName);
 
 					connModel.setName(obj.getName());
 					connModel.setProcessToThread(true);
