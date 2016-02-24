@@ -129,4 +129,15 @@ public class ControllerErrorTests {
 				"Error at PulseOx_Forwarding_DevToDev_System.aadl:28: Device to device connections are not yet allowed.",
 				errorSB.toString().trim());
 	}
+
+	@Test
+	public void testDevIncDataPort() {
+		usedProperties.add("PulseOx_Forwarding_Properties");
+		usedDevices.add("PulseOx_IncDataPort_Interface");
+		runArchTransTest("PulseOxDevIncDataPort",
+				"PulseOx_IncDataPort_System");
+		assertEquals(
+				"Error at PulseOx_IncDataPort_Interface.aadl:6: Incoming device ports must be event or event data.",
+				errorSB.toString().trim());
+	}
 }

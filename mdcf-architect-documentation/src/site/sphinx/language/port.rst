@@ -29,7 +29,7 @@ Properties, Contexts and Directions
 	:direction: Either ``in`` or ``out``
 	:trigger-type event: Message arrival must be handled by a sporadic thread, messages have no payload.
 	:trigger-type event data: Message arrival must be handled by a sporadic thread, messages have a payload of the port's type.
-	:trigger-type data: Message arrival must not be handled but will rather cause a predictably-named field to be updated. Messages have a payload of the port's type. Thread ports cannot have a ``data`` trigger.
+	:trigger-type data: Message arrival must not be handled but will rather cause a predictably-named field to be updated. Messages have a payload of the port's type. Thread ports cannot have a ``data`` trigger. Devices must not use ``data`` ports.
 	
 .. note::
 	1. The ExchangeName property is ignored on ports not attached to devices.

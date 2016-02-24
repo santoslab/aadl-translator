@@ -129,9 +129,12 @@ Data Properties
 	
    :default name: N/A
    :override: Data_Model::Data_Representation
-   :type: ``Boolean``, ``Integer``, or ``Double``
+   :type: ``Boolean``, ``Integer``, or ``Float``
    :context: :construct:`data`
    :example: ``Integer``
+
+.. note::
+	Declaring a data representation of ``Float`` will translate to a ``Double``, as they are "generally the default choice" for decimal values (`source <https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html>`_)
 
 Example Property Set
 ====================

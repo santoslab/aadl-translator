@@ -1,0 +1,45 @@
+package PulseOx_IncDataPort_System
+public
+with PulseOx_IncDataPort_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display, 
+	PulseOx_Forwarding_Properties, MAP_Properties, MAP_Error_Properties,
+	PulseOx_Forwarding_Errors;
+
+	system PulseOx_Forwarding_System
+	end PulseOx_Forwarding_System;
+	
+	system implementation PulseOx_Forwarding_System.imp
+	subcomponents
+		-- Physiological inputs
+		pulseOx : device PulseOx_IncDataPort_Interface::ICEpoInterface.imp;
+		
+		-- App logic
+		appLogic : process PulseOx_Forwarding_Logic::PulseOx_Logic_Process.imp;
+		appDisplay : process PulseOx_Forwarding_Display::PulseOx_Display_Process.imp;
+	connections
+		-- From device to logic
+		spo2_to_logic : port pulseOx.SpO2 -> appLogic.SpO2;
+		
+		-- From device to display
+		spo2_to_display : port pulseOx.SpO2 -> appDisplay.SpO2
+		{MAP_Properties::Channel_Delay => 150 ms;};
+		
+		-- From logic to display
+		alarm_to_display : port appLogic.DerivedAlarm -> appDisplay.DerivedAlarm;
+	properties
+		MAP_Properties::Component_Type => controller;
+	annex EMV2 {**
+		use types PulseOx_Forwarding_Errors;
+		properties
+		MAP_Error_Properties::Occurrence => [
+			Kind => NotProviding;
+			ViolatedConstraint => PulseOx_Forwarding_Error_Properties::ShowAllAlarms;
+			Title => "Bad SpO2";
+			Cause => [
+				ErrorType => reference(SpO2ValueHigh);
+				Description => "The SpO2 values from the pulse oximeter are too high, so the alarm is missed";
+			];
+			Compensation => "None";
+		] applies to alarm_to_display;
+	**};
+	end PulseOx_Forwarding_System.imp;
+end PulseOx_IncDataPort_System;

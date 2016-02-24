@@ -488,8 +488,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		private String getJavaType(String name) throws NotImplementedException {
 			if (name == null) {
 				return "Object";
-			} else if (name.equals("Integer") || name.equals("Double") || name.equals("Boolean")) {
+			} else if (name.equals("Integer") || name.equals("Boolean")) {
 				return name;
+			} else if (name.equals("Float")) {
+				return "Double";
 			} else {
 				throw new NotImplementedException("No java equivalent for type " + name);
 			}
@@ -684,12 +686,15 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		private void handleDataPortImplicitTask(String portName, String portType, Port obj) {
 			String taskName = portName + "Task";
 			TaskModel tm = new TaskModel(taskName);
-			ProcessModel pm = (ProcessModel) componentModel;
 			// Default values; period is set to -1 since these tasks are all
 			// sporadic
 			// TODO: Read these from plugin preferences?
 			int period = -1, deadline = 50, wcet = 5;
 			try {
+				if(componentModel instanceof DeviceModel){
+					throw new NotImplementedException("Incoming device ports must be event or event data.");
+				}
+				ProcessModel pm = (ProcessModel) componentModel;
 				pm.addChild(taskName, tm);
 				tm = pm.getChild(taskName);
 				tm.setSporadic(true);
