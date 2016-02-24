@@ -32,6 +32,13 @@ public class DevOrProcModel extends ComponentModel<TaskModel, ProcessConnectionM
 				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 	
+	public Map<String, TaskModel> getSporadicEventOrEventDataTasks() {
+		return getSporadicTasks().entrySet()
+				.stream()
+				.filter(p -> p.getValue().getTrigPort().isEvent() || p.getValue().getTrigPort().isEventData())
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+	}
+	
 	public Map<String, TaskModel> getPeriodicTasks() {
 		return children.entrySet()
 				.stream()

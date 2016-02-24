@@ -13,14 +13,14 @@ public class <model.name> extends <model.name>SuperType {
   protected void initComponent() {
     // TODO Fill in custom initialization code here
   }
-  <model.sporadicTasks.values:{v |<userImplOnMessageStub(v)>
+  
+  <model.sporadicEventOrEventDataTasks.values:{v |<userImplOnMessageStub(v)>
   }>  
   <model.periodicTasks.keys:{k |<userImplStub(k)>
   }>}
 >>
 
 userImplStub(taskName) ::=<<
-
 
 @Override
 protected void <taskName>Method(){
@@ -31,9 +31,9 @@ protected void <taskName>Method(){
 userImplOnMessageStub(taskModel) ::=<<
 
 @Override
-<if(!taskModel.eventTriggered)>
+<if(taskModel.trigPort.eventData)>
 protected void <taskModel.trigPortName>ListenerOnMessage(MdcfMessage msg, <taskModel.trigPortType> <taskModel.trigPortName>Data) {
-<else>
+<elseif(taskModel.trigPort.event)>
 protected void <taskModel.trigPortName>ListenerOnMessage(MdcfMessage msg) {
 <endif>
   // TODO Fill in custom listener code here

@@ -5,7 +5,6 @@ public class SpO2TaskTask implements Task {
     MdcfMessage message = SpO2ReceiverPort.getReceiver().getLastMsg();
       try {
         Integer SpO2Data = SpO2ReceiverPort.getLastMsgContent();
-        SpO2ListenerOnMessage(message, SpO2Data);
       } catch (MdcfDecodeMessageException e) {
         System.err.println(getComponentTypeName() + ".SpO2TaskTask task: invalid message:" + message.getTextMsg());
         e.printStackTrace();
