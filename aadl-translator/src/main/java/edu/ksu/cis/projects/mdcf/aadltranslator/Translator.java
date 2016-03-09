@@ -562,11 +562,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			return DONE;
 		}
 
-		@Override
+		/*-@Override
 		public String caseComponentClassifier(ComponentClassifier obj) {
 			handlePropagations(obj);
 			return NOT_DONE;
-		}
+		}*/
 
 		private void handlePropagations(ComponentClassifier obj) {
 			String manifestationStr, portName;
@@ -620,13 +620,14 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 		}
 
+		/*-
 		@Override
 		public String caseSubprogramType(SubprogramType obj) {
 			lastElemProcessed = ElementType.SUBPROGRAM;
 			return NOT_DONE;
 		}
 
-		/*-
+		
 		@Override
 		public String caseSubprogramCallSequence(SubprogramCallSequence obj) {
 			handleCallSequence(

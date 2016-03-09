@@ -39,7 +39,7 @@ public class SystemConnectionModelTests {
 	
 	@Test
 	public void testPortConnectionsExist(){
-		assertEquals(systemModel.getChannels().size(), 3);
+		assertEquals(4, systemModel.getChannels().size());
 	}
 	
 	@Test

@@ -6,4 +6,7 @@ private void initComponent(){
 private void SpO2InListenerOnMessage(MdcfMessage msg, Integer SpO2InData){
   SpO2OutSenderPort.send(SpO2InData);
 }
+private void IncSpO2InListenerOnMessage(MdcfMessage msg, Integer IncSpO2InData){
+  IncSpO2OutSenderPort.send(IncSpO2InData);
+}
 

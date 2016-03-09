@@ -50,18 +50,32 @@ public class DeviceModelTests {
 
 	@Test
 	public void testDeviceSendPortExists() {
-		assertEquals(1, deviceModelStandalone.getSendPorts().size());
-		assertEquals(1, deviceModelFromSystem.getSendPorts().size());
+		assertEquals(2, deviceModelStandalone.getSendPorts().size());
+		assertEquals(2, deviceModelFromSystem.getSendPorts().size());
 		assertNotNull(deviceModelFromSystem.getSendPorts().get("SpO2Out"));
 		assertNotNull(deviceModelStandalone.getSendPorts().get("SpO2Out"));
+		assertNotNull(deviceModelFromSystem.getSendPorts().get("IncSpO2Out"));
+		assertNotNull(deviceModelStandalone.getSendPorts().get("IncSpO2Out"));
+	}
+
+	@Test
+	public void testDeviceReceivePortExists() {
+		assertEquals(2, deviceModelStandalone.getReceivePorts().size());
+		assertEquals(2, deviceModelFromSystem.getReceivePorts().size());
+		assertNotNull(deviceModelFromSystem.getReceivePorts().get("IncSpO2In"));
+		assertNotNull(deviceModelStandalone.getReceivePorts().get("IncSpO2In"));
+		assertNotNull(deviceModelFromSystem.getReceivePorts().get("SpO2In"));
+		assertNotNull(deviceModelStandalone.getReceivePorts().get("SpO2In"));
 	}
 	
 	@Test
 	public void testImplicitTasks() {
-		assertEquals(1, deviceModelStandalone.getChildren().size());
-		assertEquals(1, deviceModelFromSystem.getChildren().size());
+		assertEquals(2, deviceModelStandalone.getChildren().size());
+		assertEquals(2, deviceModelFromSystem.getChildren().size());
 		assertNotNull(deviceModelFromSystem.getChildren().get("SpO2Task"));
 		assertNotNull(deviceModelStandalone.getChildren().get("SpO2Task"));
+		assertNotNull(deviceModelFromSystem.getChildren().get("IncSpO2Task"));
+		assertNotNull(deviceModelStandalone.getChildren().get("IncSpO2Task"));
 	}
 	
 	@Test

@@ -1,21 +1,10 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.NotImplementedException;
 
 public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
-//	/**
-//	 * The name of the triggering port
-//	 */
-//	private String trigPortName;
-//
-//	/**
-//	 * The type of the triggering port
-//	 */
-//	private String trigPortType;
 	
 	private PortModel trigPort = null;
 
@@ -50,38 +39,15 @@ public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
 	 */
 	private boolean sporadic;
 
-//	/**
-//	 * Whether or not this task is triggered by an event (ie, a message without
-//	 * a payload)
-//	 */
-//	private boolean eventTriggered;
-
 	/**
 	 * This task's worst case execution time
 	 */
 	private int wcet;
 
-	// /**
-	// * The names of called methods mapped to the variables that make up the
-	// * parameter list
-	// */
-	// private HashMap<String, ArrayList<String>> methodParameters;
-	//
-	// /**
-	// * This maps the task's name for a method to its real name
-	// */
-	// private HashMap<String, String> methodNames;
-	//
-	private ArrayList<CallModel> callSequence;
-
 	public TaskModel(String name) {
 		super();
 		incomingGlobals = new ArrayList<>();
 		outgoingGlobals = new ArrayList<>();
-		callSequence = new ArrayList<>();
-		// methodParameters = new HashMap<>();
-		// methodNames = new HashMap<>();
-//		trigPortName = null;
 		this.name = name;
 	}
 
@@ -117,48 +83,12 @@ public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
 	public void addOutGlobal(VariableModel vm) {
 		outgoingGlobals.add(vm);
 	}
-
-	public void addCalledMethod(String internalName, String externalName) {
-		// TODO: Handle pre-existing method
-		// methodParameters.put(internalName, new ArrayList<String>());
-		// methodNames.put(internalName, externalName);
-		callSequence.add(new CallModel(internalName, externalName));
-	}
-
-	/**
-	 * This gets the name of a method from a task's local name for it
-	 * 
-	 * @param internalName
-	 *            The task's name for a method
-	 * @return The method's actual name
-	 */
-	public String getMethodProcessName(String internalName) {
-		for (CallModel call : callSequence) {
-			if (call.getInternalName().equals(internalName)) {
-				return call.getExternalName();
-			}
-		}
-		return null;
-	}
-
-	public void addParameterToCalledMethod(String internalName, String formal,
-			String actual) {
-		// TODO: Handle wrong method name
-		// methodParameters.get(methodName).add(parameter);
-		for (CallModel call : callSequence) {
-			if (call.getInternalName().equals(internalName)) {
-				call.addParam(formal, actual);
-			}
-		}
-	}
 	
 	public String getTrigPortName() {
-//		return trigPortName;
 		return trigPort.getName();
 	}
 
 	public String getTrigPortType() {
-//		return trigPortType;
 		return trigPort.getType();
 	}
 
@@ -186,10 +116,6 @@ public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
 		return wcet;
 	}
 
-	public ArrayList<CallModel> getCallSequence() {
-		return callSequence;
-	}
-
 	public void setPeriod(int period) {
 		this.period = period;
 	}
@@ -201,21 +127,6 @@ public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
 	public void setWcet(int wcet) {
 		this.wcet = wcet;
 	}
-
-	/*-
-	public void addReturnToCalledMethod(String internalName, String methodName,
-			String taskName) {
-
-	}
-	 */
-
-//	public boolean isEventTriggered() {
-//		return eventTriggered;
-//	}
-//
-//	public void setEventTriggered(boolean eventTriggered) {
-//		this.eventTriggered = eventTriggered;
-//	}
 	
 	public PortModel getTrigPort(){
 		return trigPort;
@@ -236,10 +147,4 @@ public class TaskModel extends ComponentModel<MethodModel, ConnectionModel>{
 	public void setTrigPortLocalName(String name) {
 		trigPortLocalName = name;
 	}
-	
-	/*-
-	 public HashMap<String, ArrayList<String>> getMethodParameters() {
-		return methodParameters;
-	}
-	 */
 }

@@ -54,15 +54,7 @@ public class TaskModelTests {
 		assertNotNull(handleAlarmThread);
 		assertNotNull(pseudoDevThread);
 	}
-
-	@Test
-	public void testTaskCallSequence() {
-		assertEquals(0, checkSpO2Thread.getCallSequence().size());
-		assertEquals(0, updateSpO2Thread.getCallSequence().size());
-		assertEquals(0, handleAlarmThread.getCallSequence().size());
-		assertEquals(0, pseudoDevThread.getCallSequence().size());
-	}
-
+	
 	@Test
 	public void testTaskDefaultDeadline() {
 		assertEquals(50, checkSpO2Thread.getDeadline());

@@ -35,6 +35,40 @@
 
   <mdcf.core.app.Channel>
     <chanName>$PLACEHOLDER$</chanName>
+    <pubName>SpO2</pubName>
+    <subName>SpO2In</subName>
+    <pubComp>
+      <name>appLogic</name>
+      <type>PulseOx_Logic_Process</type>
+      <role>Logic</role>
+    </pubComp>
+    <subComp>
+      <name>pulseOx</name>
+      <type>ICEpoInterface</type>
+      <role>Logic</role>
+    </subComp>
+    <channelDelay>100</channelDelay>
+  </mdcf.core.app.Channel>
+  <mdcf.core.app.Channel>
+    <chanName>$PLACEHOLDER$</chanName>
+    <pubName>SpO2Out</pubName>
+    <subName>$PLACEHOLDER$</subName>
+    <exchangeName>spo2_per</exchangeName>
+    <pubComp>
+      <name>pulseOx</name>
+      <type>ICEpoInterface</type>
+      <role>Logic</role>
+    </pubComp>
+    <subComp>
+      <name>$PLACEHOLDER$</name>
+      <type>$PLACEHOLDER$</type>
+      <role>Device</role>
+    </subComp>
+    <channelDelay>100</channelDelay>
+  </mdcf.core.app.Channel>
+
+  <mdcf.core.app.Channel>
+    <chanName>$PLACEHOLDER$</chanName>
     <pubName>$PLACEHOLDER$</pubName>
     <subName>SpO2In</subName>
     <exchangeName>spo2_per</exchangeName>

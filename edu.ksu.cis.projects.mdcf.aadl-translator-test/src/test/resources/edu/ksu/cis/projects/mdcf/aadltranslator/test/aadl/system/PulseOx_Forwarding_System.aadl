@@ -25,6 +25,9 @@ with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display,
 		
 		-- From logic to display
 		alarm_to_display : port appLogic.DerivedAlarm -> appDisplay.DerivedAlarm;
+		
+		-- From logic to device
+		logic_to_spo2 : port appLogic.SpO2 -> pulseOx.SpO2;
 	properties
 		MAP_Properties::Component_Type => controller;
 	annex EMV2 {**
