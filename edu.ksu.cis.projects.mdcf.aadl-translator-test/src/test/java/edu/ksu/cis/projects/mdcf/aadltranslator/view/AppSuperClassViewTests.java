@@ -107,7 +107,7 @@ public class AppSuperClassViewTests {
 	// Convenience method so everything doesn't get cluttered up by all the
 	// required parameters
 	private void runTest(String testName, Object model) {
-		runWriterTest(testName, model, appSuperClassSTG, GENERATE_EXPECTED,
+		runWriterTest(testName, model, "model", appSuperClassSTG, GENERATE_EXPECTED,
 				EXPECTED_DIR);
 	}
 }

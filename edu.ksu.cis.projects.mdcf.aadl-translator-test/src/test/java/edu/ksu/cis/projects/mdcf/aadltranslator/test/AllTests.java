@@ -448,12 +448,12 @@ public class AllTests {
 		return stats.getDeviceComponentModel();
 	}
 
-	public static void runWriterTest(String testName, Object model,
+	public static void runWriterTest(String testName, Object var, String varName,
 			STGroup stg, boolean GENERATE_EXPECTED, String expectedDir) {
 		stg.registerRenderer(String.class, MarkdownLinkRenderer.getInstance());
 		URL expectedOutputUrl = Platform.getBundle(TEST_PLUGIN_BUNDLE_ID)
 				.getEntry(TEST_DIR + expectedDir + testName + ".txt");
-		String actualStr = stg.getInstanceOf(testName).add("model", model)
+		String actualStr = stg.getInstanceOf(testName).add(varName, var)
 				.render();
 		String expectedStr = null;
 		try {

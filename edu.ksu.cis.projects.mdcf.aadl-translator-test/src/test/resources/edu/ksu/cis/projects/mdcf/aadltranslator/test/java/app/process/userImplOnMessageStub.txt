@@ -1,0 +1,4 @@
+@Override
+protected void SpO2ListenerOnMessage(MdcfMessage msg, Integer SpO2Data) {
+  // TODO Fill in custom listener code here
+}
