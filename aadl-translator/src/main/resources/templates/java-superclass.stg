@@ -33,12 +33,10 @@ public class <taskName>Task implements Task {
     <taskModel.incomingGlobals:{vm | <initGlobal(vm.innerName, vm.outerName)>
     }>
     MdcfMessage message = <taskModel.trigPortName>ReceiverPort.getReceiver().getLastMsg();
-    <if(taskModel.trigPort.eventData || taskModel.trigPort.data)>
+    <if(!taskModel.trigPort.event)>
       try {
         <taskModel.trigPortType> <taskModel.trigPortLocalName>Data = <taskModel.trigPortName>ReceiverPort.getLastMsgContent();
-        <if(taskModel.trigPort.eventData)>
-          <taskModel.trigPortName>ListenerOnMessage(message, <taskModel.trigPortLocalName>Data);
-        <endif>
+        <taskModel.trigPortName>ListenerOnMessage(message, <taskModel.trigPortLocalName>Data);
       } catch (MdcfDecodeMessageException e) {
         System.err.println(getComponentTypeName() + ".<taskName>Task task: invalid message:" + message.getTextMsg());
         e.printStackTrace();

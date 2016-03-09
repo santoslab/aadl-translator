@@ -2,11 +2,9 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,7 +15,6 @@ import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.ContainedNamedElement;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DeviceSubcomponent;
 import org.osate.aadl2.DeviceType;
@@ -54,6 +51,7 @@ import org.osate.aadl2.properties.PropertyNotPresentException;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.aadl2.util.Aadl2Util;
 import org.osate.contribution.sei.names.DataModel;
+import org.osate.xtext.aadl2.errormodel.errorModel.EMV2PropertyAssociation;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPropagation;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.TypeToken;
@@ -597,7 +595,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				
 				portName = eProp.getFeatureorPPRef().getFeatureorPP().getFullName();
 				if (eProp.getDirection() == DirectionType.IN) {
-					manifestationStr = getPropagationManifestation(eProp);
+					manifestationStr = "ManifestationPlaceholder";
 					portModel = resolvePortModel(componentModel, portName, true);
 				} else {
 					manifestationStr = null;
@@ -620,28 +618,6 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					return;
 				}
 			}
-		}
-
-		private String getPropagationManifestation(ErrorPropagation eProp) {
-			String manifestationStr;
-			List<ContainedNamedElement> propVal;
-			try {
-				Property property = Aadl2Util.lookupPropertyDefinition(eProp, "MAP_Error_Properties", "Manifestation");
-
-				// getProperty throws a NPE if the property doesn't exist and I
-				// cannot for the life of me figure out how to check for it
-				// without just calling the function itself...
-				propVal = EMV2Properties.getProperty(property.getQualifiedName(),
-						eProp.getFeatureorPPRef().getFeatureorPP().getContainingClassifier(), eProp, null);
-
-				// You can't have multiple propagation points with one property,
-				// so we can safely get the first element
-				manifestationStr = EMV2Properties.getEnumerationOrIntegerPropertyConstantPropertyValue(
-						EMV2Properties.getPropertyValue(propVal.get(0)));
-			} catch (NullPointerException e) {
-				return null;
-			}
-			return manifestationStr;
 		}
 
 		@Override
@@ -906,7 +882,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 */
 
 		private void handleProcessPortConnection(PortConnection obj) {
-			String taskName, localName, portName, portType;
+			String taskName, localName, portName;
 			TaskModel task;
 			ProcessConnectionModel connModel = new ProcessConnectionModel();
 			ProcessModel procModel = (ProcessModel) componentModel;
@@ -917,7 +893,6 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					taskName = ((ThreadType) obj.getAllSource().getOwner()).getName();
 					localName = obj.getAllSource().getName();
 					portName = obj.getAllDestination().getName();
-					portType = procModel.getPortByName(portName).getType();
 					task = procModel.getChild(taskName);
 
 					connModel.setName(obj.getName());
@@ -936,7 +911,6 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					localName = obj.getAllDestination().getName();
 					portName = obj.getAllSource().getName();
 					task = procModel.getChild(taskName);
-					portType = procModel.getPortByName(portName).getType();
 					task.setTrigPort(procModel.getPortByName(portName));
 					task.setTrigPortLocalName(localName);
 

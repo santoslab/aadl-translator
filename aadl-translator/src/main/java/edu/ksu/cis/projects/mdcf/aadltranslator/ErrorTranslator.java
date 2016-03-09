@@ -63,12 +63,12 @@ public final class ErrorTranslator {
 			return;
 		}
 		
-		try {
-			parseOccurrences(emv2);
+//		try {
+//			parseOccurrences(emv2);
 //			parsePropagations(model, emv2);
-		} catch (MissingRequiredPropertyException e) {
-			e.printStackTrace();
-		}
+//		} catch (MissingRequiredPropertyException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 //	private void parsePropagations(ComponentModel<?, ?> model, ErrorModelSubclause emv2) {
@@ -103,109 +103,109 @@ public final class ErrorTranslator {
 //		}
 //	}
 
-	private void parseOccurrences(ErrorModelSubclause emv2)
-			throws MissingRequiredPropertyException {
-		RecordValueImpl rv;
-		String connectionName, connErrorName;
-		for (PropertyAssociation pa : emv2.getProperties()) {
-			// Setup
-			if(!(pa.getOwnedValues().get(0).getOwnedValue() instanceof RecordValueImpl)){
-				continue;
-			}
-			rv = ((RecordValueImpl) pa.getOwnedValues().get(0)
-					.getOwnedValue());
-			if (!(pa.getAppliesTos().iterator().next()
-					.getContainmentPathElements().iterator().next()
-					.getNamedElement() instanceof PortConnectionImpl))
-				continue;
-			connectionName = ((PortConnectionImpl) pa.getAppliesTos()
-					.iterator().next().getContainmentPathElements()
-					.iterator().next().getNamedElement()).getName();
-			connErrorName = pa.getAppliesTos().iterator().next()
-					.getContainmentPathElements().iterator().next()
-					.getNamedElement().getName();
-			OccurrenceModel om = null;
-			ConstraintModel cm = null;
-			String title = "$UNSET$", description = "$UNSET$", compensation = "$UNSET$";
-			ErrorTypeModel errorType = null;
-			Keyword keyword = null;
-			RecordValueImpl cause;
-
-			// Kind
-			NamedValue nv = ((NamedValue) PropertyUtils
-					.getRecordFieldValue(rv, "Kind"));
-			EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
-			String keywordName = el.getName();
-			keyword = Keyword.valueOf(keywordName.toUpperCase());
-
-			// Constraint
-			nv = ((NamedValue) PropertyUtils.getRecordFieldValue(rv,
-					"ViolatedConstraint"));
-			if (nv != null) {
-				// Constraints are optional, typically they aren't used for
-				// non-hazardous / non-applicable occurrences
-				PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
-				pc = (PropertyConstant) nv.getNamedValue();
-				cm = systemModel.getConstraintByName(pc.getName());
-			}
-			// Title
-			title = ((StringLiteral) PropertyUtils.getRecordFieldValue(rv,
-					"Title")).getValue();
-			
-			// Cause
-			cause = ((RecordValueImpl) PropertyUtils.getRecordFieldValue(
-					rv, "Cause"));
-
-			// Description
-			description = ((StringLiteral) PropertyUtils
-					.getRecordFieldValue(cause, "Description")).getValue();
-
-			// ErrorType
-			ReferenceValue reva = (ReferenceValue) PropertyUtils
-					.getRecordFieldValue(cause, "ErrorType");
-			if (reva != null) {
-				// ErrorTypes are optional, typically they aren't used for
-				// non-hazardous / non-applicable occurrences
-				ContainmentPathElement cpe = (ContainmentPathElement) reva
-						.getContainmentPathElements().get(0);
-				errorType = errorTypes.get(cpe.getNamedElement().getName());
-			}
-
-			// Compensation
-			compensation = ((StringLiteral) PropertyUtils
-					.getRecordFieldValue(rv, "Compensation")).getValue();
-
-			// Anything missing?
-			if (keyword == null) {
-				throw new MissingRequiredPropertyException(
-						"Got an occurrence property missing the required subproperty \"Kind\"");
-			} else if (title.equals("$UNSET$")) {
-				throw new MissingRequiredPropertyException(
-						"Got an occurrence property missing the required subproperty \"Title\"");
-			} else if (description.equals("$UNSET$")) {
-				throw new MissingRequiredPropertyException(
-						"Got an occurrence property missing the required subproperty \"Cause\"");
-			} else if (compensation.equals("$UNSET$")) {
-				throw new MissingRequiredPropertyException(
-						"Got an occurrence property missing the required subproperty \"Compensation\"");
-			}
-
-			// Create model
-			om = new OccurrenceModel();
-			om.setKeyword(keyword);
-			om.setConstraint(cm);
-			om.setTitle(title);
-			om.setCause(description);
-			om.setCompensation(compensation);
-			om.setErrorType(errorType);
-			om.setConnErrorName(connErrorName);
-			if (emv2.getContainingClassifier() instanceof SystemImplementationImpl) {
-				systemModel.getChannelByName(connectionName).addOccurrence(om);
-			}
-
-			// TODO: Put in event chain trace
-		}
-	}
+//	private void parseOccurrences(ErrorModelSubclause emv2)
+//			throws MissingRequiredPropertyException {
+//		RecordValueImpl rv;
+//		String connectionName, connErrorName;
+//		for (PropertyAssociation pa : emv2.getProperties()) {
+//			// Setup
+//			if(!(pa.getOwnedValues().get(0).getOwnedValue() instanceof RecordValueImpl)){
+//				continue;
+//			}
+//			rv = ((RecordValueImpl) pa.getOwnedValues().get(0)
+//					.getOwnedValue());
+//			if (!(pa.getAppliesTos().iterator().next()
+//					.getContainmentPathElements().iterator().next()
+//					.getNamedElement() instanceof PortConnectionImpl))
+//				continue;
+//			connectionName = ((PortConnectionImpl) pa.getAppliesTos()
+//					.iterator().next().getContainmentPathElements()
+//					.iterator().next().getNamedElement()).getName();
+//			connErrorName = pa.getAppliesTos().iterator().next()
+//					.getContainmentPathElements().iterator().next()
+//					.getNamedElement().getName();
+//			OccurrenceModel om = null;
+//			ConstraintModel cm = null;
+//			String title = "$UNSET$", description = "$UNSET$", compensation = "$UNSET$";
+//			ErrorTypeModel errorType = null;
+//			Keyword keyword = null;
+//			RecordValueImpl cause;
+//
+//			// Kind
+//			NamedValue nv = ((NamedValue) PropertyUtils
+//					.getRecordFieldValue(rv, "Kind"));
+//			EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
+//			String keywordName = el.getName();
+//			keyword = Keyword.valueOf(keywordName.toUpperCase());
+//
+//			// Constraint
+//			nv = ((NamedValue) PropertyUtils.getRecordFieldValue(rv,
+//					"ViolatedConstraint"));
+//			if (nv != null) {
+//				// Constraints are optional, typically they aren't used for
+//				// non-hazardous / non-applicable occurrences
+//				PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
+//				pc = (PropertyConstant) nv.getNamedValue();
+//				cm = systemModel.getConstraintByName(pc.getName());
+//			}
+//			// Title
+//			title = ((StringLiteral) PropertyUtils.getRecordFieldValue(rv,
+//					"Title")).getValue();
+//			
+//			// Cause
+//			cause = ((RecordValueImpl) PropertyUtils.getRecordFieldValue(
+//					rv, "Cause"));
+//
+//			// Description
+//			description = ((StringLiteral) PropertyUtils
+//					.getRecordFieldValue(cause, "Description")).getValue();
+//
+//			// ErrorType
+//			ReferenceValue reva = (ReferenceValue) PropertyUtils
+//					.getRecordFieldValue(cause, "ErrorType");
+//			if (reva != null) {
+//				// ErrorTypes are optional, typically they aren't used for
+//				// non-hazardous / non-applicable occurrences
+//				ContainmentPathElement cpe = (ContainmentPathElement) reva
+//						.getContainmentPathElements().get(0);
+//				errorType = errorTypes.get(cpe.getNamedElement().getName());
+//			}
+//
+//			// Compensation
+//			compensation = ((StringLiteral) PropertyUtils
+//					.getRecordFieldValue(rv, "Compensation")).getValue();
+//
+//			// Anything missing?
+//			if (keyword == null) {
+//				throw new MissingRequiredPropertyException(
+//						"Got an occurrence property missing the required subproperty \"Kind\"");
+//			} else if (title.equals("$UNSET$")) {
+//				throw new MissingRequiredPropertyException(
+//						"Got an occurrence property missing the required subproperty \"Title\"");
+//			} else if (description.equals("$UNSET$")) {
+//				throw new MissingRequiredPropertyException(
+//						"Got an occurrence property missing the required subproperty \"Cause\"");
+//			} else if (compensation.equals("$UNSET$")) {
+//				throw new MissingRequiredPropertyException(
+//						"Got an occurrence property missing the required subproperty \"Compensation\"");
+//			}
+//
+//			// Create model
+//			om = new OccurrenceModel();
+//			om.setKeyword(keyword);
+//			om.setConstraint(cm);
+//			om.setTitle(title);
+//			om.setCause(description);
+//			om.setCompensation(compensation);
+//			om.setErrorType(errorType);
+//			om.setConnErrorName(connErrorName);
+//			if (emv2.getContainingClassifier() instanceof SystemImplementationImpl) {
+//				systemModel.getChannelByName(connectionName).addOccurrence(om);
+//			}
+//
+//			// TODO: Put in event chain trace
+//		}
+//	}
 	
 	private PortModel resolvePortModel(ComponentModel<?, ?> model, String portName, boolean isIn){
 		PortModel pm = model.getPortByName(portName);

@@ -1,7 +1,5 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
-
 public class ModelUtil {
 	public static enum ProcessType {
 		PSEUDODEVICE, DISPLAY, LOGIC
@@ -16,7 +14,7 @@ public class ModelUtil {
 	};
 	
 	public static enum ManifestationType {
-		CONTENTHIGH
+		MANIFESTATIONPLACEHOLDER
 	};
 
 //	public final static PropagationModel FLOW_SOURCE = new PropagationModel(

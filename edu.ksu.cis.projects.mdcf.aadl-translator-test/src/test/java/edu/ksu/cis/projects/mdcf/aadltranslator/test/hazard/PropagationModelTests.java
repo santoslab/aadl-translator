@@ -59,7 +59,7 @@ public class PropagationModelTests {
 	
 	@Test
 	public void testManifestation() {
-		assertEquals("CONTENTHIGH", pmInProps.iterator().next().getManifestation());
+		assertEquals("MANIFESTATIONPLACEHOLDER", pmInProps.iterator().next().getManifestation());
 	}
 	
 	@Test

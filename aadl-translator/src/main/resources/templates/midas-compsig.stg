@@ -7,7 +7,7 @@ compsig(model) ::=<<
 typeTasksAndPorts(model) ::=<<
 <type>$model.name$</type>
 <moduleTasks>
-  $model.tasks.values:{k |$task(k)$
+  $model.children.values:{k |$task(k)$
   }$</moduleTasks>
 <portSignatures>
   $ model.ports.values:{k |$port(k)$
