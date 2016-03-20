@@ -36,7 +36,7 @@ Contents
 
 .. admonition:: Acknowledgements
    
-	The development of the |MDCF Architect| is supported in part by the US National Science Foundation (NSF) :nsfgrant:`OCI-1239543 <1239543>` award, the NSF US Food and Drug Administration Scholar-in-Residence Program :nsfgrant:`OCI-1355778 <1355778>` and the National Institutes of Health / NIBIB Quantum Program.
+	The development of the |MDCF Architect| is supported in part by the US National Science Foundation (:nsfgrant:`OCI-1239543 <1239543>`) award, the NSF US Food and Drug Administration Scholar-in-Residence Program (:nsfgrant:`OCI-1355778 <1355778>` and :nsfgrant:`OCI-1446544 <1446544>`), and the National Institutes of Health / NIBIB Quantum Program.
     
 	Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the previously mentioned institutions.
 
