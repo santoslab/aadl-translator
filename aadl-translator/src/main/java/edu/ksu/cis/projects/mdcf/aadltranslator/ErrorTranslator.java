@@ -6,35 +6,17 @@ import java.util.List;
 import java.util.Set;
 
 import org.osate.aadl2.ComponentClassifier;
-import org.osate.aadl2.ContainmentPathElement;
-import org.osate.aadl2.DirectionType;
-import org.osate.aadl2.EnumerationLiteral;
-import org.osate.aadl2.NamedValue;
-import org.osate.aadl2.PropertyAssociation;
-import org.osate.aadl2.PropertyConstant;
-import org.osate.aadl2.ReferenceValue;
-import org.osate.aadl2.StringLiteral;
-import org.osate.aadl2.impl.PortConnectionImpl;
-import org.osate.aadl2.impl.RecordValueImpl;
-import org.osate.aadl2.impl.SystemImplementationImpl;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorModelSubclause;
-import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPropagation;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorTypes;
 import org.osate.xtext.aadl2.errormodel.errorModel.TypeToken;
 import org.osate.xtext.aadl2.errormodel.util.EMV2Util;
-import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
-import edu.ksu.cis.projects.mdcf.aadltranslator.exception.MissingRequiredPropertyException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.Keyword;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ConstraintModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.OccurrenceModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 
 public final class ErrorTranslator {
 
@@ -45,7 +27,7 @@ public final class ErrorTranslator {
 		errorTypes = new HashMap<>();
 		
 		errors.forEach((et) -> {
-			errorTypes.put(et.getName(), new ErrorTypeModel(et.getName()));
+			errorTypes.put(et.getName(), new ErrorTypeModel(et.getName(), et.getSuperType()));
 		});
 	}
 
@@ -207,35 +189,6 @@ public final class ErrorTranslator {
 //		}
 //	}
 	
-	private PortModel resolvePortModel(ComponentModel<?, ?> model, String portName, boolean isIn){
-		PortModel pm = model.getPortByName(portName);
-		
-		// Ideally we'll just have the portname as planned
-		if (pm != null){
-			return pm;
-		} else if (model instanceof DeviceModel) {
-			// Since devices get turned into pseudodevices, with both in and out
-			// ports, we only want the propagation to map to the port that
-			// interacts with our system
-			if(isIn){
-				return model.getPortByName(portName + "In");
-			} else {
-				return model.getPortByName(portName + "Out");
-			}
-		}
-			
-		return null;
-	}
-	
-	private Set<ErrorTypeModel> tokenSetToTypes(List<TypeToken> typeTokens) {
-		HashSet<ErrorTypeModel> ret = new HashSet<>();
-		for(TypeToken tok : typeTokens){
-			// Guaranteed to only have one since we don't consider type sets
-			ret.add(new ErrorTypeModel(tok.getType().iterator().next().getName()));
-		}
-		return ret;
-	}
-
 	public void setSystemModel(SystemModel systemModel) {
 		this.systemModel = systemModel;
 	}

@@ -5,13 +5,13 @@ with MAP_Errors, PulseOx_Forwarding_Error_Properties, MAP_Error_Properties;
 annex EMV2
 {**
 	error types
-	SpO2ValueHigh : type extends MAP_Errors::WrongPhysioDataError;
 	
-	MissedAlarm : type extends MAP_Errors::WrongInfoDisplayedError;
+	SpO2ValueHigh : type extends MAP_Errors::High;
 	
-	-- Meaningless error types used for testing
-	ExtraTypeOne : type;
-	ExtraTypeTwo : type;
+	MissedAlarm : type extends MAP_Errors::ViolatedConstraint;
+	
+	SpO2ValueLow : type extends MAP_Errors::Low;
+	BogusAlarm : type extends MAP_Errors::ViolatedConstraint;
 	
 	end types;
 **};

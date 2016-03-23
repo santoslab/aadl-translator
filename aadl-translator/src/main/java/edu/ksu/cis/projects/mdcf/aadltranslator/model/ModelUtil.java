@@ -14,11 +14,6 @@ public class ModelUtil {
 	};
 	
 	public static enum ManifestationType {
-		MANIFESTATIONPLACEHOLDER
+		CONTENT, HIGH, LOW, TIMING, EARLY, LATE, HALTED, ERRATIC, VIOLATEDCONSTRAINT 
 	};
-
-//	public final static PropagationModel FLOW_SOURCE = new PropagationModel(
-//			false, null, null);
-//	public final static PropagationModel FLOW_SINK = new PropagationModel(true,
-//			null, null);
 }

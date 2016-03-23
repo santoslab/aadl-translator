@@ -22,64 +22,76 @@ Accident_Level : type record (
 	Level : aadlinteger;
 	Description: aadlstring;
 	Explanations : list of aadlstring;
+	Accidents : list of MAP_Error_Properties::Accident;
 );
 
 Accident : type record (
 	Description : aadlstring;
-	Level : MAP_Error_Properties::Accident_Level;
 	Explanations : list of aadlstring;
+	Hazards : list of MAP_Error_Properties::Hazard;
 );
 
 Hazard: type record (
+	Name : aadlstring;
 	Description : aadlstring;
-	Accident : MAP_Error_Properties::Accident;
 	HazardousFactor : aadlstring;
 	SystemElement : reference (device, process);
-	SystemElementState : aadlstring;
+	SystemElementState : reference({emv2}** error type, {emv2}** error type set);
 	EnvironmentElement : reference (abstract);
-	EnvironmentElementState : aadlstring;
+	EnvironmentElementStates : list of reference({emv2}** error type);
 	Explanations : list of aadlstring;
+	Constraints : list of MAP_Error_Properties::Constraint;
 );
 
 Constraint: type record (
+	Name : aadlstring;
 	Description : aadlstring;
-	Hazard : MAP_Error_Properties::Hazard;
-	HazardousFactor : aadlstring;
-	SystemElement : reference (device, process);
-	SystemElementState : aadlstring;
-	EnvironmentElement : reference (abstract);
-	EnvironmentElementState : aadlstring;
-	Explanations : list of aadlstring;
+	ErrorType : reference({emv2}** error type);
 );
 
--- ============================ --
--- Types related to STPA step 1 --
--- ============================ --
+Fundamentals : list of MAP_Error_Properties::Accident_Level applies to (all);
 
-KindsType : type enumeration (
-	NotProviding, Providing, Early, Late, AppliedTooLong, StoppedTooSoon, 
-	ValueLow, ValueHigh, ParamsMissing, ParamsWrong, ParamsOutOfOrder
+ProcessVariable : type record (
+	Name : aadlstring;
+	Values : list of reference(mode);	
 );
 
-Occurrence : record (
-	Kind : MAP_Error_Properties::KindsType;
-	ViolatedConstraint : MAP_Error_Properties::Constraint;
-	Title : aadlstring;
-	Cause : record (
-		ErrorType : reference ({emv2}**error type);
-		Description : aadlstring;
-	);
-	Compensation : aadlstring;
-) applies to (port connection, {emv2}**connection error source);
+ProcessModel : list of MAP_Error_Properties::ProcessVariable applies to (all);
 
-ManifestationType : type enumeration(
-	Content, ContentHigh, ContentLow,
-	Halted,
-	Erratic,
-	TimingEarly, TimingLate,
-	ClearText
-);
+ExternallyCausedDanger : record (
+	ControlledProcessState : reference(mode);
+	ProcessVariableValue : reference(mode);
+	Explanation : aadlstring;
+) applies to (all);
 
-Manifestation : MAP_Error_Properties::ManifestationType applies to ({emv2}**error propagation);
+Compensation : type aadlstring;
+
+InternallyCausedDanger : record (
+	ControlledProcessState : reference({emv2}** error type);
+	DesignTimeHandling : list of MAP_Error_Properties::Compensation;
+	Explanation : aadlstring;
+) applies to (all);
+
+RuntimeErrorDetection : record (
+	ErrorDetectionApproach : enumeration (Concurrent, Preemptive);
+	Explanation : aadlstring; 
+) applies to (all);
+
+RuntimeErrorHandling : record (
+	ErrorHandlingApproach : enumeration (Rollback, Rollforward, Compensation);
+	Explanation : aadlstring;
+) applies to (all);
+
+RuntimeFaultHandling : record (
+	ErrorHandlingApproach : enumeration (Diagnosis, Isolation, Reconfiguration, Reinitialization);
+	Explanation : aadlstring;
+) applies to (all);
+
+
+EliminatedFaults : record (
+	FaultTypes : list of reference({emv2}** error type);
+	Explanation : aadlstring;	
+) applies to (all);
+
 
 end MAP_Error_Properties;

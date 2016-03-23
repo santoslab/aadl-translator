@@ -2,6 +2,7 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,9 +11,11 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.DataPort;
@@ -37,7 +40,6 @@ import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.RecordValue;
 import org.osate.aadl2.StringLiteral;
-import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
@@ -49,16 +51,15 @@ import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitchWithProgr
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.properties.PropertyNotPresentException;
 import org.osate.aadl2.util.Aadl2Switch;
-import org.osate.aadl2.util.Aadl2Util;
 import org.osate.contribution.sei.names.DataModel;
-import org.osate.xtext.aadl2.errormodel.errorModel.EMV2PropertyAssociation;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPropagation;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.TypeToken;
-import org.osate.xtext.aadl2.errormodel.util.EMV2Properties;
 import org.osate.xtext.aadl2.errormodel.util.EMV2Util;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
+
+import com.google.common.collect.Lists;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.CoreException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
@@ -75,6 +76,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ManifestationType;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AbbreviationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentLevelModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentModel;
@@ -250,7 +252,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				// TODO: This shouldn't be hit. Throw an error?
 			}
 			lastElemProcessed = ElementType.DEVICE;
-			processEList(obj.getOwnedElements());
+			// For some reason getOwnedElements returns items in the reverse of
+			// their declaration order, so we have to reverse the list to avoid
+			// processing EMv2 first
+			processEList(new BasicEList<Element>(Lists.reverse(obj.getOwnedElements())));
 			return NOT_DONE;
 		}
 
@@ -262,78 +267,91 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			componentModel.setComponentType(componentType);
 		}
 
-		@Override
-		public String casePropertyConstant(PropertyConstant obj) {
-			try {
-				if (obj.getPropertyType() == null || obj.getPropertyType().getName() == null) {
-					return NOT_DONE;
-				} else if (obj.getPropertyType().getName().equals("Accident_Level")) {
-					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
-					IntegerLiteral il = ((IntegerLiteral) PropertyUtils.getRecordFieldValue(rv, "Level"));
-					if (il.getValue() > Integer.MAX_VALUE) {
-						throw new PropertyOutOfRangeException("Accident levels must be less than 2,147,483,647");
-					}
-					AccidentLevelModel alm = new AccidentLevelModel();
-					alm.setNumber((int) il.getValue());
-					handleExplanations(rv, alm);
-					alm.setName(obj.getName());
-					alm.setDescription(sl.getValue());
-					systemModel.addAccidentLevel(alm);
-				} else if (obj.getPropertyType().getName().equals("Context")) {
-					StringLiteral sl = (StringLiteral) obj.getConstantValue();
-					systemModel.setHazardReportContext(sl.getValue());
-				} else if (obj.getPropertyType().getName().equals("Assumption")) {
-					StringLiteral sl = (StringLiteral) obj.getConstantValue();
-					systemModel.addAssumption(sl.getValue());
-				} else if (obj.getPropertyType().getName().equals("Abbreviation")) {
-					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral fullSL = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Full");
-					StringLiteral defSL = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Definition");
-					AbbreviationModel am = new AbbreviationModel();
-					am.setName(obj.getName());
-					am.setFull(fullSL.getValue());
-					am.setDefinition(defSL.getValue());
-					systemModel.addAbbreviation(am);
-				} else if (obj.getPropertyType().getName().equals("Accident")) {
-					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
-					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Level");
-					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
-					AccidentModel am = new AccidentModel();
-					handleExplanations(rv, am);
-					am.setName(obj.getName());
-					am.setDescription(sl.getValue());
-					am.setParent(systemModel.getAccidentLevelByName(pc.getName()));
-					systemModel.addAccident(am);
-				} else if (obj.getPropertyType().getName().equals("Hazard")) {
-					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
-					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Accident");
-					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
-					HazardModel hm = new HazardModel();
-					handleExplanations(rv, hm);
-					hm.setName(obj.getName());
-					hm.setDescription(sl.getValue());
-					hm.setParent(systemModel.getAccidentByName(pc.getName()));
-					systemModel.addHazard(hm);
-				} else if (obj.getPropertyType().getName().equals("Constraint")) {
-					RecordValue rv = (RecordValue) obj.getConstantValue();
-					StringLiteral sl = (StringLiteral) PropertyUtils.getRecordFieldValue(rv, "Description");
-					NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv, "Hazard");
-					PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
-					ConstraintModel cm = new ConstraintModel();
-					handleExplanations(rv, cm);
-					cm.setName(obj.getName());
-					cm.setDescription(sl.getValue());
-					cm.setParent(systemModel.getHazardByName(pc.getName()));
-					systemModel.addConstraint(cm);
-				}
-			} catch (PropertyOutOfRangeException | DuplicateElementException e) {
-				handleException(obj, e);
-			}
-			return NOT_DONE;
-		}
+		// @Override
+		// public String casePropertyConstant(PropertyConstant obj) {
+		// try {
+		// if (obj.getPropertyType() == null || obj.getPropertyType().getName()
+		// == null) {
+		// return NOT_DONE;
+		// } else if (obj.getPropertyType().getName().equals("Accident_Level"))
+		// {
+		// RecordValue rv = (RecordValue) obj.getConstantValue();
+		// StringLiteral sl = (StringLiteral)
+		// PropertyUtils.getRecordFieldValue(rv, "Description");
+		// IntegerLiteral il = ((IntegerLiteral)
+		// PropertyUtils.getRecordFieldValue(rv, "Level"));
+		// if (il.getValue() > Integer.MAX_VALUE) {
+		// throw new PropertyOutOfRangeException("Accident levels must be less
+		// than 2,147,483,647");
+		// }
+		// AccidentLevelModel alm = new AccidentLevelModel();
+		// alm.setNumber((int) il.getValue());
+		// handleExplanations(rv, alm);
+		// alm.setName(obj.getName());
+		// alm.setDescription(sl.getValue());
+		// systemModel.addAccidentLevel(alm);
+		// } else if (obj.getPropertyType().getName().equals("Context")) {
+		// StringLiteral sl = (StringLiteral) obj.getConstantValue();
+		// systemModel.setHazardReportContext(sl.getValue());
+		// } else if (obj.getPropertyType().getName().equals("Assumption")) {
+		// StringLiteral sl = (StringLiteral) obj.getConstantValue();
+		// systemModel.addAssumption(sl.getValue());
+		// } else if (obj.getPropertyType().getName().equals("Abbreviation")) {
+		// RecordValue rv = (RecordValue) obj.getConstantValue();
+		// StringLiteral fullSL = (StringLiteral)
+		// PropertyUtils.getRecordFieldValue(rv, "Full");
+		// StringLiteral defSL = (StringLiteral)
+		// PropertyUtils.getRecordFieldValue(rv, "Definition");
+		// AbbreviationModel am = new AbbreviationModel();
+		// am.setName(obj.getName());
+		// am.setFull(fullSL.getValue());
+		// am.setDefinition(defSL.getValue());
+		// systemModel.addAbbreviation(am);
+		// } else if (obj.getPropertyType().getName().equals("Accident")) {
+		// RecordValue rv = (RecordValue) obj.getConstantValue();
+		// StringLiteral sl = (StringLiteral)
+		// PropertyUtils.getRecordFieldValue(rv, "Description");
+		// NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv,
+		// "Level");
+		// PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
+		// AccidentModel am = new AccidentModel();
+		// handleExplanations(rv, am);
+		// am.setName(obj.getName());
+		// am.setDescription(sl.getValue());
+		// am.setParent(systemModel.getAccidentLevelByName(pc.getName()));
+		// systemModel.addAccident(am);
+		// } else if (obj.getPropertyType().getName().equals("Hazard")) {
+		// RecordValue rv = (RecordValue) obj.getConstantValue();
+		// StringLiteral sl = (StringLiteral)
+		// PropertyUtils.getRecordFieldValue(rv, "Description");
+		// NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv,
+		// "Accident");
+		// PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
+		// HazardModel hm = new HazardModel();
+		// handleExplanations(rv, hm);
+		// hm.setName(obj.getName());
+		// hm.setDescription(sl.getValue());
+		// hm.setParent(systemModel.getAccidentByName(pc.getName()));
+		// systemModel.addHazard(hm);
+		// } else if (obj.getPropertyType().getName().equals("Constraint")) {
+		// RecordValue rv = (RecordValue) obj.getConstantValue();
+		// StringLiteral sl = (StringLiteral)
+		// PropertyUtils.getRecordFieldValue(rv, "Description");
+		// NamedValue nv = (NamedValue) PropertyUtils.getRecordFieldValue(rv,
+		// "Hazard");
+		// PropertyConstant pc = (PropertyConstant) nv.getNamedValue();
+		// ConstraintModel cm = new ConstraintModel();
+		// handleExplanations(rv, cm);
+		// cm.setName(obj.getName());
+		// cm.setDescription(sl.getValue());
+		// cm.setParent(systemModel.getHazardByName(pc.getName()));
+		// systemModel.addConstraint(cm);
+		// }
+		// } catch (PropertyOutOfRangeException | DuplicateElementException e) {
+		// handleException(obj, e);
+		// }
+		// return NOT_DONE;
+		// }
 
 		@Override
 		public String caseProcessType(ProcessType obj) {
@@ -379,7 +397,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				return DONE;
 			}
 			lastElemProcessed = ElementType.PROCESS;
-			processEList(obj.getOwnedElements());
+			processEList(new BasicEList<Element>(Lists.reverse(obj.getOwnedElements())));
 			return NOT_DONE;
 		}
 
@@ -429,10 +447,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				maxPeriod = handleOverridableProperty(obj, "Default_Output_Rate", "MAP_Properties", "Output_Rate",
 						PropertyType.RANGE_MAX);
 
-				if (minPeriod == null || maxPeriod == null){
+				if (minPeriod == null || maxPeriod == null) {
 					throw new MissingRequiredPropertyException("Missing the required output rate specification.");
 				}
-				
+
 				exchangeName = checkCustomProperty(obj, "Exchange_Name", PropertyType.STRING);
 
 				PortModel pm = new PortModel();
@@ -568,10 +586,15 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			return NOT_DONE;
 		}*/
 
+		public String caseAnnexSubclause(AnnexSubclause obj) {
+
+			handlePropagations((ComponentClassifier) obj.getContainingClassifier());
+			return NOT_DONE;
+		}
+
 		private void handlePropagations(ComponentClassifier obj) {
-			String manifestationStr, portName;
+			String portName;
 			PortModel portModel;
-			PropagationModel propModel;
 			Set<ErrorTypeModel> errorTypes;
 			ErrorTypeModel etm;
 
@@ -588,31 +611,32 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					// types allowed ie, only allow ad-hoc, anonymous sets
 					// created in propagations
 					etm = systemModel.getErrorTypeModelByName(tt.getType().get(0).getName());
-					if(etm != null) {
+					if (etm != null) {
+						etm.setManifestation(ManifestationType
+								.valueOf(((ErrorType) tt.getType().get(0)).getSuperType().getName().toUpperCase()));
 						errorTypes.add(etm);
 					}
 				}
-				
+
 				portName = eProp.getFeatureorPPRef().getFeatureorPP().getFullName();
-				if (eProp.getDirection() == DirectionType.IN) {
-					manifestationStr = "ManifestationPlaceholder";
-					portModel = resolvePortModel(componentModel, portName, true);
-				} else {
-					manifestationStr = null;
-					portModel = resolvePortModel(componentModel, portName, false);
-				}
-				if(portModel == null){
-					// If we're here, something is wrong and an error should have been logged already.
-					// We bail out to avoid an NPE -- the error log should reflect the root exception
+				portModel = resolvePortModel(componentModel, portName, eProp.getDirection() == DirectionType.IN);
+
+				if (portModel == null) {
+					// If we're here, something is wrong and an error should
+					// have been logged already.
+					// We bail out to avoid an NPE -- the error log should
+					// reflect the root exception
 					return;
 				}
-				propModel = new PropagationModel(errorTypes, manifestationStr);
+
 				try {
-					if (eProp.getDirection() == DirectionType.IN) {
-						portModel.addInPropagation(propModel);
-					} else {
-						portModel.setOutPropagation(propModel);
-					}					
+					for (ErrorTypeModel errorType : errorTypes) {
+						if (eProp.getDirection() == DirectionType.IN) {
+							portModel.addInPropagation(new PropagationModel(errorType, true));
+						} else {
+							portModel.setOutPropagation(new PropagationModel(errorType, false));
+						}
+					}
 				} catch (DuplicateElementException e) {
 					handleException(obj, e);
 					return;
@@ -626,7 +650,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			lastElemProcessed = ElementType.SUBPROGRAM;
 			return NOT_DONE;
 		}
-
+		
 		
 		@Override
 		public String caseSubprogramCallSequence(SubprogramCallSequence obj) {
@@ -653,7 +677,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				tm.setDeadline(deadline);
 				tm.setWcet(wcet);
 				String portName = obj.getName() + "Out";
-//				tm.setTrigPortInfo(trigPortName, dm.getPortByName(portName).getType(), portName, false);
+				// tm.setTrigPortInfo(trigPortName,
+				// dm.getPortByName(portName).getType(), portName, false);
 				tm.setTrigPortLocalName(portName);
 				tm.setTrigPort(dm.getPortByName(portName));
 			} catch (DuplicateElementException | NotImplementedException e) {
@@ -662,14 +687,15 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 		}
 
-		private void handleDataPortImplicitTask(PortModel portModel, Port obj) throws NotImplementedException, DuplicateElementException {
+		private void handleDataPortImplicitTask(PortModel portModel, Port obj)
+				throws NotImplementedException, DuplicateElementException {
 			String taskName = portModel.getName() + "Task";
 			TaskModel tm = new TaskModel(taskName);
 			// Default values; period is set to -1 since these tasks are all
 			// sporadic
 			// TODO: Read these from plugin preferences?
 			int period = -1, deadline = 50, wcet = 5;
-			if(componentModel instanceof DeviceModel){
+			if (componentModel instanceof DeviceModel) {
 				throw new NotImplementedException("Incoming device ports must be event or event data.");
 			}
 			ProcessModel pm = (ProcessModel) componentModel;
@@ -1160,24 +1186,25 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 			return NOT_DONE;
 		}
-		
-		private PortModel resolvePortModel(ComponentModel<?, ?> model, String portName, boolean isIn){
+
+		private PortModel resolvePortModel(ComponentModel<?, ?> model, String portName, boolean isIn) {
 			PortModel pm = model.getPortByName(portName);
-			
+
 			// Ideally we'll just have the portname as planned
-			if (pm != null){
+			if (pm != null) {
 				return pm;
 			} else if (model instanceof DeviceModel) {
-				// Since devices get turned into pseudodevices, with both in and out
+				// Since devices get turned into pseudodevices, with both in and
+				// out
 				// ports, we only want the propagation to map to the port that
 				// interacts with our system
-				if(isIn){
+				if (isIn) {
 					return model.getPortByName(portName + "In");
 				} else {
 					return model.getPortByName(portName + "Out");
 				}
 			}
-				
+
 			return null;
 		}
 	}
@@ -1227,6 +1254,6 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	}
 
 	private void handleErrorType(ErrorType et) {
-		errorTypeModels.put(et.getName(), new ErrorTypeModel(et.getName()));
+		errorTypeModels.put(et.getName(), new ErrorTypeModel(et.getName(), et.getSuperType()));
 	}
 }

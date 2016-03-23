@@ -1,5 +1,9 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis;
 
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
+
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ManifestationType;
+
 /**
  * This class models a single EMv2 error type.
  * 
@@ -11,9 +15,14 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis;
  */
 public class ErrorTypeModel implements Comparable<ErrorTypeModel>{
 	private String name;
+	private ManifestationType manifestation;
 
-	public ErrorTypeModel(String name) {
+	public ErrorTypeModel(String name, ErrorType parentType) {
 		this.name = name;
+	}
+
+	public void setManifestation(ManifestationType manifestation) {
+		this.manifestation = manifestation;
 	}
 
 	public String getName() {
@@ -22,6 +31,10 @@ public class ErrorTypeModel implements Comparable<ErrorTypeModel>{
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getManifestationName() {
+		return manifestation.toString();
 	}
 
 	@Override

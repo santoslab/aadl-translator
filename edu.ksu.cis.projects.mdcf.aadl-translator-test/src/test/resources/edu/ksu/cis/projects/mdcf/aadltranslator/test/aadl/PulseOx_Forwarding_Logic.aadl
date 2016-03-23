@@ -13,9 +13,9 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 	annex EMV2 {** 
  		use types PulseOx_Forwarding_Errors;
 		error propagations
-			SpO2 : in propagation {SpO2ValueHigh};
+			SpO2 : in propagation {SpO2ValueHigh, SpO2ValueLow};
 			
-			DerivedAlarm : out propagation {MissedAlarm, ExtraTypeOne, ExtraTypeTwo};
+			DerivedAlarm : out propagation {MissedAlarm, BogusAlarm};
 			
 			flows
 				HighSpO2LeadsToOD : error path SpO2{SpO2ValueHigh} -> DerivedAlarm{MissedAlarm};
