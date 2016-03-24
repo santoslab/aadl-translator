@@ -2,10 +2,10 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,10 +24,8 @@ import org.osate.aadl2.DeviceType;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.EventDataPort;
-import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ListValue;
 import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortCategory;
 import org.osate.aadl2.PortConnection;
@@ -35,7 +33,6 @@ import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.Property;
-import org.osate.aadl2.PropertyConstant;
 import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.RecordValue;
@@ -70,19 +67,14 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.UseBeforeDeclarationEx
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DevOrProcModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ManifestationType;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ManifestationType;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AbbreviationModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentLevelModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ConstraintModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.HazardModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.StpaPreliminaryModel;
 
@@ -605,7 +597,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			if (eProps.isEmpty())
 				return;
 			for (ErrorPropagation eProp : eProps) {
-				errorTypes = new HashSet<>();
+				errorTypes = new LinkedHashSet<>();
 				for (TypeToken tt : eProp.getTypeSet().getTypeTokens()) {
 					// We assume that there are no pre-defined sets of error
 					// types allowed ie, only allow ad-hoc, anonymous sets
@@ -631,11 +623,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 				try {
 					for (ErrorTypeModel errorType : errorTypes) {
-						if (eProp.getDirection() == DirectionType.IN) {
-							portModel.addInPropagation(new PropagationModel(errorType, true));
-						} else {
-							portModel.setOutPropagation(new PropagationModel(errorType, false));
-						}
+						portModel.addPropagation(new PropagationModel(errorType));
 					}
 				} catch (DuplicateElementException e) {
 					handleException(obj, e);

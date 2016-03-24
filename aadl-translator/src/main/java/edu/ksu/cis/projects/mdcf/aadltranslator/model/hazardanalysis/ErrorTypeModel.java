@@ -7,13 +7,10 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ManifestationTyp
 /**
  * This class models a single EMv2 error type.
  * 
- * It implements comparable so that unordered sets can be sorted for testing
- * purposes
- * 
  * @author Sam
  *
  */
-public class ErrorTypeModel implements Comparable<ErrorTypeModel>{
+public class ErrorTypeModel {
 	private String name;
 	private ManifestationType manifestation;
 
@@ -35,10 +32,5 @@ public class ErrorTypeModel implements Comparable<ErrorTypeModel>{
 	
 	public String getManifestationName() {
 		return manifestation.toString();
-	}
-
-	@Override
-	public int compareTo(ErrorTypeModel o) {
-		return name.compareTo(o.getName());
 	}
 }

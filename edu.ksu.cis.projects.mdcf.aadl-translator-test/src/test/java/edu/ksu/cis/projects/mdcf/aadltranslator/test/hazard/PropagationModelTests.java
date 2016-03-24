@@ -6,26 +6,27 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
 public class PropagationModelTests {
 	
 	private static Set<PropagationModel> pmInProps;
-	private static PropagationModel pmOutProp;
-	private static PropagationModel dmProp;
+	private static Set<PropagationModel> pmOutProps;
+	private static Set<PropagationModel> dmProps;
+	private static Iterator<PropagationModel> pmInIter;
+	private static Iterator<PropagationModel> pmOutIter;
 
 	@BeforeClass
 	public static void initialize() {
@@ -39,10 +40,15 @@ public class PropagationModelTests {
 		DeviceModel deviceModel = systemModel.getDeviceByType("ICEpoInterface");
 		ProcessModel processModel = systemModel.getProcessByType("PulseOx_Logic_Process");
 		
-		dmProp = deviceModel.getPortByName("SpO2Out").getOutPropagation();
-		
-		pmInProps = processModel.getPortByName("SpO2").getInPropagations();
-		pmOutProp = processModel.getPortByName("DerivedAlarm").getOutPropagation();
+		dmProps = new LinkedHashSet<>(deviceModel.getPortByName("SpO2Out").getPropagations());
+		pmInProps = new LinkedHashSet<>(processModel.getPortByName("SpO2").getPropagations());
+		pmOutProps = new LinkedHashSet<>(processModel.getPortByName("DerivedAlarm").getPropagations());
+	}
+	
+	@Before
+	public void setup(){
+		pmInIter = pmInProps.iterator();
+		pmOutIter = pmOutProps.iterator();
 	}
 	
 	@AfterClass
@@ -52,23 +58,29 @@ public class PropagationModelTests {
 
 	@Test
 	public void testPropagationExists() {
-		assertNotNull(dmProp);
+		assertNotNull(dmProps);
+		assertEquals(1, dmProps.size());
 		assertNotNull(pmInProps);
-		assertEquals(1, pmInProps.size());
-		assertNotNull(pmOutProp);
+		assertEquals(2, pmInProps.size());
+		assertNotNull(pmOutProps);
+		assertEquals(2, pmOutProps.size());
 	}
 	
 	@Test
 	public void testManifestationKinds() {
-		assertEquals("HIGH", pmInProps.iterator().next().getError().getManifestationName());
-		assertEquals("VIOLATEDCONSTRAINT", pmOutProp.getError().getManifestationName());
-		assertEquals("HIGH", dmProp.getError().getManifestationName());
+		assertEquals("HIGH", pmInIter.next().getError().getManifestationName());
+		assertEquals("LOW", pmInIter.next().getError().getManifestationName());
+		assertEquals("VIOLATEDCONSTRAINT", pmOutIter.next().getError().getManifestationName());
+		assertEquals("VIOLATEDCONSTRAINT", pmOutIter.next().getError().getManifestationName());
+		assertEquals("HIGH", dmProps.iterator().next().getError().getManifestationName());
 	}
 	
 	@Test
 	public void testManifestations() {
-		assertEquals("SpO2ValueHigh", dmProp.getError().getName());
-		assertEquals("SpO2ValueHigh", pmInProps.iterator().next().getError().getName());
-		assertEquals("MissedAlarm", pmOutProp.getError().getName());		
+		assertEquals("SpO2ValueHigh", pmInIter.next().getError().getName());
+		assertEquals("SpO2ValueLow", pmInIter.next().getError().getName());
+		assertEquals("MissedAlarm", pmOutIter.next().getError().getName());
+		assertEquals("BogusAlarm", pmOutIter.next().getError().getName());
+		assertEquals("SpO2ValueHigh", dmProps.iterator().next().getError().getName());
 	}
 }
