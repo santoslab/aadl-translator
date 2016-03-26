@@ -2,11 +2,11 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -593,7 +593,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 			try {
 				handleErrorFlows(component);
-			} catch (NotImplementedException e) {
+			} catch (NotImplementedException | CoreException e) {
 				handleException(obj, e);
 				return DONE;
 			}
@@ -601,7 +601,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			return NOT_DONE;
 		}
 
-		private void handleErrorFlows(ComponentClassifier obj) throws NotImplementedException {
+		private void handleErrorFlows(ComponentClassifier obj) throws NotImplementedException, CoreException {
 			Set<ErrorFlow> eFlows = new HashSet<>();
 			eFlows.addAll(EMV2Util.getAllErrorFlows(obj));
 			if (eFlows.isEmpty()) {
@@ -620,24 +620,20 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 		}
 
-		private void handleErrorPath(ErrorPath path) {
+		private void handleErrorPath(ErrorPath path) throws CoreException {
 			TypeSet incomingErrors = path.getTypeTokenConstraint();
 			TypeSet outgoingErrors = path.getTargetToken();
 			PropagationModel manifestation = null, succDanger = null;
-			if (incomingErrors.getTypeTokens().size() == 1) {
-				manifestation = getPropFromToken(path, incomingErrors.getTypeTokens().get(0), true);
-			}
-			if (outgoingErrors.getTypeTokens().size() == 1) {
-				succDanger = getPropFromToken(path, outgoingErrors.getTypeTokens().get(0), false);
-			}
+			manifestation = getPropFromTokens(path, incomingErrors.getTypeTokens(), true);
+			succDanger = getPropFromTokens(path, outgoingErrors.getTypeTokens(), false);
 			ExternallyCausedDangerModel ecdm = new ExternallyCausedDangerModel(succDanger, manifestation,
 					"Placeholder Interpretation", null);
 			componentModel.addCausedDanger(ecdm);
 		}
 
 		/**
-		 * Get the propagation associated with a particular error type token
-		 * on a particular propagation path
+		 * Get the propagation associated with a particular error type token on
+		 * a particular propagation path
 		 * 
 		 * @param path
 		 *            The ErrorPath to examine
@@ -646,11 +642,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 * @param isIn
 		 *            True if we want the incoming error token, false if we want
 		 *            the outgoing
-		 * @return The propagation corresponding to the token, or null if it can't be
-		 *         found
+		 * @return The propagation corresponding to the token, or null if it
+		 *         can't be found
 		 */
-		private PropagationModel getPropFromToken(ErrorPath path, TypeToken token, boolean isIn) {
-			String dangerName = EMV2Util.getName(token);
+		private PropagationModel getPropFromTokens(ErrorPath path, EList<TypeToken> tokens, boolean isIn) {
 			ErrorPropagation eProp = null;
 			if (isIn) {
 				eProp = path.getIncoming();
@@ -659,8 +654,27 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 			String portName = eProp.getFeatureorPPRef().getFeatureorPP().getName();
 			PortModel portModel = resolvePortModel(componentModel, portName, isIn);
-			PropagationModel manifestation = portModel.getPropagationByName(dangerName);
-			return manifestation;
+			Collection<ErrorTypeModel> errors = getErrorModelsFromTokens(tokens, portModel);
+			PropagationModel propModel = new PropagationModel(path.getName(), errors, portModel);
+			portModel.addPropagation(propModel);
+			return propModel;
+		}
+
+		/**
+		 * Gets the collection of error types referred to in a list of tokens
+		 * 
+		 * @param tokens
+		 *            The tokens to resolve the error type models of
+		 * @param portModel
+		 *            The port these tokens are being propagated into or out of
+		 * @return The error type models referred to by the tokens
+		 */
+		private Collection<ErrorTypeModel> getErrorModelsFromTokens(EList<TypeToken> tokens, PortModel portModel) {
+			Collection<ErrorTypeModel> errors = new LinkedHashSet<>();
+			for (TypeToken token : tokens) {
+				errors.add(portModel.getPropagatableErrorByName(EMV2Util.getName(token)));
+			}
+			return errors;
 		}
 
 		private void handlePropagations(ComponentClassifier obj) {
@@ -695,20 +709,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 				if (portModel == null) {
 					// If we're here, something is wrong and an error should
-					// have been logged already.
-					// We bail out to avoid an NPE -- the error log should
-					// reflect the root exception
+					// have been logged already. We bail out to avoid an NPE --
+					// the error log should reflect the root exception
 					return;
 				}
-
-				try {
-					for (ErrorTypeModel errorType : errorTypes) {
-						portModel.addPropagation(new PropagationModel(errorType, portModel));
-					}
-				} catch (DuplicateElementException e) {
-					handleException(obj, e);
-					return;
-				}
+				portModel.addPropagatableErrors(errorTypes);
 			}
 		}
 

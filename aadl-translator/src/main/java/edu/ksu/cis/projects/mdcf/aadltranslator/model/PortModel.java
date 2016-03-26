@@ -2,11 +2,12 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.osate.aadl2.PortCategory;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 
 public class PortModel {
@@ -20,8 +21,13 @@ public class PortModel {
 	private String containingComponentName;
 
 	/**
-	 * Error propagations entering or leaving this port, we use a LinkedHashSet
-	 * to preserve insertion order
+	 * Error types entering or leaving this port
+	 */
+	private Map<String, ErrorTypeModel> propagatableErrors = new LinkedHashMap<>();
+
+	/**
+	 * The actual propagations that describe how the incoming or outgoing errors
+	 * are grouped
 	 */
 	private Map<String, PropagationModel> propagations = new LinkedHashMap<>();
 
@@ -113,17 +119,25 @@ public class PortModel {
 		return containingComponentName;
 	}
 
-	public void addPropagation(PropagationModel propagation) throws DuplicateElementException {
-		if (propagations.containsKey(propagation.getError().getName()))
-			throw new DuplicateElementException("Incoming model propagations must be unique");
-		propagations.put(propagation.getError().getName(), propagation);
+	public void addPropagatableErrors(Collection<ErrorTypeModel> propagations) {
+		for (ErrorTypeModel errType : propagations) {
+			propagatableErrors.put(errType.getName(), errType);
+		}
+	}
+	
+	public Map<String, ErrorTypeModel> getPropagatableErrors() {
+		return propagatableErrors;
 	}
 
-	public Collection<PropagationModel> getPropagations() {
-		return propagations.values();
+	public void addPropagation(PropagationModel propModel) {
+		propagations.put(propModel.getName(), propModel);
 	}
 
-	public PropagationModel getPropagationByName(String name) {
+	public ErrorTypeModel getPropagatableErrorByName(String name) {
+		return propagatableErrors.get(name);
+	}
+	
+	public PropagationModel getPropagationByName(String name){
 		return propagations.get(name);
 	}
 }

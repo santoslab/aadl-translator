@@ -73,7 +73,7 @@ public abstract class ComponentModel<ChildType extends ComponentModel, Connectio
 	 */
 	protected HashMap<String, String> hazardReportDiagrams;
 
-	private Set<CausedDangerModel> causedDangers = new HashSet<>();
+	private Map<String, CausedDangerModel> causedDangers = new HashMap<>();
 
 	public ComponentModel() {
 		initHazardReportDiagrams();
@@ -287,17 +287,17 @@ public abstract class ComponentModel<ChildType extends ComponentModel, Connectio
 	}
 
 	public void addCausedDanger(CausedDangerModel ecdm) {
-		causedDangers.add(ecdm);
+		causedDangers.put(ecdm.getName(), ecdm);
 	}
 
-	public Set<CausedDangerModel> getCausedDangers() {
+	public Map<String, CausedDangerModel> getCausedDangers() {
 		return causedDangers;
 	}
 
-	public Set<ExternallyCausedDangerModel> getExternallyCausedDangers() {
-		return causedDangers.stream()
-				.filter(m -> m instanceof ExternallyCausedDangerModel)
-				.map(m -> (ExternallyCausedDangerModel) m)
-				.collect(Collectors.toSet());
+	public Map<String, ExternallyCausedDangerModel> getExternallyCausedDangers() {
+		return causedDangers.entrySet()
+				.stream()
+				.filter(m -> m.getValue() instanceof ExternallyCausedDangerModel)
+				.collect(Collectors.toMap(m -> m.getKey(), m -> (ExternallyCausedDangerModel) m.getValue()));
 	}
 }

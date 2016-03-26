@@ -74,7 +74,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIAADLSystemEr
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ExternallyCausedDangerModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardBackgroundTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesTests;
-import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.PropagationModelTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.PropagatableErrorTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.util.MarkdownLinkRenderer;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSpecViewTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
@@ -96,7 +96,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.STRendererTests;
 //		ConnectionModelHazardTests.class,
 		HazardPreliminariesTests.class,
 		HazardBackgroundTests.class,
-		PropagationModelTests.class,
+		PropagatableErrorTests.class,
 		ExternallyCausedDangerModelTests.class,
 
 		// Error-handling tests
