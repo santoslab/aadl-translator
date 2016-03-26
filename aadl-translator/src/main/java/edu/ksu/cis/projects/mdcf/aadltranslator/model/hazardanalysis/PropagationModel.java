@@ -23,5 +23,9 @@ public class PropagationModel{
 
 	public void setError(ErrorTypeModel errors) {
 		this.error = errors;
-	}	
+	}
+
+	public PortModel getPort() {
+		return port;
+	}
 }

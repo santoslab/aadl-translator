@@ -623,12 +623,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		private void handleErrorPath(ErrorPath path) {
 			TypeSet incomingErrors = path.getTypeTokenConstraint();
 			TypeSet outgoingErrors = path.getTargetToken();
-			ErrorTypeModel manifestation = null, succDanger = null;
+			PropagationModel manifestation = null, succDanger = null;
 			if (incomingErrors.getTypeTokens().size() == 1) {
-				manifestation = getDangerFromToken(path, incomingErrors.getTypeTokens().get(0), true);
+				manifestation = getPropFromToken(path, incomingErrors.getTypeTokens().get(0), true);
 			}
 			if (outgoingErrors.getTypeTokens().size() == 1) {
-				succDanger = getDangerFromToken(path, outgoingErrors.getTypeTokens().get(0), false);
+				succDanger = getPropFromToken(path, outgoingErrors.getTypeTokens().get(0), false);
 			}
 			ExternallyCausedDangerModel ecdm = new ExternallyCausedDangerModel(succDanger, manifestation,
 					"Placeholder Interpretation", null);
@@ -636,8 +636,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		/**
-		 * Get the ErrorTypeModel associated with a particular error type token
-		 * on a particular path
+		 * Get the propagation associated with a particular error type token
+		 * on a particular propagation path
 		 * 
 		 * @param path
 		 *            The ErrorPath to examine
@@ -646,10 +646,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 * @param isIn
 		 *            True if we want the incoming error token, false if we want
 		 *            the outgoing
-		 * @return The model corresponding to the token, or null if it can't be
+		 * @return The propagation corresponding to the token, or null if it can't be
 		 *         found
 		 */
-		private ErrorTypeModel getDangerFromToken(ErrorPath path, TypeToken token, boolean isIn) {
+		private PropagationModel getPropFromToken(ErrorPath path, TypeToken token, boolean isIn) {
 			String dangerName = EMV2Util.getName(token);
 			ErrorPropagation eProp = null;
 			if (isIn) {
@@ -659,12 +659,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 			String portName = eProp.getFeatureorPPRef().getFeatureorPP().getName();
 			PortModel portModel = resolvePortModel(componentModel, portName, isIn);
-			ErrorTypeModel manifestation;
-			try {
-				manifestation = portModel.getPropagationByName(dangerName).getError();
-			} catch (Exception e) {
-				manifestation = null;
-			}
+			PropagationModel manifestation = portModel.getPropagationByName(dangerName);
 			return manifestation;
 		}
 

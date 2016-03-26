@@ -4,11 +4,15 @@ import java.util.Set;
 
 public class ExternallyCausedDangerModel extends CausedDangerModel {
 	
-	ErrorTypeModel manifestation;
+	PropagationModel danger;
 	
-	public ExternallyCausedDangerModel(ErrorTypeModel succDanger, ErrorTypeModel name, String interp, Set<ErrorTypeModel> cooccurringDangers) {
+	public ExternallyCausedDangerModel(PropagationModel succDanger, PropagationModel manifestation, String interp, Set<ErrorTypeModel> cooccurringDangers) {
 		super(succDanger, interp, cooccurringDangers);
-		this.manifestation = name;
+		this.danger = manifestation;
+	}
+
+	public PropagationModel getDanger() {
+		return danger;
 	}
 
 }
