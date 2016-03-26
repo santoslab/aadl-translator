@@ -13,8 +13,6 @@ with PulseOx_Forwarding_Types, MAP_Properties, PulseOx_Forwarding_Properties;
  		use types PulseOx_Forwarding_Errors;
 		error propagations
 			DerivedAlarm : in propagation {MissedAlarm};
-			flows
-				AlarmOmission : error sink DerivedAlarm {MissedAlarm};	
 		end propagations;
 	**};
 	end PulseOx_Display_Process;
@@ -26,6 +24,13 @@ with PulseOx_Forwarding_Types, MAP_Properties, PulseOx_Forwarding_Properties;
 	connections
 		incoming_spo2 : port SpO2 -> UpdateSpO2Thread.SpO2;
 		incoming_alarm : port DerivedAlarm -> HandleAlarmThread.Alarm;
+	annex EMV2 {**
+		use types PulseOx_Forwarding_Errors;
+		error propagations
+			flows
+				AlarmOmission : error sink DerivedAlarm {MissedAlarm};
+		end propagations;
+	**};
 	end PulseOx_Display_Process.imp;
 	
 	thread UpdateSpO2Thread

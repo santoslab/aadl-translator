@@ -19,10 +19,10 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementExcept
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ComponentType;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentLevelModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.CausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ConstraintModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorFlowModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.HazardModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.StpaPreliminaryModel;
 
 public abstract class ComponentModel <ChildType extends ComponentModel, ConnectionType extends ConnectionModel> {
@@ -71,6 +71,8 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	 * Maps diagram name (eg: SystemBoundary) to file path
 	 */
 	protected HashMap<String, String> hazardReportDiagrams;
+
+	private Set<CausedDangerModel> causedDangers = new HashSet<>();
 	
 	public ComponentModel(){
 		initHazardReportDiagrams();
@@ -309,5 +311,9 @@ public abstract class ComponentModel <ChildType extends ComponentModel, Connecti
 	
 	public HashMap<String, String> getHazardReportDiagrams() {
 		return hazardReportDiagrams;
+	}
+
+	public void addCausedDanger(CausedDangerModel ecdm) {
+		causedDangers .add(ecdm);		
 	}
 }

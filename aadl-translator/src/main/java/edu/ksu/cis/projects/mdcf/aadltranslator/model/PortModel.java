@@ -1,7 +1,8 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.osate.aadl2.PortCategory;
 
@@ -22,7 +23,7 @@ public class PortModel {
 	 * Error propagations entering or leaving this port, we use a LinkedHashSet
 	 * to preserve insertion order
 	 */
-	private Set<PropagationModel> propagations = new LinkedHashSet<>();
+	private Map<String, PropagationModel> propagations = new LinkedHashMap<>();
 
 	public String getName() {
 		return name;
@@ -113,12 +114,16 @@ public class PortModel {
 	}
 
 	public void addPropagation(PropagationModel propagation) throws DuplicateElementException {
-		if (propagations.contains(propagation))
+		if (propagations.containsKey(propagation.getError().getName()))
 			throw new DuplicateElementException("Incoming model propagations must be unique");
-		propagations.add(propagation);
+		propagations.put(propagation.getError().getName(), propagation);
 	}
 
-	public Set<PropagationModel> getPropagations() {
-		return propagations;
+	public Collection<PropagationModel> getPropagations() {
+		return propagations.values();
+	}
+
+	public PropagationModel getPropagationByName(String name) {
+		return propagations.get(name);
 	}
 }

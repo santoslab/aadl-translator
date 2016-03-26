@@ -6,12 +6,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.osate.aadl2.AadlPackage;
@@ -38,7 +40,6 @@ import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.RecordValue;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.modelsupport.errorreporting.MarkerParseErrorReporter;
@@ -49,8 +50,13 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.properties.PropertyNotPresentException;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.contribution.sei.names.DataModel;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorFlow;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPath;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPropagation;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorSink;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorSource;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
+import org.osate.xtext.aadl2.errormodel.errorModel.TypeSet;
 import org.osate.xtext.aadl2.errormodel.errorModel.TypeToken;
 import org.osate.xtext.aadl2.errormodel.util.EMV2Util;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
@@ -75,6 +81,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ExternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.StpaPreliminaryModel;
 
@@ -560,15 +567,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		@Override
 		public String caseComponentImplementation(ComponentImplementation obj) {
-			if (!obj.getOwnedSubcomponents().isEmpty())
-				processEList(obj.getOwnedSubcomponents());
-			if (obj instanceof ThreadImplementation
-					&& !((((ThreadImplementation) obj).getOwnedSubprogramCallSequences()).isEmpty()))
-				processEList(((ThreadImplementation) obj).getOwnedSubprogramCallSequences());
-			if (!obj.getOwnedConnections().isEmpty())
-				processEList(obj.getOwnedConnections());
-			if (!obj.getOwnedPropertyAssociations().isEmpty())
-				processEList(obj.getOwnedPropertyAssociations());
+			processEList(obj.getOwnedElements());
 			return DONE;
 		}
 
@@ -579,9 +578,94 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}*/
 
 		public String caseAnnexSubclause(AnnexSubclause obj) {
+			if (!(obj.getName().equals("EMV2") && (obj.getContainingClassifier() instanceof ComponentClassifier))) {
+				// Make sure we aren't reading non-emv2 annotations
+				// And that we're dealing with a component
+				return NOT_DONE;
+			}
+			ComponentClassifier component = (ComponentClassifier) obj.getContainingClassifier();
+			if (!(component instanceof ComponentImplementation)) {
+				// AADL lets you redefine propagations in a component
+				// implementation. This seems, to me, to be counter to the
+				// notion of an interface, so we skip propagation declarations
+				// within implementations
+				handlePropagations(component);
+			}
+			try {
+				handleErrorFlows(component);
+			} catch (NotImplementedException e) {
+				handleException(obj, e);
+				return DONE;
+			}
 
-			handlePropagations((ComponentClassifier) obj.getContainingClassifier());
 			return NOT_DONE;
+		}
+
+		private void handleErrorFlows(ComponentClassifier obj) throws NotImplementedException {
+			Set<ErrorFlow> eFlows = new HashSet<>();
+			eFlows.addAll(EMV2Util.getAllErrorFlows(obj));
+			if (eFlows.isEmpty()) {
+				return; // Bail out if there aren't any flows
+			}
+			for (ErrorFlow flow : eFlows) {
+				if (flow instanceof ErrorPath) {
+					handleErrorPath((ErrorPath) flow);
+				} else if (flow instanceof ErrorSink) {
+					// handleErrorSink
+				} else if (flow instanceof ErrorSource) {
+					// handleErrorSource
+				} else {
+					throw new NotImplementedException("Error flows must be paths, sources, or sinks!");
+				}
+			}
+		}
+
+		private void handleErrorPath(ErrorPath path) {
+			TypeSet incomingErrors = path.getTypeTokenConstraint();
+			TypeSet outgoingErrors = path.getTargetToken();
+			ErrorTypeModel manifestation = null, succDanger = null;
+			if (incomingErrors.getTypeTokens().size() == 1) {
+				manifestation = getDangerFromToken(path, incomingErrors.getTypeTokens().get(0), true);
+			}
+			if (outgoingErrors.getTypeTokens().size() == 1) {
+				succDanger = getDangerFromToken(path, outgoingErrors.getTypeTokens().get(0), false);
+			}
+			ExternallyCausedDangerModel ecdm = new ExternallyCausedDangerModel(succDanger, manifestation,
+					"Placeholder Interpretation", null);
+			componentModel.addCausedDanger(ecdm);
+		}
+
+		/**
+		 * Get the ErrorTypeModel associated with a particular error type token
+		 * on a particular path
+		 * 
+		 * @param path
+		 *            The ErrorPath to examine
+		 * @param token
+		 *            The token that contains the error type we want
+		 * @param isIn
+		 *            True if we want the incoming error token, false if we want
+		 *            the outgoing
+		 * @return The model corresponding to the token, or null if it can't be
+		 *         found
+		 */
+		private ErrorTypeModel getDangerFromToken(ErrorPath path, TypeToken token, boolean isIn) {
+			String dangerName = EMV2Util.getName(token);
+			ErrorPropagation eProp = null;
+			if (isIn) {
+				eProp = path.getIncoming();
+			} else {
+				eProp = path.getOutgoing();
+			}
+			String portName = eProp.getFeatureorPPRef().getFeatureorPP().getName();
+			PortModel portModel = resolvePortModel(componentModel, portName, isIn);
+			ErrorTypeModel manifestation;
+			try {
+				manifestation = portModel.getPropagationByName(dangerName).getError();
+			} catch (Exception e) {
+				manifestation = null;
+			}
+			return manifestation;
 		}
 
 		private void handlePropagations(ComponentClassifier obj) {
@@ -590,19 +674,20 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			Set<ErrorTypeModel> errorTypes;
 			ErrorTypeModel etm;
 
-			// Why can't I just get all the error propagations at once?
+			// Odd that I can't just get all the error propagations at once
 			Set<ErrorPropagation> eProps = new HashSet<>();
 			eProps.addAll(EMV2Util.getAllErrorPropagations(obj, DirectionType.IN));
 			eProps.addAll(EMV2Util.getAllErrorPropagations(obj, DirectionType.OUT));
-			if (eProps.isEmpty())
-				return;
+			if (eProps.isEmpty()) {
+				return; // Bail out if there aren't any propagations
+			}
 			for (ErrorPropagation eProp : eProps) {
 				errorTypes = new LinkedHashSet<>();
 				for (TypeToken tt : eProp.getTypeSet().getTypeTokens()) {
 					// We assume that there are no pre-defined sets of error
 					// types allowed ie, only allow ad-hoc, anonymous sets
 					// created in propagations
-					etm = systemModel.getErrorTypeModelByName(tt.getType().get(0).getName());
+					etm = systemModel.getErrorTypeModelByName(EMV2Util.getName(tt));
 					if (etm != null) {
 						etm.setManifestation(ManifestationType
 								.valueOf(((ErrorType) tt.getType().get(0)).getSuperType().getName().toUpperCase()));
@@ -623,7 +708,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 				try {
 					for (ErrorTypeModel errorType : errorTypes) {
-						portModel.addPropagation(new PropagationModel(errorType));
+						portModel.addPropagation(new PropagationModel(errorType, portModel));
 					}
 				} catch (DuplicateElementException e) {
 					handleException(obj, e);
