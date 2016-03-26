@@ -29,15 +29,28 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 		error propagations			
 			flows
 				-- Error path examples
-				HighSpO2LeadsToOD : error path SpO2{SpO2ValueHigh} -> DerivedAlarm{MissedAlarm};
+				HighSpO2LeadsToMissedAlarm : error path SpO2{SpO2ValueHigh} -> DerivedAlarm{MissedAlarm};
 				LowSpO2DoesNothing : error sink SpO2{SpO2ValueLow};
 				BogusAlarmsArePossible : error source DerivedAlarm{BogusAlarm};
 				
 				-- Nonsensical error paths here as examples of more complex behaviors: 
 				MultipleInputs : error path SpO2{SpO2ValueHigh, SpO2ValueLow} -> DerivedAlarm{MissedAlarm};
 				MultipleOutputs : error path SpO2{SpO2ValueHigh} -> DerivedAlarm{MissedAlarm, BogusAlarm};
-				MtoN : error path SpO2{SpO2ValueHigh, SpO2ValueLow} -> DerivedAlarm{MissedAlarm, BogusAlarm};
+				MtoN : error path SpO2{SpO2ValueLow, SpO2ValueHigh} -> DerivedAlarm{BogusAlarm, MissedAlarm};
 		end propagations;
+		properties
+			MAP_Error_Properties::ExternallyCausedDanger => [
+				Explanation => "The SpO2 value is too high, leading the app to fail to issue an alarm when it should";
+			] applies to HighSpO2LeadsToMissedAlarm;
+			MAP_Error_Properties::ExternallyCausedDanger => [
+				Explanation => "Placeholder explanation";
+			] applies to MultipleInputs;
+			MAP_Error_Properties::ExternallyCausedDanger => [
+				Explanation => "Placeholder explanation";
+			] applies to MultipleOutputs;
+			MAP_Error_Properties::ExternallyCausedDanger => [
+				Explanation => "Placeholder explanation";
+			] applies to MtoN;
 	**};
 	end PulseOx_Logic_Process.imp;
 	

@@ -3,10 +3,12 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,6 +52,7 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.properties.PropertyNotPresentException;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.contribution.sei.names.DataModel;
+import org.osate.xtext.aadl2.errormodel.errorModel.EMV2PropertyAssociation;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorFlow;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPath;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPropagation;
@@ -58,6 +61,7 @@ import org.osate.xtext.aadl2.errormodel.errorModel.ErrorSource;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.TypeSet;
 import org.osate.xtext.aadl2.errormodel.errorModel.TypeToken;
+import org.osate.xtext.aadl2.errormodel.util.EMV2Properties;
 import org.osate.xtext.aadl2.errormodel.util.EMV2Util;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
@@ -95,7 +99,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	};
 
 	private enum PropertyType {
-		ENUM, INT, RANGE_MIN, RANGE_MAX, STRING
+		ENUM, INT, RANGE_MIN, RANGE_MAX, STRING, RECORD
 	};
 
 	private TranslationTarget target = null;
@@ -593,42 +597,95 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 			try {
 				handleErrorFlows(component);
-			} catch (NotImplementedException | CoreException e) {
-				handleException(obj, e);
+			} catch (CoreException e) {
+				// Exceptions are handled in the handlers for more specific
+				// messages, but we need to stop translation
 				return DONE;
 			}
 
 			return NOT_DONE;
 		}
 
-		private void handleErrorFlows(ComponentClassifier obj) throws NotImplementedException, CoreException {
+		private void handleErrorFlows(ComponentClassifier obj) throws CoreException {
 			Set<ErrorFlow> eFlows = new HashSet<>();
 			eFlows.addAll(EMV2Util.getAllErrorFlows(obj));
 			if (eFlows.isEmpty()) {
 				return; // Bail out if there aren't any flows
 			}
 			for (ErrorFlow flow : eFlows) {
-				if (flow instanceof ErrorPath) {
-					handleErrorPath((ErrorPath) flow);
-				} else if (flow instanceof ErrorSink) {
-					// handleErrorSink
-				} else if (flow instanceof ErrorSource) {
-					// handleErrorSource
-				} else {
-					throw new NotImplementedException("Error flows must be paths, sources, or sinks!");
+				try {
+					if (flow instanceof ErrorPath) {
+						handleErrorPath((ErrorPath) flow);
+					} else if (flow instanceof ErrorSink) {
+						// handleErrorSink
+					} else if (flow instanceof ErrorSource) {
+						// handleErrorSource
+					} else {
+						throw new NotImplementedException("Error flows must be paths, sources, or sinks!");
+					}
+				} catch (NotImplementedException | CoreException | MissingRequiredPropertyException e) {
+					handleException(flow, e);
+					throw new CoreException("An internal error occurred.");
 				}
 			}
 		}
 
-		private void handleErrorPath(ErrorPath path) throws CoreException {
+		private void handleErrorPath(ErrorPath path)
+				throws CoreException, NotImplementedException, MissingRequiredPropertyException {
 			TypeSet incomingErrors = path.getTypeTokenConstraint();
 			TypeSet outgoingErrors = path.getTargetToken();
 			PropagationModel manifestation = null, succDanger = null;
 			manifestation = getPropFromTokens(path, incomingErrors.getTypeTokens(), true);
 			succDanger = getPropFromTokens(path, outgoingErrors.getTypeTokens(), false);
-			ExternallyCausedDangerModel ecdm = new ExternallyCausedDangerModel(succDanger, manifestation,
-					"Placeholder Interpretation", null);
+			String interp = checkCustomEMV2Property(path, "MAP_Error_Properties::ExternallyCausedDanger",
+					PropertyType.RECORD, Collections.singletonList("Explanation"));
+			if (interp == null) {
+				throw new MissingRequiredPropertyException("No matching ExternallyCausedDanger found!");
+			}
+			ExternallyCausedDangerModel ecdm = new ExternallyCausedDangerModel(succDanger, manifestation, interp, null);
 			componentModel.addCausedDanger(ecdm);
+		}
+
+		/**
+		 * Retrieves the value of the specified property as a String.
+		 * 
+		 * @param elem
+		 *            The element that the property applies to
+		 * @param propName
+		 *            The fully qualified name of the property
+		 * @param propType
+		 *            The type of the property
+		 * @return String representation of property value or null if the
+		 *         property isn't found
+		 * @throws NotImplementedException
+		 *             Thrown if the property usage isn't supported by the
+		 *             translator
+		 */
+		private String checkCustomEMV2Property(NamedElement elem, String propName, PropertyType propType)
+				throws NotImplementedException {
+			return checkCustomEMV2Property(elem, propName, propType, null);
+		}
+
+		private String checkCustomEMV2Property(NamedElement elem, String propName, PropertyType propType,
+				List<String> path) throws NotImplementedException {
+			if (propType == PropertyType.RECORD) {
+				List<EMV2PropertyAssociation> pas = EMV2Properties.getProperty(propName, elem.getContainingClassifier(),
+						elem, null);
+				if (pas.size() == 0) {
+					return null;
+				} else if (pas.size() > 1) {
+					throw new NotImplementedException(
+							"Multiple externally caused dangers associated with one error flow path!");
+				}
+				RecordValue rv = (RecordValue) EMV2Properties.getPropertyValue(pas.get(0));
+				if (path.size() == 1) {
+					return ((StringLiteral) PropertyUtils.getRecordFieldValue(rv, path.get(0))).getValue();
+				} else {
+					return checkCustomEMV2Property(elem, propName, propType, path.subList(1, path.size()));
+				}
+			} else {
+				throw new NotImplementedException("Tried to parse garbage PropType: " + propType);
+			}
 		}
 
 		/**
@@ -929,14 +986,6 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			if (propType == PropertyType.ENUM)
 				return PropertyUtils.getEnumLiteral(obj, prop).getName();
 			else if (propType == PropertyType.INT) {
-				// Should you ever need to get the unit of a property, this is
-				// how you can do it. This example needs a better home, but it
-				// took me so long to figure out that I can't just delete it.
-				//
-				// NumberValue nv =
-				// (NumberValue)PropertyUtils.getSimplePropertyValue(obj, prop);
-				// nv.getUnit()
-
 				return getStringFromScaledNumber(
 						PropertyUtils.getScaledNumberValue(obj, prop, GetProperties.findUnitLiteral(prop, "ms")), obj,
 						prop);

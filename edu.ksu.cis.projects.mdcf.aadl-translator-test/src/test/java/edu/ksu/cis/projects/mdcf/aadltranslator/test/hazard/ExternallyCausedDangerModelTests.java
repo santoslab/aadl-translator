@@ -49,27 +49,33 @@ public class ExternallyCausedDangerModelTests {
 
 	@Test
 	public void testECDMNames() {
-		assertTrue(pmDangers.keySet().contains("HighSpO2LeadsToOD"));
+		assertTrue(pmDangers.keySet().contains("HighSpO2LeadsToMissedAlarm"));
 		assertTrue(pmDangers.keySet().contains("MultipleInputs"));
 		assertTrue(pmDangers.keySet().contains("MultipleOutputs"));
 		assertTrue(pmDangers.keySet().contains("MtoN"));
 	}
+	
+	@Test
+	public void testInterpretation() {
+		assertEquals("The SpO2 value is too high, leading the app to fail to issue an alarm when it should",
+				pmDangers.get("HighSpO2LeadsToMissedAlarm").getInterp());
+	}
 
 	@Test
 	public void testECDMOutPort() {
-		assertEquals("DerivedAlarm", pmDangers.get("HighSpO2LeadsToOD").getSuccessorDanger().getPort().getName());
+		assertEquals("DerivedAlarm", pmDangers.get("HighSpO2LeadsToMissedAlarm").getSuccessorDanger().getPort().getName());
 		assertEquals("DerivedAlarm", pmDangers.get("MultipleInputs").getSuccessorDanger().getPort().getName());
 	}
 
 	@Test
 	public void testECDMSingleSuccDangerExists() {
-		assertEquals(1, pmDangers.get("HighSpO2LeadsToOD").getSuccessorDanger().getErrors().size());
+		assertEquals(1, pmDangers.get("HighSpO2LeadsToMissedAlarm").getSuccessorDanger().getErrors().size());
 		assertEquals(1, pmDangers.get("MultipleInputs").getSuccessorDanger().getErrors().size());
 	}
 
 	@Test
 	public void testECDMSingleSuccDangerManifestation() {
-		assertEquals("VIOLATEDCONSTRAINT", pmDangers.get("HighSpO2LeadsToOD").getSuccessorDanger().getErrors()
+		assertEquals("VIOLATEDCONSTRAINT", pmDangers.get("HighSpO2LeadsToMissedAlarm").getSuccessorDanger().getErrors()
 				.iterator().next().getManifestationName());
 		assertEquals("VIOLATEDCONSTRAINT", pmDangers.get("MultipleInputs").getSuccessorDanger().getErrors()
 				.iterator().next().getManifestationName());
@@ -78,7 +84,7 @@ public class ExternallyCausedDangerModelTests {
 	@Test
 	public void testECDMSingleSuccDangerName() {
 		assertEquals("MissedAlarm",
-				pmDangers.get("HighSpO2LeadsToOD").getSuccessorDanger().getErrors().iterator().next().getName());
+				pmDangers.get("HighSpO2LeadsToMissedAlarm").getSuccessorDanger().getErrors().iterator().next().getName());
 		assertEquals("MissedAlarm",
 				pmDangers.get("MultipleInputs").getSuccessorDanger().getErrors().iterator().next().getName());
 	}
@@ -109,26 +115,26 @@ public class ExternallyCausedDangerModelTests {
 
 		assertEquals("MissedAlarm", multOutIter.next().getName());
 		assertEquals("BogusAlarm", multOutIter.next().getName());
-		assertEquals("MissedAlarm", mtoNIter.next().getName());
 		assertEquals("BogusAlarm", mtoNIter.next().getName());
+		assertEquals("MissedAlarm", mtoNIter.next().getName());
 	}
 
 	@Test
 	public void testECDMInPort() {
-		assertEquals("SpO2", pmDangers.get("HighSpO2LeadsToOD").getDanger().getPort().getName());
+		assertEquals("SpO2", pmDangers.get("HighSpO2LeadsToMissedAlarm").getDanger().getPort().getName());
 		assertEquals("SpO2", pmDangers.get("MultipleOutputs").getDanger().getPort().getName());
 	}
 
 	@Test
 	public void testECDMSingleDangerExists() {
-		assertEquals(1, pmDangers.get("HighSpO2LeadsToOD").getDanger().getErrors().size());
+		assertEquals(1, pmDangers.get("HighSpO2LeadsToMissedAlarm").getDanger().getErrors().size());
 		assertEquals(1, pmDangers.get("MultipleOutputs").getDanger().getErrors().size());
 	}
 
 	@Test
 	public void testECDMSingleDangerManifestation() {
 		assertEquals("HIGH",
-				pmDangers.get("HighSpO2LeadsToOD").getDanger().getErrors().iterator().next().getManifestationName());
+				pmDangers.get("HighSpO2LeadsToMissedAlarm").getDanger().getErrors().iterator().next().getManifestationName());
 		assertEquals("HIGH",
 				pmDangers.get("MultipleOutputs").getDanger().getErrors().iterator().next().getManifestationName());
 	}
@@ -136,7 +142,7 @@ public class ExternallyCausedDangerModelTests {
 	@Test
 	public void testECDMSingleDangerName() {
 		assertEquals("SpO2ValueHigh",
-				pmDangers.get("HighSpO2LeadsToOD").getDanger().getErrors().iterator().next().getName());
+				pmDangers.get("HighSpO2LeadsToMissedAlarm").getDanger().getErrors().iterator().next().getName());
 		assertEquals("SpO2ValueHigh",
 				pmDangers.get("MultipleOutputs").getDanger().getErrors().iterator().next().getName());
 	}
@@ -154,8 +160,8 @@ public class ExternallyCausedDangerModelTests {
 
 		assertEquals("HIGH", multInIter.next().getManifestationName());
 		assertEquals("LOW", multInIter.next().getManifestationName());
-		assertEquals("HIGH", mtoNIter.next().getManifestationName());
 		assertEquals("LOW", mtoNIter.next().getManifestationName());
+		assertEquals("HIGH", mtoNIter.next().getManifestationName());
 	}
 
 	@Test
@@ -165,7 +171,7 @@ public class ExternallyCausedDangerModelTests {
 
 		assertEquals("SpO2ValueHigh", multInIter.next().getName());
 		assertEquals("SpO2ValueLow", multInIter.next().getName());
-		assertEquals("SpO2ValueHigh", mtoNIter.next().getName());
 		assertEquals("SpO2ValueLow", mtoNIter.next().getName());
+		assertEquals("SpO2ValueHigh", mtoNIter.next().getName());
 	}
 }
