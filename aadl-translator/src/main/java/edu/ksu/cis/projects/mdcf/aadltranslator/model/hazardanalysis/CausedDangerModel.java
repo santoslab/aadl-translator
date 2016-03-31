@@ -8,8 +8,8 @@ public abstract class CausedDangerModel {
 	String interp;
 	Set<ErrorTypeModel> cooccurringDangers;
 	String name; // The name should be set by the concrete extensions of this class
-	//RuntimeDetectionModel
-	//RuntimeHandlingModel
+	Set<RuntimeDetectionModel> runtimeDetections;
+	Set<RuntimeHandlingModel> runtimeHandlings;
 	
 	public CausedDangerModel(PropagationModel succDanger, String interp,
 			Set<ErrorTypeModel> cooccurringDangers) {
@@ -32,5 +32,21 @@ public abstract class CausedDangerModel {
 
 	public Set<ErrorTypeModel> getCooccurringDangers() {
 		return cooccurringDangers;
+	}
+
+	public Set<RuntimeDetectionModel> getRuntimeDetection() {
+		return runtimeDetections;
+	}
+
+	public void addRuntimeDetection(RuntimeDetectionModel runtimeDetection) {
+		this.runtimeDetections.add(runtimeDetection);
+	}
+
+	public Set<RuntimeHandlingModel> getRuntimeHandlings() {
+		return runtimeHandlings;
+	}
+
+	public void addRuntimeHandling(RuntimeHandlingModel runtimeHandling) {
+		this.runtimeHandlings.add(runtimeHandling);
 	}
 }

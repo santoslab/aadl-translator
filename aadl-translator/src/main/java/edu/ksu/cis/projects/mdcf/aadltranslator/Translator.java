@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
@@ -53,6 +54,8 @@ import org.osate.aadl2.properties.PropertyNotPresentException;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.contribution.sei.names.DataModel;
 import org.osate.xtext.aadl2.errormodel.errorModel.EMV2PropertyAssociation;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorBehaviorEvent;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorEvent;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorFlow;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPath;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPropagation;
@@ -78,15 +81,18 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DevOrProcModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ManifestationType;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.RuntimeErrorDetectionApproach;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.CausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ExternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.RuntimeDetectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.StpaPreliminaryModel;
 
 public final class Translator extends AadlProcessingSwitchWithProgress {
@@ -120,14 +126,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		/**
 		 * A reference to the "current" component model, stored for convenience
 		 */
-		@SuppressWarnings("rawtypes")
-		private ComponentModel componentModel = null;
+		private ComponentModel<?,?> componentModel = null;
 
 		/**
 		 * A reference to the current component's parent
 		 */
-		@SuppressWarnings("rawtypes")
-		private ComponentModel parentModel = null;
+		private ComponentModel<?, ?> parentModel = null;
 
 		/**
 		 * A reference to the type of the last element processed
@@ -597,6 +601,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 			try {
 				handleErrorFlows(component);
+				handleErrorEvents(component);
 			} catch (CoreException e) {
 				// Exceptions are handled in the handlers for more specific
 				// messages, but we need to stop translation
@@ -604,6 +609,45 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 
 			return NOT_DONE;
+		}
+
+		private void handleErrorEvents(ComponentClassifier obj) throws CoreException {
+			Set<ErrorBehaviorEvent> eEvents = new HashSet<>();
+			eEvents.addAll(EMV2Util.getAllErrorBehaviorEvents(obj));
+			if (eEvents.isEmpty()) {
+				return; // Bail out if there aren't any events
+			}
+			for (ErrorBehaviorEvent event : eEvents) {
+				try {
+					if (event instanceof ErrorEvent) {
+						handleErrorEvent((ErrorEvent) event);
+					} else {
+						throw new NotImplementedException(
+								"Error behavior events must not be recover or repair events!");
+					}
+				} catch (NotImplementedException e) {
+					handleException(event, e);
+					throw new CoreException("An internal error occurred.");
+				}
+			}
+		}
+
+		private void handleErrorEvent(ErrorEvent evt) throws NotImplementedException {
+			String evtName = evt.getName();
+			String explanation = checkCustomEMV2Property(evt, "MAP_Error_Properties::RuntimeErrorDetection",
+					PropertyType.RECORD, Collections.singletonList("Explanation"));
+			String detectionApproach = checkCustomEMV2Property(evt, "MAP_Error_Properties::RuntimeErrorDetection",
+					PropertyType.RECORD, Collections.singletonList("ErrorDetectionApproach"));
+			RuntimeDetectionModel rdm = new RuntimeDetectionModel(
+					RuntimeErrorDetectionApproach.valueOf(detectionApproach.toUpperCase()), explanation, evtName);
+			for(ExternallyCausedDangerModel ecdm : componentModel.getExternallyCausedDangers().values()){
+				PropagationModel pm = ecdm.getDanger();
+				for(TypeToken tt : evt.getTypeSet().getTypeTokens()){
+					if(pm.getErrorByName(EMV2Util.getName(tt)) != null){
+						ecdm.addRuntimeDetection(rdm);
+					}
+				}
+			}
 		}
 
 		private void handleErrorFlows(ComponentClassifier obj) throws CoreException {
@@ -655,17 +699,15 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 *            The fully qualified name of the property
 		 * @param propType
 		 *            The type of the property
+		 * @param path
+		 *            The keys that should be used to navigate through the
+		 *            record property, or null if the property isn't a record
 		 * @return String representation of property value or null if the
 		 *         property isn't found
 		 * @throws NotImplementedException
 		 *             Thrown if the property usage isn't supported by the
 		 *             translator
 		 */
-		private String checkCustomEMV2Property(NamedElement elem, String propName, PropertyType propType)
-				throws NotImplementedException {
-			return checkCustomEMV2Property(elem, propName, propType, null);
-		}
-
 		private String checkCustomEMV2Property(NamedElement elem, String propName, PropertyType propType,
 				List<String> path) throws NotImplementedException {
 			if (propType == PropertyType.RECORD) {

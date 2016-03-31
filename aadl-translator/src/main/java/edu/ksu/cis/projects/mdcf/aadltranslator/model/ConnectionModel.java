@@ -97,17 +97,6 @@ public class ConnectionModel {
 	public HashMap<String, HashSet<OccurrenceModel>> getOccurrenceMap() {
 		return occurrenceMap;
 	}
-	
-	public void addOccurrence(OccurrenceModel occurrence) {
-		String key = occurrence.getKeyword().toString().toUpperCase();
-		if(occurrenceMap.containsKey(key)){
-			occurrenceMap.get(key).add(occurrence);
-		} else {
-			HashSet<OccurrenceModel> set = new HashSet<>();
-			set.add(occurrence);
-			occurrenceMap.put(key, set);
-		}
-	}
 
 	public String getName() {
 		return name;

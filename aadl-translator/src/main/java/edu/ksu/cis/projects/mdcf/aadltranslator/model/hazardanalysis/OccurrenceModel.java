@@ -1,11 +1,8 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.Keyword;
 
 public class OccurrenceModel {
-	private Keyword keyword;
 	private HazardModel hazard;
 	private ConstraintModel constraint;
 	private String title;
@@ -15,14 +12,6 @@ public class OccurrenceModel {
 	private String connErrorName;
 	private ComponentModel parent;
 	private ComponentModel child;
-	
-	public Keyword getKeyword() {
-		return keyword;
-	}
-	
-	public void setKeyword(Keyword keyword) {
-		this.keyword = keyword;
-	}
 	
 	public HazardModel getHazard() {
 		return hazard;

@@ -9,11 +9,15 @@ public class ModelUtil {
 		SENSOR, ACTUATOR, CONTROLLER, CONTROLLEDPROCESS, AGGREGATION, TOP
 	};
 
-	public static enum Keyword {
-		NOTPROVIDING, PROVIDING, EARLY, LATE, APPLIEDTOOLONG, STOPPEDTOOSOON, VALUELOW, VALUEHIGH, PARAMSMISSING, PARAMSWRONG, PARAMSOUTOFORDER
-	};
-	
 	public static enum ManifestationType {
 		CONTENT, HIGH, LOW, TIMING, EARLY, LATE, HALTED, ERRATIC, VIOLATEDCONSTRAINT 
+	};
+	
+	public static enum RuntimeErrorHandlingApproach {
+		ROLLBACK, ROLLFORWARD, COMPENSATION,
+	};
+	
+	public static enum RuntimeErrorDetectionApproach {
+		CONCURRENT, PREEMPTIVE,
 	};
 }

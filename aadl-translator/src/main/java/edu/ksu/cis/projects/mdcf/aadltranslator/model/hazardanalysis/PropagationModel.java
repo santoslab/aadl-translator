@@ -1,7 +1,9 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
@@ -14,21 +16,28 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
  */
 public class PropagationModel{
 	private String name;
-	private Set<ErrorTypeModel> errors;
+	private Map<String, ErrorTypeModel> errors;
 	private PortModel port;
 
 	public PropagationModel(String name, Collection<ErrorTypeModel> errors, PortModel portModel) {
 		this.name = name;
-		this.errors = new LinkedHashSet<>(errors);
+		setError(errors);
 		this.port = portModel;
 	}
 
 	public Set<ErrorTypeModel> getErrors() {
-		return errors;
+		return new LinkedHashSet<>(errors.values());
 	}
 
-	public void setError(Set<ErrorTypeModel> errors) {
-		this.errors = new LinkedHashSet<>(errors);
+	public void setError(Collection<ErrorTypeModel> errors) {
+		this.errors = new LinkedHashMap<>();
+		for(ErrorTypeModel error : errors){
+			this.errors.put(error.getName(), error);
+		}
+	}
+	
+	public ErrorTypeModel getErrorByName(String name){
+		return errors.get(name);
 	}
 
 	public PortModel getPort() {
