@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
@@ -29,7 +28,6 @@ import org.osate.aadl2.DeviceType;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.EventDataPort;
-import org.osate.aadl2.ListValue;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortCategory;
@@ -38,7 +36,6 @@ import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.Property;
-import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.RecordValue;
 import org.osate.aadl2.StringLiteral;
@@ -88,12 +85,11 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.CausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ExternallyCausedDangerModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.NotDangerousDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.RuntimeDetectionModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.StpaPreliminaryModel;
 
 public final class Translator extends AadlProcessingSwitchWithProgress {
 	private enum ElementType {
@@ -379,12 +375,19 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				children.put(componentModel, obj);
 			} else if (target == TranslationTarget.PROCESS) {
 				// Translating just a process...
+				
+				// 1. Create a stub system
 				systemModel = new SystemModel();
 				systemModel.setName("Process_Stub_System");
+				
+				// 2. Process the type before the impl
+//				processEList(new BasicEList<Element>(Collections.singletonList((Element)obj.getContainingClassifier())));
+				
+				// 3. Process the impl
 				if (handleNewProcess(obj) != null)
 					return DONE;
 				pm = systemModel.getProcessByType(obj.getName());
-				children.put(pm, obj);
+				children.put(pm, obj);				
 			} else {
 				// TODO: This shouldn't be hit. Throw an error?
 			}
@@ -661,8 +664,9 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					if (flow instanceof ErrorPath) {
 						handleErrorPath((ErrorPath) flow);
 					} else if (flow instanceof ErrorSink) {
-						// handleErrorSink
+						handleErrorSink((ErrorSink) flow);
 					} else if (flow instanceof ErrorSource) {
+						int six = 7;
 						// handleErrorSource
 					} else {
 						throw new NotImplementedException("Error flows must be paths, sources, or sinks!");
@@ -672,6 +676,14 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					throw new CoreException("An internal error occurred.");
 				}
 			}
+		}
+		
+		private void handleErrorSink(ErrorSink sink) {
+			TypeSet incomingErrors = sink.getTypeTokenConstraint();
+			String interp = "Not dangerous";
+			PropagationModel succDanger = getPropFromTokens(sink, incomingErrors.getTypeTokens(), true);
+			NotDangerousDangerModel nddm = new NotDangerousDangerModel(succDanger, interp, Collections.emptySet());
+			componentModel.addCausedDanger(nddm);
 		}
 
 		private void handleErrorPath(ErrorPath path)
@@ -734,7 +746,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 * Get the propagation associated with a particular error type token on
 		 * a particular propagation path
 		 * 
-		 * @param path
+		 * @param flow
 		 *            The ErrorPath to examine
 		 * @param token
 		 *            The token that contains the error type we want
@@ -744,17 +756,25 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 * @return The propagation corresponding to the token, or null if it
 		 *         can't be found
 		 */
-		private PropagationModel getPropFromTokens(ErrorPath path, EList<TypeToken> tokens, boolean isIn) {
+		private PropagationModel getPropFromTokens(ErrorFlow flow, EList<TypeToken> tokens, boolean isIn) {
 			ErrorPropagation eProp = null;
 			if (isIn) {
-				eProp = path.getIncoming();
+				if(flow instanceof ErrorPath) {
+					eProp = ((ErrorPath) flow).getIncoming();
+				} else { // flow instanceof ErrorSink
+					eProp = ((ErrorSink) flow).getIncoming();
+				}
 			} else {
-				eProp = path.getOutgoing();
+				if(flow instanceof ErrorPath) {
+					eProp = ((ErrorPath) flow).getOutgoing();
+				} else { // flow instanceof ErrorSource
+					eProp = ((ErrorSource) flow).getOutgoing();
+				}
 			}
 			String portName = eProp.getFeatureorPPRef().getFeatureorPP().getName();
 			PortModel portModel = resolvePortModel(componentModel, portName, isIn);
 			Collection<ErrorTypeModel> errors = getErrorModelsFromTokens(tokens, portModel);
-			PropagationModel propModel = new PropagationModel(path.getName(), errors, portModel);
+			PropagationModel propModel = new PropagationModel(flow.getName(), errors, portModel);
 			portModel.addPropagation(propModel);
 			return propModel;
 		}
@@ -1200,19 +1220,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			connModel.setName(obj.getName());
 			systemModel.addConnection(obj.getName(), connModel);
 		}
-
-		private void handleExplanations(RecordValue rv, StpaPreliminaryModel spm) {
-			ListValue lv = (ListValue) PropertyUtils.getRecordFieldValue(rv, "Explanations");
-
-			if (lv == null) {
-				return;
-			}
-
-			for (PropertyExpression pe : lv.getOwnedListElements()) {
-				spm.addExplanation(((StringLiteral) pe).getValue());
-			}
-		}
-
+		
 		/*-
 		private void handleSubprogramDataConnection(AccessConnection obj) {
 			// TODO: This method currently creates methods as necessary --

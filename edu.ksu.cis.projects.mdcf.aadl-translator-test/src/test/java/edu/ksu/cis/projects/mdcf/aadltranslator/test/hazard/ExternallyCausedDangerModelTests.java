@@ -174,4 +174,6 @@ public class ExternallyCausedDangerModelTests {
 		assertEquals("SpO2ValueLow", mtoNIter.next().getName());
 		assertEquals("SpO2ValueHigh", mtoNIter.next().getName());
 	}
+	
+	
 }

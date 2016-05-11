@@ -286,8 +286,8 @@ public abstract class ComponentModel<ChildType extends ComponentModel, Connectio
 		return hazardReportDiagrams;
 	}
 
-	public void addCausedDanger(CausedDangerModel ecdm) {
-		causedDangers.put(ecdm.getName(), ecdm);
+	public void addCausedDanger(CausedDangerModel cdm) {
+		causedDangers.put(cdm.getName(), cdm);
 	}
 
 	public Map<String, CausedDangerModel> getCausedDangers() {
