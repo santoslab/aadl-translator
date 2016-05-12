@@ -686,11 +686,16 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 		}
 		
-		private void handleErrorSource(ErrorSource source) throws CoreException {
+		private void handleErrorSource(ErrorSource source) throws CoreException, NotImplementedException, MissingRequiredPropertyException {
 			TypeSet faultClass = source.getFailureModeType();
 			TypeSet resultingError = source.getTypeTokenConstraint();
 			PropagationModel succDanger = getPropFromTokens(source, resultingError.getTypeTokens(), false);
-			InternallyCausedDangerModel icdm = new InternallyCausedDangerModel(succDanger, "Placeholder Interp", Collections.emptySet());
+			String interp = checkCustomEMV2Property(source, "MAP_Error_Properties::InternallyCausedDanger",
+					PropertyType.RECORD, Collections.singletonList("Explanation"));
+			if (interp == null) {
+				throw new MissingRequiredPropertyException("No matching InternallyCausedDanger found!");
+			}
+			InternallyCausedDangerModel icdm = new InternallyCausedDangerModel(succDanger, interp, Collections.emptySet());
 			setFaultClasses(faultClass, icdm);
 			componentModel.addCausedDanger(icdm);
 		}

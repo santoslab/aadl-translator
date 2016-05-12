@@ -52,22 +52,32 @@ public class InternallyCausedDangerModelTests {
 
 	@Test
 	public void testICDMCausedErrorExists() {
-		assertEquals(1, pmDangers.values().iterator().next().getSuccessorDanger().getErrors().size());
+		assertEquals(1, pmDangers.get("BogusAlarmsArePossible").getSuccessorDanger().getErrors().size());
 	}
 	
 	@Test
 	public void testICDMCausedErrorName() {
-		assertEquals("BogusAlarm", pmDangers.values().iterator().next().getSuccessorDanger().getErrors().iterator().next().getName());
+		assertEquals("BogusAlarm", pmDangers.get("BogusAlarmsArePossible").getSuccessorDanger().getErrors().iterator().next().getName());
 	}
 	
 	@Test
 	public void testICDMCausedErrorPortName() {
-		assertEquals("DerivedAlarm", pmDangers.values().iterator().next().getSuccessorDanger().getPort().getName());
+		assertEquals("DerivedAlarm", pmDangers.get("BogusAlarmsArePossible").getSuccessorDanger().getPort().getName());
 	}
 	
 	@Test
 	public void testICDMFaultClass() {
-		assertTrue(pmDangers.values().iterator().next().getFaultClasses().iterator().next().getName().equals("SoftwareBug"));
-		//TODO: Add multiple fault classes
+		assertTrue(pmDangers.get("BogusAlarmsArePossible").getFaultClasses().iterator().next().getName().equals("Deterioration"));
+		//TODO: Add multiple fault classes? What should the semantics be? ie, and, or, somehow user specified, etc.
+	}
+	
+	@Test
+	public void testICDMInterpretation() {
+		assertEquals("This is a placeholder explanation to test the InternallyCausedDanger property.", pmDangers.get("BogusAlarmsArePossible").getInterp());
+	}
+	
+	@Test
+	public void testICDMDesignTimeHandling() {
+		assertTrue(false);
 	}
 }
