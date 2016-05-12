@@ -15,16 +15,15 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.CoreException;
 public class ExternallyCausedDangerModel extends CausedDangerModel {
 
 	PropagationModel danger;
-
-	public ExternallyCausedDangerModel(PropagationModel succDanger, PropagationModel manifestation, String interp,
+	public ExternallyCausedDangerModel(PropagationModel inProp, PropagationModel outProp, String interp,
 			Set<ManifestationTypeModel> cooccurringDangers) throws CoreException {
-		super(succDanger, interp, cooccurringDangers);
-		if (!succDanger.getName().equals(manifestation.getName())) {
+		super(inProp, interp, cooccurringDangers);
+		if (!inProp.getName().equals(outProp.getName())) {
 			throw new CoreException(
 					"Tried to create an external danger out of mismatched successor danger and manifestation!");
 		}
-		this.name = succDanger.getName();
-		this.danger = manifestation;
+		super.setName(inProp.getName());
+		this.danger = outProp;
 	}
 
 	public PropagationModel getDanger() {

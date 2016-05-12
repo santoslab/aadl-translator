@@ -12,9 +12,6 @@ public class NotDangerousDangerModel extends CausedDangerModel {
 
 	public NotDangerousDangerModel(PropagationModel succDanger, String interp, Set<ManifestationTypeModel> cooccurringDangers) {
 		super(succDanger, interp, cooccurringDangers);
-		this.name = succDanger.getName();
-	}
-
-	
-	
+		super.setName(succDanger.getName());
+	}	
 }

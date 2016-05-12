@@ -32,6 +32,7 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 				-- Error path examples
 				HighSpO2LeadsToMissedAlarm : error path SpO2{SpO2ValueHigh} -> DerivedAlarm{MissedAlarm};
 				LowSpO2DoesNothing : error sink SpO2{SpO2ValueLow};
+				LateSpO2DoesNothing : error sink SpO2{LateSpO2};
 				BogusAlarmsArePossible : error source DerivedAlarm{BogusAlarm} when {Deterioration};
 				
 				-- Nonsensical error paths here as examples of more complex behaviors: 

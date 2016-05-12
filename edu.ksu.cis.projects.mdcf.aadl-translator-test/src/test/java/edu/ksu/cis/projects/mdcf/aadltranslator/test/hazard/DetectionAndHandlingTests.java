@@ -6,20 +6,25 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.RuntimeErrorDetectionApproach;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ManifestationTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.NotDangerousDangerModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.RuntimeDetectionModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ExternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
-public class NotDangerousDangerModelTests {
+public class DetectionAndHandlingTests {
 
-	private static Map<String, NotDangerousDangerModel> sunkDangers;
+	private static Map<String, NotDangerousDangerModel> pmDangers;
 
 	@BeforeClass
 	public static void initialize() {
@@ -31,7 +36,7 @@ public class NotDangerousDangerModelTests {
 
 		SystemModel systemModel = AllTests.runHazardTransTest("PulseOx", "PulseOx_Forwarding_System");
 		ProcessModel processModel = systemModel.getProcessByType("PulseOx_Logic_Process");
-		sunkDangers = processModel.getSunkDangers();
+		pmDangers = processModel.getSunkDangers();
 	}
 
 	@AfterClass
@@ -40,28 +45,19 @@ public class NotDangerousDangerModelTests {
 	}
 
 	@Test
-	public void testNDDMExist() {
-		assertFalse(sunkDangers.isEmpty());
-		assertEquals(2, sunkDangers.size());
+	public void testRuntimeErrorsExist() {
+		assertEquals("TimestampViolation", pmDangers.get("LateSpO2DoesNothing").getRuntimeDetection().iterator().next().getName());
 	}
 
 	@Test
-	public void testNDDMName() {
-		assertTrue(sunkDangers.keySet().contains("LowSpO2DoesNothing"));
+	public void testRuntimeErrorDetectionExplanation() {
+		assertEquals("Messages should be timestamped so latency violations can be detected",
+				pmDangers.get("LateSpO2DoesNothing").getRuntimeDetection().iterator().next().getExplanation());
 	}
 
 	@Test
-	public void testNDDMSuccDangerExists() {
-		assertEquals(1, sunkDangers.get("LowSpO2DoesNothing").getSuccessorDanger().getErrors().size());
-	}
-	
-	@Test
-	public void testNDDMSuccDangerErrorName() {
-		assertEquals("SpO2ValueLow", sunkDangers.get("LowSpO2DoesNothing").getSuccessorDanger().getErrors().iterator().next().getName());
-	}
-	
-	@Test
-	public void testNDDMSuccDangerPortName() {
-		assertEquals("SpO2", sunkDangers.get("LowSpO2DoesNothing").getSuccessorDanger().getPort().getName());
+	public void testRuntimeErrorDetectionApproach() {
+		assertEquals(RuntimeErrorDetectionApproach.CONCURRENT,
+				pmDangers.get("LateSpO2DoesNothing").getRuntimeDetection().iterator().next().getApproach());
 	}
 }

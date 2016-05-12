@@ -12,4 +12,16 @@ public class RuntimeDetectionModel {
 		this.explanation = explanation;
 		this.name = name;
 	}
+
+	public RuntimeErrorDetectionApproach getApproach() {
+		return approach;
+	}
+
+	public String getExplanation() {
+		return explanation;
+	}
+
+	public String getName() {
+		return name;
+	}
 }

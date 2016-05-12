@@ -21,7 +21,7 @@ public class InternallyCausedDangerModel extends CausedDangerModel {
 	public InternallyCausedDangerModel(PropagationModel succDanger, String interp,
 			Set<ManifestationTypeModel> cooccurringDangers) {
 		super(succDanger, interp, cooccurringDangers);
-		this.name = succDanger.getName();
+		super.setName(succDanger.getName());
 	}
 	
 	public void addFaultClass(ErrorTypeModel etm) {

@@ -92,6 +92,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.CausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorBehaviorModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ExternallyCausedDangerModel;
@@ -119,8 +120,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	private ArrayList<String> propertySetNames = new ArrayList<>();
 	private ParseErrorReporterManager errorManager;
 	public SystemImplementation sysImpl;
-	@SuppressWarnings("rawtypes")
-	private Map<ComponentModel, ComponentClassifier> children = new HashMap<>();
+	private Map<ComponentModel<?,?>, ComponentClassifier> children = new HashMap<>();
 
 	/**
 	 * Error type name -> model
@@ -672,11 +672,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 			RuntimeDetectionModel rdm = new RuntimeDetectionModel(
 					RuntimeErrorDetectionApproach.valueOf(detectionApproach.toUpperCase()), explanation, evtName);
-			for(ExternallyCausedDangerModel ecdm : componentModel.getExternallyCausedDangers().values()){
-				PropagationModel pm = ecdm.getDanger();
+			//TODO: can this be optimized? Does it need to be?
+			for(CausedDangerModel cdm : componentModel.getCausedDangers().values()){
+				PropagationModel pm = cdm.getSuccessorDanger();
 				for(TypeToken tt : evt.getTypeSet().getTypeTokens()){
 					if(pm.getErrorByName(EMV2Util.getName(tt)) != null){
-						ecdm.addRuntimeDetection(rdm);
+						cdm.addRuntimeDetection(rdm);
 					}
 				}
 			}
@@ -1486,8 +1487,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		return sysImpl;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public Map<ComponentModel, ComponentClassifier> getChildren() {
+	public Map<ComponentModel<?,?>, ComponentClassifier> getChildren() {
 		return children;
 	}
 

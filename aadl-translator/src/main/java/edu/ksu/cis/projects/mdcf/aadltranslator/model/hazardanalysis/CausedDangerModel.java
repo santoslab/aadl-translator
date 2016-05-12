@@ -1,15 +1,16 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public abstract class CausedDangerModel {
 
-	PropagationModel successorDanger;
-	String interp;
-	Set<ManifestationTypeModel> cooccurringDangers;
-	String name; // The name should be set by the concrete extensions of this class
-	Set<RuntimeDetectionModel> runtimeDetections;
-	Set<RuntimeHandlingModel> runtimeHandlings;
+	private PropagationModel successorDanger;
+	private String interp;
+	private Set<ManifestationTypeModel> cooccurringDangers;
+	private String name; // The name should be set by the concrete extensions of this class
+	private Set<RuntimeDetectionModel> runtimeDetections = new LinkedHashSet<>();
+	private Set<RuntimeHandlingModel> runtimeHandlings = new LinkedHashSet<>();
 	
 	public CausedDangerModel(PropagationModel succDanger, String interp,
 			Set<ManifestationTypeModel> cooccurringDangers) {
@@ -48,5 +49,9 @@ public abstract class CausedDangerModel {
 
 	public void addRuntimeHandling(RuntimeHandlingModel runtimeHandling) {
 		this.runtimeHandlings.add(runtimeHandling);
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 }
