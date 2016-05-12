@@ -6,13 +6,13 @@ public abstract class CausedDangerModel {
 
 	PropagationModel successorDanger;
 	String interp;
-	Set<ErrorTypeModel> cooccurringDangers;
+	Set<ManifestationTypeModel> cooccurringDangers;
 	String name; // The name should be set by the concrete extensions of this class
 	Set<RuntimeDetectionModel> runtimeDetections;
 	Set<RuntimeHandlingModel> runtimeHandlings;
 	
 	public CausedDangerModel(PropagationModel succDanger, String interp,
-			Set<ErrorTypeModel> cooccurringDangers) {
+			Set<ManifestationTypeModel> cooccurringDangers) {
 		this.successorDanger = succDanger;
 		this.interp = interp;
 		this.cooccurringDangers = cooccurringDangers;
@@ -30,7 +30,7 @@ public abstract class CausedDangerModel {
 		return interp;
 	}
 
-	public Set<ErrorTypeModel> getCooccurringDangers() {
+	public Set<ManifestationTypeModel> getCooccurringDangers() {
 		return cooccurringDangers;
 	}
 

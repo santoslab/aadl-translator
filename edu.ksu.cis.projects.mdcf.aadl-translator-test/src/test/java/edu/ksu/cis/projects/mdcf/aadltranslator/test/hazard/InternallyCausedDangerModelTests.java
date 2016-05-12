@@ -14,12 +14,12 @@ import org.junit.Test;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.NotDangerousDangerModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.InternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
-public class NotDangerousDangerModelTests {
+public class InternallyCausedDangerModelTests {
 
-	private static Map<String, NotDangerousDangerModel> sunkDangers;
+	private static Map<String, InternallyCausedDangerModel> pmDangers;
 
 	@BeforeClass
 	public static void initialize() {
@@ -31,7 +31,7 @@ public class NotDangerousDangerModelTests {
 
 		SystemModel systemModel = AllTests.runHazardTransTest("PulseOx", "PulseOx_Forwarding_System");
 		ProcessModel processModel = systemModel.getProcessByType("PulseOx_Logic_Process");
-		sunkDangers = processModel.getSunkDangers();
+		pmDangers = processModel.getInternallyCausedDangers();
 	}
 
 	@AfterClass
@@ -40,28 +40,34 @@ public class NotDangerousDangerModelTests {
 	}
 
 	@Test
-	public void testNDDMExist() {
-		assertFalse(sunkDangers.isEmpty());
-		assertEquals(1, sunkDangers.size());
+	public void testICDMExist() {
+		assertFalse(pmDangers.isEmpty());
+		assertEquals(1, pmDangers.size());
 	}
 
 	@Test
-	public void testNDDMName() {
-		assertTrue(sunkDangers.keySet().contains("LowSpO2DoesNothing"));
+	public void testICDMName() {
+		assertTrue(pmDangers.keySet().contains("BogusAlarmsArePossible"));
 	}
 
 	@Test
-	public void testNDDMSuccDangerExists() {
-		assertEquals(1, sunkDangers.values().iterator().next().getSuccessorDanger().getErrors().size());
+	public void testICDMCausedErrorExists() {
+		assertEquals(1, pmDangers.values().iterator().next().getSuccessorDanger().getErrors().size());
 	}
 	
 	@Test
-	public void testNDDMSuccDangerErrorName() {
-		assertEquals("SpO2ValueLow", sunkDangers.values().iterator().next().getSuccessorDanger().getErrors().iterator().next().getName());
+	public void testICDMCausedErrorName() {
+		assertEquals("BogusAlarm", pmDangers.values().iterator().next().getSuccessorDanger().getErrors().iterator().next().getName());
 	}
 	
 	@Test
-	public void testNDDMSuccDangerPortName() {
-		assertEquals("SpO2", sunkDangers.values().iterator().next().getSuccessorDanger().getPort().getName());
+	public void testICDMCausedErrorPortName() {
+		assertEquals("DerivedAlarm", pmDangers.values().iterator().next().getSuccessorDanger().getPort().getName());
+	}
+	
+	@Test
+	public void testICDMFaultClass() {
+		assertTrue(pmDangers.values().iterator().next().getFaultClasses().iterator().next().getName().equals("SoftwareBug"));
+		//TODO: Add multiple fault classes
 	}
 }

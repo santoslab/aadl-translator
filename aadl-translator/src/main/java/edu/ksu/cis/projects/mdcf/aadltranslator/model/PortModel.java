@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.osate.aadl2.PortCategory;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ManifestationTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 
 public class PortModel {
@@ -23,7 +23,7 @@ public class PortModel {
 	/**
 	 * Error types entering or leaving this port
 	 */
-	private Map<String, ErrorTypeModel> propagatableErrors = new LinkedHashMap<>();
+	private Map<String, ManifestationTypeModel> propagatableErrors = new LinkedHashMap<>();
 
 	/**
 	 * The actual propagations that describe how the incoming or outgoing errors
@@ -119,13 +119,13 @@ public class PortModel {
 		return containingComponentName;
 	}
 
-	public void addPropagatableErrors(Collection<ErrorTypeModel> propagations) {
-		for (ErrorTypeModel errType : propagations) {
+	public void addPropagatableErrors(Collection<ManifestationTypeModel> propagations) {
+		for (ManifestationTypeModel errType : propagations) {
 			propagatableErrors.put(errType.getName(), errType);
 		}
 	}
 	
-	public Map<String, ErrorTypeModel> getPropagatableErrors() {
+	public Map<String, ManifestationTypeModel> getPropagatableErrors() {
 		return propagatableErrors;
 	}
 
@@ -133,7 +133,7 @@ public class PortModel {
 		propagations.put(propModel.getName(), propModel);
 	}
 
-	public ErrorTypeModel getPropagatableErrorByName(String name) {
+	public ManifestationTypeModel getPropagatableErrorByName(String name) {
 		return propagatableErrors.get(name);
 	}
 	

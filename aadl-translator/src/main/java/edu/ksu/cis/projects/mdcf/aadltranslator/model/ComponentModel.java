@@ -24,6 +24,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ConstraintM
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorFlowModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ExternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.HazardModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.InternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.NotDangerousDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.StpaPreliminaryModel;
 
@@ -300,6 +301,13 @@ public abstract class ComponentModel<ChildType extends ComponentModel, Connectio
 				.stream()
 				.filter(m -> m.getValue() instanceof ExternallyCausedDangerModel)
 				.collect(Collectors.toMap(m -> m.getKey(), m -> (ExternallyCausedDangerModel) m.getValue()));
+	}
+
+	public Map<String, InternallyCausedDangerModel> getInternallyCausedDangers() {
+		return causedDangers.entrySet()
+				.stream()
+				.filter(m -> m.getValue() instanceof InternallyCausedDangerModel)
+				.collect(Collectors.toMap(m -> m.getKey(), m -> (InternallyCausedDangerModel) m.getValue()));
 	}
 	
 	public Map<String, NotDangerousDangerModel> getSunkDangers() {

@@ -16,18 +16,18 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ManifestationTypeModel;
 
 public final class ErrorTranslator {
 
-	private HashMap<String, ErrorTypeModel> errorTypes;
+	private HashMap<String, ManifestationTypeModel> errorTypes;
 	private SystemModel systemModel;
 
 	public void setErrorType(HashSet<ErrorType> errors) {
 		errorTypes = new HashMap<>();
 		
 		errors.forEach((et) -> {
-			errorTypes.put(et.getName(), new ErrorTypeModel(et.getName(), et.getSuperType()));
+			errorTypes.put(et.getName(), new ManifestationTypeModel(et.getName(), et.getSuperType()));
 		});
 	}
 

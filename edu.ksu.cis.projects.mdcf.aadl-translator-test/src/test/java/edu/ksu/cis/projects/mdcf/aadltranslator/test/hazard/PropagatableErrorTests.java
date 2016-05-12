@@ -17,16 +17,16 @@ import org.junit.Test;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ManifestationTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
 public class PropagatableErrorTests {
 
-	private static Set<ErrorTypeModel> pmInPropErrors;
-	private static Set<ErrorTypeModel> pmOutPropErrors;
-	private static Set<ErrorTypeModel> dmPropErrors;
-	private static Iterator<ErrorTypeModel> pmInIter;
-	private static Iterator<ErrorTypeModel> pmOutIter;
+	private static Set<ManifestationTypeModel> pmInPropErrors;
+	private static Set<ManifestationTypeModel> pmOutPropErrors;
+	private static Set<ManifestationTypeModel> dmPropErrors;
+	private static Iterator<ManifestationTypeModel> pmInIter;
+	private static Iterator<ManifestationTypeModel> pmOutIter;
 
 	@BeforeClass
 	public static void initialize() {

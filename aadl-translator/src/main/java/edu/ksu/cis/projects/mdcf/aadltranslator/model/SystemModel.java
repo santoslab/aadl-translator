@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AbbreviationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ManifestationTypeModel;
 
 public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnectionModel>{
 
@@ -19,11 +20,14 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 	private String hazardReportContext;
 	private HashSet<AbbreviationModel> hazardReportAbbreviations;
 	private HashSet<String> hazardReportAssumptions;
+	
+	// Fault name -> Fault model
+	private HashMap<String, ErrorTypeModel> faultClasses;
 
 	/**
 	 * Error type name -> model
 	 */
-	private Map<String, ErrorTypeModel> errorTypeModels;
+	private Map<String, ManifestationTypeModel> errorTypeModels;
 
 	public SystemModel() {
 		super();
@@ -143,20 +147,24 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 		return chanMap;
 	}
 
-	public void setErrorTypes(Map<String, ErrorTypeModel> errorTypeModels) {
+	public void setErrorTypes(Map<String, ManifestationTypeModel> errorTypeModels) {
 		this.errorTypeModels = errorTypeModels;
 	}
 	
-	public Map<String, ErrorTypeModel> getErrorTypes(){
+	public Map<String, ManifestationTypeModel> getErrorTypes(){
 		return errorTypeModels;
 	}
 	
-	public ErrorTypeModel getErrorTypeModelByName(String name){
+	public ManifestationTypeModel getErrorTypeModelByName(String name){
 		if(errorTypeModels == null){
 			// This will happen if there is no error type information at all
 			// We don't want to require that, so we just return null
 			return null;
 		}
 		return errorTypeModels.get(name);
+	}
+	
+	public void addFaultClass(ErrorTypeModel etm){
+		
 	}
 }

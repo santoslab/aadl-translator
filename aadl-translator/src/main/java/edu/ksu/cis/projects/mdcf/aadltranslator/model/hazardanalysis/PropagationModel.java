@@ -16,27 +16,27 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
  */
 public class PropagationModel{
 	private String name;
-	private Map<String, ErrorTypeModel> errors;
+	private Map<String, ManifestationTypeModel> errors;
 	private PortModel port;
 
-	public PropagationModel(String name, Collection<ErrorTypeModel> errors, PortModel portModel) {
+	public PropagationModel(String name, Collection<ManifestationTypeModel> errors, PortModel portModel) {
 		this.name = name;
 		setError(errors);
 		this.port = portModel;
 	}
 
-	public Set<ErrorTypeModel> getErrors() {
+	public Set<ManifestationTypeModel> getErrors() {
 		return new LinkedHashSet<>(errors.values());
 	}
 
-	public void setError(Collection<ErrorTypeModel> errors) {
+	public void setError(Collection<ManifestationTypeModel> errors) {
 		this.errors = new LinkedHashMap<>();
-		for(ErrorTypeModel error : errors){
+		for(ManifestationTypeModel error : errors){
 			this.errors.put(error.getName(), error);
 		}
 	}
 	
-	public ErrorTypeModel getErrorByName(String name){
+	public ManifestationTypeModel getErrorByName(String name){
 		return errors.get(name);
 	}
 

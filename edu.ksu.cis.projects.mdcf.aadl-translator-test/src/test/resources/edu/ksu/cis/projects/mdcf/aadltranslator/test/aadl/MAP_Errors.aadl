@@ -1,6 +1,6 @@
 package MAP_Errors
 public
-annex EMv2
+annex EMV2
 {**
 	error types
 	
@@ -49,6 +49,27 @@ annex EMv2
 	SyntaxMismatch : type;
 	RateMismatch : type;
 	SemanticMismatch : type;
+	
+	StandardFaultClasses : type set {
+		SoftwareBug,
+		BadSoftwareDesign,
+		CompromisedSoftware,
+		CompromisedHardware,
+		HardwareBug,
+		BadHardwareDesign,
+		ProductionDefect,
+		Deterioration,
+		CosmicRay,
+		OperatorHWMistake,
+		OperatorHWWrongChoice,
+		AdversaryAccessesHardware,
+		AdversaryAccessesSoftware,
+		OperatorSWMistake,
+		OperatorSWWrongChoice,
+		SyntaxMismatch,
+		RateMismatch,
+		SemanticMismatch
+	};
 	
 	end types;
 **};

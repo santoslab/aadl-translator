@@ -17,7 +17,7 @@ public class ExternallyCausedDangerModel extends CausedDangerModel {
 	PropagationModel danger;
 
 	public ExternallyCausedDangerModel(PropagationModel succDanger, PropagationModel manifestation, String interp,
-			Set<ErrorTypeModel> cooccurringDangers) throws CoreException {
+			Set<ManifestationTypeModel> cooccurringDangers) throws CoreException {
 		super(succDanger, interp, cooccurringDangers);
 		if (!succDanger.getName().equals(manifestation.getName())) {
 			throw new CoreException(

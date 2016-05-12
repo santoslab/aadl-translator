@@ -9,11 +9,11 @@ with PulseOx_Forwarding_Types, PulseOx_Forwarding_Properties, MAP_Properties;
 	properties
 		MAP_Properties::Component_Type => sensor;
 	annex EMV2 {** 
- 		use types PulseOx_Forwarding_Errors;
+ 		use types PulseOx_Forwarding_Errors, MAP_Errors;
 		error propagations
 			SpO2 : out propagation {SpO2ValueHigh};
 			flows
-				SpO2TooHighFlowSource : error source SpO2 {SpO2ValueHigh};
+				SpO2TooHighFlowSource : error source SpO2 {SpO2ValueHigh} when {Deterioration};
 		end propagations;
 	**};
 	end ICEpoInterface;

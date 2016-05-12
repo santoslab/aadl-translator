@@ -25,13 +25,13 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 	connections
 		outgoing_alarm : port CheckSpO2Thread.Alarm -> DerivedAlarm;
 	annex EMV2 {**
-		use types PulseOx_Forwarding_Errors;
+		use types MAP_Errors, PulseOx_Forwarding_Errors;
 		error propagations			
 			flows
 				-- Error path examples
 				HighSpO2LeadsToMissedAlarm : error path SpO2{SpO2ValueHigh} -> DerivedAlarm{MissedAlarm};
 				LowSpO2DoesNothing : error sink SpO2{SpO2ValueLow};
-				BogusAlarmsArePossible : error source DerivedAlarm{BogusAlarm};
+				BogusAlarmsArePossible : error source DerivedAlarm{BogusAlarm} when {SoftwareBug};
 				
 				-- Nonsensical error paths here as examples of more complex behaviors: 
 				MultipleInputs : error path SpO2{SpO2ValueHigh, SpO2ValueLow} -> DerivedAlarm{MissedAlarm};

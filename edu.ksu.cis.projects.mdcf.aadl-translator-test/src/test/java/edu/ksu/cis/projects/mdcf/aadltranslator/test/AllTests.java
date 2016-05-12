@@ -51,6 +51,7 @@ import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterFactory;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorTypes;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
 import org.stringtemplate.v4.STGroup;
 
@@ -74,6 +75,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIAADLSystemEr
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ExternallyCausedDangerModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardBackgroundTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.NotDangerousDangerModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.PropagatableErrorTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.util.MarkdownLinkRenderer;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSpecViewTests;
@@ -98,6 +100,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.STRendererTests;
 		HazardBackgroundTests.class,
 		PropagatableErrorTests.class,
 		ExternallyCausedDangerModelTests.class,
+		NotDangerousDangerModelTests.class,
 
 		// Error-handling tests
 		ControllerErrorTests.class,
@@ -483,8 +486,8 @@ public class AllTests {
 		return target;
 	}
 	
-	private static HashSet<ErrorType> getErrorTypes(ResourceSet rs, HashSet<IFile> usedFiles) {
-		HashSet<ErrorType> retSet = new HashSet<>();
+	private static HashSet<ErrorTypes> getErrorTypes(ResourceSet rs, HashSet<IFile> usedFiles) {
+		HashSet<ErrorTypes> retSet = new HashSet<>();
 		for (IFile f : usedFiles) {
 			Resource res = rs.getResource(OsateResourceUtil.getResourceURI((IResource) f), true);
 			Element target = (Element) res.getContents().get(0);
@@ -494,14 +497,12 @@ public class AllTests {
 			AadlPackage pack = (AadlPackage) target;
 			PublicPackageSection sect = pack.getPublicSection();
 			if (sect.getOwnedAnnexLibraries().size() > 0
-					&& sect.getOwnedAnnexLibraries().get(0).getName().equals("EMV2")) {
+					&& sect.getOwnedAnnexLibraries().get(0).getName().equalsIgnoreCase("EMV2")) {
 				AnnexLibrary annexLibrary = sect.getOwnedAnnexLibraries().get(0);
 				DefaultAnnexLibrary defaultAnnexLibrary = (DefaultAnnexLibrary) annexLibrary;
 				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary.getParsedAnnexLibrary();
 				retSet.addAll(emImpl.getTypes());
-				if(!emImpl.getTypesets().isEmpty()){
-					System.err.println("Sets of error types are not supported");
-				}
+				retSet.addAll(emImpl.getTypesets());
 			}
 		}
 		return retSet;

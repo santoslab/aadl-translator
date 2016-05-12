@@ -48,7 +48,7 @@ import org.osate.aadl2.modelsupport.modeltraversal.TraverseWorkspace;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.core.OsateCorePlugin;
-import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorTypes;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
@@ -505,8 +505,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		return systemFile;
 	}
 
-	private HashSet<ErrorType> getErrorTypes(ResourceSet rs, HashSet<IFile> usedFiles) {
-		HashSet<ErrorType> retSet = new HashSet<>();
+	private HashSet<ErrorTypes> getErrorTypes(ResourceSet rs, HashSet<IFile> usedFiles) {
+		HashSet<ErrorTypes> retSet = new HashSet<>();
 		for (IFile f : usedFiles) {
 			Resource res = rs.getResource(OsateResourceUtil.getResourceURI((IResource) f), true);
 			Element target = (Element) res.getContents().get(0);
@@ -516,14 +516,12 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 			AadlPackage pack = (AadlPackage) target;
 			PublicPackageSection sect = pack.getPublicSection();
 			if (sect.getOwnedAnnexLibraries().size() > 0
-					&& sect.getOwnedAnnexLibraries().get(0).getName().equals("EMV2")) {
+					&& sect.getOwnedAnnexLibraries().get(0).getName().equalsIgnoreCase("EMV2")) {
 				AnnexLibrary annexLibrary = sect.getOwnedAnnexLibraries().get(0);
 				DefaultAnnexLibrary defaultAnnexLibrary = (DefaultAnnexLibrary) annexLibrary;
 				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary.getParsedAnnexLibrary();
 				retSet.addAll(emImpl.getTypes());
-				if(!emImpl.getTypesets().isEmpty()){
-					System.err.println("Sets of error types are not supported");
-				}
+				retSet.addAll(emImpl.getTypesets());
 			}
 		}
 		return retSet;

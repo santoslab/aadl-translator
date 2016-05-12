@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ManifestationTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ExternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
@@ -97,9 +97,9 @@ public class ExternallyCausedDangerModelTests {
 
 	@Test
 	public void testECDMMultipleSuccDangerManifestation() {
-		Iterator<ErrorTypeModel> multOutIter = pmDangers.get("MultipleOutputs").getSuccessorDanger().getErrors()
+		Iterator<ManifestationTypeModel> multOutIter = pmDangers.get("MultipleOutputs").getSuccessorDanger().getErrors()
 				.iterator();
-		Iterator<ErrorTypeModel> mtoNIter = pmDangers.get("MtoN").getSuccessorDanger().getErrors().iterator();
+		Iterator<ManifestationTypeModel> mtoNIter = pmDangers.get("MtoN").getSuccessorDanger().getErrors().iterator();
 
 		assertEquals("VIOLATEDCONSTRAINT", multOutIter.next().getManifestationName());
 		assertEquals("VIOLATEDCONSTRAINT", multOutIter.next().getManifestationName());
@@ -109,9 +109,9 @@ public class ExternallyCausedDangerModelTests {
 
 	@Test
 	public void testECDMMultipleSuccDangerName() {
-		Iterator<ErrorTypeModel> multOutIter = pmDangers.get("MultipleOutputs").getSuccessorDanger().getErrors()
+		Iterator<ManifestationTypeModel> multOutIter = pmDangers.get("MultipleOutputs").getSuccessorDanger().getErrors()
 				.iterator();
-		Iterator<ErrorTypeModel> mtoNIter = pmDangers.get("MtoN").getSuccessorDanger().getErrors().iterator();
+		Iterator<ManifestationTypeModel> mtoNIter = pmDangers.get("MtoN").getSuccessorDanger().getErrors().iterator();
 
 		assertEquals("MissedAlarm", multOutIter.next().getName());
 		assertEquals("BogusAlarm", multOutIter.next().getName());
@@ -155,8 +155,8 @@ public class ExternallyCausedDangerModelTests {
 
 	@Test
 	public void testECDMMultipleDangerManifestation() {
-		Iterator<ErrorTypeModel> multInIter = pmDangers.get("MultipleInputs").getDanger().getErrors().iterator();
-		Iterator<ErrorTypeModel> mtoNIter = pmDangers.get("MtoN").getDanger().getErrors().iterator();
+		Iterator<ManifestationTypeModel> multInIter = pmDangers.get("MultipleInputs").getDanger().getErrors().iterator();
+		Iterator<ManifestationTypeModel> mtoNIter = pmDangers.get("MtoN").getDanger().getErrors().iterator();
 
 		assertEquals("HIGH", multInIter.next().getManifestationName());
 		assertEquals("LOW", multInIter.next().getManifestationName());
@@ -166,8 +166,8 @@ public class ExternallyCausedDangerModelTests {
 
 	@Test
 	public void testECDMMultipleDangerName() {
-		Iterator<ErrorTypeModel> multInIter = pmDangers.get("MultipleInputs").getDanger().getErrors().iterator();
-		Iterator<ErrorTypeModel> mtoNIter = pmDangers.get("MtoN").getDanger().getErrors().iterator();
+		Iterator<ManifestationTypeModel> multInIter = pmDangers.get("MultipleInputs").getDanger().getErrors().iterator();
+		Iterator<ManifestationTypeModel> mtoNIter = pmDangers.get("MtoN").getDanger().getErrors().iterator();
 
 		assertEquals("SpO2ValueHigh", multInIter.next().getName());
 		assertEquals("SpO2ValueLow", multInIter.next().getName());

@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -59,6 +60,7 @@ import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPropagation;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorSink;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorSource;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorTypes;
 import org.osate.xtext.aadl2.errormodel.errorModel.TypeSet;
 import org.osate.xtext.aadl2.errormodel.errorModel.TypeToken;
 import org.osate.xtext.aadl2.errormodel.util.EMV2Properties;
@@ -87,6 +89,8 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ExternallyCausedDangerModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.InternallyCausedDangerModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ManifestationTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.NotDangerousDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.RuntimeDetectionModel;
@@ -115,7 +119,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	/**
 	 * Error type name -> model
 	 */
-	private Map<String, ErrorTypeModel> errorTypeModels = new HashMap<>();
+	private Map<String, ManifestationTypeModel> errorTypeModels = new HashMap<>();
+
+	/**
+	 * Error type set name -> collection of type models in the set
+	 */
+	private Map<String, HashMap<String, ManifestationTypeModel>> errorTypeSets = new HashMap<>();
 
 	public class TranslatorSwitch extends Aadl2Switch<String> {
 
@@ -666,8 +675,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					} else if (flow instanceof ErrorSink) {
 						handleErrorSink((ErrorSink) flow);
 					} else if (flow instanceof ErrorSource) {
-						int six = 7;
-						// handleErrorSource
+						handleErrorSource((ErrorSource) flow);
 					} else {
 						throw new NotImplementedException("Error flows must be paths, sources, or sinks!");
 					}
@@ -678,6 +686,25 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 		}
 		
+		private void handleErrorSource(ErrorSource source) throws CoreException {
+			TypeSet faultClass = source.getFailureModeType();
+			TypeSet resultingError = source.getTypeTokenConstraint();
+			PropagationModel succDanger = getPropFromTokens(source, resultingError.getTypeTokens(), false);
+			InternallyCausedDangerModel icdm = new InternallyCausedDangerModel(succDanger, "Placeholder Interp", Collections.emptySet());
+			setFaultClasses(faultClass, icdm);
+			componentModel.addCausedDanger(icdm);
+		}
+		
+		private void setFaultClasses(TypeSet faultClass, InternallyCausedDangerModel icdm) throws CoreException {
+			if(faultClass.getTypeTokens().isEmpty()){
+				throw new CoreException("All internal faults must have a base fault class declared");
+			}
+			for(TypeToken errType : faultClass.getTypeTokens()){
+				//TODO: This name should be a system-level fundamental property
+				icdm.addFaultClass(errorTypeSets.get("StandardFaultClasses").get(EMV2Util.getName(errType)));
+			}
+		}
+
 		private void handleErrorSink(ErrorSink sink) {
 			TypeSet incomingErrors = sink.getTypeTokenConstraint();
 			String interp = "Not dangerous";
@@ -757,6 +784,24 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 *         can't be found
 		 */
 		private PropagationModel getPropFromTokens(ErrorFlow flow, EList<TypeToken> tokens, boolean isIn) {
+			String portName = getPortNameFromErrorFlow(flow, isIn);
+			PortModel portModel = resolvePortModel(componentModel, portName, isIn);
+			Collection<ManifestationTypeModel> errors = getErrorModelsFromTokens(tokens, portModel).stream()
+					.map(m -> (ManifestationTypeModel) m)
+					.collect(Collectors.toCollection(HashSet::new));
+			PropagationModel propModel = new PropagationModel(flow.getName(), errors, portModel);
+			portModel.addPropagation(propModel);
+			return propModel;
+		}
+
+		/**
+		 * Get a portname from an error flow and direction
+		 * 
+		 * @param flow The error flow
+		 * @param isIn True if the port is incoming
+		 * @return The name of the port
+		 */
+		private String getPortNameFromErrorFlow(ErrorFlow flow, boolean isIn) {
 			ErrorPropagation eProp = null;
 			if (isIn) {
 				if(flow instanceof ErrorPath) {
@@ -772,11 +817,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				}
 			}
 			String portName = eProp.getFeatureorPPRef().getFeatureorPP().getName();
-			PortModel portModel = resolvePortModel(componentModel, portName, isIn);
-			Collection<ErrorTypeModel> errors = getErrorModelsFromTokens(tokens, portModel);
-			PropagationModel propModel = new PropagationModel(flow.getName(), errors, portModel);
-			portModel.addPropagation(propModel);
-			return propModel;
+			return portName;
 		}
 
 		/**
@@ -799,8 +840,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		private void handlePropagations(ComponentClassifier obj) {
 			String portName;
 			PortModel portModel;
-			Set<ErrorTypeModel> errorTypes;
-			ErrorTypeModel etm;
+			Set<ManifestationTypeModel> errorTypes;
+			ManifestationTypeModel etm;
 
 			// Odd that I can't just get all the error propagations at once
 			Set<ErrorPropagation> eProps = new HashSet<>();
@@ -1419,13 +1460,30 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		this.target = TranslationTarget.valueOf(target.toUpperCase());
 	}
 
-	public void setErrorTypes(HashSet<ErrorType> errorTypes) {
-		for (ErrorType et : errorTypes) {
-			handleErrorType(et);
+	public void setErrorTypes(HashSet<ErrorTypes> errorTypes) {
+		
+		// Run these sequentially so that all error types get processed before any sets
+		for (ErrorTypes ets : errorTypes) {
+			if(ets instanceof ErrorType){
+				handleErrorType((ErrorType) ets);
+			}
+		}
+		for (ErrorTypes ets : errorTypes) {
+			if(ets instanceof TypeSet){
+				handleErrorTypeSet((TypeSet) ets);
+			}
 		}
 	}
 
 	private void handleErrorType(ErrorType et) {
-		errorTypeModels.put(et.getName(), new ErrorTypeModel(et.getName(), et.getSuperType()));
+		errorTypeModels.put(et.getName(), new ManifestationTypeModel(et.getName(), et.getSuperType()));
+	}
+
+	private void handleErrorTypeSet(TypeSet ts) {
+		HashMap<String, ManifestationTypeModel> typeSet = new HashMap<>();
+		for(TypeToken tt : ts.getTypeTokens()){
+			typeSet.put(EMV2Util.getName(tt), errorTypeModels.get(EMV2Util.getName(tt)));
+		}
+		errorTypeSets.put(ts.getName(), typeSet);
 	}
 }
