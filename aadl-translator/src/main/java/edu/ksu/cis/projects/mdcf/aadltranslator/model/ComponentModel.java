@@ -22,6 +22,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentLev
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.CausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ConstraintModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorBehaviorModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorFlowModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ExternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.HazardModel;
@@ -77,6 +78,11 @@ public abstract class ComponentModel<ChildType extends ComponentModel, Connectio
 	protected HashMap<String, String> hazardReportDiagrams;
 
 	private Map<String, CausedDangerModel> causedDangers = new LinkedHashMap<>();
+
+	/**
+	 * This component's error behavior model, if it has one
+	 */
+	private ErrorBehaviorModel errorBehaviorModel;
 
 	public ComponentModel() {
 		initHazardReportDiagrams();
@@ -316,5 +322,9 @@ public abstract class ComponentModel<ChildType extends ComponentModel, Connectio
 				.stream()
 				.filter(m -> m.getValue() instanceof NotDangerousDangerModel)
 				.collect(Collectors.toMap(m -> m.getKey(), m -> (NotDangerousDangerModel) m.getValue()));
+	}
+
+	public void setErrorBehaviorModel(ErrorBehaviorModel ebm) {
+		errorBehaviorModel = ebm;
 	}
 }

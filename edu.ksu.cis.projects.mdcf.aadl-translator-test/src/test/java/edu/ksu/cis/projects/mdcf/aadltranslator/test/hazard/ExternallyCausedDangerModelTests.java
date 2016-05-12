@@ -113,8 +113,8 @@ public class ExternallyCausedDangerModelTests {
 				.iterator();
 		Iterator<ManifestationTypeModel> mtoNIter = pmDangers.get("MtoN").getSuccessorDanger().getErrors().iterator();
 
-		assertEquals("BogusAlarm", multOutIter.next().getName());
 		assertEquals("MissedAlarm", multOutIter.next().getName());
+		assertEquals("BogusAlarm", multOutIter.next().getName());
 		assertEquals("BogusAlarm", mtoNIter.next().getName());
 		assertEquals("MissedAlarm", mtoNIter.next().getName());
 	}
@@ -158,8 +158,8 @@ public class ExternallyCausedDangerModelTests {
 		Iterator<ManifestationTypeModel> multInIter = pmDangers.get("MultipleInputs").getDanger().getErrors().iterator();
 		Iterator<ManifestationTypeModel> mtoNIter = pmDangers.get("MtoN").getDanger().getErrors().iterator();
 
-		assertEquals("LOW", multInIter.next().getManifestationName());
 		assertEquals("HIGH", multInIter.next().getManifestationName());
+		assertEquals("LOW", multInIter.next().getManifestationName());
 		assertEquals("LOW", mtoNIter.next().getManifestationName());
 		assertEquals("HIGH", mtoNIter.next().getManifestationName());
 	}
@@ -169,8 +169,8 @@ public class ExternallyCausedDangerModelTests {
 		Iterator<ManifestationTypeModel> multInIter = pmDangers.get("MultipleInputs").getDanger().getErrors().iterator();
 		Iterator<ManifestationTypeModel> mtoNIter = pmDangers.get("MtoN").getDanger().getErrors().iterator();
 
-		assertEquals("SpO2ValueLow", multInIter.next().getName());
 		assertEquals("SpO2ValueHigh", multInIter.next().getName());
+		assertEquals("SpO2ValueLow", multInIter.next().getName());
 		assertEquals("SpO2ValueLow", mtoNIter.next().getName());
 		assertEquals("SpO2ValueHigh", mtoNIter.next().getName());
 	}

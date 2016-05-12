@@ -13,7 +13,7 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 	annex EMV2 {** 
  		use types PulseOx_Forwarding_Errors;
 		error propagations
-			SpO2 : in propagation {SpO2ValueHigh, SpO2ValueLow};
+			SpO2 : in propagation {SpO2ValueHigh, SpO2ValueLow, EarlySpO2, LateSpO2};
 			DerivedAlarm : out propagation {MissedAlarm, BogusAlarm};
 		end propagations;
 	**};
@@ -26,18 +26,33 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 		outgoing_alarm : port CheckSpO2Thread.Alarm -> DerivedAlarm;
 	annex EMV2 {**
 		use types MAP_Errors, PulseOx_Forwarding_Errors;
+ 		use behavior PulseOx_Forwarding_Errors::PulseOxStatus;
 		error propagations			
 			flows
 				-- Error path examples
 				HighSpO2LeadsToMissedAlarm : error path SpO2{SpO2ValueHigh} -> DerivedAlarm{MissedAlarm};
 				LowSpO2DoesNothing : error sink SpO2{SpO2ValueLow};
-				BogusAlarmsArePossible : error source DerivedAlarm{BogusAlarm} when {SoftwareBug};
+				BogusAlarmsArePossible : error source DerivedAlarm{BogusAlarm} when {Deterioration};
 				
 				-- Nonsensical error paths here as examples of more complex behaviors: 
 				MultipleInputs : error path SpO2{SpO2ValueHigh, SpO2ValueLow} -> DerivedAlarm{MissedAlarm};
 				MultipleOutputs : error path SpO2{SpO2ValueHigh} -> DerivedAlarm{MissedAlarm, BogusAlarm};
 				MtoN : error path SpO2{SpO2ValueLow, SpO2ValueHigh} -> DerivedAlarm{BogusAlarm, MissedAlarm};
 		end propagations;
+		component error behavior
+			events
+				-- Detectable external problems
+				TimeoutViolation : error event {EarlySpO2};
+				TimestampViolation : error event {LateSpO2};
+				
+				-- Detectable internal problems
+				PulseOxDeteriorates : error event {Deterioration};
+			transitions
+				SwitchToNoOutput : Normal -[  
+					TimeoutViolation or
+					TimestampViolation
+				]-> NoOutput;
+		end component;
 		properties
 			MAP_Error_Properties::ExternallyCausedDanger => [
 				Explanation => "The SpO2 value is too high, leading the app to fail to issue an alarm when it should";
@@ -51,6 +66,27 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 			MAP_Error_Properties::ExternallyCausedDanger => [
 				Explanation => "Placeholder explanation";
 			] applies to MtoN;
+			
+			MAP_Error_Properties::RuntimeErrorDetection => [
+				ErrorDetectionApproach => Concurrent;
+				Explanation => "Minimum separation between messages are added to detect early arrivals";
+			] applies to TimeoutViolation;
+			MAP_Error_Properties::RuntimeErrorDetection => [
+				ErrorDetectionApproach => Concurrent;
+				Explanation => "Messages should be timestamped so latency violations can be detected";
+			] applies to TimestampViolation;
+			MAP_Error_Properties::RuntimeErrorDetection => [
+				ErrorDetectionApproach => Preemptive;
+				Explanation => "The pulse oximeter should be periodically inspected for signs of wear";
+			] applies to PulseOxDeteriorates;
+			
+			MAP_Error_Properties::InternallyCausedDanger => [
+				Explanation => "This is a placeholder explanation to test the InternallyCausedDanger property.";
+				DesignTimeHandling => (
+					PulseOx_Forwarding_Error_Properties::ECCMemory,
+					PulseOx_Forwarding_Error_Properties::Shielding
+				);
+			] applies to BogusAlarmsArePossible;
 	**};
 	end PulseOx_Logic_Process.imp;
 	

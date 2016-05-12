@@ -36,6 +36,7 @@ import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.Element;
+import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.modelsupport.errorreporting.LogParseErrorReporter;
@@ -48,7 +49,6 @@ import org.osate.aadl2.modelsupport.modeltraversal.TraverseWorkspace;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.core.OsateCorePlugin;
-import org.osate.xtext.aadl2.errormodel.errorModel.ErrorTypes;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
@@ -159,7 +159,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 		// 3) Filter out the property sets, initialize the list of error types
 		filterPropertySets(rs, archTranslator, usedFiles);
-		archTranslator.setErrorTypes(getErrorTypes(rs, usedFiles));
+		archTranslator.setErrorInfo(getErrorTypes(rs, usedFiles));
 
 		// 4) Initialize the error reporter
 		ParseErrorReporterManager parseErrManager = initErrManager(archTranslator);
@@ -505,8 +505,8 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		return systemFile;
 	}
 
-	private HashSet<ErrorTypes> getErrorTypes(ResourceSet rs, HashSet<IFile> usedFiles) {
-		HashSet<ErrorTypes> retSet = new HashSet<>();
+	private HashSet<NamedElement> getErrorTypes(ResourceSet rs, HashSet<IFile> usedFiles) {
+		HashSet<NamedElement> retSet = new HashSet<>();
 		for (IFile f : usedFiles) {
 			Resource res = rs.getResource(OsateResourceUtil.getResourceURI((IResource) f), true);
 			Element target = (Element) res.getContents().get(0);
@@ -522,6 +522,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary.getParsedAnnexLibrary();
 				retSet.addAll(emImpl.getTypes());
 				retSet.addAll(emImpl.getTypesets());
+				retSet.addAll(emImpl.getBehaviors());
 			}
 		}
 		return retSet;
