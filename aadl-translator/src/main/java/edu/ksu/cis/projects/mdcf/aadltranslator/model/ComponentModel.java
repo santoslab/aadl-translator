@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -75,7 +76,7 @@ public abstract class ComponentModel<ChildType extends ComponentModel, Connectio
 	 */
 	protected HashMap<String, String> hazardReportDiagrams;
 
-	private Map<String, CausedDangerModel> causedDangers = new HashMap<>();
+	private Map<String, CausedDangerModel> causedDangers = new LinkedHashMap<>();
 
 	public ComponentModel() {
 		initHazardReportDiagrams();
