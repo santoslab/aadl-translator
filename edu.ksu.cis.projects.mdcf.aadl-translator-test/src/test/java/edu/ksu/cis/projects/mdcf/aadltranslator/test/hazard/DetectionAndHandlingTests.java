@@ -14,6 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.RuntimeErrorDetectionApproach;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.RuntimeErrorHandlingApproach;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ManifestationTypeModel;
@@ -46,7 +47,16 @@ public class DetectionAndHandlingTests {
 
 	@Test
 	public void testRuntimeErrorsExist() {
-		assertEquals("TimestampViolation", pmDangers.get("LateSpO2DoesNothing").getRuntimeDetection().iterator().next().getName());
+		assertEquals("TimestampViolation",
+				pmDangers.get("LateSpO2DoesNothing").getRuntimeDetection().iterator().next().getName());
+	}
+
+	@Test
+	public void testRuntimeHandlingsExist() {
+		assertEquals("SwitchToNoOutput",
+				pmDangers.get("LateSpO2DoesNothing").getRuntimeHandlings().iterator().next().getName());
+		assertEquals("SwitchToNoOutput",
+				pmDangers.get("EarlySpO2DoesNothing").getRuntimeHandlings().iterator().next().getName());
 	}
 
 	@Test
@@ -56,8 +66,24 @@ public class DetectionAndHandlingTests {
 	}
 
 	@Test
+	public void testRuntimeErrorHandlingExplanation() {
+		assertEquals("The pump switches into a fail-safe mode, ie, it runs at a minimal (KVO) rate",
+				pmDangers.get("LateSpO2DoesNothing").getRuntimeHandlings().iterator().next().getExplanation());
+		assertEquals("The pump switches into a fail-safe mode, ie, it runs at a minimal (KVO) rate",
+				pmDangers.get("EarlySpO2DoesNothing").getRuntimeHandlings().iterator().next().getExplanation());
+	}
+
+	@Test
 	public void testRuntimeErrorDetectionApproach() {
 		assertEquals(RuntimeErrorDetectionApproach.CONCURRENT,
 				pmDangers.get("LateSpO2DoesNothing").getRuntimeDetection().iterator().next().getApproach());
+	}
+
+	@Test
+	public void testRuntimeErrorHandlingApproach() {
+		assertEquals(RuntimeErrorHandlingApproach.ROLLFORWARD,
+				pmDangers.get("LateSpO2DoesNothing").getRuntimeHandlings().iterator().next().getApproach());
+		assertEquals(RuntimeErrorHandlingApproach.ROLLFORWARD,
+				pmDangers.get("EarlySpO2DoesNothing").getRuntimeHandlings().iterator().next().getApproach());
 	}
 }

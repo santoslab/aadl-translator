@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,10 +56,13 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.properties.PropertyNotPresentException;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.contribution.sei.names.DataModel;
+import org.osate.xtext.aadl2.errormodel.errorModel.ConditionElement;
+import org.osate.xtext.aadl2.errormodel.errorModel.ConditionExpression;
 import org.osate.xtext.aadl2.errormodel.errorModel.EMV2PropertyAssociation;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorBehaviorEvent;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorBehaviorState;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorBehaviorStateMachine;
+import org.osate.xtext.aadl2.errormodel.errorModel.ErrorBehaviorTransition;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorEvent;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorFlow;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPath;
@@ -66,6 +70,7 @@ import org.osate.xtext.aadl2.errormodel.errorModel.ErrorPropagation;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorSink;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorSource;
 import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
+import org.osate.xtext.aadl2.errormodel.errorModel.OrExpression;
 import org.osate.xtext.aadl2.errormodel.errorModel.TypeSet;
 import org.osate.xtext.aadl2.errormodel.errorModel.TypeToken;
 import org.osate.xtext.aadl2.errormodel.util.EMV2Properties;
@@ -101,6 +106,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.Manifestati
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.NotDangerousDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.RuntimeDetectionModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.RuntimeHandlingModel;
 
 public final class Translator extends AadlProcessingSwitchWithProgress {
 	private enum ElementType {
@@ -120,7 +126,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	private ArrayList<String> propertySetNames = new ArrayList<>();
 	private ParseErrorReporterManager errorManager;
 	public SystemImplementation sysImpl;
-	private Map<ComponentModel<?,?>, ComponentClassifier> children = new HashMap<>();
+	private Map<ComponentModel<?, ?>, ComponentClassifier> children = new HashMap<>();
 
 	/**
 	 * Error type name -> model
@@ -131,7 +137,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	 * Error type set name -> collection of type models in the set
 	 */
 	private Map<String, HashMap<String, ManifestationTypeModel>> errorTypeSets = new HashMap<>();
-	
+
 	/**
 	 * Machine Name -> Machine model
 	 */
@@ -142,7 +148,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		/**
 		 * A reference to the "current" component model, stored for convenience
 		 */
-		private ComponentModel<?,?> componentModel = null;
+		private ComponentModel<?, ?> componentModel = null;
 
 		/**
 		 * A reference to the current component's parent
@@ -395,19 +401,20 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				children.put(componentModel, obj);
 			} else if (target == TranslationTarget.PROCESS) {
 				// Translating just a process...
-				
+
 				// 1. Create a stub system
 				systemModel = new SystemModel();
 				systemModel.setName("Process_Stub_System");
-				
+
 				// 2. Process the type before the impl
-//				processEList(new BasicEList<Element>(Collections.singletonList((Element)obj.getContainingClassifier())));
-				
+				// processEList(new
+				// BasicEList<Element>(Collections.singletonList((Element)obj.getContainingClassifier())));
+
 				// 3. Process the impl
 				if (handleNewProcess(obj) != null)
 					return DONE;
 				pm = systemModel.getProcessByType(obj.getName());
-				children.put(pm, obj);				
+				children.put(pm, obj);
 			} else {
 				// TODO: This shouldn't be hit. Throw an error?
 			}
@@ -623,11 +630,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				handlePropagations(component);
 			}
 			try {
-				if(EMV2Util.getErrorBehaviorStateMachine(obj) != null){
+				if (EMV2Util.getErrorBehaviorStateMachine(obj) != null) {
 					componentModel.setErrorBehaviorModel(errBehaviorMachines.get(obj.getName()));
 				}
 				handleErrorFlows(component);
 				handleErrorEvents(component);
+				handleErrorStateTransitions(component);
 			} catch (CoreException e) {
 				// Exceptions are handled in the handlers for more specific
 				// messages, but we need to stop translation
@@ -637,8 +645,55 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			return NOT_DONE;
 		}
 
+		private void handleErrorStateTransitions(ComponentClassifier obj) throws CoreException {
+			Set<ErrorBehaviorTransition> ebTrans = new LinkedHashSet<>();
+			ebTrans.addAll(EMV2Util.getAllErrorBehaviorTransitions(obj));
+			if (ebTrans.isEmpty()) {
+				return; // Bail out if there aren't any transitions
+			}
+			try {
+				for (ErrorBehaviorTransition ebt : ebTrans) {
+					String name = ebt.getName();
+					String approachStr = checkCustomEMV2Property(ebt, "MAP_Error_Properties::RuntimeErrorHandling",
+							PropertyType.RECORD, Collections.singletonList("ErrorHandlingApproach"));
+					if (approachStr == null) {
+						throw new MissingRequiredPropertyException(
+								"All behavior transitions must have an approach specified via a RuntimeErrorHandling property");
+					}
+					String explanation = checkCustomEMV2Property(ebt, "MAP_Error_Properties::RuntimeErrorHandling",
+							PropertyType.RECORD, Collections.singletonList("Explanation"));
+					if (explanation == null) {
+						throw new MissingRequiredPropertyException(
+								"All behavior transitions must have an explanation specified via a RuntimeErrorHandling property");
+					}
+					RuntimeHandlingModel rhm = new RuntimeHandlingModel(name, approachStr, explanation);
+					
+					// error handling for anything other than or-expressions
+					List<ErrorEvent> events = new LinkedList<>();
+					ConditionExpression cond = ebt.getCondition();
+					OrExpression orCond;
+					while (cond instanceof OrExpression) {
+						orCond = (OrExpression) cond;
+						events.add((ErrorEvent) ((ConditionElement) (orCond).getOperands().get(1))
+								.getQualifiedErrorPropagationReference().getEmv2Target().getNamedElement());
+						cond = orCond.getOperands().get(0);
+					}
+					events.add((ErrorEvent) ((ConditionElement) cond).getQualifiedErrorPropagationReference()
+							.getEmv2Target().getNamedElement());
+					for (ErrorEvent evt : events) {
+						for (CausedDangerModel cdm : getCausedDangerModelByPropagationName(evt)) {
+							cdm.addRuntimeHandling(rhm);
+						}
+					}
+				}
+			} catch (NotImplementedException | MissingRequiredPropertyException e) {
+				handleException(obj, e);
+				throw new CoreException("An internal error occurred");
+			}
+		}
+
 		private void handleErrorEvents(ComponentClassifier obj) throws CoreException {
-			Set<ErrorBehaviorEvent> eEvents = new HashSet<>();
+			Set<ErrorBehaviorEvent> eEvents = new LinkedHashSet<>();
 			eEvents.addAll(EMV2Util.getAllErrorBehaviorEvents(obj));
 			if (eEvents.isEmpty()) {
 				return; // Bail out if there aren't any events
@@ -662,29 +717,39 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			String evtName = evt.getName();
 			String explanation = checkCustomEMV2Property(evt, "MAP_Error_Properties::RuntimeErrorDetection",
 					PropertyType.RECORD, Collections.singletonList("Explanation"));
-			if(explanation == null){
-				throw new MissingRequiredPropertyException("Runtime error detections, with an explanation, must be specified.");
+			if (explanation == null) {
+				throw new MissingRequiredPropertyException(
+						"Runtime error detections, with an explanation, must be specified.");
 			}
-			String detectionApproach = checkCustomEMV2Property(evt, "MAP_Error_Properties::RuntimeErrorDetection",
+			String detectionApproachStr = checkCustomEMV2Property(evt, "MAP_Error_Properties::RuntimeErrorDetection",
 					PropertyType.RECORD, Collections.singletonList("ErrorDetectionApproach"));
-			if(detectionApproach == null){
-				throw new MissingRequiredPropertyException("Runtime error detections, with a detection approach, must be specified.");
+			if (detectionApproachStr == null) {
+				throw new MissingRequiredPropertyException(
+						"Runtime error detections, with a detection approach, must be specified.");
 			}
-			RuntimeDetectionModel rdm = new RuntimeDetectionModel(
-					RuntimeErrorDetectionApproach.valueOf(detectionApproach.toUpperCase()), explanation, evtName);
-			//TODO: can this be optimized? Does it need to be?
-			for(CausedDangerModel cdm : componentModel.getCausedDangers().values()){
-				PropagationModel pm = cdm.getSuccessorDanger();
-				for(TypeToken tt : evt.getTypeSet().getTypeTokens()){
-					if(pm.getErrorByName(EMV2Util.getName(tt)) != null){
-						cdm.addRuntimeDetection(rdm);
-					}
-				}
+			RuntimeDetectionModel rdm = new RuntimeDetectionModel(detectionApproachStr, explanation, evtName);
+			// TODO: can this be optimized? Does it need to be?
+
+			for (CausedDangerModel cdm : getCausedDangerModelByPropagationName(evt)) {
+				cdm.addRuntimeDetection(rdm);
 			}
 		}
 
+		private Set<CausedDangerModel> getCausedDangerModelByPropagationName(ErrorEvent evt) {
+			Set<CausedDangerModel> ret = new LinkedHashSet<>();
+			for (CausedDangerModel cdm : componentModel.getCausedDangers().values()) {
+				PropagationModel pm = cdm.getSuccessorDanger();
+				for (TypeToken tt : evt.getTypeSet().getTypeTokens()) {
+					if (pm.getErrorByName(EMV2Util.getName(tt)) != null) {
+						ret.add(cdm);
+					}
+				}
+			}
+			return ret;
+		}
+
 		private void handleErrorFlows(ComponentClassifier obj) throws CoreException {
-			Set<ErrorFlow> eFlows = new HashSet<>();
+			Set<ErrorFlow> eFlows = new LinkedHashSet<>();
 			eFlows.addAll(EMV2Util.getAllErrorFlows(obj));
 			if (eFlows.isEmpty()) {
 				return; // Bail out if there aren't any flows
@@ -706,29 +771,31 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				}
 			}
 		}
-		
-		private void handleErrorSource(ErrorSource source) throws CoreException, NotImplementedException, MissingRequiredPropertyException {
+
+		private void handleErrorSource(ErrorSource source)
+				throws CoreException, NotImplementedException, MissingRequiredPropertyException {
 			TypeSet faultClass = source.getFailureModeType();
 			TypeSet resultingError = source.getTypeTokenConstraint();
 			PropagationModel succDanger = getPropFromTokens(source, resultingError.getTypeTokens(), false);
-			
+
 			String interp = checkCustomEMV2Property(source, "MAP_Error_Properties::InternallyCausedDanger",
 					PropertyType.RECORD, Collections.singletonList("Explanation"));
 			if (interp == null) {
 				throw new MissingRequiredPropertyException("No matching InternallyCausedDanger found!");
 			}
-			
-			InternallyCausedDangerModel icdm = new InternallyCausedDangerModel(succDanger, interp, Collections.emptySet());
+
+			InternallyCausedDangerModel icdm = new InternallyCausedDangerModel(succDanger, interp,
+					Collections.emptySet());
 			setFaultClasses(faultClass, icdm);
 			componentModel.addCausedDanger(icdm);
 		}
-		
+
 		private void setFaultClasses(TypeSet faultClass, InternallyCausedDangerModel icdm) throws CoreException {
-			if(faultClass.getTypeTokens().isEmpty()){
+			if (faultClass.getTypeTokens().isEmpty()) {
 				throw new CoreException("All internal faults must have a base fault class declared");
 			}
-			for(TypeToken errType : faultClass.getTypeTokens()){
-				//TODO: This name should be a system-level fundamental property
+			for (TypeToken errType : faultClass.getTypeTokens()) {
+				// TODO: This name should come from a system-level fundamental property
 				icdm.addFaultClass(errorTypeSets.get("StandardFaultClasses").get(EMV2Util.getName(errType)));
 			}
 		}
@@ -789,12 +856,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				RecordValue rv = (RecordValue) EMV2Properties.getPropertyValue(pas.get(0));
 				if (path.size() == 1) {
 					PropertyExpression val = (PropertyUtils.getRecordFieldValue(rv, path.get(0)));
-					if(val instanceof StringLiteral){
+					if (val instanceof StringLiteral) {
 						return ((StringLiteral) val).getValue();
-					} else if(val instanceof NamedValue){
+					} else if (val instanceof NamedValue) {
 						// check for enum literal, and maybe constant?
 						AbstractNamedValue anv = ((NamedValue) val).getNamedValue();
-						if(anv instanceof EnumerationLiteral){
+						if (anv instanceof EnumerationLiteral) {
 							return ((EnumerationLiteral) anv).getName();
 						}
 						return null;
@@ -827,8 +894,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			String portName = getPortNameFromErrorFlow(flow, isIn);
 			PortModel portModel = resolvePortModel(componentModel, portName, isIn);
 			Collection<ManifestationTypeModel> errors = getErrorModelsFromTokens(tokens, portModel).stream()
-					.map(m -> (ManifestationTypeModel) m)
-					.collect(Collectors.toCollection(LinkedHashSet::new));
+					.map(m -> (ManifestationTypeModel) m).collect(Collectors.toCollection(LinkedHashSet::new));
 			PropagationModel propModel = new PropagationModel(flow.getName(), errors, portModel);
 			portModel.addPropagation(propModel);
 			return propModel;
@@ -837,20 +903,22 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		/**
 		 * Get a portname from an error flow and direction
 		 * 
-		 * @param flow The error flow
-		 * @param isIn True if the port is incoming
+		 * @param flow
+		 *            The error flow
+		 * @param isIn
+		 *            True if the port is incoming
 		 * @return The name of the port
 		 */
 		private String getPortNameFromErrorFlow(ErrorFlow flow, boolean isIn) {
 			ErrorPropagation eProp = null;
 			if (isIn) {
-				if(flow instanceof ErrorPath) {
+				if (flow instanceof ErrorPath) {
 					eProp = ((ErrorPath) flow).getIncoming();
 				} else { // flow instanceof ErrorSink
 					eProp = ((ErrorSink) flow).getIncoming();
 				}
 			} else {
-				if(flow instanceof ErrorPath) {
+				if (flow instanceof ErrorPath) {
 					eProp = ((ErrorPath) flow).getOutgoing();
 				} else { // flow instanceof ErrorSource
 					eProp = ((ErrorSource) flow).getOutgoing();
@@ -1301,7 +1369,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			connModel.setName(obj.getName());
 			systemModel.addConnection(obj.getName(), connModel);
 		}
-		
+
 		/*-
 		private void handleSubprogramDataConnection(AccessConnection obj) {
 			// TODO: This method currently creates methods as necessary --
@@ -1487,7 +1555,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		return sysImpl;
 	}
 
-	public Map<ComponentModel<?,?>, ComponentClassifier> getChildren() {
+	public Map<ComponentModel<?, ?>, ComponentClassifier> getChildren() {
 		return children;
 	}
 
@@ -1500,18 +1568,19 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	}
 
 	public void setErrorInfo(HashSet<NamedElement> errorTypes) {
-		
-		// Run these sequentially so that all error types get processed before any sets
+
+		// Run these sequentially so that all error types get processed before
+		// any sets
 		for (NamedElement ets : errorTypes) {
-			if(ets instanceof ErrorType){
+			if (ets instanceof ErrorType) {
 				handleErrorType((ErrorType) ets);
 			}
 		}
 		for (NamedElement ets : errorTypes) {
-			if(ets instanceof TypeSet){
+			if (ets instanceof TypeSet) {
 				handleErrorTypeSet((TypeSet) ets);
 			}
-			if(ets instanceof ErrorBehaviorStateMachine){
+			if (ets instanceof ErrorBehaviorStateMachine) {
 				handleErrorBehaviorStateMachine((ErrorBehaviorStateMachine) ets);
 			}
 		}
@@ -1519,7 +1588,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 	private void handleErrorBehaviorStateMachine(ErrorBehaviorStateMachine ets) {
 		ErrorBehaviorModel ebm = new ErrorBehaviorModel();
-		for(ErrorBehaviorState state : ets.getStates()){
+		for (ErrorBehaviorState state : ets.getStates()) {
 			ebm.addState(state.getName());
 		}
 		errBehaviorMachines.put(ets.getName(), ebm);
@@ -1531,7 +1600,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 	private void handleErrorTypeSet(TypeSet ts) {
 		HashMap<String, ManifestationTypeModel> typeSet = new HashMap<>();
-		for(TypeToken tt : ts.getTypeTokens()){
+		for (TypeToken tt : ts.getTypeTokens()) {
 			typeSet.put(EMV2Util.getName(tt), errorTypeModels.get(EMV2Util.getName(tt)));
 		}
 		errorTypeSets.put(ts.getName(), typeSet);

@@ -75,9 +75,4 @@ public class InternallyCausedDangerModelTests {
 	public void testICDMInterpretation() {
 		assertEquals("This is a placeholder explanation to test the InternallyCausedDanger property.", pmDangers.get("BogusAlarmsArePossible").getInterp());
 	}
-	
-	@Test
-	public void testICDMDesignTimeHandling() {
-		assertTrue(false);
-	}
 }

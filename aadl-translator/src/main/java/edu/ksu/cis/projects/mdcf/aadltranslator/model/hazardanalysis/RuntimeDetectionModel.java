@@ -7,10 +7,10 @@ public class RuntimeDetectionModel {
 	private String explanation;
 	private String name;
 	
-	public RuntimeDetectionModel(RuntimeErrorDetectionApproach approach, String explanation, String name) {
-		this.approach = approach;
+	public RuntimeDetectionModel(String approachStr, String explanation, String name) {
 		this.explanation = explanation;
 		this.name = name;
+		this.approach = RuntimeErrorDetectionApproach.valueOf(approachStr.toUpperCase());
 	}
 
 	public RuntimeErrorDetectionApproach getApproach() {

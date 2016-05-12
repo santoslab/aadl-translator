@@ -33,6 +33,7 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 				HighSpO2LeadsToMissedAlarm : error path SpO2{SpO2ValueHigh} -> DerivedAlarm{MissedAlarm};
 				LowSpO2DoesNothing : error sink SpO2{SpO2ValueLow};
 				LateSpO2DoesNothing : error sink SpO2{LateSpO2};
+				EarlySpO2DoesNothing : error sink SpO2{EarlySpO2};
 				BogusAlarmsArePossible : error source DerivedAlarm{BogusAlarm} when {Deterioration};
 				
 				-- Nonsensical error paths here as examples of more complex behaviors: 
@@ -80,6 +81,11 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 				ErrorDetectionApproach => Preemptive;
 				Explanation => "The pulse oximeter should be periodically inspected for signs of wear";
 			] applies to PulseOxDeteriorates;
+						
+			MAP_Error_Properties::RuntimeErrorHandling => [
+				ErrorHandlingApproach => Rollforward;
+				Explanation => "The pump switches into a fail-safe mode, ie, it runs at a minimal (KVO) rate";
+			] applies to SwitchToNoOutput;
 			
 			MAP_Error_Properties::InternallyCausedDanger => [
 				Explanation => "This is a placeholder explanation to test the InternallyCausedDanger property.";

@@ -42,7 +42,7 @@ public class NotDangerousDangerModelTests {
 	@Test
 	public void testNDDMExist() {
 		assertFalse(sunkDangers.isEmpty());
-		assertEquals(2, sunkDangers.size());
+		assertEquals(3, sunkDangers.size());
 	}
 
 	@Test
