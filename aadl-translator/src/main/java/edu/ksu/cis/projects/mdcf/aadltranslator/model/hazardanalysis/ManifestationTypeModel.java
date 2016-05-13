@@ -10,11 +10,16 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ManifestationTyp
  * @author Sam
  *
  */
-public class ManifestationTypeModel extends ErrorTypeModel {
+public class ManifestationTypeModel {
+	private String name;
 	private ManifestationType manifestation;
 
 	public ManifestationTypeModel(String name, ErrorType parentType) {
 		this.name = name;
+	}
+	
+	public String getName(){
+		return name;
 	}
 
 	public void setManifestation(ManifestationType manifestation) {

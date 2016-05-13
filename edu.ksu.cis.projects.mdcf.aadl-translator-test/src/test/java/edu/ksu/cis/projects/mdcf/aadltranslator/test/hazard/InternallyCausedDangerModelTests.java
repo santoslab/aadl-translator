@@ -67,7 +67,7 @@ public class InternallyCausedDangerModelTests {
 	
 	@Test
 	public void testICDMFaultClass() {
-		assertTrue(pmDangers.get("BogusAlarmsArePossible").getFaultClasses().iterator().next().getName().equals("Deterioration"));
+		assertTrue(pmDangers.get("BogusAlarmsArePossible").getFaultClasses().iterator().next().equals("Deterioration"));
 		//TODO: Add multiple fault classes? What should the semantics be? ie, and, or, somehow user specified, etc.
 	}
 	

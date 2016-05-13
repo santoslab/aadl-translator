@@ -89,11 +89,41 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 			
 			MAP_Error_Properties::InternallyCausedDanger => [
 				Explanation => "This is a placeholder explanation to test the InternallyCausedDanger property.";
-				DesignTimeHandling => (
-					PulseOx_Forwarding_Error_Properties::ECCMemory,
-					PulseOx_Forwarding_Error_Properties::Shielding
-				);
+--				DesignTimeHandling => (
+--					PulseOx_Forwarding_Error_Properties::ECCMemory,
+--					PulseOx_Forwarding_Error_Properties::Shielding
+--				);
 			] applies to BogusAlarmsArePossible;
+			
+			MAP_Error_Properties::EliminatedFaults =>[
+				FaultTypes => (
+					reference(SoftwareBug), 
+					reference(BadSoftwareDesign), 
+					reference(CompromisedSoftware),
+					reference(CompromisedHardware),
+					reference(HardwareBug),
+					reference(BadHardwareDesign),
+					reference(ProductionDefect)
+				);
+				Explanation => "We're using a 'proven in use' app";
+			] applies to Normal;
+			
+			MAP_Error_Properties::EliminatedFaults => [
+				FaultTypes => (
+					reference(AdversaryAccessesHardware),
+					reference(AdversaryAccessesSoftware)
+				);
+				Explanation => "The hospital has physical security measures in place";
+			] applies to Normal;
+			
+			MAP_Error_Properties::EliminatedFaults => [
+				FaultTypes => (
+					reference(SyntaxMismatch),
+					reference(RateMismatch),
+					reference(SemanticMismatch)
+				);
+				Explanation => "The app logic isn't a connection between two components";
+			] applies to Normal;
 	**};
 	end PulseOx_Logic_Process.imp;
 	

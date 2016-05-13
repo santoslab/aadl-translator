@@ -1,8 +1,7 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -16,7 +15,7 @@ public class InternallyCausedDangerModel extends CausedDangerModel {
 	/**
 	 * Fault class name -> Fault Class Model
 	 */
-	private Map<String, ErrorTypeModel> faultClasses = new LinkedHashMap<>();
+	private Set<String> faultClasses = new LinkedHashSet<>();
 
 	public InternallyCausedDangerModel(PropagationModel succDanger, String interp,
 			Set<ManifestationTypeModel> cooccurringDangers) {
@@ -24,11 +23,11 @@ public class InternallyCausedDangerModel extends CausedDangerModel {
 		super.setName(succDanger.getName());
 	}
 	
-	public void addFaultClass(ErrorTypeModel etm) {
-		faultClasses.put(etm.getName(), etm);
+	public void addFaultClass(String etm) {
+		faultClasses.add(etm);
 	}
 
-	public Collection<ErrorTypeModel> getFaultClasses() {
-		return faultClasses.values();
+	public Collection<String> getFaultClasses() {
+		return faultClasses;
 	}
 }

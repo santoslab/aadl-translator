@@ -22,15 +22,15 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentLev
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.CausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ConstraintModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorBehaviorModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorFlowModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ExternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.HazardModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.InternallyCausedDangerModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ManifestationTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.NotDangerousDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.StpaPreliminaryModel;
 
-public abstract class ComponentModel<ChildType extends ComponentModel, ConnectionType extends ConnectionModel> {
+public abstract class ComponentModel<ChildType extends ComponentModel<?, ?>, ConnectionType extends ConnectionModel> {
 
 	/**
 	 * The type name of this component
@@ -80,9 +80,15 @@ public abstract class ComponentModel<ChildType extends ComponentModel, Connectio
 	private Map<String, CausedDangerModel> causedDangers = new LinkedHashMap<>();
 
 	/**
-	 * This component's error behavior model, if it has one
+	 * Explanation -> Names of faults that have been eliminated
 	 */
-	private ErrorBehaviorModel errorBehaviorModel;
+	private Map<String, Set<String>> eliminatedFaults = new LinkedHashMap<>();
+
+	/**
+	 * The set of fault classes that should be accounted for. Each component has
+	 * their own copy because it's modified when calculating missed fault classes.
+	 */
+	private Set<String> faultClasses;
 
 	public ComponentModel() {
 		initHazardReportDiagrams();
@@ -304,27 +310,43 @@ public abstract class ComponentModel<ChildType extends ComponentModel, Connectio
 	}
 
 	public Map<String, ExternallyCausedDangerModel> getExternallyCausedDangers() {
-		return causedDangers.entrySet()
-				.stream()
-				.filter(m -> m.getValue() instanceof ExternallyCausedDangerModel)
+		return causedDangers.entrySet().stream().filter(m -> m.getValue() instanceof ExternallyCausedDangerModel)
 				.collect(Collectors.toMap(m -> m.getKey(), m -> (ExternallyCausedDangerModel) m.getValue()));
 	}
 
 	public Map<String, InternallyCausedDangerModel> getInternallyCausedDangers() {
-		return causedDangers.entrySet()
-				.stream()
-				.filter(m -> m.getValue() instanceof InternallyCausedDangerModel)
+		return causedDangers.entrySet().stream().filter(m -> m.getValue() instanceof InternallyCausedDangerModel)
 				.collect(Collectors.toMap(m -> m.getKey(), m -> (InternallyCausedDangerModel) m.getValue()));
 	}
-	
+
 	public Map<String, NotDangerousDangerModel> getSunkDangers() {
-		return causedDangers.entrySet()
-				.stream()
-				.filter(m -> m.getValue() instanceof NotDangerousDangerModel)
+		return causedDangers.entrySet().stream().filter(m -> m.getValue() instanceof NotDangerousDangerModel)
 				.collect(Collectors.toMap(m -> m.getKey(), m -> (NotDangerousDangerModel) m.getValue()));
 	}
 
-	public void setErrorBehaviorModel(ErrorBehaviorModel ebm) {
-		errorBehaviorModel = ebm;
+	public Map<String, Set<String>> getEliminatedFaults() {
+		return eliminatedFaults;
+	}
+
+	public void addEliminatedFaults(String explanation, Set<String> faults) {
+		eliminatedFaults.put(explanation, faults);
+	}
+
+	/**
+	 * Note that as this method computes missing fault classes, it is more
+	 * expensive than the standard O(1) getter.
+	 */
+	public Set<String> getMissedFaultClasses() {
+		for (Set<String> elimFaults : eliminatedFaults.values()) {
+			faultClasses.removeAll(elimFaults);
+		}
+		for (InternallyCausedDangerModel icdm : getInternallyCausedDangers().values()) {
+			faultClasses.removeAll(icdm.getFaultClasses());
+		}
+		return faultClasses;
+	}
+
+	public void setFaultClasses(HashMap<String, ManifestationTypeModel> faultClasses) {
+		this.faultClasses = faultClasses.keySet();
 	}
 }

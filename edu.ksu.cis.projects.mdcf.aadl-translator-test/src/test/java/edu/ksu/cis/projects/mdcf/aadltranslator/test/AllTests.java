@@ -62,7 +62,6 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFactory;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DevOrProcModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.InternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model_for_device.DeviceComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.ControllerErrorTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.DeviceModelTests;
@@ -74,9 +73,8 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.SystemModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.arch.TaskModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIAADLSystemErrorTest;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.DetectionAndHandlingTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.EliminatedFaultsTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ExternallyCausedDangerModelTests;
-import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardBackgroundTests;
-import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.InternallyCausedDangerModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.NotDangerousDangerModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.PropagatableErrorTests;
@@ -106,6 +104,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.STRendererTests;
 		InternallyCausedDangerModelTests.class,
 		NotDangerousDangerModelTests.class,
 		DetectionAndHandlingTests.class,
+		EliminatedFaultsTests.class,
 
 		// Error-handling tests
 		ControllerErrorTests.class,
