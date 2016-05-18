@@ -27,6 +27,10 @@ public class ManifestationTypeModel {
 	}
 
 	public String getManifestationName() {
-		return manifestation.toString();
+		if(manifestation == null){
+			return null;
+		} else {
+			return manifestation.toString();
+		}
 	}
 }

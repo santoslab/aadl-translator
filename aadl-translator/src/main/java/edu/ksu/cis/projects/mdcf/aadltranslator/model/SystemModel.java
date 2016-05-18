@@ -2,6 +2,7 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -150,8 +151,11 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 		this.errorTypeModels = errorTypeModels;
 	}
 	
-	public Map<String, ManifestationTypeModel> getErrorTypes(){
-		return errorTypeModels;
+	public Set<String> getAllErrorTypes(){		
+		return errorTypeModels.values()
+				.stream()
+				.map(v -> v.getManifestationName())
+				.collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 	
 	public ManifestationTypeModel getErrorTypeModelByName(String name){

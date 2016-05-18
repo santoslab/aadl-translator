@@ -23,7 +23,7 @@ public class AwasTests {
 	// Enable to overwrite existing expected values
 	// Note that doing so will cause all tests to fail until this value is
 	// re-disabled.
-	private final static boolean GENERATE_EXPECTED = true;
+	private final static boolean GENERATE_EXPECTED = false;
 	private final static String EXPECTED_DIR = "awas/";
 
 	private static SystemModel systemModel;
@@ -50,7 +50,7 @@ public class AwasTests {
 
 	@Test
 	public void testTypes() {
-		runTest("ntypes", systemModel);
+		runTest("types", systemModel);
 		/*
 		 * for each subcomponent of the system
 		 *   for each port

@@ -1,5 +1,2 @@
 types
-  enum Error{
-  	SpO2DerivedAlarm, 
-  	SpO2DerivedAlarm, 
-  	IncSpO2OutSpO2InSpO2OutIncSpO2In}
+  enum Error{VIOLATEDCONSTRAINT, EARLY, HIGH, LATE, LOW}

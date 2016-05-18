@@ -4,11 +4,5 @@ spec(model) ::=<<
 
 types(model) ::=<<
 types
-  enum Error{<model.children.values:{c | 
-  	<c.ports.values : {p | <p.name>}>}; separator=", ">}
->>
-
-ntypes(model) ::=<<
-types
-  enum Error{<model.errorTypes.values:{e | <e.manifestationName>}; separator=", ">}
+  enum Error{<model.allErrorTypes:{e | <e>}; separator=", ">}
 >>
