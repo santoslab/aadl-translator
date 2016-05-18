@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -88,7 +89,7 @@ public abstract class ComponentModel<ChildType extends ComponentModel<?, ?>, Con
 	 * The set of fault classes that should be accounted for. Each component has
 	 * their own copy because it's modified when calculating missed fault classes.
 	 */
-	private Set<String> faultClasses;
+	private Set<String> faultClasses = new LinkedHashSet<>();
 
 	public ComponentModel() {
 		initHazardReportDiagrams();

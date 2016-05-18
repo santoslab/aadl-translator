@@ -13,7 +13,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ManifestationTyp
 public class ManifestationTypeModel {
 	private String name;
 	private ManifestationType manifestation;
-
+	
 	public ManifestationTypeModel(String name, ErrorType parentType) {
 		this.name = name;
 	}

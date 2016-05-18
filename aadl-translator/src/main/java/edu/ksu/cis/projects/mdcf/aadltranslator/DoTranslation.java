@@ -73,6 +73,7 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 	private final STGroup midas_appspecSTG = new STGroupFile("src/main/resources/templates/midas-appspec.stg");
 	private final STGroup report_overview = new STGroupFile("src/main/resources/templates/report-overview.stg");
 	private final STGroup report_element = new STGroupFile("src/main/resources/templates/report-element.stg");
+	private final STGroup awasSTG = new STGroupFile("src/main/resources/templates/awas.stg");
 
 	private final STGroup java_device_supertypeSTG = new STGroupFile(
 			"src/main/resources/templates/java-device-supertype.stg");
@@ -172,13 +173,6 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 
 		// 6.1) If selected, build the in-memory hazard analysis model
 		if (mode == Mode.HAZARD_ANALYSIS) {
-//			ErrorTranslator hazardAnalysis = new ErrorTranslator();
-//			HashSet<ErrorType> errors = getErrorTypes(rs, usedFiles);
-
-//			hazardAnalysis.setErrorType(errors);
-//			hazardAnalysis.setSystemModel(archTranslator.getSystemModel());
-//			hazardAnalysis.parseEMV2(archTranslator.getSystemModel(), archTranslator.getSystemImplementation());
-//			archTranslator.getChildren().forEach((model, classifier) -> hazardAnalysis.parseEMV2(model, classifier));
 
 			IProject proj = targetFile.getProject();
 			if (proj.getFolder("diagrams").exists()) {
@@ -305,8 +299,10 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		report_overview.registerRenderer(String.class, MarkdownLinkRenderer.getInstance());
 		report_element.registerRenderer(String.class, MarkdownLinkRenderer.getInstance());
 
+		//TODO: Can this be put in the elementReports map instead of being stored / printed separately?
 		String overview = report_overview.getInstanceOf("report").add("model", sysModel).render();
-
+		String awas = awasSTG.getInstanceOf("spec").add("model", sysModel).render();
+		
 		// We just use one element for testing, this will need to be expanded to
 		// a full DFS later
 		ComponentModel<?, ?> cm = sysModel.getChild("appLogic");
@@ -314,6 +310,10 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 				.add("name", "appLogic")
 				.add("timestamp", sysModel.getTimestamp()).render();
 		elementReports.put("appLogic", elem_report);
+		
+		// Put the AWAS file in
+		elementReports.put(sysModel.getName().concat(".awas"), awas);
+		
 
 		try {
 			URI reportHeaderURI = FileLocator.toFileURL(Platform.getBundle("edu.ksu.cis.projects.mdcf.aadl-translator")
