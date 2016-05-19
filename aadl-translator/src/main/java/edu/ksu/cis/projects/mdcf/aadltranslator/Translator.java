@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -100,6 +101,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.CausedDangerModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.DesignTimeDetectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorBehaviorModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ExternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.InternallyCausedDangerModel;
@@ -123,18 +125,18 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	};
 
 	private static final String FAULT_CLASSES_NAME = "StandardFaultClasses";
-	
+
 	private TranslationTarget target = null;
 	private SystemModel systemModel = null;
 	private ArrayList<String> propertySetNames = new ArrayList<>();
 	private ParseErrorReporterManager errorManager;
 	public SystemImplementation sysImpl;
-	private Map<ComponentModel<?, ?>, ComponentClassifier> children = new HashMap<>();
+	private Map<ComponentModel<?, ?>, ComponentClassifier> children = new LinkedHashMap<>();
 
 	/**
 	 * Error type name -> model
 	 */
-	private Map<String, ManifestationTypeModel> errorTypeModels = new HashMap<>();
+	private Map<String, ManifestationTypeModel> errorTypeModels = new LinkedHashMap<>();
 
 	/**
 	 * Error type set name -> collection of type models in the set
@@ -745,22 +747,79 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		private void handleErrorEvent(ErrorEvent evt) throws NotImplementedException, MissingRequiredPropertyException {
-			String evtName = evt.getName();
+			Set<ManifestationTypeModel> ecdms = new HashSet<>();
+			Set<InternallyCausedDangerModel> icdms = new HashSet<>();
+
+			for (TypeToken tt : evt.getTypeSet().getTypeTokens()) {
+				ecdms.addAll(componentModel.getSunkDangers().values().stream() // get
+																				// compensated
+																				// dangers
+						.map(v -> v.getSuccessorDanger().getErrors()) // get the
+																		// sets
+																		// of
+																		// errors
+																		// that
+																		// cause
+																		// them
+						.flatMap(w -> w.stream()) // flatten those sets into one
+													// collection
+						.filter(v -> v.getName().equals(EMV2Util.getName(tt))) // if
+																				// the
+																				// name
+																				// matches,
+																				// store
+																				// it.
+						.collect(Collectors.toSet()));
+				icdms.addAll(componentModel.getInternallyCausedDangers().values().stream()
+						.filter(v -> v.getFaultClasses().contains(EMV2Util.getName(tt))).collect(Collectors.toSet()));
+			}
+
+			if (ecdms.size() > 0 && icdms.size() > 0) { // Event is triggered by
+														// both fault and
+														// external event.
+				throw new NotImplementedException(
+						"Error events have to be associated with either internal or external problems, but not both.");
+			} else if (ecdms.size() > 0) { // Detectable external error
+				handleDetectableExternalEvent(evt);
+			} else if (icdms.size() > 0) { // Detectable internal fault
+				handleDetectableInternalEvent(evt);
+			}
+		}
+
+		private void handleDetectableInternalEvent(ErrorEvent evt) throws NotImplementedException {
+			String explanation = checkCustomEMV2Property(evt, "MAP_Error_Properties::DesignTimeFaultDetection",
+					PropertyType.RECORD, Collections.singletonList("Explanation"));
+			if (explanation == null) {
+				explanation = "(None Given)";
+			}
+			String approachStr = checkCustomEMV2Property(evt, "MAP_Error_Properties::DesignTimeFaultDetection",
+					PropertyType.RECORD, Collections.singletonList("FaultDetectionApproach"));
+			DesignTimeDetectionModel ddm = new DesignTimeDetectionModel(explanation, evt.getName(), approachStr);
+
+			// TODO: can this be optimized? Does it need to be?
+			for (CausedDangerModel cdm : getCausedDangerModelsByPropagationName(evt)) {
+				((InternallyCausedDangerModel) cdm).addDesignTimeDetection(ddm);
+			}
+
+		}
+
+		private void handleDetectableExternalEvent(ErrorEvent evt)
+				throws NotImplementedException, MissingRequiredPropertyException {
 			String explanation = checkCustomEMV2Property(evt, "MAP_Error_Properties::RuntimeErrorDetection",
 					PropertyType.RECORD, Collections.singletonList("Explanation"));
 			if (explanation == null) {
 				throw new MissingRequiredPropertyException(
 						"Runtime error detections, with an explanation, must be specified.");
 			}
-			String detectionApproachStr = checkCustomEMV2Property(evt, "MAP_Error_Properties::RuntimeErrorDetection",
+			String approachStr = checkCustomEMV2Property(evt, "MAP_Error_Properties::RuntimeErrorDetection",
 					PropertyType.RECORD, Collections.singletonList("ErrorDetectionApproach"));
-			if (detectionApproachStr == null) {
+			if (approachStr == null) {
 				throw new MissingRequiredPropertyException(
 						"Runtime error detections, with a detection approach, must be specified.");
 			}
-			RuntimeDetectionModel rdm = new RuntimeDetectionModel(detectionApproachStr, explanation, evtName);
-			// TODO: can this be optimized? Does it need to be?
+			RuntimeDetectionModel rdm = new RuntimeDetectionModel(explanation, evt.getName(), approachStr);
 
+			// TODO: can this be optimized? Does it need to be?
 			for (CausedDangerModel cdm : getCausedDangerModelsByPropagationName(evt)) {
 				cdm.addRuntimeDetection(rdm);
 			}
@@ -769,9 +828,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		private Set<CausedDangerModel> getCausedDangerModelsByPropagationName(ErrorEvent evt) {
 			Set<CausedDangerModel> ret = new LinkedHashSet<>();
 			for (CausedDangerModel cdm : componentModel.getCausedDangers().values()) {
-				PropagationModel pm = cdm.getSuccessorDanger();
 				for (TypeToken tt : evt.getTypeSet().getTypeTokens()) {
-					if (pm.getErrorByName(EMV2Util.getName(tt)) != null) {
+					if (((cdm instanceof NotDangerousDangerModel)
+							&& (cdm.getSuccessorDanger().getErrorByName(EMV2Util.getName(tt)) != null))
+							|| ((cdm instanceof InternallyCausedDangerModel) && (((InternallyCausedDangerModel) cdm)
+									.getFaultClasses().contains(EMV2Util.getName(tt))))) {
 						ret.add(cdm);
 					}
 				}
@@ -805,16 +866,20 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		private void handleErrorSource(ErrorSource source)
 				throws CoreException, NotImplementedException, MissingRequiredPropertyException {
+
+			// 1. Get the fault class, resulting error, and successor danger
 			TypeSet faultClass = source.getFailureModeType();
 			TypeSet resultingError = source.getTypeTokenConstraint();
 			PropagationModel succDanger = getPropFromTokens(source, resultingError.getTypeTokens(), false);
 
+			// 2. Parse the associated internally caused danger property
 			String interp = checkCustomEMV2Property(source, "MAP_Error_Properties::InternallyCausedDanger",
 					PropertyType.RECORD, Collections.singletonList("Explanation"));
 			if (interp == null) {
 				throw new MissingRequiredPropertyException("No matching InternallyCausedDanger found!");
 			}
 
+			// X. Create the model, and set its values
 			InternallyCausedDangerModel icdm = new InternallyCausedDangerModel(succDanger, interp,
 					Collections.emptySet());
 			setFaultClasses(faultClass, icdm);
@@ -969,7 +1034,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 *            The port these tokens are being propagated into or out of
 		 * @return The error type models referred to by the tokens
 		 */
-		private Collection<ManifestationTypeModel> getErrorModelsFromTokens(EList<TypeToken> tokens, PortModel portModel) {
+		private Collection<ManifestationTypeModel> getErrorModelsFromTokens(EList<TypeToken> tokens,
+				PortModel portModel) {
 			Collection<ManifestationTypeModel> errors = new LinkedHashSet<>();
 			for (TypeToken token : tokens) {
 				errors.add(portModel.getPropagatableErrorByName(EMV2Util.getName(token)));

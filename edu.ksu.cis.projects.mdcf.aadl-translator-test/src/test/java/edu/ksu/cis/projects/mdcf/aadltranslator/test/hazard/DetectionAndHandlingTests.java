@@ -46,7 +46,7 @@ public class DetectionAndHandlingTests {
 	}
 
 	@Test
-	public void testRuntimeErrorsExist() {
+	public void testRuntimeErrorDetectionsExist() {
 		assertEquals("TimestampViolation",
 				pmDangers.get("LateSpO2DoesNothing").getRuntimeDetection().iterator().next().getName());
 	}

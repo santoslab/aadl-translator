@@ -119,7 +119,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.STRendererTests;
 		AppSuperClassViewTests.class,
 		AppSpecViewTests.class,
 		STRendererTests.class,
-		AwasTests.class,
+//		AwasTests.class,
 })
 public class AllTests {
 	private static final Logger log = Logger

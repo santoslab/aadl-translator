@@ -151,7 +151,7 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 		this.errorTypeModels = errorTypeModels;
 	}
 	
-	public Set<String> getAllErrorTypes(){		
+	public Set<String> getAllErrorTypes(){
 		return errorTypeModels.values()
 				.stream()
 				.map(v -> v.getManifestationName())

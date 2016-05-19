@@ -64,34 +64,44 @@ ExternallyCausedDanger : record (
 	Explanation : aadlstring;
 ) applies to (all);
 
-Compensation : type aadlstring;
+--Compensation : type aadlstring;
 
+ErrorHandlingApproachType : type enumeration (Rollback, Rollforward, Compensation);
+
+-- Partially tested, no DesignTimeHandling or ControlledProcessState coverage
 InternallyCausedDanger : record (
 	ControlledProcessState : reference({emv2}** error type);
-	DesignTimeHandling : list of MAP_Error_Properties::Compensation;
+--	DesignTimeHandling : list of MAP_Error_Properties::Compensation;
 	Explanation : aadlstring;
 ) applies to (all);
 
+-- Tested
 RuntimeErrorDetection : record (
 	ErrorDetectionApproach : enumeration (Concurrent, Preemptive);
 	Explanation : aadlstring; 
 ) applies to (all);
 
+-- Tested
 RuntimeErrorHandling : record (
-	ErrorHandlingApproach : enumeration (Rollback, Rollforward, Compensation);
+	ErrorHandlingApproach : MAP_Error_Properties::ErrorHandlingApproachType;
+	Explanation : aadlstring;
+) applies to (all);
+
+DesignTimeFaultDetection : record (
+	FaultDetectionApproach : enumeration (StaticAnalysis, TheoremProving, ModelChecking, SymbolicExecution, Testing);
 	Explanation : aadlstring;
 ) applies to (all);
 
 RuntimeFaultHandling : record (
-	ErrorHandlingApproach : enumeration (Diagnosis, Isolation, Reconfiguration, Reinitialization);
+	FaultHandlingApproach : enumeration (Diagnosis, Isolation, Reconfiguration, Reinitialization);
+	ErrorHandlingApproach : MAP_Error_Properties::ErrorHandlingApproachType;
 	Explanation : aadlstring;
 ) applies to (all);
 
-
+-- Tested
 EliminatedFaults : record (
 	FaultTypes : list of reference({emv2}** error type);
 	Explanation : aadlstring;	
 ) applies to (all);
-
 
 end MAP_Error_Properties;

@@ -17,7 +17,13 @@ public class ModelUtil {
 		ROLLBACK, ROLLFORWARD, COMPENSATION,
 	};
 	
-	public static enum RuntimeErrorDetectionApproach {
-		CONCURRENT, PREEMPTIVE,
+	public static interface DetectionApproach {	};
+	
+	public static enum RuntimeErrorDetectionApproach implements DetectionApproach{
+		NOTSPECIFIED, CONCURRENT, PREEMPTIVE,
+	};
+	
+	public static enum DesignTimeFaultDetectionApproach implements DetectionApproach{
+		NOTSPECIFIED, STATICANALYSIS, THEOREMPROVING, MODELCHECKING, SYMBOLICEXECUTION, TESTING,
 	};
 }

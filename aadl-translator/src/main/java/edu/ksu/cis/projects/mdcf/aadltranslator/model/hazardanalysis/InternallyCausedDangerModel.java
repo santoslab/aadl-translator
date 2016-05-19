@@ -16,6 +16,7 @@ public class InternallyCausedDangerModel extends CausedDangerModel {
 	 * Fault class name -> Fault Class Model
 	 */
 	private Set<String> faultClasses = new LinkedHashSet<>();
+	private Set<DesignTimeDetectionModel> designTimeDetections = new LinkedHashSet<>();
 
 	public InternallyCausedDangerModel(PropagationModel succDanger, String interp,
 			Set<ManifestationTypeModel> cooccurringDangers) {
@@ -29,5 +30,13 @@ public class InternallyCausedDangerModel extends CausedDangerModel {
 
 	public Collection<String> getFaultClasses() {
 		return faultClasses;
+	}
+
+	public void addDesignTimeDetection(DesignTimeDetectionModel designTimeDetection) {
+		this.designTimeDetections.add(designTimeDetection);
+	}
+
+	public Set<DesignTimeDetectionModel> getDesignTimeDetections() {
+		return designTimeDetections;
 	}
 }

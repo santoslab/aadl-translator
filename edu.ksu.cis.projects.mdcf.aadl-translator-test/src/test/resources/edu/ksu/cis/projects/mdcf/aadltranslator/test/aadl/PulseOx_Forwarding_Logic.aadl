@@ -95,6 +95,11 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 --				);
 			] applies to BogusAlarmsArePossible;
 			
+			MAP_Error_Properties::DesignTimeFaultDetection => [
+				FaultDetectionApproach => Testing;
+				Explanation => "The PulseOx is poorly maintained, and reports bad values due to deterioration. It should be tested periodically to ensure proper functioning.";
+			] applies to PulseOxDeteriorates;
+			
 			MAP_Error_Properties::EliminatedFaults =>[
 				FaultTypes => (
 					reference(SoftwareBug), 

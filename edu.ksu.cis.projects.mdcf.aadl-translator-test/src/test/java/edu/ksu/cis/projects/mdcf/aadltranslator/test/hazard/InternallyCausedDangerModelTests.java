@@ -14,6 +14,8 @@ import org.junit.Test;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.DesignTimeFaultDetectionApproach;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.DesignTimeDetectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.InternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
@@ -54,25 +56,44 @@ public class InternallyCausedDangerModelTests {
 	public void testICDMCausedErrorExists() {
 		assertEquals(1, pmDangers.get("BogusAlarmsArePossible").getSuccessorDanger().getErrors().size());
 	}
-	
+
 	@Test
 	public void testICDMCausedErrorName() {
-		assertEquals("BogusAlarm", pmDangers.get("BogusAlarmsArePossible").getSuccessorDanger().getErrors().iterator().next().getName());
+		assertEquals("BogusAlarm",
+				pmDangers.get("BogusAlarmsArePossible").getSuccessorDanger().getErrors().iterator().next().getName());
 	}
-	
+
 	@Test
 	public void testICDMCausedErrorPortName() {
 		assertEquals("DerivedAlarm", pmDangers.get("BogusAlarmsArePossible").getSuccessorDanger().getPort().getName());
 	}
-	
+
 	@Test
 	public void testICDMFaultClass() {
 		assertTrue(pmDangers.get("BogusAlarmsArePossible").getFaultClasses().iterator().next().equals("Deterioration"));
-		//TODO: Add multiple fault classes? What should the semantics be? ie, and, or, somehow user specified, etc.
+		// TODO: Add multiple fault classes? What should the semantics be? ie,
+		// and, or, somehow user specified, etc.
 	}
-	
+
 	@Test
 	public void testICDMInterpretation() {
-		assertEquals("This is a placeholder explanation to test the InternallyCausedDanger property.", pmDangers.get("BogusAlarmsArePossible").getInterp());
+		assertEquals("This is a placeholder explanation to test the InternallyCausedDanger property.",
+				pmDangers.get("BogusAlarmsArePossible").getInterp());
+	}
+
+	@Test
+	public void testDTFDExists() {
+		assertEquals(1,	pmDangers.get("BogusAlarmsArePossible").getDesignTimeDetections().size());
+	}
+
+	@Test
+	public void testDTFDExplanation() {
+		assertEquals("The PulseOx is poorly maintained, and reports bad values due to deterioration. It should be tested periodically to ensure proper functioning.",	pmDangers.get("BogusAlarmsArePossible").getDesignTimeDetections().iterator().next().getExplanation());
+	}
+
+	@Test
+	public void testDTFDApproach() {
+		assertEquals(DesignTimeFaultDetectionApproach.TESTING,	pmDangers.get("BogusAlarmsArePossible").getDesignTimeDetections().iterator().next().getApproach());
+		assertEquals("TESTING",	pmDangers.get("BogusAlarmsArePossible").getDesignTimeDetections().iterator().next().getApproachStr());
 	}
 }
