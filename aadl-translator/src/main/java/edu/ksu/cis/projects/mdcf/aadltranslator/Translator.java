@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IResource;
@@ -112,6 +113,10 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.RuntimeDete
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.RuntimeHandlingModel;
 
 public final class Translator extends AadlProcessingSwitchWithProgress {
+	private enum DangerSource {
+		BOTH, INTERNAL, EXTERNAL
+	}
+
 	private enum ElementType {
 		SYSTEM, PROCESS, THREAD, SUBPROGRAM, DEVICE, NONE
 	};
@@ -682,24 +687,10 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 			try {
 				for (ErrorBehaviorTransition ebt : ebTrans) {
-					String name = ebt.getName();
-					String approachStr = checkCustomEMV2Property(ebt, "MAP_Error_Properties::RuntimeErrorHandling",
-							PropertyType.RECORD, Collections.singletonList("ErrorHandlingApproach"));
-					if (approachStr == null) {
-						throw new MissingRequiredPropertyException(
-								"All behavior transitions must have an approach specified via a RuntimeErrorHandling property");
-					}
-					String explanation = checkCustomEMV2Property(ebt, "MAP_Error_Properties::RuntimeErrorHandling",
-							PropertyType.RECORD, Collections.singletonList("Explanation"));
-					if (explanation == null) {
-						throw new MissingRequiredPropertyException(
-								"All behavior transitions must have an explanation specified via a RuntimeErrorHandling property");
-					}
-					RuntimeHandlingModel rhm = new RuntimeHandlingModel(name, approachStr, explanation);
-
 					List<ErrorEvent> events = new LinkedList<>();
 					ConditionExpression cond = ebt.getCondition();
 					OrExpression orCond;
+
 					while (cond instanceof OrExpression) {
 						orCond = (OrExpression) cond;
 						events.add((ErrorEvent) ((ConditionElement) (orCond).getOperands().get(1))
@@ -708,11 +699,54 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					}
 					events.add((ErrorEvent) ((ConditionElement) cond).getQualifiedErrorPropagationReference()
 							.getEmv2Target().getNamedElement());
+
+					DangerSource dangerSource = events.stream()
+							.reduce(typesAreInternalOrExternal(events.get(0).getTypeSet()), 
+									(accumDS, evt) -> typesAreInternalOrExternal(evt.getTypeSet()) == accumDS ? accumDS : null,
+							(accDS1, accDS2) -> accDS1 == accDS2 ? accDS1 : null);
+
+					
+					String kind = null;
+					if(dangerSource == DangerSource.INTERNAL){
+						kind = "Fault";
+					} else if (dangerSource == DangerSource.EXTERNAL){
+						kind = "Error";
+					} else {
+						throw new NotImplementedException("Error behavior transitions must not mix internal and external dangers.");
+					}
+
+					String errorApproachStr = checkCustomEMV2Property(ebt,
+							"MAP_Error_Properties::Runtime" + kind + "Handling", PropertyType.RECORD,
+							Collections.singletonList("ErrorHandlingApproach"));
+					if (errorApproachStr == null) {
+						errorApproachStr = "NOTSPECIFIED";
+					}
+					String explanation = checkCustomEMV2Property(ebt,
+							"MAP_Error_Properties::Runtime" + kind + "Handling", PropertyType.RECORD,
+							Collections.singletonList("Explanation"));
+					if (explanation == null) {
+						throw new MissingRequiredPropertyException(
+								"All behavior transitions associated with externally caused problems must have an explanation specified via a Runtime"
+										+ kind + "Handling property");
+					}
+					RuntimeHandlingModel rhm = new RuntimeHandlingModel(ebt.getName(), errorApproachStr, explanation);
+
+					if(dangerSource == DangerSource.INTERNAL){
+						String faultApproachStr = checkCustomEMV2Property(ebt,
+								"MAP_Error_Properties::RuntimeFaultHandling", PropertyType.RECORD,
+								Collections.singletonList("FaultHandlingApproach"));
+						if (faultApproachStr == null) {
+							faultApproachStr = "NOTSPECIFIED";
+						}
+						rhm.setFaultHandlingApproach(faultApproachStr);
+					}
+					
 					for (ErrorEvent evt : events) {
 						for (CausedDangerModel cdm : getCausedDangerModelsByPropagationName(evt)) {
 							cdm.addRuntimeHandling(rhm);
 						}
 					}
+
 				}
 			} catch (NotImplementedException | MissingRequiredPropertyException e) {
 				handleException(obj, e);
@@ -747,43 +781,45 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		private void handleErrorEvent(ErrorEvent evt) throws NotImplementedException, MissingRequiredPropertyException {
+			TypeSet ts = evt.getTypeSet();
+			DangerSource dangerSource = typesAreInternalOrExternal(ts);
+			if (dangerSource == DangerSource.BOTH) {
+				throw new NotImplementedException(
+						"Error events have to be associated with either internal or external problems, but not both.");
+			} else if (dangerSource == DangerSource.EXTERNAL) {
+				handleDetectableExternalEvent(evt);
+			} else if (dangerSource == DangerSource.INTERNAL) {
+				handleDetectableInternalEvent(evt);
+			}
+		}
+
+		private DangerSource typesAreInternalOrExternal(TypeSet ts) {
 			Set<ManifestationTypeModel> ecdms = new HashSet<>();
 			Set<InternallyCausedDangerModel> icdms = new HashSet<>();
-
-			for (TypeToken tt : evt.getTypeSet().getTypeTokens()) {
-				ecdms.addAll(componentModel.getSunkDangers().values().stream() // get
-																				// compensated
-																				// dangers
-						.map(v -> v.getSuccessorDanger().getErrors()) // get the
-																		// sets
-																		// of
-																		// errors
-																		// that
-																		// cause
-																		// them
-						.flatMap(w -> w.stream()) // flatten those sets into one
-													// collection
-						.filter(v -> v.getName().equals(EMV2Util.getName(tt))) // if
-																				// the
-																				// name
-																				// matches,
-																				// store
-																				// it.
-						.collect(Collectors.toSet()));
+			for (TypeToken tt : ts.getTypeTokens()) {
+				// get compensated dangers
+				ecdms.addAll(componentModel.getSunkDangers().values().stream()
+						// get the sets of errors that cause them
+						.map(v -> v.getSuccessorDanger().getErrors())
+						// flatten those sets into one collection
+						.flatMap(w -> w.stream())
+						// if the name matches, store it.
+						.filter(v -> v.getName().equals(EMV2Util.getName(tt))).collect(Collectors.toSet()));
 				icdms.addAll(componentModel.getInternallyCausedDangers().values().stream()
 						.filter(v -> v.getFaultClasses().contains(EMV2Util.getName(tt))).collect(Collectors.toSet()));
 			}
-
-			if (ecdms.size() > 0 && icdms.size() > 0) { // Event is triggered by
-														// both fault and
-														// external event.
-				throw new NotImplementedException(
-						"Error events have to be associated with either internal or external problems, but not both.");
-			} else if (ecdms.size() > 0) { // Detectable external error
-				handleDetectableExternalEvent(evt);
-			} else if (icdms.size() > 0) { // Detectable internal fault
-				handleDetectableInternalEvent(evt);
+			DangerSource kind = null;
+			if (ecdms.size() > 0 && icdms.size() > 0) {
+				// Event is triggered by both fault and external event.
+				kind = DangerSource.BOTH;
+			} else if (ecdms.size() > 0) {
+				// Detectable external error
+				kind = DangerSource.EXTERNAL;
+			} else if (icdms.size() > 0) {
+				// Detectable internal fault
+				kind = DangerSource.INTERNAL;
 			}
+			return kind;
 		}
 
 		private void handleDetectableInternalEvent(ErrorEvent evt) throws NotImplementedException {

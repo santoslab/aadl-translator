@@ -54,6 +54,10 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 					TimeoutViolation or
 					TimestampViolation
 				]-> NoOutput;
+				
+				ClinicianTurnsOffPulseOx : Normal -[
+					PulseOxDeteriorates
+				]-> NoOutput;
 		end component;
 		properties
 			MAP_Error_Properties::ExternallyCausedDanger => [
@@ -99,6 +103,12 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 				FaultDetectionApproach => Testing;
 				Explanation => "The PulseOx is poorly maintained, and reports bad values due to deterioration. It should be tested periodically to ensure proper functioning.";
 			] applies to PulseOxDeteriorates;
+			
+			MAP_Error_Properties::RuntimeFaultHandling => [
+				FaultHandlingApproach => Diagnosis;
+				ErrorHandlingApproach => Rollforward;
+				Explanation => "The nurse sees that the pulse oximeter has deteriorated and turns it off.";
+			] applies to ClinicianTurnsOffPulseOx;
 			
 			MAP_Error_Properties::EliminatedFaults =>[
 				FaultTypes => (

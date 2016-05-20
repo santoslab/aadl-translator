@@ -71,7 +71,6 @@ ErrorHandlingApproachType : type enumeration (Rollback, Rollforward, Compensatio
 -- Partially tested, no DesignTimeHandling or ControlledProcessState coverage
 InternallyCausedDanger : record (
 	ControlledProcessState : reference({emv2}** error type);
---	DesignTimeHandling : list of MAP_Error_Properties::Compensation;
 	Explanation : aadlstring;
 ) applies to (all);
 
@@ -87,11 +86,13 @@ RuntimeErrorHandling : record (
 	Explanation : aadlstring;
 ) applies to (all);
 
+-- Tested
 DesignTimeFaultDetection : record (
 	FaultDetectionApproach : enumeration (StaticAnalysis, TheoremProving, ModelChecking, SymbolicExecution, Testing);
 	Explanation : aadlstring;
 ) applies to (all);
 
+-- Tested
 RuntimeFaultHandling : record (
 	FaultHandlingApproach : enumeration (Diagnosis, Isolation, Reconfiguration, Reinitialization);
 	ErrorHandlingApproach : MAP_Error_Properties::ErrorHandlingApproachType;

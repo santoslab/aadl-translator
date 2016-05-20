@@ -12,10 +12,11 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.DesignTimeFaultDetectionApproach;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.RuntimeErrorHandlingApproach;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.RuntimeFaultHandlingApproach;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.DesignTimeFaultDetectionApproach;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.DesignTimeDetectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.InternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 
@@ -79,21 +80,5 @@ public class InternallyCausedDangerModelTests {
 	public void testICDMInterpretation() {
 		assertEquals("This is a placeholder explanation to test the InternallyCausedDanger property.",
 				pmDangers.get("BogusAlarmsArePossible").getInterp());
-	}
-
-	@Test
-	public void testDTFDExists() {
-		assertEquals(1,	pmDangers.get("BogusAlarmsArePossible").getDesignTimeDetections().size());
-	}
-
-	@Test
-	public void testDTFDExplanation() {
-		assertEquals("The PulseOx is poorly maintained, and reports bad values due to deterioration. It should be tested periodically to ensure proper functioning.",	pmDangers.get("BogusAlarmsArePossible").getDesignTimeDetections().iterator().next().getExplanation());
-	}
-
-	@Test
-	public void testDTFDApproach() {
-		assertEquals(DesignTimeFaultDetectionApproach.TESTING,	pmDangers.get("BogusAlarmsArePossible").getDesignTimeDetections().iterator().next().getApproach());
-		assertEquals("TESTING",	pmDangers.get("BogusAlarmsArePossible").getDesignTimeDetections().iterator().next().getApproachStr());
 	}
 }

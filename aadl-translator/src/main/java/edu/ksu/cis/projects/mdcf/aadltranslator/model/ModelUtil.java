@@ -13,8 +13,14 @@ public class ModelUtil {
 		CONTENT, HIGH, LOW, TIMING, EARLY, LATE, HALTED, ERRATIC, VIOLATEDCONSTRAINT 
 	};
 	
-	public static enum RuntimeErrorHandlingApproach {
-		ROLLBACK, ROLLFORWARD, COMPENSATION,
+	public static interface HandlingApproach { };
+	
+	public static enum RuntimeErrorHandlingApproach implements HandlingApproach{
+		NOTSPECIFIED, ROLLBACK, ROLLFORWARD, COMPENSATION,
+	};
+	
+	public static enum RuntimeFaultHandlingApproach implements HandlingApproach{
+		NOTSPECIFIED, DIAGNOSIS, ISOLATION, RECONFIGURATION, REINITIALIZATION,
 	};
 	
 	public static interface DetectionApproach {	};
