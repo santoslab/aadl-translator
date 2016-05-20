@@ -24,6 +24,7 @@ import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AbstractNamedValue;
+import org.osate.aadl2.AbstractSubcomponent;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
@@ -652,6 +653,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 			return NOT_DONE;
 		}
+		
+		@Override
+		public String caseAbstractSubcomponent(AbstractSubcomponent obj){
+			return NOT_DONE;
+		}
 
 		private void handleErrorStates(ComponentClassifier obj) throws CoreException {
 			ErrorBehaviorState init = null;
@@ -700,6 +706,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					events.add((ErrorEvent) ((ConditionElement) cond).getQualifiedErrorPropagationReference()
 							.getEmv2Target().getNamedElement());
 
+					// Set dangerSource to internal or external depending on the events.
 					DangerSource dangerSource = events.stream()
 							.reduce(typesAreInternalOrExternal(events.get(0).getTypeSet()), 
 									(accumDS, evt) -> typesAreInternalOrExternal(evt.getTypeSet()) == accumDS ? accumDS : null,
