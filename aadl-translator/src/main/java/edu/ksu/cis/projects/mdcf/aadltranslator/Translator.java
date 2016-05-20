@@ -2,6 +2,7 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -127,7 +128,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	};
 
 	private enum PropertyType {
-		ENUM, INT, RANGE_MIN, RANGE_MAX, STRING, RECORD
+		ENUM, INT, RANGE_MIN, RANGE_MAX, STRING, RECORD, LIST
 	};
 
 	private static final String FAULT_CLASSES_NAME = "StandardFaultClasses";
@@ -653,9 +654,16 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 			return NOT_DONE;
 		}
-		
+
 		@Override
-		public String caseAbstractSubcomponent(AbstractSubcomponent obj){
+		public String caseAbstractSubcomponent(AbstractSubcomponent obj) {
+			try {
+				String accLevelName = checkCustomEMV2Property(obj, "MAP_Error_Properties::Fundamentals",
+						Arrays.asList(PropertyType.LIST, PropertyType.RECORD), Arrays.asList("0", "Name"));
+			} catch (NotImplementedException | CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return NOT_DONE;
 		}
 
@@ -706,31 +714,34 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					events.add((ErrorEvent) ((ConditionElement) cond).getQualifiedErrorPropagationReference()
 							.getEmv2Target().getNamedElement());
 
-					// Set dangerSource to internal or external depending on the events.
+					// Set dangerSource to internal or external depending on the
+					// events.
 					DangerSource dangerSource = events.stream()
-							.reduce(typesAreInternalOrExternal(events.get(0).getTypeSet()), 
-									(accumDS, evt) -> typesAreInternalOrExternal(evt.getTypeSet()) == accumDS ? accumDS : null,
+							.reduce(typesAreInternalOrExternal(
+									events.get(0).getTypeSet()),
+							(accumDS, evt) -> typesAreInternalOrExternal(evt.getTypeSet()) == accumDS ? accumDS : null,
 							(accDS1, accDS2) -> accDS1 == accDS2 ? accDS1 : null);
 
-					
 					String kind = null;
-					if(dangerSource == DangerSource.INTERNAL){
+					if (dangerSource == DangerSource.INTERNAL) {
 						kind = "Fault";
-					} else if (dangerSource == DangerSource.EXTERNAL){
+					} else if (dangerSource == DangerSource.EXTERNAL) {
 						kind = "Error";
 					} else {
-						throw new NotImplementedException("Error behavior transitions must not mix internal and external dangers.");
+						throw new NotImplementedException(
+								"Error behavior transitions must not mix internal and external dangers.");
 					}
 
 					String errorApproachStr = checkCustomEMV2Property(ebt,
-							"MAP_Error_Properties::Runtime" + kind + "Handling", PropertyType.RECORD,
+							"MAP_Error_Properties::Runtime" + kind + "Handling",
+							Collections.singletonList(PropertyType.RECORD),
 							Collections.singletonList("ErrorHandlingApproach"));
 					if (errorApproachStr == null) {
 						errorApproachStr = "NOTSPECIFIED";
 					}
 					String explanation = checkCustomEMV2Property(ebt,
-							"MAP_Error_Properties::Runtime" + kind + "Handling", PropertyType.RECORD,
-							Collections.singletonList("Explanation"));
+							"MAP_Error_Properties::Runtime" + kind + "Handling",
+							Collections.singletonList(PropertyType.RECORD), Collections.singletonList("Explanation"));
 					if (explanation == null) {
 						throw new MissingRequiredPropertyException(
 								"All behavior transitions associated with externally caused problems must have an explanation specified via a Runtime"
@@ -738,16 +749,17 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					}
 					RuntimeHandlingModel rhm = new RuntimeHandlingModel(ebt.getName(), errorApproachStr, explanation);
 
-					if(dangerSource == DangerSource.INTERNAL){
+					if (dangerSource == DangerSource.INTERNAL) {
 						String faultApproachStr = checkCustomEMV2Property(ebt,
-								"MAP_Error_Properties::RuntimeFaultHandling", PropertyType.RECORD,
+								"MAP_Error_Properties::RuntimeFaultHandling",
+								Collections.singletonList(PropertyType.RECORD),
 								Collections.singletonList("FaultHandlingApproach"));
 						if (faultApproachStr == null) {
 							faultApproachStr = "NOTSPECIFIED";
 						}
 						rhm.setFaultHandlingApproach(faultApproachStr);
 					}
-					
+
 					for (ErrorEvent evt : events) {
 						for (CausedDangerModel cdm : getCausedDangerModelsByPropagationName(evt)) {
 							cdm.addRuntimeHandling(rhm);
@@ -787,7 +799,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 		}
 
-		private void handleErrorEvent(ErrorEvent evt) throws NotImplementedException, MissingRequiredPropertyException {
+		private void handleErrorEvent(ErrorEvent evt) throws NotImplementedException, MissingRequiredPropertyException, CoreException {
 			TypeSet ts = evt.getTypeSet();
 			DangerSource dangerSource = typesAreInternalOrExternal(ts);
 			if (dangerSource == DangerSource.BOTH) {
@@ -829,14 +841,15 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			return kind;
 		}
 
-		private void handleDetectableInternalEvent(ErrorEvent evt) throws NotImplementedException {
+		private void handleDetectableInternalEvent(ErrorEvent evt) throws NotImplementedException, CoreException {
 			String explanation = checkCustomEMV2Property(evt, "MAP_Error_Properties::DesignTimeFaultDetection",
-					PropertyType.RECORD, Collections.singletonList("Explanation"));
+					Collections.singletonList(PropertyType.RECORD), Collections.singletonList("Explanation"));
 			if (explanation == null) {
 				explanation = "(None Given)";
 			}
 			String approachStr = checkCustomEMV2Property(evt, "MAP_Error_Properties::DesignTimeFaultDetection",
-					PropertyType.RECORD, Collections.singletonList("FaultDetectionApproach"));
+					Collections.singletonList(PropertyType.RECORD),
+					Collections.singletonList("FaultDetectionApproach"));
 			DesignTimeDetectionModel ddm = new DesignTimeDetectionModel(explanation, evt.getName(), approachStr);
 
 			// TODO: can this be optimized? Does it need to be?
@@ -847,15 +860,16 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		private void handleDetectableExternalEvent(ErrorEvent evt)
-				throws NotImplementedException, MissingRequiredPropertyException {
+				throws NotImplementedException, MissingRequiredPropertyException, CoreException {
 			String explanation = checkCustomEMV2Property(evt, "MAP_Error_Properties::RuntimeErrorDetection",
-					PropertyType.RECORD, Collections.singletonList("Explanation"));
+					Collections.singletonList(PropertyType.RECORD), Collections.singletonList("Explanation"));
 			if (explanation == null) {
 				throw new MissingRequiredPropertyException(
 						"Runtime error detections, with an explanation, must be specified.");
 			}
 			String approachStr = checkCustomEMV2Property(evt, "MAP_Error_Properties::RuntimeErrorDetection",
-					PropertyType.RECORD, Collections.singletonList("ErrorDetectionApproach"));
+					Collections.singletonList(PropertyType.RECORD),
+					Collections.singletonList("ErrorDetectionApproach"));
 			if (approachStr == null) {
 				throw new MissingRequiredPropertyException(
 						"Runtime error detections, with a detection approach, must be specified.");
@@ -917,7 +931,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 			// 2. Parse the associated internally caused danger property
 			String interp = checkCustomEMV2Property(source, "MAP_Error_Properties::InternallyCausedDanger",
-					PropertyType.RECORD, Collections.singletonList("Explanation"));
+					Collections.singletonList(PropertyType.RECORD), Collections.singletonList("Explanation"));
 			if (interp == null) {
 				throw new MissingRequiredPropertyException("No matching InternallyCausedDanger found!");
 			}
@@ -956,7 +970,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			manifestation = getPropFromTokens(path, incomingErrors.getTypeTokens(), true);
 			succDanger = getPropFromTokens(path, outgoingErrors.getTypeTokens(), false);
 			String interp = checkCustomEMV2Property(path, "MAP_Error_Properties::ExternallyCausedDanger",
-					PropertyType.RECORD, Collections.singletonList("Explanation"));
+					Collections.singletonList(PropertyType.RECORD), Collections.singletonList("Explanation"));
 			if (interp == null) {
 				throw new MissingRequiredPropertyException("No matching ExternallyCausedDanger found!");
 			}
@@ -972,7 +986,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 * @param propName
 		 *            The fully qualified name of the property
 		 * @param propType
-		 *            The type of the property
+		 *            The types of the properties that are associated with each
+		 *            element of the path list
 		 * @param path
 		 *            The keys that should be used to navigate through the
 		 *            record property, or null if the property isn't a record
@@ -981,38 +996,46 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 * @throws NotImplementedException
 		 *             Thrown if the property usage isn't supported by the
 		 *             translator
+		 * @throws CoreException
+		 *             Thrown if the caller uses different-length lists for
+		 *             propTypes and path
 		 */
-		private String checkCustomEMV2Property(NamedElement elem, String propName, PropertyType propType,
-				List<String> path) throws NotImplementedException {
-			if (propType == PropertyType.RECORD) {
-				List<EMV2PropertyAssociation> pas = EMV2Properties.getProperty(propName, elem.getContainingClassifier(),
-						elem, null);
-				if (pas.size() == 0) {
-					return null;
-				} else if (pas.size() > 1) {
-					throw new NotImplementedException(
-							"Multiple externally caused dangers associated with one error flow path!");
+		private String checkCustomEMV2Property(NamedElement elem, String propName, List<PropertyType> propTypes,
+				List<String> path) throws NotImplementedException, CoreException {
+
+			if (path.size() != propTypes.size()) {
+				throw new CoreException("Path and proptype list sizes don't match!");
+			}
+
+			List<EMV2PropertyAssociation> pas = EMV2Properties.getProperty(propName, elem.getContainingClassifier(),
+					elem, null);
+			if (pas.size() == 0) {
+				return null;
+			} else if (pas.size() > 1) {
+				throw new NotImplementedException(
+						"Mutliple properties are associated with this element, but only one was expected");
+			}
+
+			PropertyExpression prex = EMV2Properties.getPropertyValue(pas.get(0));
+			for (int i = 0; i < path.size(); i++) {
+				if(propTypes.get(i) == PropertyType.RECORD){
+					prex = (PropertyUtils.getRecordFieldValue((RecordValue) prex, path.get(i)));
+				} else if (propTypes.get(i) == PropertyType.LIST) {
+					prex = ((ListValue)prex).getOwnedListElements().get(Integer.valueOf(path.get(i)));
 				}
-				RecordValue rv = (RecordValue) EMV2Properties.getPropertyValue(pas.get(0));
-				if (path.size() == 1) {
-					PropertyExpression val = (PropertyUtils.getRecordFieldValue(rv, path.get(0)));
-					if (val instanceof StringLiteral) {
-						return ((StringLiteral) val).getValue();
-					} else if (val instanceof NamedValue) {
-						// check for enum literal, and maybe constant?
-						AbstractNamedValue anv = ((NamedValue) val).getNamedValue();
-						if (anv instanceof EnumerationLiteral) {
-							return ((EnumerationLiteral) anv).getName();
-						}
-						return null;
-					} else {
-						return null;
-					}
-				} else {
-					return checkCustomEMV2Property(elem, propName, propType, path.subList(1, path.size()));
+			} 
+						
+			if (prex instanceof StringLiteral) {
+				return ((StringLiteral) prex).getValue();
+			} else if (prex instanceof NamedValue) {
+				// check for enum literal, and maybe constant?
+				AbstractNamedValue anv = ((NamedValue) prex).getNamedValue();
+				if (anv instanceof EnumerationLiteral) {
+					return ((EnumerationLiteral) anv).getName();
 				}
+				return null;
 			} else {
-				throw new NotImplementedException("Tried to parse garbage PropType: " + propType);
+				return null;
 			}
 		}
 

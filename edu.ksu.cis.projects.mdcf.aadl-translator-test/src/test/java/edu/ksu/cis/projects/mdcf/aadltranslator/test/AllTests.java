@@ -75,13 +75,13 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.device.DeviceEIAADLSystemEr
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.DetectionAndHandlingTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.EliminatedFaultsTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.ExternallyCausedDangerModelTests;
+import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.HazardPreliminariesTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.InternallyCausedDangerModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.NotDangerousDangerModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.PropagatableErrorTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.util.MarkdownLinkRenderer;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSpecViewTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
-import edu.ksu.cis.projects.mdcf.aadltranslator.view.AwasTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.STRendererTests;
 
 @RunWith(Suite.class)

@@ -36,7 +36,7 @@ public class ControllerErrorTests {
 		usedProperties.add("PulseOx_ForwardingNoChannelDelay_Properties");
 		runArchTransTest("PulseOxNoChannelDelay", "PulseOx_Forwarding_System");
 		assertEquals(
-				"Error at PulseOx_Forwarding_System.aadl:20: Missing required property 'Default_Channel_Delay'",
+				"Error at PulseOx_Forwarding_System.aadl:23: Missing required property 'Default_Channel_Delay'",
 				errorSB.toString().trim());
 	}
 

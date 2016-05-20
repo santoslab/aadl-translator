@@ -19,6 +19,7 @@ Abbreviation : type record (
 -- =================================== --
 
 Accident_Level : type record (
+	Name : aadlstring;
 	Level : aadlinteger;
 	Description: aadlstring;
 	Explanations : list of aadlstring;
@@ -26,6 +27,7 @@ Accident_Level : type record (
 );
 
 Accident : type record (
+	Name : aadlstring;
 	Description : aadlstring;
 	Explanations : list of aadlstring;
 	Hazards : list of MAP_Error_Properties::Hazard;
@@ -47,6 +49,7 @@ Constraint: type record (
 	Name : aadlstring;
 	Description : aadlstring;
 	ErrorType : reference({emv2}** error type);
+	Explanations : list of aadlstring;
 );
 
 Fundamentals : list of MAP_Error_Properties::Accident_Level applies to (all);

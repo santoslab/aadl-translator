@@ -62,7 +62,7 @@ with EMV2, MAP_Error_Properties;
 --		);
 --	];
 	
-	ECCMemory : constant MAP_Error_Properties::Compensation => "Use error-correcting code memory";
-	Shielding : constant MAP_Error_Properties::Compensation => "Shield the device from cosmic rays";
+--	ECCMemory : constant MAP_Error_Properties::Compensation => "Use error-correcting code memory";
+--	Shielding : constant MAP_Error_Properties::Compensation => "Shield the device from cosmic rays";
 	
 end PulseOx_Forwarding_Error_Properties;
