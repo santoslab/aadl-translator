@@ -64,22 +64,22 @@ public class HazardPreliminariesTests {
 		assertArrayEquals(explanations.toArray(), systemModel.getAccidentByName(ACCIDENT_NAME).getExplanations().toArray());
 	}
 
-//	@Test
-//	public void testHazard() {
-//		assertEquals(2, systemModel.getHazards().size());
-//		assertEquals(HAZARD_NAME, systemModel.getHazardByName(HAZARD_NAME).getName());
-//		assertEquals("Incorrect information is sent to the display.",
-//				systemModel.getHazardByName(HAZARD_NAME).getDescription());
-//	}
-//
-//	@Test
-//	public void testConstraint() {
-//		assertEquals(2, systemModel.getConstraints().size());
-//		assertEquals(CONSTRAINT_NAME, systemModel.getConstraintByName(CONSTRAINT_NAME).getName());
-//		assertEquals(
-//				"The app must accurately inform the display of the status of the patient's"
-//						+ " vital signs.", systemModel
-//						.getConstraintByName(CONSTRAINT_NAME).getDescription());
-//		assertArrayEquals(explanations.toArray(), systemModel.getConstraintByName(CONSTRAINT_NAME).getExplanations().toArray());
-//	}
+	@Test
+	public void testHazard() {
+		assertEquals(2, systemModel.getHazards().size());
+		assertEquals(HAZARD_NAME, systemModel.getHazardByName(HAZARD_NAME).getName());
+		assertEquals("Incorrect information is sent to the display.",
+				systemModel.getHazardByName(HAZARD_NAME).getDescription());
+	}
+
+	@Test
+	public void testConstraint() {
+		assertEquals(2, systemModel.getConstraints().size());
+		assertEquals(CONSTRAINT_NAME, systemModel.getConstraintByName(CONSTRAINT_NAME).getName());
+		assertEquals(
+				"The app must accurately inform the display of the status of the patient's"
+						+ " vital signs.", systemModel
+						.getConstraintByName(CONSTRAINT_NAME).getDescription());
+		assertArrayEquals(explanations.toArray(), systemModel.getConstraintByName(CONSTRAINT_NAME).getExplanations().toArray());
+	}
 }
