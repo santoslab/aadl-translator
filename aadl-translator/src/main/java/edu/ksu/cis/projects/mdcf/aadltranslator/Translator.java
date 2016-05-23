@@ -2,7 +2,6 @@ package edu.ksu.cis.projects.mdcf.aadltranslator;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -14,7 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IResource;
@@ -37,6 +35,7 @@ import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.EventDataPort;
+import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ListValue;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NamedValue;
@@ -103,6 +102,8 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemConnectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.TaskModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentLevelModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AccidentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.CausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.DesignTimeDetectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ErrorBehaviorModel;
@@ -113,6 +114,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.NotDangerou
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.RuntimeDetectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.RuntimeHandlingModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.StpaPreliminaryModel;
 
 public final class Translator extends AadlProcessingSwitchWithProgress {
 	private enum DangerSource {
@@ -658,13 +660,117 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		@Override
 		public String caseAbstractSubcomponent(AbstractSubcomponent obj) {
 			try {
-				String accLevelName = checkCustomEMV2Property(obj, "MAP_Error_Properties::Fundamentals",
-						Arrays.asList(PropertyType.LIST, PropertyType.RECORD), Arrays.asList("0", "Name"));
-			} catch (NotImplementedException | CoreException e) {
+				handleFundamentalsProperties(obj);
+			} catch (NotImplementedException | CoreException | DuplicateElementException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return NOT_DONE;
+		}
+
+		private void handleFundamentalsProperties(AbstractSubcomponent obj)
+				throws NotImplementedException, CoreException, DuplicateElementException {
+
+			// Initialize counters -- these get set and reset by the loops below
+			int accidentLevelNumber = 0;
+			int accidentNumber = 0;
+			int hazardNumber = 0;
+			int constraintNumber = 0;
+
+			// Declare models uptop rather than within the loops
+			AccidentModel accidentModel;
+			AccidentLevelModel accidentLevelModel;
+
+			// Declare and initialize the proptypes and path list.
+			// These are paths through the full fundamentals structure, and are
+			// read from low index (top of fundamentals tree) to high index
+			// (leaves of fund. tree)
+			List<PropertyType> propTypes = new ArrayList<PropertyType>();
+			List<String> path = new ArrayList<String>();
+
+			// Initialize values for parsing the accident model: outer structure
+			// is a list
+			propTypes.add(PropertyType.LIST);
+			// And we want the first one (index 0)
+			path.add(String.valueOf(accidentLevelNumber));
+			// Create the model
+			accidentLevelModel = new AccidentLevelModel();
+			// Parse the common values
+			handleFundamentalsProperty(obj, accidentLevelModel, propTypes, path);
+
+			while (accidentLevelModel != null) {
+				// If we're here, we know we have an accident level, so we add
+				// the AccidentLevel Unique feature (number)
+				accidentLevelModel.setNumber(accidentLevelNumber + 1);
+				// And add the whole thing to the model
+				systemModel.addAccidentLevel(accidentLevelModel);
+
+				// Now we parse the accidents associated with this accident
+				// level. First, this involves extending the path and proptypes
+				propTypes.add(PropertyType.RECORD);
+				path.add("Accidents");
+				propTypes.add(PropertyType.LIST);
+				path.add(String.valueOf(accidentNumber));
+				// Initializing our model
+				accidentModel = new AccidentModel();
+				// And filling in the known values
+				handleFundamentalsProperty(obj, accidentModel, propTypes, path);
+				while (accidentModel != null) {
+					// If we're here, we know we have an accident
+					accidentModel.setParent(accidentLevelModel);
+					systemModel.addAccident(accidentModel);
+
+					path.set(path.size() - 1, String.valueOf(accidentNumber++));
+					accidentModel = new AccidentModel();
+					handleFundamentalsProperty(obj, accidentModel, propTypes, path);
+				}
+				// By this point, we've parsed all the accidents (and their
+				// children), so we reset the path and propTypes so we can
+				// examine the next accident level model.
+				path.remove(path.size() - 1);
+				propTypes.remove(propTypes.size() - 1);
+				path.remove(path.size() - 1);
+				propTypes.remove(propTypes.size() - 1);
+
+				path.set(path.size() - 1, String.valueOf(accidentLevelNumber++));
+				accidentLevelModel = new AccidentLevelModel();
+				handleFundamentalsProperty(obj, accidentLevelModel, propTypes, path);
+			}
+		}
+
+		private void handleFundamentalsProperty(AbstractSubcomponent obj, StpaPreliminaryModel prelim,
+				List<PropertyType> propTypes, List<String> path) throws NotImplementedException, CoreException {
+			final String PROP_NAME = "MAP_Error_Properties::Fundamentals";
+
+			propTypes.add(PropertyType.RECORD);
+			path.add("Name");
+			String name = checkCustomEMV2Property(obj, PROP_NAME, propTypes, path);
+
+			path.set(path.size() - 1, "Description");
+			String desc = checkCustomEMV2Property(obj, PROP_NAME, propTypes, path);
+
+			if (name == null || desc == null) {
+				prelim = null;
+				return;
+			}
+
+			path.set(path.size() - 1, "Explanations");
+			path.add("0");
+			propTypes.add(PropertyType.LIST);
+			String accLevelExp = checkCustomEMV2Property(obj, PROP_NAME, propTypes, path);
+			int i = 1;
+			while (accLevelExp != null) {
+				prelim.addExplanation(accLevelExp);
+				path.set(path.size() - 1, String.valueOf(i));
+				accLevelExp = checkCustomEMV2Property(obj, PROP_NAME, propTypes, path);
+				i++;
+			}
+			path.remove(path.size() - 1);
+			path.remove(path.size() - 1);
+			propTypes.remove(propTypes.size() - 1);
+			propTypes.remove(propTypes.size() - 1);
+			prelim.setName(name);
+			prelim.setDescription(desc);
 		}
 
 		private void handleErrorStates(ComponentClassifier obj) throws CoreException {
@@ -799,7 +905,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 		}
 
-		private void handleErrorEvent(ErrorEvent evt) throws NotImplementedException, MissingRequiredPropertyException, CoreException {
+		private void handleErrorEvent(ErrorEvent evt)
+				throws NotImplementedException, MissingRequiredPropertyException, CoreException {
 			TypeSet ts = evt.getTypeSet();
 			DangerSource dangerSource = typesAreInternalOrExternal(ts);
 			if (dangerSource == DangerSource.BOTH) {
@@ -1017,14 +1124,21 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 
 			PropertyExpression prex = EMV2Properties.getPropertyValue(pas.get(0));
-			for (int i = 0; i < path.size(); i++) {
-				if(propTypes.get(i) == PropertyType.RECORD){
-					prex = (PropertyUtils.getRecordFieldValue((RecordValue) prex, path.get(i)));
-				} else if (propTypes.get(i) == PropertyType.LIST) {
-					prex = ((ListValue)prex).getOwnedListElements().get(Integer.valueOf(path.get(i)));
+
+			try {
+				for (int i = 0; i < path.size(); i++) {
+					if (propTypes.get(i) == PropertyType.RECORD) {
+						prex = (PropertyUtils.getRecordFieldValue((RecordValue) prex, path.get(i)));
+					} else if (propTypes.get(i) == PropertyType.LIST) {
+						prex = ((ListValue) prex).getOwnedListElements().get(Integer.valueOf(path.get(i)));
+					}
 				}
-			} 
-						
+			} catch (IndexOutOfBoundsException e) {
+				// This gets hit if the caller wants a value that isn't set, ie
+				// an unset key for a record or an out of bounds list index
+				return null;
+			}
+
 			if (prex instanceof StringLiteral) {
 				return ((StringLiteral) prex).getValue();
 			} else if (prex instanceof NamedValue) {
@@ -1034,6 +1148,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					return ((EnumerationLiteral) anv).getName();
 				}
 				return null;
+			} else if (prex instanceof IntegerLiteral) {
+				return String.valueOf(((IntegerLiteral) prex).getValue());
 			} else {
 				return null;
 			}

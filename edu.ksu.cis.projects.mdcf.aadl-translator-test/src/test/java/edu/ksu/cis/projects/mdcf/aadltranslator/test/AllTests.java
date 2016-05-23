@@ -98,7 +98,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.STRendererTests;
 
 		// Hazard Analysis Model tests
 //		ConnectionModelHazardTests.class,
-//		HazardPreliminariesTests.class,
+		HazardPreliminariesTests.class,
 //		HazardBackgroundTests.class,
 		PropagatableErrorTests.class,
 		ExternallyCausedDangerModelTests.class,
