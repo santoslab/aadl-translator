@@ -3,10 +3,10 @@ private void initComponent(){
   // Do nothing, pseudodevices require no initialization
 }
 
-private void SpO2InListenerOnMessage(MdcfMessage msg, Integer SpO2InData){
+private void SpO2InListenerOnMessage(MdcfMessage msg, Double SpO2InData){
   SpO2OutSenderPort.send(SpO2InData);
 }
-private void IncSpO2InListenerOnMessage(MdcfMessage msg, Integer IncSpO2InData){
+private void IncSpO2InListenerOnMessage(MdcfMessage msg, Double IncSpO2InData){
   IncSpO2OutSenderPort.send(IncSpO2InData);
 }
 

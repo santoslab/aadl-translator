@@ -1,5 +1,5 @@
 public abstract class PulseOx_Logic_ProcessSuperType extends LogicComponent{
   private HashMap<String, Task> taskInstanceMap;
   private HashMap<String, MdcfReceiverPort<?>> receiverPortMap;
-  private Integer SpO2Data;
+  private Double SpO2Data;
  

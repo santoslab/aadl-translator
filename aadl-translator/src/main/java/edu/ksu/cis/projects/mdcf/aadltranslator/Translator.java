@@ -29,6 +29,8 @@ import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ContainmentPathElement;
 import org.osate.aadl2.DataPort;
+import org.osate.aadl2.DataSubcomponent;
+import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DeviceSubcomponent;
 import org.osate.aadl2.DeviceType;
 import org.osate.aadl2.DirectionType;
@@ -48,6 +50,7 @@ import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PropertySet;
+import org.osate.aadl2.RangeValue;
 import org.osate.aadl2.RecordValue;
 import org.osate.aadl2.ReferenceValue;
 import org.osate.aadl2.StringLiteral;
@@ -113,6 +116,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.HazardModel
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.InternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ManifestationTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.NotDangerousDangerModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ProcessVariableModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.RuntimeDetectionModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.RuntimeHandlingModel;
@@ -132,7 +136,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 	};
 
 	private enum PropertyType {
-		ENUM, INT, RANGE_MIN, RANGE_MAX, STRING, RECORD, LIST
+		ENUM, INT, RANGE_MIN, RANGE_MAX, STRING, RECORD, LIST, BOOLEAN,
 	};
 
 	private static final String FAULT_CLASSES_NAME = "StandardFaultClasses";
@@ -269,6 +273,34 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			if (handleNewProcess(obj) != null)
 				return DONE;
 			return NOT_DONE;
+		}
+		
+		@Override
+		public String caseDataSubcomponent(DataSubcomponent obj) {
+			String isProcessModel = checkCustomProperty(obj, "ProcessVariable", PropertyType.BOOLEAN);
+			if (isProcessModel != null && isProcessModel.equals("true")){
+				handleProcessModel(obj);
+			}
+			return NOT_DONE;
+		}
+		
+		private void handleProcessModel(DataSubcomponent obj){
+			DataSubcomponentType dst = obj.getDataSubcomponentType();
+			String type = GetProperties.getDataRepresentation(dst).getName();
+			String units = GetProperties.getMeasurementUnit(dst);
+			ProcessVariableModel pvm = new ProcessVariableModel(type, units);
+			if(type.equalsIgnoreCase("Float")){
+				RangeValue rv = GetProperties.getDataRealRange(dst);
+				String minVal = String.valueOf(rv.getMinimumValue().getScaledValue());
+				String maxVal = String.valueOf(rv.getMaximumValue().getScaledValue());
+				pvm = new ProcessVariableModel(type, units, minVal, maxVal);
+			} else if(type.equalsIgnoreCase("Integer")){
+				RangeValue rv = GetProperties.getDataIntegerRange(dst);
+				String minVal = String.valueOf(rv.getMinimumValue().getScaledValue());
+				String maxVal = String.valueOf(rv.getMaximumValue().getScaledValue());
+				pvm = new ProcessVariableModel(type, units, minVal, maxVal);
+			}
+			componentModel.addProcessVariable(obj.getName(), pvm);
 		}
 
 		@Override
@@ -737,9 +769,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						hazardModel.setParent(accidentModel);
 						propTypes.add(PropertyType.RECORD);
 						path.add("SystemElement");
-						hazardModel.setSystemElement(checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path));
+						hazardModel.setSystemElement(
+								checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path));
 						path.set(path.size() - 1, "EnvironmentElement");
-						hazardModel.setEnvironmentElement(checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path));
+						hazardModel.setEnvironmentElement(
+								checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path));
 						path.remove(path.size() - 1);
 						propTypes.remove(propTypes.size() - 1);
 						systemModel.addHazard(hazardModel);
@@ -1212,7 +1246,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			} else if (prex instanceof IntegerLiteral) {
 				return String.valueOf(((IntegerLiteral) prex).getValue());
 			} else if (prex instanceof ReferenceValue) {
-				return ((ReferenceValue)prex).getContainmentPathElements().get(0).getNamedElement().getName();
+				return ((ReferenceValue) prex).getContainmentPathElements().get(0).getNamedElement().getName();
 			} else {
 				return null;
 			}
@@ -1499,6 +1533,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			} catch (PropertyOutOfRangeException e) {
 				handleException(obj, e);
 				return null;
+			} catch (CoreException e) {
+				return null;
 			}
 			return ret;
 		}
@@ -1528,7 +1564,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				} catch (PropertyOutOfRangeException e) {
 					handleException(obj, e);
 					return null;
-				} catch (PropertyNotPresentException e) {
+				} catch (PropertyNotPresentException | CoreException e) {
 					return null;
 				}
 			}
@@ -1536,7 +1572,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		}
 
 		private String handlePropertyValue(NamedElement obj, Property prop, PropertyType propType)
-				throws PropertyOutOfRangeException {
+				throws PropertyOutOfRangeException, CoreException {
 			if (propType == PropertyType.ENUM)
 				return PropertyUtils.getEnumLiteral(obj, prop).getName();
 			else if (propType == PropertyType.INT) {
@@ -1553,10 +1589,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						prop);
 			} else if (propType == PropertyType.STRING) {
 				return PropertyUtils.getStringValue(obj, prop);
+			} else if (propType == PropertyType.BOOLEAN) {
+				return String.valueOf(PropertyUtils.getBooleanValue(obj, prop));
 			} else {
-				System.err.println("HandlePropertyValue called with garbage propType: " + propType);
+				throw new CoreException("HandlePropertyValue called with garbage propType: " + propType);
 			}
-			return null;
 		}
 
 		private String getStringFromScaledNumber(double num, NamedElement obj, Property prop)

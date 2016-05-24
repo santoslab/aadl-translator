@@ -14,7 +14,7 @@ protected Map<String, MdcfReceiverPort<?>> getReceiverPortMap(){
   return this.receiverPortMap;
 }
 
-protected Integer getSpO2Data(){
+protected Double getSpO2Data(){
   return SpO2Data;
 }
 

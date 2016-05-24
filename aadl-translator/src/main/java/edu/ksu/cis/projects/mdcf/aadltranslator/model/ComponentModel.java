@@ -29,6 +29,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.HazardModel
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.InternallyCausedDangerModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ManifestationTypeModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.NotDangerousDangerModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ProcessVariableModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.StpaPreliminaryModel;
 
 public abstract class ComponentModel<ChildType extends ComponentModel<?, ?>, ConnectionType extends ConnectionModel> {
@@ -87,9 +88,16 @@ public abstract class ComponentModel<ChildType extends ComponentModel<?, ?>, Con
 
 	/**
 	 * The set of fault classes that should be accounted for. Each component has
-	 * their own copy because it's modified when calculating missed fault classes.
+	 * their own copy because it's modified when calculating missed fault
+	 * classes.
 	 */
 	private Set<String> faultClasses = new LinkedHashSet<>();
+
+	/**
+	 * The collection of process variables that colelctively define the process
+	 * model of this component
+	 */
+	private Map<String, ProcessVariableModel> processModel = new LinkedHashMap<>();
 
 	public ComponentModel() {
 		initHazardReportDiagrams();
@@ -349,5 +357,13 @@ public abstract class ComponentModel<ChildType extends ComponentModel<?, ?>, Con
 
 	public void setFaultClasses(HashMap<String, ManifestationTypeModel> faultClasses) {
 		this.faultClasses = faultClasses.keySet();
+	}
+	
+	public void addProcessVariable(String name, ProcessVariableModel var){
+		this.processModel.put(name, var);
+	}
+	
+	public Map<String, ProcessVariableModel> getProcessModel() {
+		return this.processModel;
 	}
 }

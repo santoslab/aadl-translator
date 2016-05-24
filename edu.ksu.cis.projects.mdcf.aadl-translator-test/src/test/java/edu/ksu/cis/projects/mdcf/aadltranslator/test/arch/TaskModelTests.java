@@ -93,7 +93,7 @@ public class TaskModelTests {
 
 	@Test
 	public void testTaskTrigPortInfo() {
-		assertEquals("Integer", updateSpO2Thread.getTrigPortType());
+		assertEquals("Double", updateSpO2Thread.getTrigPortType());
 		assertEquals("SpO2", updateSpO2Thread.getTrigPortName());
 		assertEquals("SpO2", updateSpO2Thread.getTrigPortLocalName());
 	}

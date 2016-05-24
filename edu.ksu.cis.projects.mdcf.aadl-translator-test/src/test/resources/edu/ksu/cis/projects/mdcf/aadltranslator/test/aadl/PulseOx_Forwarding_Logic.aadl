@@ -22,6 +22,8 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 	process implementation PulseOx_Logic_Process.imp
 	subcomponents
 		CheckSpO2Thread : thread CheckSpO2Thread.imp;
+		SpO2Val : data PulseOx_Forwarding_Types::SpO2
+		{MAP_Error_Properties::ProcessVariable => true;};
 	connections
 		outgoing_alarm : port CheckSpO2Thread.Alarm -> DerivedAlarm;
 	annex EMV2 {**
@@ -61,6 +63,8 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 		end component;
 		properties
 			MAP_Error_Properties::ExternallyCausedDanger => [
+				ProcessVariableValue => reference(SpO2Val);
+				ProcessVariableConstraint => "Higher than true value";
 				Explanation => "The SpO2 value is too high, leading the app to fail to issue an alarm when it should";
 			] applies to HighSpO2LeadsToMissedAlarm;
 			MAP_Error_Properties::ExternallyCausedDanger => [

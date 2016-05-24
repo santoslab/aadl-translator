@@ -54,16 +54,11 @@ Constraint: type record (
 
 Fundamentals : list of MAP_Error_Properties::Accident_Level applies to (all);
 
-ProcessVariable : type record (
-	Name : aadlstring;
-	Values : list of reference(mode);	
-);
-
-ProcessModel : list of MAP_Error_Properties::ProcessVariable applies to (all);
+ProcessVariable : aadlboolean applies to (data);
 
 ExternallyCausedDanger : record (
-	ControlledProcessState : reference(mode);
-	ProcessVariableValue : reference(mode);
+	ProcessVariableValue : reference(data);
+	ProcessVariableConstraint : aadlstring;
 	Explanation : aadlstring;
 ) applies to (all);
 
@@ -107,5 +102,7 @@ EliminatedFaults : record (
 	FaultTypes : list of reference({emv2}** error type);
 	Explanation : aadlstring;	
 ) applies to (all);
+
+
 
 end MAP_Error_Properties;

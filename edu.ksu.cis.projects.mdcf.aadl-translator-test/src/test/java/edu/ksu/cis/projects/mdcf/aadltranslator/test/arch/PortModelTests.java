@@ -51,7 +51,7 @@ public class PortModelTests {
 
 	@Test
 	public void testPortType() {
-		assertEquals("Integer", devSendPort.getType());
+		assertEquals("Double", devSendPort.getType());
 		assertEquals("Object", procSendPort.getType());
 	}
 
