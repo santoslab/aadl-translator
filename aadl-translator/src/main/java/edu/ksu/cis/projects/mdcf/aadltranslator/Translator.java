@@ -161,6 +161,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 	public class TranslatorSwitch extends Aadl2Switch<String> {
 
+		private static final String FUNDAMENTALS_PROP_NAME = "MAP_Error_Properties::Fundamentals";
+
 		/**
 		 * A reference to the "current" component model, stored for convenience
 		 */
@@ -733,9 +735,17 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					handleFundamentalsProperty(obj, hazardModel, propTypes, path);
 					while (hazardModel.getName() != null) {
 						hazardModel.setParent(accidentModel);
+						propTypes.add(PropertyType.RECORD);
+						path.add("SystemElement");
+						hazardModel.setSystemElement(checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path));
+						path.set(path.size() - 1, "EnvironmentElement");
+						hazardModel.setEnvironmentElement(checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path));
+						path.remove(path.size() - 1);
+						propTypes.remove(propTypes.size() - 1);
 						systemModel.addHazard(hazardModel);
-						
-						// Now we parse the constraints associated with this hazard
+
+						// Now we parse the constraints associated with this
+						// hazard
 						propTypes.add(PropertyType.RECORD);
 						path.add("Constraints");
 						propTypes.add(PropertyType.LIST);
@@ -745,7 +755,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						while (constraintModel.getName() != null) {
 							constraintModel.setParent(hazardModel);
 							systemModel.addConstraint(constraintModel);
-							
+
 							path.set(path.size() - 1, String.valueOf(++constraintNumber));
 							constraintModel = new ConstraintModel();
 							handleFundamentalsProperty(obj, constraintModel, propTypes, path);
@@ -755,7 +765,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						propTypes.remove(propTypes.size() - 1);
 						path.remove(path.size() - 1);
 						propTypes.remove(propTypes.size() - 1);
-						
+
 						path.set(path.size() - 1, String.valueOf(++hazardNumber));
 						hazardModel = new HazardModel();
 						handleFundamentalsProperty(obj, hazardModel, propTypes, path);
@@ -765,7 +775,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 					propTypes.remove(propTypes.size() - 1);
 					path.remove(path.size() - 1);
 					propTypes.remove(propTypes.size() - 1);
-					
+
 					path.set(path.size() - 1, String.valueOf(++accidentNumber));
 					accidentModel = new AccidentModel();
 					handleFundamentalsProperty(obj, accidentModel, propTypes, path);
@@ -787,14 +797,13 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		private void handleFundamentalsProperty(AbstractSubcomponent obj, StpaPreliminaryModel prelim,
 				List<PropertyType> propTypes, List<String> path) throws NotImplementedException, CoreException {
-			final String PROP_NAME = "MAP_Error_Properties::Fundamentals";
 
 			propTypes.add(PropertyType.RECORD);
 			path.add("Name");
-			String name = checkCustomEMV2Property(obj, PROP_NAME, propTypes, path);
+			String name = checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path);
 
 			path.set(path.size() - 1, "Description");
-			String desc = checkCustomEMV2Property(obj, PROP_NAME, propTypes, path);
+			String desc = checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path);
 
 			if (name == null || desc == null) {
 				propTypes.remove(propTypes.size() - 1);
@@ -805,12 +814,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			path.set(path.size() - 1, "Explanations");
 			path.add("0");
 			propTypes.add(PropertyType.LIST);
-			String accLevelExp = checkCustomEMV2Property(obj, PROP_NAME, propTypes, path);
+			String accLevelExp = checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path);
 			int i = 1;
 			while (accLevelExp != null) {
 				prelim.addExplanation(accLevelExp);
 				path.set(path.size() - 1, String.valueOf(i));
-				accLevelExp = checkCustomEMV2Property(obj, PROP_NAME, propTypes, path);
+				accLevelExp = checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path);
 				i++;
 			}
 			path.remove(path.size() - 1);
@@ -1175,8 +1184,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 			try {
 				for (int i = 0; i < path.size(); i++) {
-					if(prex == null){
-						// An property that the caller thought was set isn't
+					if (prex == null) {
+						// A property that the caller thought was set isn't
 						return null;
 					}
 					if (propTypes.get(i) == PropertyType.RECORD) {
@@ -1202,6 +1211,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				return null;
 			} else if (prex instanceof IntegerLiteral) {
 				return String.valueOf(((IntegerLiteral) prex).getValue());
+			} else if (prex instanceof ReferenceValue) {
+				return ((ReferenceValue)prex).getContainmentPathElements().get(0).getNamedElement().getName();
 			} else {
 				return null;
 			}

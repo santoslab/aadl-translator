@@ -2,8 +2,9 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard;
 
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.initComplete;
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.usedProperties;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 
@@ -30,14 +31,13 @@ public class HazardPreliminariesTests {
 		usedProperties.add("MAP_Properties");
 		usedProperties.add("PulseOx_Forwarding_Properties");
 		usedProperties.add("PulseOx_Forwarding_Error_Properties");
-		
+
 		explanations = new ArrayList<>();
 		explanations.add("First Explanation");
 		explanations.add("Second Explanation");
 		explanations.add("Third Explanation");
-		
-		systemModel = AllTests.runHazardTransTest("PulseOx",
-				"PulseOx_Forwarding_System");
+
+		systemModel = AllTests.runHazardTransTest("PulseOx", "PulseOx_Forwarding_System");
 	}
 
 	@AfterClass
@@ -45,41 +45,138 @@ public class HazardPreliminariesTests {
 		usedProperties.clear();
 	}
 
+	///////////////////////////////////////////////////////////////////////////
+	// ACCIDENT LEVEL TESTS ///////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
 	@Test
-	public void testAccidentLevel() {
+	public void testAccidentLevelExists() {
 		assertEquals(1, systemModel.getAccidentLevels().size());
+	}
+
+	@Test
+	public void testAccidentLevelName() {
 		assertEquals(ACCIDENT_LEVEL_NAME, systemModel.getAccidentLevelByName(ACCIDENT_LEVEL_NAME).getName());
-		assertEquals("A human is killed or seriously injured.", systemModel
-				.getAccidentLevelByName(ACCIDENT_LEVEL_NAME).getDescription());
+	}
+
+	@Test
+	public void testAccidentLevelDescription() {
+		assertEquals("A human is killed or seriously injured.",
+				systemModel.getAccidentLevelByName(ACCIDENT_LEVEL_NAME).getDescription());
+	}
+
+	@Test
+	public void testAccidentLevelExplanations() {
+		assertArrayEquals(explanations.toArray(),
+				systemModel.getAccidentLevelByName(ACCIDENT_LEVEL_NAME).getExplanations().toArray());
+	}
+
+	@Test
+	public void testAccidentLevelNumber() {
 		assertEquals(1, systemModel.getAccidentLevelByName(ACCIDENT_LEVEL_NAME).getNumber());
-		assertArrayEquals(explanations.toArray(), systemModel.getAccidentLevelByName(ACCIDENT_LEVEL_NAME).getExplanations().toArray());
 	}
 
 	@Test
-	public void testAccident() {
+	public void testAccidentLevelParent() {
+		assertNull(systemModel.getAccidentLevelByName(ACCIDENT_LEVEL_NAME).getParent());
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	// ACCIDENT TESTS /////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+
+	@Test
+	public void testAccidentExists() {
 		assertEquals(1, systemModel.getAccidents().size());
-		assertEquals(ACCIDENT_NAME, systemModel.getAccidentByName(ACCIDENT_NAME).getName());
-		assertEquals("Patient is killed or seriously injured.", systemModel
-				.getAccidentByName(ACCIDENT_NAME).getDescription());
-		assertArrayEquals(explanations.toArray(), systemModel.getAccidentByName(ACCIDENT_NAME).getExplanations().toArray());
 	}
 
 	@Test
-	public void testHazard() {
+	public void testAccidentName() {
+		assertEquals(ACCIDENT_NAME, systemModel.getAccidentByName(ACCIDENT_NAME).getName());
+	}
+
+	@Test
+	public void testAccidentDescription() {
+		assertEquals("Patient is killed or seriously injured.",
+				systemModel.getAccidentByName(ACCIDENT_NAME).getDescription());
+	}
+
+	@Test
+	public void testAccidentExplanations() {
+		assertArrayEquals(explanations.toArray(),
+				systemModel.getAccidentByName(ACCIDENT_NAME).getExplanations().toArray());
+	}
+
+	@Test
+	public void testAccidentParent() {
+		assertEquals(systemModel.getAccidentLevelByName(ACCIDENT_LEVEL_NAME),
+				systemModel.getAccidentByName(ACCIDENT_NAME).getParent());
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	// HAZARD TESTS ///////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+
+	@Test
+	public void testHazardExists() {
 		assertEquals(2, systemModel.getHazards().size());
+	}
+
+	@Test
+	public void testHazardName() {
 		assertEquals(HAZARD_NAME, systemModel.getHazardByName(HAZARD_NAME).getName());
+	}
+
+	@Test
+	public void testHazardDescription() {
 		assertEquals("Incorrect information is sent to the display.",
 				systemModel.getHazardByName(HAZARD_NAME).getDescription());
 	}
 
 	@Test
-	public void testConstraint() {
+	public void testHazardParent() {
+		assertEquals(systemModel.getAccidentByName(ACCIDENT_NAME),
+				systemModel.getHazardByName(HAZARD_NAME).getParent());
+	}
+	
+	@Test
+	public void testHazardSystemElement() {
+		assertEquals("pulseOx", systemModel.getHazardByName(HAZARD_NAME).getSystemElement());
+	}
+	
+	@Test
+	public void testHazardEnvironmentElement() {
+		assertEquals("patient", systemModel.getHazardByName(HAZARD_NAME).getEnvironmentElement());
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	// CONSTRAINT TESTS ///////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+
+	@Test
+	public void testConstraintExists() {
 		assertEquals(2, systemModel.getConstraints().size());
+	}
+
+	@Test
+	public void testConstraintName() {
 		assertEquals(CONSTRAINT_NAME, systemModel.getConstraintByName(CONSTRAINT_NAME).getName());
-		assertEquals(
-				"The app must accurately inform the display of the status of the patient's"
-						+ " vital signs.", systemModel
-						.getConstraintByName(CONSTRAINT_NAME).getDescription());
-		assertArrayEquals(explanations.toArray(), systemModel.getConstraintByName(CONSTRAINT_NAME).getExplanations().toArray());
+	}
+
+	@Test
+	public void testConstraintDescription() {
+		assertEquals("The app must accurately inform the display of the status of the patient's" + " vital signs.",
+				systemModel.getConstraintByName(CONSTRAINT_NAME).getDescription());
+	}
+
+	@Test
+	public void testConstraintExplanations() {
+		assertArrayEquals(explanations.toArray(),
+				systemModel.getConstraintByName(CONSTRAINT_NAME).getExplanations().toArray());
+	}
+
+	@Test
+	public void testConstraintParent() {
+		assertEquals(systemModel.getHazardByName(HAZARD_NAME),
+				systemModel.getConstraintByName(CONSTRAINT_NAME).getParent());
 	}
 }
