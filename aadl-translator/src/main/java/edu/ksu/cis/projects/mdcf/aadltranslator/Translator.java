@@ -750,6 +750,9 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				// If we're here, we know we have an accident level, so we add
 				// the AccidentLevel Unique feature (number)
 				accidentLevelModel.setNumber(accidentLevelNumber + 1);
+				// Associate the accident level with this system so the children
+				// can query it later
+				accidentLevelModel.setSystem(systemModel);
 				// And add the whole thing to the model
 				systemModel.addAccidentLevel(accidentLevelModel);
 
@@ -798,6 +801,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 						handleFundamentalsProperty(obj, constraintModel, propTypes, path);
 						while (constraintModel.getName() != null) {
 							constraintModel.setParent(hazardModel);
+							propTypes.add(PropertyType.RECORD);
+							path.add("ErrorType");
+							constraintModel.setErrorTypeName(
+									checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path));
+							path.remove(path.size() - 1);
+							propTypes.remove(propTypes.size() - 1);
 							systemModel.addConstraint(constraintModel);
 
 							path.set(path.size() - 1, String.valueOf(++constraintNumber));

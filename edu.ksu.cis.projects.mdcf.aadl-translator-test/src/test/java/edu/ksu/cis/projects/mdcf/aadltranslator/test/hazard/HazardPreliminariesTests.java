@@ -137,12 +137,12 @@ public class HazardPreliminariesTests {
 		assertEquals(systemModel.getAccidentByName(ACCIDENT_NAME),
 				systemModel.getHazardByName(HAZARD_NAME).getParent());
 	}
-	
+
 	@Test
 	public void testHazardSystemElement() {
 		assertEquals("pulseOx", systemModel.getHazardByName(HAZARD_NAME).getSystemElement());
 	}
-	
+
 	@Test
 	public void testHazardEnvironmentElement() {
 		assertEquals("patient", systemModel.getHazardByName(HAZARD_NAME).getEnvironmentElement());
@@ -179,9 +179,11 @@ public class HazardPreliminariesTests {
 		assertEquals(systemModel.getHazardByName(HAZARD_NAME),
 				systemModel.getConstraintByName(CONSTRAINT_NAME).getParent());
 	}
-	
-//	@Test
-//	public void testConstraintErrorType() {
-//		assertEquals("SpO2ValueHigh", systemModel.getConstraintByName(CONSTRAINT_NAME).getErrorType());
-//	}
+
+	@Test
+	public void testConstraintErrorType() {
+		assertEquals("MissedAlarm", systemModel.getConstraintByName(CONSTRAINT_NAME).getErrorType().getName());
+		assertEquals("VIOLATEDCONSTRAINT",
+				systemModel.getConstraintByName(CONSTRAINT_NAME).getErrorType().getManifestationName());
+	}
 }
