@@ -31,6 +31,7 @@ import org.osate.aadl2.ContainmentPathElement;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DataSubcomponentType;
+import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.DeviceSubcomponent;
 import org.osate.aadl2.DeviceType;
 import org.osate.aadl2.DirectionType;
@@ -215,7 +216,15 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		@Override
 		public String caseProcessImplementation(ProcessImplementation obj) {
-			return NOT_DONE;
+			// This is a hack to get the ordering of children correct
+			BasicEList<Element> elems = new BasicEList<>(obj.getOwnedElements());
+			if (obj.getOwnedElements().get(0) instanceof DefaultAnnexSubclause) {
+				elems.remove(0);
+				elems.add(obj.getOwnedElements().get(0));
+			}
+			processEList(elems);
+			return DONE;
+			// return NOT_DONE;
 		}
 
 		@Override
@@ -274,31 +283,32 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				return DONE;
 			return NOT_DONE;
 		}
-		
+
 		@Override
 		public String caseDataSubcomponent(DataSubcomponent obj) {
 			String isProcessModel = checkCustomProperty(obj, "ProcessVariable", PropertyType.BOOLEAN);
-			if (isProcessModel != null && isProcessModel.equals("true")){
+			if (isProcessModel != null && isProcessModel.equals("true")) {
 				handleProcessModel(obj);
 			}
 			return NOT_DONE;
 		}
-		
-		private void handleProcessModel(DataSubcomponent obj){
+
+		private void handleProcessModel(DataSubcomponent obj) {
 			DataSubcomponentType dst = obj.getDataSubcomponentType();
+			String name = obj.getName();
 			String type = GetProperties.getDataRepresentation(dst).getName();
 			String units = GetProperties.getMeasurementUnit(dst);
-			ProcessVariableModel pvm = new ProcessVariableModel(type, units);
-			if(type.equalsIgnoreCase("Float")){
+			ProcessVariableModel pvm = new ProcessVariableModel(type, units, name);
+			if (type.equalsIgnoreCase("Float")) {
 				RangeValue rv = GetProperties.getDataRealRange(dst);
 				String minVal = String.valueOf(rv.getMinimumValue().getScaledValue());
 				String maxVal = String.valueOf(rv.getMaximumValue().getScaledValue());
-				pvm = new ProcessVariableModel(type, units, minVal, maxVal);
-			} else if(type.equalsIgnoreCase("Integer")){
+				pvm = new ProcessVariableModel(type, units, name, minVal, maxVal);
+			} else if (type.equalsIgnoreCase("Integer")) {
 				RangeValue rv = GetProperties.getDataIntegerRange(dst);
 				String minVal = String.valueOf(rv.getMinimumValue().getScaledValue());
 				String maxVal = String.valueOf(rv.getMaximumValue().getScaledValue());
-				pvm = new ProcessVariableModel(type, units, minVal, maxVal);
+				pvm = new ProcessVariableModel(type, units, name, minVal, maxVal);
 			}
 			componentModel.addProcessVariable(obj.getName(), pvm);
 		}
@@ -1172,7 +1182,15 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			if (interp == null) {
 				throw new MissingRequiredPropertyException("No matching ExternallyCausedDanger found!");
 			}
-			ExternallyCausedDangerModel ecdm = new ExternallyCausedDangerModel(succDanger, manifestation, interp, null);
+			ProcessVariableModel pvm = componentModel.getProcessModel()
+					.get(checkCustomEMV2Property(path, "MAP_Error_Properties::ExternallyCausedDanger",
+							Collections.singletonList(PropertyType.RECORD),
+							Collections.singletonList("ProcessVariableValue")));
+			String constraint = checkCustomEMV2Property(path, "MAP_Error_Properties::ExternallyCausedDanger",
+					Collections.singletonList(PropertyType.RECORD),
+					Collections.singletonList("ProcessVariableConstraint"));
+			ExternallyCausedDangerModel ecdm = new ExternallyCausedDangerModel(succDanger, manifestation, interp, null,
+					pvm, constraint);
 			componentModel.addCausedDanger(ecdm);
 		}
 

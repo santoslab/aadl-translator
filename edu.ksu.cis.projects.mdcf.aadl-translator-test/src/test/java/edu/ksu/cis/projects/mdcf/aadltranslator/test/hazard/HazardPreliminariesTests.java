@@ -179,4 +179,9 @@ public class HazardPreliminariesTests {
 		assertEquals(systemModel.getHazardByName(HAZARD_NAME),
 				systemModel.getConstraintByName(CONSTRAINT_NAME).getParent());
 	}
+	
+//	@Test
+//	public void testConstraintErrorType() {
+//		assertEquals("SpO2ValueHigh", systemModel.getConstraintByName(CONSTRAINT_NAME).getErrorType());
+//	}
 }

@@ -19,7 +19,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 public class ProcessModelTests {
 	private static ProcessModel logicModel;
 	private static ProcessModel displayModel;
-	private static ProcessModel processOnlyProcessModel;
+//	private static ProcessModel processOnlyProcessModel;
 	
 	@BeforeClass
 	public static void initialize() {

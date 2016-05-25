@@ -6,17 +6,20 @@ public class ProcessVariableModel {
 	private typeType type;
 	private double minVal;
 	private double maxVal;
+	private String name;
 	
-	public ProcessVariableModel(String type, String units, String minVal, String maxVal){
+	public ProcessVariableModel(String type, String units, String name, String minVal, String maxVal){
 		this.type = typeType.valueOf(type.toUpperCase());
 		this.units = units;
+		this.name = name;
 		this.minVal = Double.valueOf(minVal);
 		this.maxVal = Double.valueOf(maxVal);
 	}
 	
-	public ProcessVariableModel(String type, String units){
+	public ProcessVariableModel(String type, String units, String name){
 		this.type = typeType.valueOf(type.toUpperCase());
 		this.units = units;
+		this.name = name;
 		this.minVal = Double.NaN;
 		this.maxVal = Double.NaN;
 	}
@@ -35,5 +38,9 @@ public class ProcessVariableModel {
 	
 	public String getType() {
 		return type.toString();
+	}
+
+	public String getName() {
+		return name;
 	}
 }

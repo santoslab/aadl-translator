@@ -14,9 +14,13 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.CoreException;
  */
 public class ExternallyCausedDangerModel extends CausedDangerModel {
 
-	PropagationModel danger;
+	private PropagationModel danger;
+	private ProcessVariableModel processVariableModel;
+	private String processVariableModelConstraint;
+
 	public ExternallyCausedDangerModel(PropagationModel inProp, PropagationModel outProp, String interp,
-			Set<ManifestationTypeModel> cooccurringDangers) throws CoreException {
+			Set<ManifestationTypeModel> cooccurringDangers, ProcessVariableModel processVariableModel,
+			String constraint) throws CoreException {
 		super(inProp, interp, cooccurringDangers);
 		if (!inProp.getName().equals(outProp.getName())) {
 			throw new CoreException(
@@ -24,10 +28,19 @@ public class ExternallyCausedDangerModel extends CausedDangerModel {
 		}
 		super.setName(inProp.getName());
 		this.danger = outProp;
+		this.processVariableModel = processVariableModel;
+		this.processVariableModelConstraint = constraint;
 	}
 
 	public PropagationModel getDanger() {
 		return danger;
 	}
 
+	public ProcessVariableModel getProcessVariable() {
+		return processVariableModel;
+	}
+
+	public String getProcessVariableConstraint() {
+		return processVariableModelConstraint;
+	}
 }

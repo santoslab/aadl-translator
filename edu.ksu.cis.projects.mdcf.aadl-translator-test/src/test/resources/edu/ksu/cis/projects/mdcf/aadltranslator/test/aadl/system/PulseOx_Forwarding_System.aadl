@@ -55,7 +55,7 @@ with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display,
 					Constraints => ([
 						Name => "ShowGoodInfo";
 						Description => "The app must accurately inform the display of the status of the patient's vital signs.";
---						ErrorType => reference(TooMuchAnalgesic);
+						ErrorType => reference(SpO2ValueHigh);
 						Explanations => ("First Explanation", "Second Explanation", "Third Explanation");
 					]);
 				], [

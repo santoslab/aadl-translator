@@ -28,6 +28,7 @@ public class ExternallyCausedDangerModelTests {
 		if (!initComplete)
 			AllTests.initialize();
 		usedProperties.add("MAP_Properties");
+		usedProperties.add("MAP_Error_Properties");
 		usedProperties.add("PulseOx_Forwarding_Properties");
 		usedProperties.add("PulseOx_Forwarding_Error_Properties");
 
@@ -56,9 +57,19 @@ public class ExternallyCausedDangerModelTests {
 	}
 	
 	@Test
-	public void testInterpretation() {
+	public void testECDMExplanation() {
 		assertEquals("The SpO2 value is too high, leading the app to fail to issue an alarm when it should",
 				pmDangers.get("HighSpO2LeadsToMissedAlarm").getInterp());
+	}
+	
+	@Test
+	public void testECDMProcessVariableRef() {
+		assertEquals("SpO2Val",	pmDangers.get("HighSpO2LeadsToMissedAlarm").getProcessVariable().getName());
+	}
+	
+	@Test
+	public void testECDMProcessVariableConstraint() {
+		assertEquals("Higher than true value",	pmDangers.get("HighSpO2LeadsToMissedAlarm").getProcessVariableConstraint());
 	}
 
 	@Test
