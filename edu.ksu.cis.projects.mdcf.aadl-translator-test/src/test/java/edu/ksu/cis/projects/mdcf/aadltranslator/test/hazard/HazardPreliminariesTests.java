@@ -140,7 +140,7 @@ public class HazardPreliminariesTests {
 
 	@Test
 	public void testHazardSystemElement() {
-		assertEquals("pulseOx", systemModel.getHazardByName(HAZARD_NAME).getSystemElement());
+		assertEquals("appLogic", systemModel.getHazardByName(HAZARD_NAME).getSystemElement());
 	}
 
 	@Test
