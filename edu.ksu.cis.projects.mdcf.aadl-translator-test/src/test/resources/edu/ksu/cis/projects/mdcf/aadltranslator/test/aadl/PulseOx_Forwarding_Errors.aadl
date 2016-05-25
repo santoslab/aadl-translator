@@ -9,6 +9,7 @@ annex EMV2
 	SpO2ValueHigh : type extends MAP_Errors::High;
 	
 	MissedAlarm : type extends MAP_Errors::ViolatedConstraint;
+	LateAlarm : type extends MAP_Errors::ViolatedConstraint;
 	
 	SpO2ValueLow : type extends MAP_Errors::Low;
 	BogusAlarm : type extends MAP_Errors::ViolatedConstraint;

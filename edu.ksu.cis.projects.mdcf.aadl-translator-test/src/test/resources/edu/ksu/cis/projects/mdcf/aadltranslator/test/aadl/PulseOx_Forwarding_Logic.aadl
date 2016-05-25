@@ -97,10 +97,6 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 			
 			MAP_Error_Properties::InternallyCausedDanger => [
 				Explanation => "This is a placeholder explanation to test the InternallyCausedDanger property.";
---				DesignTimeHandling => (
---					PulseOx_Forwarding_Error_Properties::ECCMemory,
---					PulseOx_Forwarding_Error_Properties::Shielding
---				);
 			] applies to BogusAlarmsArePossible;
 			
 			MAP_Error_Properties::DesignTimeFaultDetection => [

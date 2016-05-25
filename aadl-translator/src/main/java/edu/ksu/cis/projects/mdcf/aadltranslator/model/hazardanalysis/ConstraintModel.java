@@ -38,6 +38,7 @@ public class ConstraintModel extends StpaPreliminaryModel {
 		List<ManifestationTypeModel> errorTypeSet = system.getChild(elemName).getExternallyCausedDangers().values()
 				.stream().map(v -> v.getSuccessorDanger().getErrors()).flatMap(w -> w.stream())
 				.filter(x -> x.getName().equals(typeName)).collect(Collectors.toList());
+		// TODO: Can this list have more than one element?
 		this.errorType = errorTypeSet.get(0);
 	}
 }

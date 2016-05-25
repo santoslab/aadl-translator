@@ -56,7 +56,6 @@ import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
 import org.stringtemplate.v4.STGroup;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.DeviceTranslator;
-import edu.ksu.cis.projects.mdcf.aadltranslator.ErrorTranslator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.IncludesCalculator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.Translator;
 import edu.ksu.cis.projects.mdcf.aadltranslator.error.TestParseErrorReporterFactory;
@@ -372,10 +371,6 @@ public class AllTests {
 		errorSB.append(parseErrManager.getReporter((IResource) inputFile)
 				.toString());
 
-//		HashSet<IFile> supportingFiles = getSupportingFiles(inputFile);
-		
-		ErrorTranslator hazardAnalysis = new ErrorTranslator();
-
 		for (IFile supportingFile : supportingFiles) {
 			res = resourceSet.getResource(OsateResourceUtil
 					.getResourceURI((IResource) supportingFile), true);
@@ -383,27 +378,7 @@ public class AllTests {
 			stats.process(target);
 			errorSB.append(parseErrManager.getReporter(
 					(IResource) supportingFile).toString());
-			if (target instanceof PropertySet)
-				continue;
-			AadlPackage pack = (AadlPackage) target;
-			PublicPackageSection sect = pack.getPublicSection();
-			if (sect.getOwnedAnnexLibraries().size() > 0
-					&& sect.getOwnedAnnexLibraries().get(0).getName()
-							.equals("EMV2")) {
-				AnnexLibrary annexLibrary = sect.getOwnedAnnexLibraries()
-						.get(0);
-				DefaultAnnexLibrary defaultAnnexLibrary = (DefaultAnnexLibrary) annexLibrary;
-				ErrorModelLibraryImpl emImpl = (ErrorModelLibraryImpl) defaultAnnexLibrary
-						.getParsedAnnexLibrary();
-				HashSet<ErrorType> errors = new HashSet<ErrorType>(
-						emImpl.getTypes());
-				hazardAnalysis.setErrorType(errors);
-			}
 		}
-
-		hazardAnalysis.setSystemModel(stats.getSystemModel());
-		hazardAnalysis.parseEMV2(stats.getSystemModel(), stats.getSystemImplementation());
-		stats.getChildren().forEach((model, classifier) -> hazardAnalysis.parseEMV2(model, classifier));
 
 		return stats.getSystemModel();
 	}

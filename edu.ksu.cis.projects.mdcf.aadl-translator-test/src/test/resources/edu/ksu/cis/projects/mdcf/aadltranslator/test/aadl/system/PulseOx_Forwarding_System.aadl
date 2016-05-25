@@ -49,9 +49,7 @@ with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display,
 					Description => "Incorrect information is sent to the display.";
 					HazardousFactor => "SpO2 Information";
 					SystemElement => reference (appLogic);
---					SystemElementState => reference(NonzeroTicketValue);
 					EnvironmentElement => reference (patient);
---					EnvironmentElementStates => (reference(AtRisk), reference(Overdosed));
 					Constraints => ([
 						Name => "ShowGoodInfo";
 						Description => "The app must accurately inform the display of the status of the patient's vital signs.";
@@ -62,14 +60,12 @@ with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display,
 					Name => "InfoLate";
 					Description => "Information that is out of date is sent to the display.";
 					HazardousFactor => "SpO2 Information";
---					SystemElement => reference (pcaPump);
---					SystemElementState => reference(NonzeroTicketValue);
---					EnvironmentElement => reference (patient);
---					EnvironmentElementStates => (reference(AtRisk), reference(Overdosed));
+					SystemElement => reference (appLogic);
+					EnvironmentElement => reference (patient);
 					Constraints => ([
 						Name => "ShowInfoOnTime";
 						Description => "The app must inform the display of the status of the patient's vital signs in a timely manner.";
---						ErrorType => reference(TooMuchAnalgesic);
+						ErrorType => reference(LateAlarm);
 						Explanations => ("First Explanation", "Second Explanation", "Third Explanation");
 					]);
 				]);
