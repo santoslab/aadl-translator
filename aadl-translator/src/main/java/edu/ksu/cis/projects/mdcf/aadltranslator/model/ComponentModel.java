@@ -47,7 +47,7 @@ public abstract class ComponentModel<ChildType extends ComponentModel<?, ?>, Con
 	/**
 	 * Maps port name -> port model
 	 */
-	protected HashMap<String, PortModel> ports = new HashMap<>();
+	protected HashMap<String, FeatureModel> ports = new HashMap<>();
 
 	/**
 	 * Maps child name -> model
@@ -141,42 +141,54 @@ public abstract class ComponentModel<ChildType extends ComponentModel<?, ?>, Con
 		return name;
 	}
 
-	public void addPort(PortModel pm) throws DuplicateElementException {
-		if (ports.containsKey(pm.getName()))
-			throw new DuplicateElementException("Ports cannot share names");
-		ports.put(pm.getName(), pm);
+	public void addFeature(FeatureModel fm) throws DuplicateElementException {
+		if (ports.containsKey(fm.getName()))
+			throw new DuplicateElementException("Ports/Features cannot share names");
+		ports.put(fm.getName(), fm);
 	}
 
 	public PortModel getPortByName(String portName) {
+		return getPorts().get(portName);
+	}
+
+	public FeatureModel getFeatureByName(String portName) {
 		return ports.get(portName);
 	}
 
 	public Map<String, PortModel> getPorts() {
-		return ports;
+		// TODO: This could be optimized by caching the results, or keeping a
+		// separate map of only ports
+		return ports.entrySet().stream().filter(p -> p.getValue() instanceof PortModel)
+				.collect(Collectors.toMap(p -> p.getKey(), p -> (PortModel) p.getValue()));
+	}
+
+	public Map<String, FeatureModel> getFeatures() {
+		return ports.entrySet().stream().filter(p -> p instanceof FeatureModel)
+				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 
 	public Map<String, PortModel> getReceivePorts() {
-		return ports.entrySet().stream().filter(p -> p.getValue().isSubscribe())
+		return getPorts().entrySet().stream().filter(p -> p.getValue().isSubscribe())
 				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 
 	public Map<String, PortModel> getReceiveEventDataPorts() {
-		return ports.entrySet().stream().filter(p -> p.getValue().isSubscribe() && p.getValue().isEventData())
+		return getPorts().entrySet().stream().filter(p -> p.getValue().isSubscribe() && p.getValue().isEventData())
 				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 
 	public Map<String, PortModel> getReceiveEventPorts() {
-		return ports.entrySet().stream().filter(p -> p.getValue().isSubscribe() && p.getValue().isEvent())
+		return getPorts().entrySet().stream().filter(p -> p.getValue().isSubscribe() && p.getValue().isEvent())
 				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 
 	public Map<String, PortModel> getReceiveDataPorts() {
-		return ports.entrySet().stream().filter(p -> p.getValue().isSubscribe() && p.getValue().isData())
+		return getPorts().entrySet().stream().filter(p -> p.getValue().isSubscribe() && p.getValue().isData())
 				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 
 	public Map<String, PortModel> getSendPorts() {
-		return ports.entrySet().stream().filter(p -> !p.getValue().isSubscribe())
+		return getPorts().entrySet().stream().filter(p -> !p.getValue().isSubscribe())
 				.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	}
 
@@ -358,11 +370,11 @@ public abstract class ComponentModel<ChildType extends ComponentModel<?, ?>, Con
 	public void setFaultClasses(HashMap<String, ManifestationTypeModel> faultClasses) {
 		this.faultClasses = faultClasses.keySet();
 	}
-	
-	public void addProcessVariable(String name, ProcessVariableModel var){
+
+	public void addProcessVariable(String name, ProcessVariableModel var) {
 		this.processModel.put(name, var);
 	}
-	
+
 	public Map<String, ProcessVariableModel> getProcessModel() {
 		return this.processModel;
 	}

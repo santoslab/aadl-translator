@@ -6,7 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.FeatureModel;
 
 /**
  * This class models EMv2 propagations.
@@ -17,9 +17,9 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
 public class PropagationModel{
 	private String name;
 	private Map<String, ManifestationTypeModel> errors;
-	private PortModel port;
+	private FeatureModel port;
 
-	public PropagationModel(String name, Collection<ManifestationTypeModel> errors, PortModel portModel) {
+	public PropagationModel(String name, Collection<ManifestationTypeModel> errors, FeatureModel portModel) {
 		this.name = name;
 		setError(errors);
 		this.port = portModel;
@@ -40,7 +40,7 @@ public class PropagationModel{
 		return errors.get(name);
 	}
 
-	public PortModel getPort() {
+	public FeatureModel getPort() {
 		return port;
 	}
 

@@ -22,6 +22,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.AbstractFeature;
 import org.osate.aadl2.AbstractNamedValue;
 import org.osate.aadl2.AbstractSubcomponent;
 import org.osate.aadl2.AnnexSubclause;
@@ -99,6 +100,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.exception.UseBeforeDeclarationEx
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ComponentModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DevOrProcModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.DeviceModel;
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.FeatureModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ManifestationType;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessConnectionModel;
@@ -281,6 +283,22 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		public String caseProcessSubcomponent(ProcessSubcomponent obj) {
 			if (handleNewProcess(obj) != null)
 				return DONE;
+			return NOT_DONE;
+		}
+		
+		@Override
+		public String caseAbstractFeature(AbstractFeature obj) {
+			boolean in = obj.getDirection().incoming();
+			String name = obj.getName();
+			FeatureModel fm = new FeatureModel();
+			fm.setName(name);
+			fm.setSubscribe(in);
+			try {
+				componentModel.addFeature(fm);
+			} catch (DuplicateElementException e) {
+				handleException(obj, e);
+				return DONE;
+			}
 			return NOT_DONE;
 		}
 
@@ -572,7 +590,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				} else if (obj.getCategory() == PortCategory.EVENT) {
 					pm.setEvent();
 				}
-				componentModel.addPort(pm);
+				componentModel.addFeature(pm);
 			} catch (NotImplementedException | MissingRequiredPropertyException | DuplicateElementException e) {
 				handleException(obj, e);
 				return;
@@ -1295,7 +1313,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 */
 		private PropagationModel getPropFromTokens(ErrorFlow flow, EList<TypeToken> tokens, boolean isIn) {
 			String portName = getPortNameFromErrorFlow(flow, isIn);
-			PortModel portModel = resolvePortModel(componentModel, portName, isIn);
+			FeatureModel portModel = resolvePortModel(componentModel, portName, isIn);
 			Collection<ManifestationTypeModel> errors = getErrorModelsFromTokens(tokens, portModel).stream()
 					.map(m -> (ManifestationTypeModel) m).collect(Collectors.toCollection(LinkedHashSet::new));
 			PropagationModel propModel = new PropagationModel(flow.getName(), errors, portModel);
@@ -1341,7 +1359,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 		 * @return The error type models referred to by the tokens
 		 */
 		private Collection<ManifestationTypeModel> getErrorModelsFromTokens(EList<TypeToken> tokens,
-				PortModel portModel) {
+				FeatureModel portModel) {
 			Collection<ManifestationTypeModel> errors = new LinkedHashSet<>();
 			for (TypeToken token : tokens) {
 				errors.add(portModel.getPropagatableErrorByName(EMV2Util.getName(token)));
@@ -1351,7 +1369,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		private void handlePropagations(ComponentClassifier obj) {
 			String portName;
-			PortModel portModel;
+			FeatureModel portModel;
 			Set<ManifestationTypeModel> errorTypes;
 			ManifestationTypeModel etm;
 
@@ -1915,17 +1933,16 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			return NOT_DONE;
 		}
 
-		private PortModel resolvePortModel(ComponentModel<?, ?> model, String portName, boolean isIn) {
-			PortModel pm = model.getPortByName(portName);
+		private FeatureModel resolvePortModel(ComponentModel<?, ?> model, String portName, boolean isIn) {
+			FeatureModel pm = model.getFeatureByName(portName);
 
 			// Ideally we'll just have the portname as planned
 			if (pm != null) {
 				return pm;
 			} else if (model instanceof DeviceModel) {
 				// Since devices get turned into pseudodevices, with both in and
-				// out
-				// ports, we only want the propagation to map to the port that
-				// interacts with our system
+				// out ports, we only want the propagation to map to the port
+				// that interacts with our system
 				if (isIn) {
 					return model.getPortByName(portName + "In");
 				} else {

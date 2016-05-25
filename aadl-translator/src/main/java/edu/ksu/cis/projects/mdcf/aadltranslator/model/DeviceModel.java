@@ -34,7 +34,12 @@ public class DeviceModel extends DevOrProcModel {
 	}
 	
 	@Override
-	public void addPort(PortModel pm) {
+	public void addFeature(FeatureModel fm) {
+		if(!(fm instanceof PortModel)){
+			ports.put(fm.getName(), fm);
+			return;
+		}
+		PortModel pm = (PortModel) fm;
 		PortModel mirror = new PortModel();
 		String pm_suffix = pm.isSubscribe() ? "In" : "Out";
 		String mirror_suffix = pm.isSubscribe() ? "Out" : "In";
@@ -59,8 +64,8 @@ public class DeviceModel extends DevOrProcModel {
 			addOutPortName(mirror.getName(), pm.getName());
 	}
 	
-	@Override
-	public Map<String, PortModel> getPorts(){
-		return ports;
-	}
+//	@Override
+//	public Map<String, PortModel> getPorts(){
+//		return ports;
+//	}
 }
