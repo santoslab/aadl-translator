@@ -23,17 +23,36 @@ public class ProcessVariableModel {
 		this.minVal = Double.NaN;
 		this.maxVal = Double.NaN;
 	}
+	
+	public boolean isNumeric() {
+		if(type == typeType.FLOAT || type == typeType.INTEGER){
+			return true;
+		}
+		return false;
+	}
 
 	public String getUnits() {
 		return units;
 	}
 
-	public double getMinVal() {
-		return minVal;
+	public String getMinVal() {
+		if(type == typeType.FLOAT){
+			return String.valueOf(minVal);
+		} else if (type == typeType.INTEGER){
+			return String.valueOf((int) minVal);
+		} else {
+			return null;
+		}
 	}
 
-	public double getMaxVal() {
-		return maxVal;
+	public String getMaxVal() {
+		if(type == typeType.FLOAT){
+			return String.valueOf(maxVal);
+		} else if (type == typeType.INTEGER){
+			return String.valueOf((int) maxVal);
+		} else {
+			return null;
+		}
 	}
 	
 	public String getType() {

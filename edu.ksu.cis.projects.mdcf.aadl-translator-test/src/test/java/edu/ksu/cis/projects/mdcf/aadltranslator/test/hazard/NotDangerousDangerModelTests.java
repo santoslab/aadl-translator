@@ -12,6 +12,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.ksu.cis.projects.mdcf.aadltranslator.model.PortModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.ProcessModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.SystemModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.NotDangerousDangerModel;
@@ -20,6 +21,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests;
 public class NotDangerousDangerModelTests {
 
 	private static Map<String, NotDangerousDangerModel> sunkDangers;
+	private static PortModel port;
 
 	@BeforeClass
 	public static void initialize() {
@@ -32,6 +34,7 @@ public class NotDangerousDangerModelTests {
 		SystemModel systemModel = AllTests.runHazardTransTest("PulseOx", "PulseOx_Forwarding_System");
 		ProcessModel processModel = systemModel.getProcessByType("PulseOx_Logic_Process");
 		sunkDangers = processModel.getSunkDangers();
+		port = processModel.getPortByName("SpO2");
 	}
 
 	@AfterClass
@@ -63,5 +66,15 @@ public class NotDangerousDangerModelTests {
 	@Test
 	public void testNDDMSuccDangerPortName() {
 		assertEquals("SpO2", sunkDangers.get("LowSpO2DoesNothing").getSuccessorDanger().getPort().getName());
+	}
+	
+	@Test
+	public void testPortPropIsSunk() {
+		assertTrue(port.getPropagatableErrorByName("LateSpO2").isSunk());
+	}
+	
+	@Test
+	public void testPortPropNotSunk() {
+		assertFalse(port.getPropagatableErrorByName("SpO2ValueHigh").isSunk());
 	}
 }

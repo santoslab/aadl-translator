@@ -3,7 +3,7 @@ report(model, name, timestamp) ::=<<
 <tblOfContents()>
 <fundamentals(model, name)>
 <decomposition(model)>
-<propagationsAndTransformations(model)>
+<processModel(model)>
 <unsafeInteractions(model)>
 >>
 
@@ -22,7 +22,7 @@ tblOfContents() ::=<<
 	1. [Control Structure](#control-structure)
 	2. [Components](#components)
 	3. [Connections](#connections)
-3. [Propagations and Transformations](#propagations-and-transformations)
+3. [Process Model](#process-model)
 4. [Unsafe Interactions](#unsafe-interactions)
 	1. [Successor Dangers](#successor-dangers)
 	2. [Manifestions](#manifestations)
@@ -37,7 +37,7 @@ fundamentals(model, name) ::=<<
 ## Fundamentals
 
 * Element Name: <name>
-* Element Type:  <model.name>
+* Element Type: <model.name>
 * Successor Link Names:
 	<model.sendPorts.keys:{k | <linkName(k, model.sendPorts.(k))>
 }>* Predecessor Link Names:
@@ -61,10 +61,16 @@ decomposition(model) ::=<<
 }>
 >>
 
-propagationsAndTransformations(model) ::=<<
+processModel(model) ::=<<
 
-## Propagations and Transformations
+## Process Model
 
+<model.processModel.values : {v | <processVariable(v)>
+}>
+>>
+
+processVariable(model) ::=<<
+* <model.name> (<model.type>): <if(model.numeric)><model.minVal> -- <model.maxVal> <endif><model.units>
 >>
 
 unsafeInteractions(model) ::=<<
@@ -78,7 +84,7 @@ unsafeInteractions(model) ::=<<
 
 ### Manifestations
 
-<model.receivePorts.values:{p | <manifestations(p)>
+<model.receivePorts.values:{p | <manifestation(p)>
 }>
 
 >>
@@ -92,15 +98,9 @@ elementTocEntry(elemName) ::=<<
 >>
 
 succDanger(portModel) ::=<<
-* <portModel.name>: {<portModel.outPropagation.errors:{e | <e.name>}; separator=",">}
+* <portModel.name>: {<portModel.propagatableErrors.values :{pe | <pe.name>}; separator=", ">}
 >>
 
-manifestations(portModel) ::=<<
-* <portModel.name> 
-<portModel.inPropagations:{p | <manifestation(p)>
-}>
->>
-
-manifestation(propModel) ::=<<
-	* **<propModel.manifestation>** -- <propModel.port.name> {<propModel.errors:{e | <e.name>}; separator=",">}
+manifestation(portModel) ::=<<
+* <portModel.name>: {<portModel.propagatableErrors.values :{pe | <if(pe.sunk)>~~<endif><pe.name> (<pe.manifestationName>)<if(pe.sunk)>~~<endif>}; separator=", ">}
 >>

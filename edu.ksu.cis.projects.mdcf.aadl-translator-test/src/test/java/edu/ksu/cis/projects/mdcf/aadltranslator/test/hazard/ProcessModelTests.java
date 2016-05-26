@@ -4,6 +4,7 @@ import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.initComplet
 import static edu.ksu.cis.projects.mdcf.aadltranslator.test.AllTests.usedProperties;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
@@ -19,8 +20,6 @@ public class ProcessModelTests {
 
 	private static Map<String, ProcessVariableModel> processModel;
 	
-	private static final double DELTA = 1e-15;
-
 	@BeforeClass
 	public static void initialize() {
 		if (!initComplete)
@@ -61,11 +60,16 @@ public class ProcessModelTests {
 	
 	@Test
 	public void testProcessVariableMinVal() {
-		assertEquals(0.0, processModel.get("SpO2Val").getMinVal(), DELTA);
+		assertEquals("0.0", processModel.get("SpO2Val").getMinVal());
 	}
 	
 	@Test
 	public void testProcessVariableMaxVal() {
-		assertEquals(100.0, processModel.get("SpO2Val").getMaxVal(), DELTA);
+		assertEquals("100.0", processModel.get("SpO2Val").getMaxVal());
+	}
+	
+	@Test
+	public void testProcessModelIsNumeric() {
+		assertTrue(processModel.get("SpO2Val").isNumeric());
 	}
 }

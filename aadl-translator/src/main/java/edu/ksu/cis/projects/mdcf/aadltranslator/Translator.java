@@ -1193,6 +1193,9 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			TypeSet incomingErrors = sink.getTypeTokenConstraint();
 			String interp = "Not dangerous";
 			PropagationModel succDanger = getPropFromTokens(sink, incomingErrors.getTypeTokens(), true);
+			for(ManifestationTypeModel mtm : succDanger.getErrors()){
+				mtm.setSunk();
+			}
 			NotDangerousDangerModel nddm = new NotDangerousDangerModel(succDanger, interp, Collections.emptySet());
 			componentModel.addCausedDanger(nddm);
 		}

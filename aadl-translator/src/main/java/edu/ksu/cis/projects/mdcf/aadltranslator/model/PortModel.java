@@ -1,14 +1,6 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-
 import org.osate.aadl2.PortCategory;
-
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ManifestationTypeModel;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.PropagationModel;
 
 public class PortModel extends FeatureModel {
 	private PortCategory category;

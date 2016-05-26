@@ -1,0 +1,12 @@
+## Decomposition
+
+### Control Structure
+
+### Components
+
+#. [SpO2Task](spo2task.html)
+#. [CheckSpO2Thread](checkspo2thread.html)
+
+### Connections
+
+#. [outgoing_alarm](outgoing_alarm.html)

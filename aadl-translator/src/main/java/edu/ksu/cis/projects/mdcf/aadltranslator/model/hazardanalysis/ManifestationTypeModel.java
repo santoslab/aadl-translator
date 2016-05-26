@@ -13,6 +13,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.model.ModelUtil.ManifestationTyp
 public class ManifestationTypeModel {
 	private String name;
 	private ManifestationType manifestation;
+	private boolean sunk = false;
 	
 	public ManifestationTypeModel(String name, ErrorType parentType) {
 		this.name = name;
@@ -32,5 +33,13 @@ public class ManifestationTypeModel {
 		} else {
 			return manifestation.toString();
 		}
+	}
+	
+	public boolean isSunk() {
+		return sunk;
+	}
+	
+	public void setSunk() {
+		sunk = true;
 	}
 }
