@@ -19,9 +19,8 @@ public class ExternallyCausedDangerModel extends CausedDangerModel {
 	private String processVariableModelConstraint;
 
 	public ExternallyCausedDangerModel(PropagationModel inProp, PropagationModel outProp, String interp,
-			Set<ManifestationTypeModel> cooccurringDangers, ProcessVariableModel processVariableModel,
-			String constraint) throws CoreException {
-		super(inProp, interp, cooccurringDangers);
+			ProcessVariableModel processVariableModel, String constraint) throws CoreException {
+		super(inProp, interp);
 		if (!inProp.getName().equals(outProp.getName())) {
 			throw new CoreException(
 					"Tried to create an external danger out of mismatched successor danger and manifestation!");

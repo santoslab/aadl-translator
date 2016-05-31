@@ -299,21 +299,21 @@ public final class DoTranslation implements IHandler, IRunnableWithProgress {
 		report_overview.registerRenderer(String.class, MarkdownLinkRenderer.getInstance());
 		report_element.registerRenderer(String.class, MarkdownLinkRenderer.getInstance());
 
-		//TODO: Can this be put in the elementReports map instead of being stored / printed separately?
+		// TODO: Can this be put in the elementReports map instead of being
+		// stored / printed separately?
 		String overview = report_overview.getInstanceOf("report").add("model", sysModel).render();
 		String awas = awasSTG.getInstanceOf("spec").add("model", sysModel).render();
-		
-		// We just use one element for testing, this will need to be expanded to
-		// a full DFS later
-		ComponentModel<?, ?> cm = sysModel.getChild("appLogic");
-		String elem_report = report_element.getInstanceOf("report").add("model", cm)
-				.add("name", "appLogic")
-				.add("timestamp", sysModel.getTimestamp()).render();
-		elementReports.put("appLogic", elem_report);
-		
+
+		// We just traverse the system's immediate children at first, we'll
+		// later need a full DFS
+		for (String childName : sysModel.getChildren().keySet()) {
+			elementReports.put(childName,
+					report_element.getInstanceOf("report").add("model", sysModel.getChild(childName))
+							.add("name", childName).add("timestamp", sysModel.getTimestamp()).render());
+		}
+
 		// Put the AWAS file in
 		elementReports.put(sysModel.getName().concat(".awas"), awas);
-		
 
 		try {
 			URI reportHeaderURI = FileLocator.toFileURL(Platform.getBundle("edu.ksu.cis.projects.mdcf.aadl-translator")

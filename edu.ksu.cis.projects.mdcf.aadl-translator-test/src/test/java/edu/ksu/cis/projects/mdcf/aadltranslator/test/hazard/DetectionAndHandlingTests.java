@@ -47,7 +47,7 @@ public class DetectionAndHandlingTests {
 	@Test
 	public void testRuntimeErrorDetectionsExist() {
 		assertEquals("TimestampViolation",
-				sunkDangers.get("LateSpO2DoesNothing").getRuntimeDetection().iterator().next().getName());
+				sunkDangers.get("LateSpO2DoesNothing").getRuntimeDetections().iterator().next().getName());
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public class DetectionAndHandlingTests {
 	@Test
 	public void testRuntimeErrorDetectionExplanation() {
 		assertEquals("Messages should be timestamped so latency violations can be detected",
-				sunkDangers.get("LateSpO2DoesNothing").getRuntimeDetection().iterator().next().getExplanation());
+				sunkDangers.get("LateSpO2DoesNothing").getRuntimeDetections().iterator().next().getExplanation());
 	}
 
 	@Test
@@ -75,7 +75,7 @@ public class DetectionAndHandlingTests {
 	@Test
 	public void testRuntimeErrorDetectionApproach() {
 		assertEquals(RuntimeErrorDetectionApproach.CONCURRENT,
-				sunkDangers.get("LateSpO2DoesNothing").getRuntimeDetection().iterator().next().getApproach());
+				sunkDangers.get("LateSpO2DoesNothing").getRuntimeDetections().iterator().next().getApproach());
 	}
 
 	@Test

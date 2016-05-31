@@ -1,5 +1,5 @@
 spec(model) ::=<<
-<ntypes(model)>
+<types(model)>
 >>
 
 types(model) ::=<<

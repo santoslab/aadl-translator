@@ -18,9 +18,8 @@ public class InternallyCausedDangerModel extends CausedDangerModel {
 	private Set<String> faultClasses = new LinkedHashSet<>();
 	private Set<DesignTimeDetectionModel> designTimeDetections = new LinkedHashSet<>();
 
-	public InternallyCausedDangerModel(PropagationModel succDanger, String interp,
-			Set<ManifestationTypeModel> cooccurringDangers) {
-		super(succDanger, interp, cooccurringDangers);
+	public InternallyCausedDangerModel(PropagationModel succDanger, String interp) {
+		super(succDanger, interp);
 		super.setName(succDanger.getName());
 	}
 	

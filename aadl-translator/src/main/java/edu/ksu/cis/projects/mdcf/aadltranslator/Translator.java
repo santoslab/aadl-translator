@@ -1172,8 +1172,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			}
 
 			// X. Create the model, and set its values
-			InternallyCausedDangerModel icdm = new InternallyCausedDangerModel(succDanger, interp,
-					Collections.emptySet());
+			InternallyCausedDangerModel icdm = new InternallyCausedDangerModel(succDanger, interp);
 			setFaultClasses(faultClass, icdm);
 			componentModel.addCausedDanger(icdm);
 		}
@@ -1196,7 +1195,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			for(ManifestationTypeModel mtm : succDanger.getErrors()){
 				mtm.setSunk();
 			}
-			NotDangerousDangerModel nddm = new NotDangerousDangerModel(succDanger, interp, Collections.emptySet());
+			NotDangerousDangerModel nddm = new NotDangerousDangerModel(succDanger, interp);
 			componentModel.addCausedDanger(nddm);
 		}
 
@@ -1219,7 +1218,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			String constraint = checkCustomEMV2Property(path, "MAP_Error_Properties::ExternallyCausedDanger",
 					Collections.singletonList(PropertyType.RECORD),
 					Collections.singletonList("ProcessVariableConstraint"));
-			ExternallyCausedDangerModel ecdm = new ExternallyCausedDangerModel(succDanger, manifestation, interp, null,
+			ExternallyCausedDangerModel ecdm = new ExternallyCausedDangerModel(succDanger, manifestation, interp,
 					pvm, constraint);
 			componentModel.addCausedDanger(ecdm);
 		}

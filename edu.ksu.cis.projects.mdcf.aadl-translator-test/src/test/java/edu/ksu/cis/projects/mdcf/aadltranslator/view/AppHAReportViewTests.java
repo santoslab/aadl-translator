@@ -24,7 +24,7 @@ public class AppHAReportViewTests {
 	// Enable to overwrite existing expected values
 	// Note that doing so will cause all tests to fail until this value is
 	// re-disabled.
-	private final static boolean GENERATE_EXPECTED = false;
+	private final static boolean GENERATE_EXPECTED = true;
 	private final static String EXPECTED_DIR = "markdown/app/report/";
 
 	private static ProcessModel processModel;

@@ -7,16 +7,13 @@ public abstract class CausedDangerModel {
 
 	private PropagationModel successorDanger;
 	private String interp;
-	private Set<ManifestationTypeModel> cooccurringDangers;
 	private String name; // The name should be set by the concrete extensions of this class
 	private Set<RuntimeDetectionModel> runtimeDetections = new LinkedHashSet<>();
 	private Set<RuntimeHandlingModel> runtimeHandlings = new LinkedHashSet<>();
 	
-	public CausedDangerModel(PropagationModel succDanger, String interp,
-			Set<ManifestationTypeModel> cooccurringDangers) {
+	public CausedDangerModel(PropagationModel succDanger, String interp) {
 		this.successorDanger = succDanger;
 		this.interp = interp;
-		this.cooccurringDangers = cooccurringDangers;
 	}
 	
 	public String getName(){
@@ -31,11 +28,7 @@ public abstract class CausedDangerModel {
 		return interp;
 	}
 
-	public Set<ManifestationTypeModel> getCooccurringDangers() {
-		return cooccurringDangers;
-	}
-
-	public Set<RuntimeDetectionModel> getRuntimeDetection() {
+	public Set<RuntimeDetectionModel> getRuntimeDetections() {
 		return runtimeDetections;
 	}
 

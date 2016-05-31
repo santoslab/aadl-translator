@@ -10,8 +10,8 @@ import java.util.Set;
  */
 public class NotDangerousDangerModel extends CausedDangerModel {
 
-	public NotDangerousDangerModel(PropagationModel succDanger, String interp, Set<ManifestationTypeModel> cooccurringDangers) {
-		super(succDanger, interp, cooccurringDangers);
+	public NotDangerousDangerModel(PropagationModel succDanger, String interp) {
+		super(succDanger, interp);
 		super.setName(succDanger.getName());
 	}	
 }
