@@ -5,6 +5,7 @@ report(model, name, timestamp) ::=<<
 <decomposition(model)>
 <processModel(model)>
 <unsafeInteractions(model)>
+<internalFaults(model)>
 >>
 
 header(name, timestamp) ::=<<
@@ -23,13 +24,14 @@ tblOfContents() ::=<<
 	2. [Components](#components)
 	3. [Connections](#connections)
 3. [Process Model](#process-model)
-4. [Unsafe Interactions](#unsafe-interactions)
+4. [External Interactions](#external-interactions)
 	1. [Successor Dangers](#successor-dangers)
 	2. [Manifestions](#manifestations)
 	3. [Externally Caused Dangers](#externally-caused-dangers)
+	4. [Sunk Dangers](#sunk-dangers)
 5. [Internal Faults](#internal-faults)
 	1. [Faults Not Considered](#faults-not-considered)
-	2. [Internally Caused Dangers](#faults-not-considered)
+	2. [Internally Caused Dangers](#internally-caused-dangers)
 
 >>
 
@@ -74,9 +76,9 @@ processVariable(model) ::=<<
 * <model.name> (<model.type>): <if(model.numeric)><model.minVal> -- <model.maxVal> <endif><model.units>
 >>
 
-unsafeInteractions(model) ::=<<
+externalInteractions(model) ::=<<
 
-## Unsafe Interactions
+## External Interactions
 
 ### Successor Dangers
 
@@ -92,6 +94,32 @@ unsafeInteractions(model) ::=<<
 
 <model.externallyCausedDangers.values:{e | <externallyCausedDanger(e)>
 }>
+
+### Sunk Dangers
+
+<model.sunkDangers.values:{e | <sunkDanger(e)>
+}>
+
+>>
+
+internalFaults(model) ::=<<
+
+## Internal Faults
+
+### Faults Not Considered
+
+<model.eliminatedFaults.keys:{f | <eliminatedFaults(f, model.eliminatedFaults.(f))>
+}>
+
+### Internally Caused Dangers
+
+<model.internallyCausedDangers.values:{e | <internallyCausedDanger(e)>
+}>
+
+### Missed Fault Classes
+
+* <model.missedFaultClasses; separator="
+* ">
 
 >>
 
@@ -111,15 +139,40 @@ manifestation(portModel) ::=<<
 * <portModel.name>: {<portModel.propagatableErrors.values :{pe | <if(pe.sunk)>~~<endif><pe.name> (<pe.manifestationName>)<if(pe.sunk)>~~<endif>}; separator=", ">}
 >>
 
+danger(dModel) ::=<<
+* <dModel.name>: <dModel.interp>
+	* *Successor Danger(s)* <dModel.successorDanger.port.name>: <ecdModel.successorDanger.errors:{e | <e.name> (<e.manifestationName>)}; separator=", ">
+>>
+
 externallyCausedDanger(ecdModel) ::=<<
-* <ecdModel.name>: <ecdModel.interp>
-	* *Successor Danger(s)* <ecdModel.successorDanger.port.name>: <ecdModel.successorDanger.errors:{e | <e.name> (<e.manifestationName>)}; separator=", ">
+<danger(ecdModel)>
 	* *Manifestation(s)* <ecdModel.danger.port.name>: <ecdModel.danger.errors:{e | <e.name> (<e.manifestationName>)}; separator=", ">
 	* *Process Variable* <ecdModel.processVariable.name>: <ecdModel.processVariableConstraint>
+>>
+
+sunkDanger(sdModel) ::=<<
+<danger(sdModel)>
 	* *Detections* 
-		* <ecdModel.runtimeDetections:{d | <d.name>: <d.explanation> (<d.approachStr>)}; separator="
+		* <sdModel.runtimeDetections:{d | <d.name>: <d.explanation> (<d.approachStr>)}; separator="
 * ">
 	* *Handlings* 
-		* <ecdModel.runtimeHandlings:{d | <d.name>: <d.explanation> (<d.approachStr>)}; separator="
+		* <sdModel.runtimeHandlings:{d | <d.name>: <d.explanation> (<d.errorHandlingApproach>)}; separator="
 * ">
+>>
+
+internallyCausedDanger(icdModel) ::=<<
+<danger(icdModel)>
+	* *Fault Class(es)* <icdModel.faultClasses; separator=", ">
+	* *Run-time Detections* 
+		* <icdModel.runtimeDetections:{d | <d.name>: <d.explanation> (<d.approachStr>)}; separator="
+* ">
+	* *Handlings* 
+		* <sdModel.runtimeHandlings:{d | <d.name>: <d.explanation> (<d.errorHandlingApproach>)}; separator="
+* ">
+>>
+
+eliminatedFaults(justification, faultSet) ::=<<
+* <justification>
+	* <faultSet; separator="
+	* ">
 >>

@@ -58,8 +58,13 @@ public class AppHAReportViewTests {
 	}
 	
 	@Test
-	public void testUnsafeInteractions() {
-		runTest("unsafeInteractions", processModel);
+	public void testExternalInteractions() {
+		runTest("externalInteractions", processModel);
+	}
+	
+	@Test
+	public void testInternalFaults() {
+		runTest("internalFaults", processModel);
 	}
 	
 	@Test

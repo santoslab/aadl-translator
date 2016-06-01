@@ -1,0 +1,53 @@
+## External Interactions
+
+### Successor Dangers
+
+* DerivedAlarm: {MissedAlarm, BogusAlarm}
+
+
+### Manifestations
+
+* SpO2: {SpO2ValueHigh (HIGH), ~~SpO2ValueLow (LOW)~~, ~~EarlySpO2 (EARLY)~~, ~~LateSpO2 (LATE)~~}
+
+
+### Externally Caused Dangers
+
+* MtoN: Placeholder explanation
+	* *Successor Danger(s)* DerivedAlarm: BogusAlarm (VIOLATEDCONSTRAINT), MissedAlarm (VIOLATEDCONSTRAINT)
+	* *Manifestation(s)* SpO2: SpO2ValueLow (LOW), SpO2ValueHigh (HIGH)
+	* *Process Variable* : 
+* MultipleOutputs: Placeholder explanation
+	* *Successor Danger(s)* DerivedAlarm: MissedAlarm (VIOLATEDCONSTRAINT), BogusAlarm (VIOLATEDCONSTRAINT)
+	* *Manifestation(s)* SpO2: SpO2ValueHigh (HIGH)
+	* *Process Variable* : 
+* MultipleInputs: Placeholder explanation
+	* *Successor Danger(s)* DerivedAlarm: MissedAlarm (VIOLATEDCONSTRAINT)
+	* *Manifestation(s)* SpO2: SpO2ValueHigh (HIGH), SpO2ValueLow (LOW)
+	* *Process Variable* : 
+* HighSpO2LeadsToMissedAlarm: The SpO2 value is too high, leading the app to fail to issue an alarm when it should
+	* *Successor Danger(s)* DerivedAlarm: MissedAlarm (VIOLATEDCONSTRAINT)
+	* *Manifestation(s)* SpO2: SpO2ValueHigh (HIGH)
+	* *Process Variable* SpO2Val: Higher than true value
+
+
+### Sunk Dangers
+
+* LateSpO2DoesNothing: Not dangerous
+	* *Successor Danger(s)* SpO2: 
+	* *Detections* 
+		* TimestampViolation: Messages should be timestamped so latency violations can be detected (CONCURRENT)
+	* *Handlings* 
+		* SwitchToNoOutput: The pump switches into a fail-safe mode, ie, it runs at a minimal (KVO) rate (ROLLFORWARD)
+* LowSpO2DoesNothing: Not dangerous
+	* *Successor Danger(s)* SpO2: 
+	* *Detections* 
+		* 
+	* *Handlings* 
+		* 
+* EarlySpO2DoesNothing: Not dangerous
+	* *Successor Danger(s)* SpO2: 
+	* *Detections* 
+		* TimeoutViolation: Minimum separation between messages are added to detect early arrivals (CONCURRENT)
+	* *Handlings* 
+		* SwitchToNoOutput: The pump switches into a fail-safe mode, ie, it runs at a minimal (KVO) rate (ROLLFORWARD)
+

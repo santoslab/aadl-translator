@@ -1,0 +1,39 @@
+## Internal Faults
+
+### Faults Not Considered
+
+* We're using a 'proven in use' app
+	* SoftwareBug
+	* BadSoftwareDesign
+	* CompromisedSoftware
+	* CompromisedHardware
+	* HardwareBug
+	* BadHardwareDesign
+	* ProductionDefect
+* The hospital has physical security measures in place
+	* AdversaryAccessesHardware
+	* AdversaryAccessesSoftware
+* The app logic isn't a connection between two components
+	* SyntaxMismatch
+	* RateMismatch
+	* SemanticMismatch
+
+
+### Internally Caused Dangers
+
+* BogusAlarmsArePossible: This is a placeholder explanation to test the InternallyCausedDanger property.
+	* *Successor Danger(s)* DerivedAlarm: 
+	* *Fault Class(es)* Deterioration
+	* *Run-time Detections* 
+		* 
+	* *Handlings* 
+		* 
+
+
+### Missed Fault Classes
+
+* OperatorSWWrongChoice
+* CosmicRay
+* OperatorSWMistake
+* OperatorHWMistake
+* OperatorHWWrongChoice
