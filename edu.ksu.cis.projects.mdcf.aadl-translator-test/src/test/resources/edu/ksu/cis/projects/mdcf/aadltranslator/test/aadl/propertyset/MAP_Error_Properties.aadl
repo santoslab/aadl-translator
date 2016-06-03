@@ -20,7 +20,6 @@ Abbreviation : type record (
 
 Accident_Level : type record (
 	Name : aadlstring;
-	Level : aadlinteger;
 	Description: aadlstring;
 	Explanations : list of aadlstring;
 	Accidents : list of MAP_Error_Properties::Accident;
@@ -38,9 +37,7 @@ Hazard: type record (
 	Description : aadlstring;
 	HazardousFactor : aadlstring;
 	SystemElement : reference (device, process);
-	SystemElementState : reference({emv2}** error type, {emv2}** error type set);
 	EnvironmentElement : reference (abstract);
-	EnvironmentElementStates : list of reference({emv2}** error type);
 	Explanations : list of aadlstring;
 	Constraints : list of MAP_Error_Properties::Constraint;
 );
@@ -52,7 +49,10 @@ Constraint: type record (
 	Explanations : list of aadlstring;
 );
 
-Fundamentals : list of MAP_Error_Properties::Accident_Level applies to (all);
+Fundamentals : record (
+	Fundamentals : list of MAP_Error_Properties::Accident_Level;
+	Explanations : list of aadlstring;
+) applies to (abstract);
 
 ProcessVariable : aadlboolean applies to (data);
 

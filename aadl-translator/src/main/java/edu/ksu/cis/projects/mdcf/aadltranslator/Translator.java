@@ -285,7 +285,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				return DONE;
 			return NOT_DONE;
 		}
-		
+
 		@Override
 		public String caseAbstractFeature(AbstractFeature obj) {
 			boolean in = obj.getDirection().incoming();
@@ -755,8 +755,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			List<String> path = new ArrayList<String>();
 
 			// Initialize values for parsing the accident model: outer structure
-			// is a list
+			// is a record
+			propTypes.add(PropertyType.RECORD);
+			// Then a list
 			propTypes.add(PropertyType.LIST);
+			// First key is the name "fundamentals"
+			path.add("Fundamentals");
 			// And we want the first one (index 0)
 			path.add(String.valueOf(accidentLevelNumber));
 			// Create the model
@@ -1168,7 +1172,11 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			String interp = checkCustomEMV2Property(source, "MAP_Error_Properties::InternallyCausedDanger",
 					Collections.singletonList(PropertyType.RECORD), Collections.singletonList("Explanation"));
 			if (interp == null) {
-				throw new MissingRequiredPropertyException("No matching InternallyCausedDanger found!");
+				// Throwing this exception here means that in data ports are
+				// required to declare ICD's, which really makes the tooling
+				// hard to use.
+//				throw new MissingRequiredPropertyException("No matching InternallyCausedDanger found!");
+				return;
 			}
 
 			// X. Create the model, and set its values
@@ -1192,7 +1200,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			TypeSet incomingErrors = sink.getTypeTokenConstraint();
 			String interp = "Not dangerous";
 			PropagationModel succDanger = getPropFromTokens(sink, incomingErrors.getTypeTokens(), true);
-			for(ManifestationTypeModel mtm : succDanger.getErrors()){
+			for (ManifestationTypeModel mtm : succDanger.getErrors()) {
 				mtm.setSunk();
 			}
 			NotDangerousDangerModel nddm = new NotDangerousDangerModel(succDanger, interp);
@@ -1218,8 +1226,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			String constraint = checkCustomEMV2Property(path, "MAP_Error_Properties::ExternallyCausedDanger",
 					Collections.singletonList(PropertyType.RECORD),
 					Collections.singletonList("ProcessVariableConstraint"));
-			ExternallyCausedDangerModel ecdm = new ExternallyCausedDangerModel(succDanger, manifestation, interp,
-					pvm, constraint);
+			ExternallyCausedDangerModel ecdm = new ExternallyCausedDangerModel(succDanger, manifestation, interp, pvm,
+					constraint);
 			componentModel.addCausedDanger(ecdm);
 		}
 

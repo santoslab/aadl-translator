@@ -33,19 +33,19 @@
 ### Sunk Dangers
 
 * LateSpO2DoesNothing: Not dangerous
-	* *Successor Danger(s)* SpO2: 
+	* *Successor Danger(s)* SpO2: LateSpO2 (LATE)
 	* *Detections* 
 		* TimestampViolation: Messages should be timestamped so latency violations can be detected (CONCURRENT)
 	* *Handlings* 
 		* SwitchToNoOutput: The pump switches into a fail-safe mode, ie, it runs at a minimal (KVO) rate (ROLLFORWARD)
 * LowSpO2DoesNothing: Not dangerous
-	* *Successor Danger(s)* SpO2: 
+	* *Successor Danger(s)* SpO2: SpO2ValueLow (LOW)
 	* *Detections* 
 		* 
 	* *Handlings* 
 		* 
 * EarlySpO2DoesNothing: Not dangerous
-	* *Successor Danger(s)* SpO2: 
+	* *Successor Danger(s)* SpO2: EarlySpO2 (EARLY)
 	* *Detections* 
 		* TimeoutViolation: Minimum separation between messages are added to detect early arrivals (CONCURRENT)
 	* *Handlings* 

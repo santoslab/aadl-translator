@@ -51,7 +51,6 @@ import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterFactory;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporterManager;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
-import org.osate.xtext.aadl2.errormodel.errorModel.ErrorType;
 import org.osate.xtext.aadl2.errormodel.errorModel.impl.ErrorModelLibraryImpl;
 import org.stringtemplate.v4.STGroup;
 
@@ -79,6 +78,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.InternallyCausedDang
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.NotDangerousDangerModelTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.test.hazard.PropagatableErrorTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.util.MarkdownLinkRenderer;
+import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppHAReportViewTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSpecViewTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.AppSuperClassViewTests;
 import edu.ksu.cis.projects.mdcf.aadltranslator.view.STRendererTests;
@@ -115,6 +115,7 @@ import edu.ksu.cis.projects.mdcf.aadltranslator.view.STRendererTests;
 		DeviceEIAADLSystemErrorTest.class,
 
 		// View tests
+		AppHAReportViewTests.class,
 		AppSuperClassViewTests.class,
 		AppSpecViewTests.class,
 		STRendererTests.class,

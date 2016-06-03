@@ -22,12 +22,12 @@
 ### Internally Caused Dangers
 
 * BogusAlarmsArePossible: This is a placeholder explanation to test the InternallyCausedDanger property.
-	* *Successor Danger(s)* DerivedAlarm: 
+	* *Successor Danger(s)* DerivedAlarm: BogusAlarm (VIOLATEDCONSTRAINT)
 	* *Fault Class(es)* Deterioration
 	* *Run-time Detections* 
 		* 
 	* *Handlings* 
-		* 
+		* ClinicianTurnsOffPulseOx: The nurse sees that the pulse oximeter has deteriorated and turns it off. (ROLLFORWARD)
 
 
 ### Missed Fault Classes

@@ -4,7 +4,7 @@ report(model, name, timestamp) ::=<<
 <fundamentals(model, name)>
 <decomposition(model)>
 <processModel(model)>
-<unsafeInteractions(model)>
+<externalInteractions(model)>
 <internalFaults(model)>
 >>
 
@@ -141,7 +141,7 @@ manifestation(portModel) ::=<<
 
 danger(dModel) ::=<<
 * <dModel.name>: <dModel.interp>
-	* *Successor Danger(s)* <dModel.successorDanger.port.name>: <ecdModel.successorDanger.errors:{e | <e.name> (<e.manifestationName>)}; separator=", ">
+	* *Successor Danger(s)* <dModel.successorDanger.port.name>: <dModel.successorDanger.errors:{e | <e.name> (<e.manifestationName>)}; separator=", ">
 >>
 
 externallyCausedDanger(ecdModel) ::=<<
@@ -167,7 +167,7 @@ internallyCausedDanger(icdModel) ::=<<
 		* <icdModel.runtimeDetections:{d | <d.name>: <d.explanation> (<d.approachStr>)}; separator="
 * ">
 	* *Handlings* 
-		* <sdModel.runtimeHandlings:{d | <d.name>: <d.explanation> (<d.errorHandlingApproach>)}; separator="
+		* <icdModel.runtimeHandlings:{d | <d.name>: <d.explanation> (<d.errorHandlingApproach>)}; separator="
 * ">
 >>
 
