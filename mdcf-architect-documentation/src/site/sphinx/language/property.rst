@@ -116,9 +116,9 @@ Device Properties
 	
    :default name: N/A
    :override: MAP_Properties::Component_Type
-   :type: Either ``actuator`` or ``sensor``
-   :context: :construct:`device`
-   :example: ``sensor``
+   :type: one of ``sensor``, ``controller``, ``actuator``, or ``controlled process``
+   :context: Any subcomponent of a :construct:`system`: ie, a :construct:`device`, :construct:`process`, or :construct:`abstract`
+   :example: ``controller``
 
 Data Properties
 ==================

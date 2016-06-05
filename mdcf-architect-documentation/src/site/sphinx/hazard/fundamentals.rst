@@ -2,52 +2,11 @@
 .. default-domain:: aadl
 .. _hazard-analysis-fundamentals:
 
-###########################
-Background and Fundamentals
-###########################
+#########################
+System-Level Fundamentals
+#########################
 
-Before a hazard analysis can begin, there are a number of app background elements and *fundamentals* that should be established. These fundamentals are documented as AADL property constants.
-
-*********************
-Background Properties
-*********************
-
-.. property:: context
-
-   The clinical context of the app. That is, the problem that the app will address. There should only be one context per app.
-
-   :type: AADLString
-   :example: "Clinicians want to view physiological parameters on a display not physically connected to a physiological monitor."
-
-.. property:: assumption
-
-   An assumption about the environment / clinical process where the app will be used.
-
-   :type: AADLString
-   :example: "There are no device-based alarms that need forwarding."
-
-.. note::
-   The names of the context and assumption properties are ignored by the report generator.
-
-.. property:: abbreviation
-
-   An assumption about the environment / clinical process where the app will be used.
-
-   :type: Record
-   :subproperty Full: The full version of the abbreviated term
-   :subproperty Definition: The meaning of the abbreviated term
-   :type Full: AADLString
-   :type Definition: AADLString
-   :example: 
-.. code-block:: aadl
-   :linenos:
-   
-   property set ExampleAbbreviationSet is
-	   SpO2 : constant MAP_Error_Properties::Abbreviation => [
-		  Full => "Blood-oxygen saturation";
-		  Definition => "The amount of oxygen in the patient's blood";
-	   ];
-   end ExampleAbbreviationSet;
+Before a hazard analysis can begin, there are a number of system-level *fundamental properties* that should be established. These fundamentals are documented as a large AADL property that is applied to the system element that would be negatively impacted.
 
 ****************************
 Hazard Analysis Fundamentals

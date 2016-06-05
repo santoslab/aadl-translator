@@ -10,6 +10,8 @@
 
 .. |MEMOCODE14 publication| replace:: `MEMOCODE14 publication <http://samprocter.com/wp-content/uploads/2012/06/memocode14.pdf>`__
 
+.. |Systematic Analysis of Faults and Errors| replace:: `Systematic Analysis of Faults and Errors <http://samprocter.com/research/systematic-analysis-of-faults-and-errors/>`__
+
 .. |EPL| replace:: `Eclipse Public License <http://www.eclipse.org/legal/epl-v10.html>`__
 
 .. |cog_go icon| image:: /tools/images/cog_go.png
@@ -40,6 +42,6 @@
 
 .. |prop data-representation| replace:: The representation of this datatype.
 
-.. |prop component-type| replace:: Whether this device is an ``actuator`` or ``sensor``
+.. |prop component-type| replace:: The role this component plays in the system, one of ``sensor``, ``controller``, ``actuator``, or ``controlled process``.
 
 .. |prop exchange-name| replace:: The name of the exchange that this port is a part of.

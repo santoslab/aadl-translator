@@ -1,8 +1,3 @@
-.. MDCF Architect documentation master file, created by
-   sphinx-quickstart on Tue May 13 16:16:06 2014.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 .. include:: util/substitution.rst
 
 ##########################################
