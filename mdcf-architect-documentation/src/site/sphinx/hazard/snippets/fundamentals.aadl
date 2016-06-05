@@ -1,50 +1,80 @@
-property set PulseOx_Forwarding_Error_Properties is
-with EMV2, MAP_Error_Properties;
+package PulseOx_Forwarding_System
+public
+with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display, 
+	PulseOx_Forwarding_Properties, MAP_Properties, MAP_Error_Properties,
+	PulseOx_Forwarding_Errors, MAP_Errors, PulseOx_Forwarding_Patient,
+	PulseOx_Forwarding_Clinician;
 
-	TheContext : constant MAP_Error_Properties::Context => 
-		"Clinicians want to view physiological parameters on a display not physically connected to a physiological monitor.";
+	system PulseOx_Forwarding_System
+	end PulseOx_Forwarding_System;
+	
+	system implementation PulseOx_Forwarding_System.imp
+	subcomponents
+		-- Physiological inputs
+		pulseOx : device PulseOx_Interface::ICEpoInterface.imp;
 		
-	NoAlarms : constant MAP_Error_Properties::Assumption =>
-		"There are no alarms that need forwarding.";
+		-- App logic
+		appLogic : process PulseOx_Forwarding_Logic::PulseOx_Logic_Process.imp;
+		appDisplay : process PulseOx_Forwarding_Display::PulseOx_Display_Process.imp;
 		
-	KVO : constant MAP_Error_Properties::Abbreviation => [
-		Full => "Keep Vein Open";
-		Definition => "A minimal rate (of drug administration)";
-	];
-
-	DeathOrInjury : constant MAP_Error_Properties::Accident_Level => [
-		Level => 1;
-		Description => "A human is killed or seriously injured.";
-	];
-	
-	PatientHarmed : constant MAP_Error_Properties::Accident => [
-		Number => 1;
-		Description => "Patient is killed or seriously injured.";
-		Level => PulseOx_Forwarding_Error_Properties::DeathOrInjury;
-	];
-	
-	BadInfoDisplayed : constant MAP_Error_Properties::Hazard => [
-		Number => 1;
-		Description => "Incorrect information is sent to the display.";
-		Accident => PulseOx_Forwarding_Error_Properties::PatientHarmed;
-	];
-	
-	MissedAlarm : constant MAP_Error_Properties::Hazard => [
-		Number => 2;
-		Description => "An alarm that should be displayed is not.";
-		Accident => PulseOx_Forwarding_Error_Properties::PatientHarmed;
-	];
-	
-	ShowGoodInfo : constant MAP_Error_Properties::Constraint => [
-		Number => 1;
-		Description => "The app must accurately inform the display of the status of the patient's vital signs.";
-		Hazard => PulseOx_Forwarding_Error_Properties::BadInfoDisplayed;
-	];
-	
-	ShowAllAlarms : constant MAP_Error_Properties::Constraint => [
-		Number => 2;
-		Description => "The app must display all alarms that are clinically necessary.";
-		Hazard => PulseOx_Forwarding_Error_Properties::MissedAlarm;
-	];
-	
-end PulseOx_Forwarding_Error_Properties;
+		-- The humans
+		patient : abstract PulseOx_Forwarding_Patient::PulseOx_Forwarding_Patient;
+		clinician : abstract PulseOx_Forwarding_Clinician::PulseOx_Forwarding_Clinician;
+	connections
+		spo2_to_logic : port pulseOx.SpO2 -> appLogic.SpO2;
+		spo2_to_display : port pulseOx.SpO2 -> appDisplay.SpO2
+		{MAP_Properties::Channel_Delay => 150 ms;};
+		alarm_to_display : port appLogic.DerivedAlarm -> appDisplay.DerivedAlarm;
+		logic_to_spo2 : port appLogic.SpO2 -> pulseOx.SpO2;
+		
+		ViewSpO2 : feature appDisplay.ShowSpO2 -> clinician.ViewSpO2;
+		AdministerTreatment : feature clinician.Treatment -> patient.Treatment;
+		Sense : feature patient.Fingerclip -> pulseOx.SensorInput;
+	properties
+		MAP_Properties::Component_Type => controller;
+	annex EMV2 {**
+		use types PulseOx_Forwarding_Errors;
+		properties
+		MAP_Error_Properties::Fundamentals => [
+			Fundamentals => ([
+				Name => "DeathOrInjury";
+				Description => "A human is killed or seriously injured.";
+				Explanations => ("First Explanation", "Second Explanation", "Third Explanation");
+				-- Accidents are specified below...
+				-- Accident levels are specified above...
+				Accidents => ([
+					Name => "PatientHarmed";
+					Description => "Patient is killed or seriously injured.";
+					Explanations => ("First Explanation", "Second Explanation", "Third Explanation");
+					Hazards => ([
+						Name => "BadInfoDisplayed";
+						Description => "Incorrect information is sent to the display.";
+						HazardousFactor => "SpO2 Information";
+						SystemElement => reference (appLogic);
+						EnvironmentElement => reference (patient);
+						Constraints => ([
+							Name => "ShowGoodInfo";
+							Description => "The app must accurately inform the display of the status of the patient's vital signs.";
+							ErrorType => reference(MissedAlarm);
+							Explanations => ("First Explanation", "Second Explanation", "Third Explanation");
+						]);
+					], [
+						Name => "InfoLate";
+						Description => "Information that is out of date is sent to the display.";
+						HazardousFactor => "SpO2 Information";
+						SystemElement => reference (appLogic);
+						EnvironmentElement => reference (patient);
+						Constraints => ([
+							Name => "ShowInfoOnTime";
+							Description => "The app must inform the display of the status of the patient's vital signs in a timely manner.";
+							ErrorType => reference(LateAlarm);
+							Explanations => ("First Explanation", "Second Explanation", "Third Explanation");
+						]);
+					]);
+				]);
+			]);
+			Explanations => ("First Explanation", "Second Explanation", "Third Explanation");
+		] applies to patient;
+	**};
+	end PulseOx_Forwarding_System.imp;
+end PulseOx_Forwarding_System;

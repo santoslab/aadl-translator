@@ -45,3 +45,5 @@
 .. |prop component-type| replace:: The role this component plays in the system, one of ``sensor``, ``controller``, ``actuator``, or ``controlled process``.
 
 .. |prop exchange-name| replace:: The name of the exchange that this port is a part of.
+
+.. |Explanations| replace:: [Optional] A list of explanatory statements that expand on or clarify this property.

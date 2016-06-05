@@ -6,7 +6,7 @@
 System-Level Fundamentals
 #########################
 
-Before a hazard analysis can begin, there are a number of system-level *fundamental properties* that should be established. These fundamentals are documented as a large AADL property that is applied to the system element that would be negatively impacted.
+Before a hazard analysis can begin, there are a number of system-level *fundamental properties* that should be established. These fundamentals are documented as a large AADL property that is applied to the system element (typically an :construct:`abstract` component) that would be negatively impacted.
 
 ****************************
 Hazard Analysis Fundamentals
@@ -17,20 +17,19 @@ Hazard Analysis Fundamentals
    The priority of an accident. Used for prioritization when mitigating one hazard would increase exposure to another.
 
    :type: Record
-   :subproperty Level: The accident priority
+   :subproperty Name: The name of this accident level
    :subproperty Description: A short description of the accident level
-   :type Level: AADLInteger
-   :type Description: AADLString
+   :subproperty Explanations: |Explanations|
+   :subproperty Accidents: A list of ways losses of this level could occur.
+   :type Name: AADLString
+   :type Explanations: List of AADLString
+   :type Accidents: List of :property:`accident`
    :example:
-.. code-block:: aadl
+.. literalinclude:: snippets/fundamentals.aadl
+   :language: aadl
+   :lines: 38-43
+   :dedent: 2
    :linenos:
-   
-   property set ExampleAccident_LevelSet is
-	   DeathOrInjury : constant MAP_Error_Properties::Accident_Level => [
-		   Level => 1;
-		   Description => "A human is killed or seriously injured.";
-	   ];
-   end ExampleAccident_LevelSet;
    
 .. property:: accident
 
