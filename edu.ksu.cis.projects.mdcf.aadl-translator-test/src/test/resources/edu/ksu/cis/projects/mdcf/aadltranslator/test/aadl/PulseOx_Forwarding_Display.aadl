@@ -6,6 +6,7 @@ with PulseOx_Forwarding_Types, MAP_Properties, PulseOx_Forwarding_Properties;
 	features
 		SpO2 : in event data port PulseOx_Forwarding_Types::SpO2;
 		DerivedAlarm : in event port;
+		ShowSpO2 : out feature;
 	properties
 		MAP_Properties::Process_Type => display;
 		MAP_Properties::Component_Type => actuator;

@@ -2,7 +2,8 @@ package PulseOx_Forwarding_System
 public
 with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display, 
 	PulseOx_Forwarding_Properties, MAP_Properties, MAP_Error_Properties,
-	PulseOx_Forwarding_Errors, MAP_Errors, PulseOx_Forwarding_Patient;
+	PulseOx_Forwarding_Errors, MAP_Errors, PulseOx_Forwarding_Patient,
+	PulseOx_Forwarding_Clinician;
 
 	system PulseOx_Forwarding_System
 	end PulseOx_Forwarding_System;
@@ -16,21 +17,19 @@ with PulseOx_Interface, PulseOx_Forwarding_Logic, PulseOx_Forwarding_Display,
 		appLogic : process PulseOx_Forwarding_Logic::PulseOx_Logic_Process.imp;
 		appDisplay : process PulseOx_Forwarding_Display::PulseOx_Display_Process.imp;
 		
-		-- The patient
+		-- The humans
 		patient : abstract PulseOx_Forwarding_Patient::PulseOx_Forwarding_Patient;
+		clinician : abstract PulseOx_Forwarding_Clinician::PulseOx_Forwarding_Clinician;
 	connections
-		-- From device to logic
 		spo2_to_logic : port pulseOx.SpO2 -> appLogic.SpO2;
-		
-		-- From device to display
 		spo2_to_display : port pulseOx.SpO2 -> appDisplay.SpO2
 		{MAP_Properties::Channel_Delay => 150 ms;};
-		
-		-- From logic to display
 		alarm_to_display : port appLogic.DerivedAlarm -> appDisplay.DerivedAlarm;
-		
-		-- From logic to device
 		logic_to_spo2 : port appLogic.SpO2 -> pulseOx.SpO2;
+		
+		ViewSpO2 : feature appDisplay.ShowSpO2 -> clinician.ViewSpO2;
+		AdministerTreatment : feature clinician.Treatment -> patient.Treatment;
+		Sense : feature patient.Fingerclip -> pulseOx.SensorInput;
 	properties
 		MAP_Properties::Component_Type => controller;
 	annex EMV2 {**

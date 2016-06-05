@@ -36,7 +36,7 @@ public class ControllerErrorTests {
 		usedProperties.add("PulseOx_ForwardingNoChannelDelay_Properties");
 		runArchTransTest("PulseOxNoChannelDelay", "PulseOx_Forwarding_System");
 		assertEquals(
-				"Error at PulseOx_Forwarding_System.aadl:23: Missing required property 'Default_Channel_Delay'",
+				"Error at PulseOx_Forwarding_System.aadl:24: Missing required property 'Default_Channel_Delay'",
 				errorSB.toString().trim());
 	}
 
@@ -63,7 +63,7 @@ public class ControllerErrorTests {
 		usedProperties.add("PulseOx_ForwardingNoThreadDispatch_Properties");
 		runArchTransTest("PulseOxNoThreadDispatch", "PulseOx_Forwarding_System");
 		assertEquals(
-				"Error at PulseOx_Forwarding_Display.aadl:36: Thread dispatch type must either be set with Default_Thread_Dispatch (at package level) or with Thread_Properties::Dispatch_Protocol (on individual thread)",
+				"Error at PulseOx_Forwarding_Display.aadl:37: Thread dispatch type must either be set with Default_Thread_Dispatch (at package level) or with Thread_Properties::Dispatch_Protocol (on individual thread)",
 				errorSB.toString().trim());
 	}
 
