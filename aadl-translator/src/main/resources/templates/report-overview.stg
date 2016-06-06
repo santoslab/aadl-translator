@@ -1,7 +1,6 @@
 report(model) ::=<<
 <header(model)>
 <tblOfContents()>
-<background(model)>
 <fundamentals(model)>
 <decomposition(model)>
 <propagationsAndTransformations(model)>
@@ -17,38 +16,15 @@ header(model) ::=<<
 tblOfContents() ::=<<
 ## Table of Contents
 
-1. [Background](#background)
-	1. [Context](#context)
-	2. [Assumptions](#assumptions)
-	3. [Abbreviations](#abbreviations)
-2. [Fundamentals](#fundamentals)
+1. [Fundamentals](#fundamentals)
 	1. [Accident Levels](#accident-levels)
 	2. [Accidents](#accidents)
 	3. [Hazards](#hazards)
 	4. [Safety Constraints](#safety-constraints)
-3. [Decomposition](#decomposition)
+2. [Decomposition](#decomposition)
 	1. [Control Structure](#control-structure)
 	2. [Components](#components)
 	3. [Connections](#connections)
-4. [Propagations and Transformations](#propagations-and-transformations)
-
->>
-
-background(model) ::=<<
-
-## Background
-
-### Context
-<model.hazardReportContext>
-
-### Assumptions
-<model.hazardReportAssumptions:{a | * <a>
-}>
-
-### Abbreviations
-<model.hazardReportAbbreviations:{a | <a.name>
-~   <a.full>: <a.definition>
-}>
 
 >>
 
@@ -75,21 +51,15 @@ decomposition(model) ::=<<
 
 ### Control Structure
 
-### Components
+#### Components
 
 <model.children.keys:{k | <elementTocEntry(k)>
 }>
 
-### Connections
+#### Connections
 
 <model.channels.keys:{k | <elementTocEntry(k)>
 }>
-
->>
-
-propagationsAndTransformations(model) ::=<<
-
-## Propagations and Transformations
 
 >>
 

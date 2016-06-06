@@ -1,14 +1,12 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import edu.ksu.cis.projects.mdcf.aadltranslator.exception.DuplicateElementException;
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.AbbreviationModel;
 import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.ManifestationTypeModel;
 
 public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnectionModel>{
@@ -17,9 +15,6 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 	private HashMap<String, DevOrProcModel> typeToComponent;
 
 	private String timestamp;
-	private String hazardReportContext;
-	private HashSet<AbbreviationModel> hazardReportAbbreviations;
-	private HashSet<String> hazardReportAssumptions;
 	
 	// Fault name -> Fault model
 //	private HashMap<String, ErrorTypeModel> faultClasses;
@@ -32,26 +27,8 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 	public SystemModel() {
 		super();
 		typeToComponent = new HashMap<>();
-		hazardReportAbbreviations = new HashSet<>();
-		hazardReportAssumptions = new HashSet<>();
 	}
-
-	public String getHazardReportContext() {
-		return hazardReportContext;
-	}
-
-	public void setHazardReportContext(String hazardReportContext) {
-		this.hazardReportContext = hazardReportContext;
-	}
-
-	public HashSet<AbbreviationModel> getHazardReportAbbreviations() {
-		return hazardReportAbbreviations;
-	}
-
-	public HashSet<String> getHazardReportAssumptions() {
-		return hazardReportAssumptions;
-	}
-
+	
 	public ProcessModel getProcessByType(String processTypeName) {
 		if (typeToComponent.get(processTypeName) instanceof ProcessModel)
 			return (ProcessModel) typeToComponent.get(processTypeName);
@@ -107,14 +84,6 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 	public boolean hasDeviceType(String typeName) {
 		return (typeToComponent.containsKey(typeName) && (typeToComponent
 				.get(typeName) instanceof DeviceModel));
-	}
-
-	public void addAbbreviation(AbbreviationModel am) {
-		hazardReportAbbreviations.add(am);
-	}
-
-	public void addAssumption(String assumption) {
-		hazardReportAssumptions.add(assumption);
 	}
 	
 	public HashMap<String, ConnectionModel> getUniqueDevicePublishedChannels(){
