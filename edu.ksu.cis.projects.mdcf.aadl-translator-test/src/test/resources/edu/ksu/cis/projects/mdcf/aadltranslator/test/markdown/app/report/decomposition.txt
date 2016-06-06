@@ -1,12 +1,12 @@
 ## Decomposition
 
-### Control Structure
-
 ### Components
 
-#. [SpO2Task](spo2task.html)
-#. [CheckSpO2Thread](checkspo2thread.html)
+#. [SpO2Task](spo2task.html): SpO2Task
+#. [CheckSpO2Thread](checkspo2thread.html): CheckSpO2Thread
+
 
 ### Connections
 
-#. [outgoing_alarm](outgoing_alarm.html)
+#. outgoing_alarm: CheckSpO2Thread.Alarm -> PulseOx_Logic_Process.DerivedAlarm [Object]
+

@@ -1,22 +1,21 @@
 package PulseOx_Forwarding_Errors
 public
-with MAP_Errors, PulseOx_Forwarding_Error_Properties, MAP_Error_Properties;
 
 annex EMV2
 {**
 	error types
 	
 	SpO2ValueHigh : type extends MAP_Errors::High;
-	
-	MissedAlarm : type extends MAP_Errors::ViolatedConstraint;
-	LateAlarm : type extends MAP_Errors::ViolatedConstraint;
-	
 	SpO2ValueLow : type extends MAP_Errors::Low;
-	BogusAlarm : type extends MAP_Errors::ViolatedConstraint;
-	
 	EarlySpO2 : type extends MAP_Errors::Early;
 	LateSpO2 : type extends MAP_Errors::Late;
+	NoSpO2 : type extends MAP_Errors::Halted;
+	ErraticSpO2 : type extends MAP_Errors::Erratic;
 	
+	MissedAlarm : type extends MAP_Errors::ViolatedConstraint;
+	LateAlarm : type extends MAP_Errors::ViolatedConstraint;	
+	BogusAlarm : type extends MAP_Errors::ViolatedConstraint;
+		
 	end types;
 
 	error behavior PulseOxStatus

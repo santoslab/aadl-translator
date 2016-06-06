@@ -13,7 +13,7 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 	annex EMV2 {** 
  		use types PulseOx_Forwarding_Errors;
 		error propagations
-			SpO2 : in propagation {SpO2ValueHigh, SpO2ValueLow, EarlySpO2, LateSpO2};
+			SpO2 : in propagation {SpO2ValueHigh, SpO2ValueLow, EarlySpO2, LateSpO2, NoSpO2, ErraticSpO2};
 			DerivedAlarm : out propagation {MissedAlarm, BogusAlarm};
 		end propagations;
 	**};

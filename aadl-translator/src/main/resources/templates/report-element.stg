@@ -52,16 +52,16 @@ fundamentals(model, name) ::=<<
 decomposition(model) ::=<<
 ## Decomposition
 
-### Control Structure
-
 ### Components
 
-<model.children.keys:{k | <elementTocEntry(k)>
+<model.children.keys:{k | <component(k, model.children.(k))>
 }>
+
 ### Connections
 
-<model.channels.keys:{k | <elementTocEntry(k)>
+<model.channels.keys:{k | <connection(k, model.channels.(k))>
 }>
+
 >>
 
 processModel(model) ::=<<
@@ -127,10 +127,13 @@ linkName(name, model) ::=<<
 * <name> (<model.type>)
 >>
 
-elementTocEntry(elemName) ::=<<
-#. [<elemName>](<elemName; format="MarkdownInterLink">)
+component(elemName, model) ::=<<
+#. [<elemName>](<elemName; format="MarkdownInterLink">): <model.name>
 >>
 
+connection(elemName, model) ::=<<
+#. <elemName>: <model.pubName>.<model.pubPortName> -> <model.subName>.<model.subPortName> [<model.subscriber.ports.(model.subPortName).type; null=model.publisher.ports.(model.pubPortName).type>]
+>>
 succDanger(portModel) ::=<<
 * <portModel.name>: {<portModel.propagatableErrors.values :{pe | <pe.name>}; separator=", ">}
 >>

@@ -62,7 +62,7 @@ public class PropagatableErrorTests {
 		assertNotNull(dmPropErrors);
 		assertEquals(1, dmPropErrors.size());
 		assertNotNull(pmInPropErrors);
-		assertEquals(4, pmInPropErrors.size());
+		assertEquals(6, pmInPropErrors.size());
 		assertNotNull(pmOutPropErrors);
 		assertEquals(2, pmOutPropErrors.size());
 	}

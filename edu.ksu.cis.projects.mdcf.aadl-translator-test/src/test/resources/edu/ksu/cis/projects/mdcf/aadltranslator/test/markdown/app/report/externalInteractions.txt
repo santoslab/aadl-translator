@@ -7,7 +7,7 @@
 
 ### Manifestations
 
-* SpO2: {SpO2ValueHigh (HIGH), ~~SpO2ValueLow (LOW)~~, ~~EarlySpO2 (EARLY)~~, ~~LateSpO2 (LATE)~~}
+* SpO2: {SpO2ValueHigh (HIGH), ~~SpO2ValueLow (LOW)~~, ~~EarlySpO2 (EARLY)~~, ~~LateSpO2 (LATE)~~, NoSpO2 (HALTED), ErraticSpO2 (ERRATIC)}
 
 
 ### Externally Caused Dangers

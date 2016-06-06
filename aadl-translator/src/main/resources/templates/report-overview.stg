@@ -76,7 +76,7 @@ component(elemName, model) ::=<<
 >>
 
 connection(elemName, model) ::=<<
-#. [<elemName>](<elemName; format="MarkdownInterLink">): <model.pubName>.<model.pubPortName> -> <model.subName>.<model.subPortName> [<model.subscriber.ports.(model.subPortName).type; null=model.publisher.ports.(model.pubPortName).type>]
+#. <elemName>: <model.pubName>.<model.pubPortName> -> <model.subName>.<model.subPortName> [<model.subscriber.ports.(model.subPortName).type; null=model.publisher.ports.(model.pubPortName).type>]
 >>
 
 explanations(model) ::=<<
