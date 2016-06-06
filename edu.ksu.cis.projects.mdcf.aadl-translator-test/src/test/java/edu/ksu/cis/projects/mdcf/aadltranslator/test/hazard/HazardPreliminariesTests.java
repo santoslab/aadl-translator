@@ -186,4 +186,14 @@ public class HazardPreliminariesTests {
 		assertEquals("VIOLATEDCONSTRAINT",
 				systemModel.getConstraintByName(CONSTRAINT_NAME).getErrorType().getManifestationName());
 	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	// EXPLANATION TEST ///////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+	
+	@Test
+	public void testSystemLevelExplanations() {
+		assertArrayEquals(explanations.toArray(),
+				systemModel.getExplanations().toArray());
+	}
 }

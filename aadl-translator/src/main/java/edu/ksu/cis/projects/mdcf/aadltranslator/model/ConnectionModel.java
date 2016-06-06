@@ -1,18 +1,8 @@
 package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
-import edu.ksu.cis.projects.mdcf.aadltranslator.model.hazardanalysis.OccurrenceModel;
-
 public class ConnectionModel {
-	protected ComponentModel publisher;
-	protected ComponentModel subscriber;
-	
-	/**
-	 * Maps an STPA guideword to any associated occurrences
-	 */
-	protected HashMap<String, HashSet<OccurrenceModel>> occurrenceMap = new HashMap<>();
+	protected ComponentModel<?,?> publisher;
+	protected ComponentModel<?,?> subscriber;
 	
 	/**
 	 * The name the app developer uses to refer to this connection
@@ -39,11 +29,11 @@ public class ConnectionModel {
 	 */
 	protected String subPortName;
 	
-	public void setPublisher(ComponentModel publisher) {
+	public void setPublisher(ComponentModel<?,?> publisher) {
 		this.publisher = publisher;
 	}
 
-	public void setSubscriber(ComponentModel subscriber) {
+	public void setSubscriber(ComponentModel<?,?> subscriber) {
 		this.subscriber = subscriber;
 	}
 
@@ -63,11 +53,11 @@ public class ConnectionModel {
 		this.subPortName = subPortName;
 	}
 
-	public ComponentModel getPublisher() {
+	public ComponentModel<?,?> getPublisher() {
 		return publisher;
 	}
 
-	public ComponentModel getSubscriber() {
+	public ComponentModel<?,?> getSubscriber() {
 		return subscriber;
 	}
 
@@ -85,17 +75,6 @@ public class ConnectionModel {
 
 	public String getSubPortName() {
 		return subPortName;
-	}
-	
-	public HashSet<OccurrenceModel> getOccurrences() {
-		HashSet<OccurrenceModel> allOccurrences = new HashSet<>();
-		for(String k : occurrenceMap.keySet())
-			allOccurrences.addAll(occurrenceMap.get(k));
-		return allOccurrences;
-	}
-	
-	public HashMap<String, HashSet<OccurrenceModel>> getOccurrenceMap() {
-		return occurrenceMap;
 	}
 
 	public String getName() {

@@ -868,6 +868,22 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 				accidentLevelModel = new AccidentLevelModel();
 				handleFundamentalsProperty(obj, accidentLevelModel, propTypes, path);
 			}
+			
+			
+			// Last but not least grab the system-level explanations
+			path.remove(path.size() - 1);
+			propTypes.remove(propTypes.size() - 1);
+			path.set(path.size() - 1, "Explanations");
+			path.add("0");
+			propTypes.add(PropertyType.LIST);
+			String explanation = checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path);
+			int i = 1;
+			while (explanation != null) {
+				systemModel.addExplanation(explanation);
+				path.set(path.size() - 1, String.valueOf(i));
+				explanation = checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path);
+				i++;
+			}
 		}
 
 		private void handleFundamentalsProperty(AbstractSubcomponent obj, StpaPreliminaryModel prelim,
@@ -889,12 +905,12 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			path.set(path.size() - 1, "Explanations");
 			path.add("0");
 			propTypes.add(PropertyType.LIST);
-			String accLevelExp = checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path);
+			String explanation = checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path);
 			int i = 1;
-			while (accLevelExp != null) {
-				prelim.addExplanation(accLevelExp);
+			while (explanation != null) {
+				prelim.addExplanation(explanation);
 				path.set(path.size() - 1, String.valueOf(i));
-				accLevelExp = checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path);
+				explanation = checkCustomEMV2Property(obj, FUNDAMENTALS_PROP_NAME, propTypes, path);
 				i++;
 			}
 			path.remove(path.size() - 1);

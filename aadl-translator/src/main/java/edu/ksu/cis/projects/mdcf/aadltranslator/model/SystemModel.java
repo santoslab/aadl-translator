@@ -2,6 +2,8 @@ package edu.ksu.cis.projects.mdcf.aadltranslator.model;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,6 +17,8 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 	private HashMap<String, DevOrProcModel> typeToComponent;
 
 	private String timestamp;
+	
+	private List<String> haExplanations = new LinkedList<>();
 	
 	// Fault name -> Fault model
 //	private HashMap<String, ErrorTypeModel> faultClasses;
@@ -134,5 +138,13 @@ public class SystemModel extends ComponentModel<DevOrProcModel, SystemConnection
 			return null;
 		}
 		return errorTypeModels.get(name);
+	}
+	
+	public void addExplanation(String exp){
+		haExplanations.add(exp);
+	}
+	
+	public List<String> getExplanations(){
+		return haExplanations;
 	}
 }
