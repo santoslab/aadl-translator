@@ -8,7 +8,7 @@ System-Level Fundamentals
 
 Before a hazard analysis can begin, there are a number of system-level *fundamental properties* that should be established. These fundamentals are documented as a large AADL property that is applied to the system element (typically an :construct:`abstract` component) that would be negatively impacted. A full discussion of the theory behind these fundamentals is out of scope for this documentation; users should be familiar with concepts and terminology from |Systematic Analysis of Faults and Errors|.
 
-The top-level fundamental property is an :property:`accident_level`, which is the level of loss (ie, death or serious injury) that might occur if something goes wrong. There can be multiple accident levels, and each can have multiple :property:`accident` subproperties. These describe specific notions of loss (ie, patient dies) associated with a particular accident level. Each accident should have one or more :property:`hazard` subproperties, which describe situations where the accident occurs (ie, patient is given improper treatment by the clinician). Each hazard then has one or more safety :property:`constraint` subproperties. If these constraints are enforced, then the hazard (and its associated notion of loss) will be avoided.
+The top-level fundamental property is an :property:`accidentlevel`, which is the level of loss (ie, death or serious injury) that might occur if something goes wrong. There can be multiple accident levels, and each can have multiple :property:`accident` subproperties. These describe specific notions of loss (ie, patient dies) associated with a particular accident level. Each accident should have one or more :property:`hazard` subproperties, which describe situations where the accident occurs (ie, patient is given improper treatment by the clinician). Each hazard then has one or more safety :property:`constraint` subproperties. If these constraints are enforced, then the hazard (and its associated notion of loss) will be avoided.
 
 These properties can be thought of as forming a collection of trees, where accident levels form the roots of the tree. One possible tree is shown below.
 
@@ -20,7 +20,7 @@ These properties can be thought of as forming a collection of trees, where accid
 Hazard Analysis Fundamentals
 ****************************
 
-.. property:: accident_level
+.. property:: accidentlevel
 
    The priority of an accident. Used for prioritization when mitigating one hazard would increase exposure to another.
 
@@ -103,6 +103,19 @@ Hazard Analysis Fundamentals
    :language: aadl
    :lines: 58-63
    :dedent: 6
+   :linenos:
+   
+.. property:: explanations
+
+   Certain parts of the fundamentals structure or the system itself require more explanation. The optional explanations subproperty can be used to add as many string-based explanations as necessary to either the system itself (as a top-level subproperty of the fundamentals property) or to one of the other definitions (:property:`accidentlevel`, :property:`accident`, :property:`hazard`, or :property:`constraint`).
+
+   :type: List of AADLString
+   :example:
+.. literalinclude:: snippets/fundamentals.aadl
+   :language: aadl
+   :lines: 38-81
+   :emphasize-lines: 5, 11, 26, 38, 43
+   :dedent: 2
    :linenos:
 
 *******
