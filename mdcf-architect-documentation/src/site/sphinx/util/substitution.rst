@@ -22,6 +22,8 @@
 
 .. |AADL book| replace:: `AADL book <http://books.google.com/books/about/Model_Based_Engineering_with_AADL.html?id=T_nOltBoX64C>`__
 
+.. |Ericson book| replace:: `Ericson book <http://www.wiley.com/WileyCDA/WileyTitle/productCd-0471720194.html>`__
+
 .. |STPA book| replace:: `STPA book <http://mitpress.mit.edu/books/engineering-safer-world>`__
 
 .. |STPA| replace:: `System Theoretic Process Analysis (STPA) <http://ocw.mit.edu/courses/aeronautics-and-astronautics/16-63j-system-safety-fall-2012/lecture-notes/MIT16_63JF12_Class10STPA.pdf>`__

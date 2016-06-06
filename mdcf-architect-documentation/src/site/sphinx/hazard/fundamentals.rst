@@ -6,7 +6,15 @@
 System-Level Fundamentals
 #########################
 
-Before a hazard analysis can begin, there are a number of system-level *fundamental properties* that should be established. These fundamentals are documented as a large AADL property that is applied to the system element (typically an :construct:`abstract` component) that would be negatively impacted.
+Before a hazard analysis can begin, there are a number of system-level *fundamental properties* that should be established. These fundamentals are documented as a large AADL property that is applied to the system element (typically an :construct:`abstract` component) that would be negatively impacted. A full discussion of the theory behind these fundamentals is out of scope for this documentation; users should be familiar with concepts and terminology from |Systematic Analysis of Faults and Errors|.
+
+The top-level fundamental property is an :property:`accident_level`, which is the level of loss (ie, death or serious injury) that might occur if something goes wrong. There can be multiple accident levels, and each can have multiple :property:`accident` subproperties. These describe specific notions of loss (ie, patient dies) associated with a particular accident level. Each accident should have one or more :property:`hazard` subproperties, which describe situations where the accident occurs (ie, patient is given improper treatment by the clinician). Each hazard then has one or more safety :property:`constraint` subproperties. If these constraints are enforced, then the hazard (and its associated notion of loss) will be avoided.
+
+These properties can be thought of as forming a collection of trees, where accident levels form the roots of the tree. One possible tree is shown below.
+
+.. image:: images/fundamentals-tree.png
+	:alt: The tree structure formed by the fundamentals property.
+	:align: center
 
 ****************************
 Hazard Analysis Fundamentals
@@ -33,102 +41,69 @@ Hazard Analysis Fundamentals
    
 .. property:: accident
 
-   A particular accident that could occur as a result of the app.
+   A particular accident (or loss) that could occur as a result of the app-composed system. Accidents are subproperties of the accident level they would cause.
 
    :type: Record
-   :subproperty Number: An identifier
+   :subproperty Name: The name of this accident
    :subproperty Description: A short description of the accident
-   :subproperty Level: The accident level associated with this accident
-   :type Number: AADLInteger
+   :subproperty Explanations: |Explanations|
+   :subproperty Hazards: A list of ways this accident could occur.
+   :type Name: AADLString
    :type Description: AADLString
-   :type Level: :property:`MAP_Error_Properties::Accident_Level<Accident_Level>`
+   :type Explanations: List of AADLString
+   :type Accidents: List of :property:`hazard`
    :example:
-.. code-block:: aadl
+.. literalinclude:: snippets/fundamentals.aadl
+   :language: aadl
+   :lines: 44-49
+   :dedent: 4
    :linenos:
-   
-   property set ExampleAccidentSet is
-	   PatientHarmed : constant MAP_Error_Properties::Accident => [
-		   Number => 1;
-		   Description => "Patient is killed or seriously injured.";
-		   Level => PulseOx_Forwarding_Error_Properties::DeathOrInjury;
-	   ];
-   end ExampleAccidentSet;
    
 .. property:: hazard
 
-   A particular hazard that the app could encounter.
-
-   :type: Record
-   :subproperty Number: An identifier
-   :subproperty Description: A short description of the hazard
-   :subproperty Accident: The accident that would occur if this hazard comes to pass
-   :type Number: AADLInteger
-   :type Description: AADLString
-   :type Accident: :property:`MAP_Error_Properties::Accident<Accident>`
-   :example:
-.. code-block:: aadl
-   :linenos:
+   A hazard that the app could encounter. In STPA and SAFE, hazards are defined as a system state and its worst-case environmental state pairing. We also borrow the concept of a "hazardous element" from the |Ericson book| (which we rename to hazardous factor).
    
-   property set ExampleHazardSet is
-	   BadInfoDisplayed : constant MAP_Error_Properties::Hazard => [
-		   Number => 1;
-		   Description => "Incorrect information is sent to the display.";
-		   Accident => PulseOx_Forwarding_Error_Properties::PatientHarmed;
-	   ];
-   end ExampleHazardSet;
+   :type: Record
+   :subproperty Name: The name of this hazard
+   :subproperty Description: A short description of the accident
+   :subproperty HazardousFactor: The "basic hazardous resource creating the impetus for the hazard" (|Ericson book|)
+   :subproperty SystemElement: The component in the system which is the direct cause of the hazard.
+   :subproperty EnvironmentElement: The component in the environment where the loss associated with this hazard will occur.
+   :subproperty Explanations: |Explanations|
+   :subproperty Constraints: A list of ways to prevent this hazard.
+   :type Name: AADLString
+   :type Description: AADLString
+   :type HazardousFactor: AADLString
+   :type SystemElement: :construct:`device` or :construct:`process` reference
+   :type EnvironmentElement: :construct:`abstract` reference
+   :type Explanations: List of AADLString
+   :type Constraints: List of :property:`constraint`
+   :example:
+.. literalinclude:: snippets/fundamentals.aadl
+   :language: aadl
+   :lines: 50-57
+   :dedent: 5
+   :linenos:
 
 .. property:: constraint
 
-   A safety constraint that, if enforced, will prevent a particular hazard from occurring.
+   A safety constraint that, if enforced, will prevent its associated hazard from occurring.
 
    :type: Record
-   :subproperty Number: An identifier
-   :subproperty Description: A short description of the constraint
-   :subproperty Hazard: The hazard that would be present if this constraint is not enforced
-   :type Number: AADLInteger
+   :subproperty Name: The name of this safety constraint
+   :subproperty Description: A short description of the safety constraint
+   :subproperty ErrorType: The specific error type that signifies the violation of this constraint
+   :subproperty Explanations: |Explanations|
+   :type Name: AADLString
    :type Description: AADLString
-   :type Hazard: :property:`MAP_Error_Properties::Hazard<Hazard>`
+   :type ErrorType: :construct:`errortype`
+   :type Explanations: List of AADLString
    :example:
-.. code-block:: aadl
+.. literalinclude:: snippets/fundamentals.aadl
+   :language: aadl
+   :lines: 58-63
+   :dedent: 6
    :linenos:
-   
-   property set ExampleConstraintSet is
-	   ShowGoodInfo : constant MAP_Error_Properties::Constraint => [
-		   Number => 1;
-		   Description => "The app must accurately inform the display of the status of the patient's vital signs.";
-		   Hazard => PulseOx_Forwarding_Error_Properties::BadInfoDisplayed;
-	   ];
-   end ExampleConstraintSet;
-
-***************
-System Diagrams
-***************
-
-Two of the "fundamentals" identified in |STPA| are graphical in nature -- an identification of the system's boundaries and an allocation of control actions individual channels of communication between components.  Unfortunately, these diagrams cannot be automatically created. To add them to the report, save the diagrams as SystemBoundary.png and ProcessModel.png in a folder named diagrams at the top level of your project.
-
-System Boundaries
-=================
-
-We believe (see the |MEMOCODE14 publication|) that there are two additional boundaries in addition to what Leveson refers to as the system boundary. The three boundaries in a MAP app are:
-
-* The process boundary: All elements involved in the clinical workflow / process that the app is designed to support.
-* The system boundary: All components that correspond with the app -- so, devices and displays, but not people (the clinician interacts with the app through a display, the patient through a device).
-* The app boundary: All components that the app controls / is controlled by -- so, the communication links between devices and the app, but not the devices themselves.
-
-Here is an example specification of the boundaries for our example app (SystemBoundary.png):
-
-.. image:: images/app-boundary.png
-   :alt: The system boundary for our example app
-   :align: center
-
-Process Model
-=============
-
-One of the benefits of modeling an app in our subset of AADL is the automatic identification of all messages that affect the state the system (ie, *feedback messages*, which measure the state of the system, and *control actions*, which modify it through actuation).  Leveson recommends that you identify these messages (which our report translator does automatically) and, later, allocate them to links between individual components in your *process model*.  The report generator will use an image of the process model -- this can be a screenshot of the system in AADL's graphical view, or a mockup.  Here's a mocked-up version of our example app's process model:
-
-.. image:: images/process-model.png
-	:alt: The process model for our example app, showing control actions and feedback messages
-	:align: center
 
 *******
 Example
@@ -142,69 +117,106 @@ Example
 Translation
 ***********
 
-The background and fundamental properties are pulled into / formatted as part of the report generation.  Additionally, control actions and feedback messages are identified and documented, and the process model and system boundary images are inserted into the report.  You can :download:`view a full report<PulseOx_Forwarding_System.html>`, or here are the parts of the report generated by the constructs on this page:
+The fundamental properties are pulled in and formatted as part of report generation, and component / connection names and types are identified and documented.  You can :download:`view a full report<PulseOx_Forwarding_System.html>`, or here are the parts of the report generated by the constructs on this page:
 
-Background
-==========
+T-SAFE: Overview for POForwarding-Tests
+=======================================
 
-Context
--------
+*This report was generated by the `MDCF
+Architect <http://santoslab.org/pub/mdcf-architect/>`__ on June 6, 2016
+at 3:03 PM*
 
-Clinicians want to view physiological parameters on a display not physically connected to a physiological monitor.
-
-Assumptions
------------
-
-* There are no alarms that need forwarding.
-
-Abbreviations
--------------
-
-KVO
-	Keep Vein Open: A minimal rate (of drug administration) 
-	
-Fundamentals
-============
-
-System Boundaries
+Table of Contents
 -----------------
 
-.. image:: images/app-boundary.png
-   :alt: The system boundary for our example app
-   :align: center
-   
+1. `Fundamentals <#fundamentals>`__
+
+   1. `Accident Levels <#accident-levels>`__
+   2. `Accidents <#accidents>`__
+   3. `Hazards <#hazards>`__
+   4. `Safety Constraints <#safety-constraints>`__
+
+2. `Decomposition <#decomposition>`__
+
+   1. `Components <#components>`__
+   2. `Connections <#connections>`__
+
+3. `Explanations <#explanations>`__
+
+Fundamentals
+------------
+
 Accident Levels
----------------
+~~~~~~~~~~~~~~~
 
 1. **DeathOrInjury**: A human is killed or seriously injured.
 
-Accidents
----------
+   -  First Explanation
+   -  Second Explanation
+   -  Third Explanation
 
-1. **PatientHarmed**: Patient is killed or seriously injured. [DeathOrInjury]
+Accidents
+~~~~~~~~~
+
+1. **PatientHarmed**: Patient is killed or seriously injured.
+   [DeathOrInjury]
+
+   -  First Explanation
+   -  Second Explanation
+   -  Third Explanation
 
 Hazards
--------
+~~~~~~~
 
-1. **BadInfoDisplayed**: Incorrect information is sent to the display. [PatientHarmed]
-2. **MissedAlarm**: An alarm that should be displayed is not. [PatientHarmed]
+1. **BadInfoDisplayed**: Incorrect information is sent to the display.
+   [PatientHarmed]
+2. **InfoLate**: Information that is out of date is sent to the display.
+   [PatientHarmed]
 
 Safety Constraints
-------------------
+~~~~~~~~~~~~~~~~~~
 
-1. **ShowGoodInfo**: The app must accurately inform the display of the status of the patient's vital signs. [BadInfoDisplayed]
-2. **ShowAllAlarms**: The app must display all alarms that are clinically necessary. [MissedAlarm]
+1. **ShowInfoOnTime**: The app must inform the display of the status of
+   the patient's vital signs in a timely manner. [InfoLate]
 
-Control Actions
----------------
+   -  First Explanation
+   -  Second Explanation
+   -  Third Explanation
 
-1. spo2_to_display: ICEpoInterface -> PulseOx_Display_Process (Integer)
-2. alarm_to_display: PulseOx_Logic_Process -> PulseOx_Display_Process (Event)
+2. **ShowGoodInfo**: The app must accurately inform the display of the
+   status of the patient's vital signs. [BadInfoDisplayed]
 
-Process Model
+   -  First Explanation
+   -  Second Explanation
+   -  Third Explanation
+
+Decomposition
 -------------
 
-.. image:: images/process-model.png
-   :alt: The process model for our example app, showing control actions and feedback messages
-   :align: center
+Components
+~~~~~~~~~~
+
+#. `appLogic <applogic.html>`__: PulseOx\_Logic\_Process
+#. `appDisplay <appdisplay.html>`__: PulseOx\_Display\_Process
+#. `pulseOx <pulseox.html>`__: ICEpoInterface
+
+Connections
+~~~~~~~~~~~
+
+#. `spo2\_to\_logic <spo2_to_logic.html>`__: pulseOx.SpO2 ->
+   appLogic.SpO2 [Double]
+#. `logic\_to\_spo2 <logic_to_spo2.html>`__: appLogic.SpO2 ->
+   pulseOx.SpO2 [Double]
+#. `spo2\_to\_display <spo2_to_display.html>`__: pulseOx.SpO2 ->
+   appDisplay.SpO2 [Double]
+#. `alarm\_to\_display <alarm_to_display.html>`__: appLogic.DerivedAlarm
+   -> appDisplay.DerivedAlarm [Object]
+
+Explanations
+------------
+
+-  First Explanation
+-  Second Explanation
+-  Third Explanation
+
 
