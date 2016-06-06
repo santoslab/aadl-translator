@@ -12,6 +12,8 @@
 
 .. |Systematic Analysis of Faults and Errors| replace:: `Systematic Analysis of Faults and Errors <http://samprocter.com/research/systematic-analysis-of-faults-and-errors/>`__
 
+.. |SAFE| replace:: `SAFE <http://samprocter.com/research/systematic-analysis-of-faults-and-errors/>`__
+
 .. |EPL| replace:: `Eclipse Public License <http://www.eclipse.org/legal/epl-v10.html>`__
 
 .. |cog_go icon| image:: /tools/images/cog_go.png
@@ -49,3 +51,5 @@
 .. |prop exchange-name| replace:: The name of the exchange that this port is a part of.
 
 .. |Explanations| replace:: [Optional] A list of explanatory statements that expand on or clarify this property.
+
+.. |Avizienis| replace:: `Avižienis et al. <http://www.nasa.gov/pdf/636745main_day_3-algirdas_avizienis.pdf>`__
