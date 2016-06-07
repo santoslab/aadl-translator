@@ -304,7 +304,7 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 
 		@Override
 		public String caseDataSubcomponent(DataSubcomponent obj) {
-			String isProcessModel = checkCustomProperty(obj, "ProcessVariable", PropertyType.BOOLEAN);
+			String isProcessModel = checkCustomProperty(obj, "Process_Variable", PropertyType.BOOLEAN);
 			if (isProcessModel != null && isProcessModel.equals("true")) {
 				handleProcessModel(obj);
 			}

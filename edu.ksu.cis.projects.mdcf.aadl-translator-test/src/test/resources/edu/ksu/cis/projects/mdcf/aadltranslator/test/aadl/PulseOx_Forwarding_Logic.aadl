@@ -23,7 +23,7 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 	subcomponents
 		CheckSpO2Thread : thread CheckSpO2Thread.imp;
 		SpO2Val : data PulseOx_Forwarding_Types::SpO2
-		{MAP_Error_Properties::ProcessVariable => true;};
+		{MAP_Error_Properties::Process_Variable => true;};
 	connections
 		outgoing_alarm : port CheckSpO2Thread.Alarm -> DerivedAlarm;
 	annex EMV2 {**

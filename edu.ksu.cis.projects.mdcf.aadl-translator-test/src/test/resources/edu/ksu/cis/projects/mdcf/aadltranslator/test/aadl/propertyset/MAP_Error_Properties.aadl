@@ -54,7 +54,7 @@ Fundamentals : record (
 	Explanations : list of aadlstring;
 ) applies to (abstract);
 
-ProcessVariable : aadlboolean applies to (data);
+Process_Variable : aadlboolean applies to (data);
 
 ExternallyCausedDanger : record (
 	ProcessVariableValue : reference(data);
