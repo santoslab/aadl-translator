@@ -53,3 +53,5 @@
 .. |Explanations| replace:: [Optional] A list of explanatory statements that expand on or clarify this property.
 
 .. |Avizienis| replace:: `Avižienis et al. <http://www.nasa.gov/pdf/636745main_day_3-algirdas_avizienis.pdf>`__
+
+.. |prop measurement-unit| replace:: This is an optional property that lets you specify the unit for a data type.

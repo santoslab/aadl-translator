@@ -25,9 +25,9 @@ Properties and Contained Elements
 	
 .. construct:: process implementation
 
-	:contained-element subcomponents: The tasks that compose this process.
+	:contained-element subcomponents: References to tasks that compose this process and, optionally, data elements that represent process variables (which should be tagged with :property:`ProcessVariable`).
 	:contained-element connections: A list of links between the various threads.  Note that thread-thread connections are not allowed.
-	:kind subcomponents: :construct:`thread`
+	:kind subcomponents: :construct:`thread` and :construct:`data`
 	:kind connections: :construct:`port connections<portconnection>`
 
 	Process implementations contain a listing of the tasks that compose the software component and connections from those tasks to the process's external ports.  There are no process implementation level properties.

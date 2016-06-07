@@ -30,10 +30,8 @@ Individual components propagate :construct:`error types<errortype>` in or out as
    :example:
 .. literalinclude:: snippets/type.aadl
 	:language: aadl
-	:emphasize-lines: 12-13
+	:emphasize-lines: 13-14
 	:linenos:
-
-.. process model data declarations (put this in the data section of the main docs?)
 
 .. flows
    * Sinks

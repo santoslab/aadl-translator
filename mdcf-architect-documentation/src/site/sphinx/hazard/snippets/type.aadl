@@ -9,6 +9,7 @@ properties
 annex EMV2 {** 
 	use types PulseOx_Forwarding_Errors;
 	error propagations
+		-- Additional error types redacted for space
 		SpO2 : in propagation {SpO2ValueHigh, SpO2ValueLow, EarlySpO2, LateSpO2};
 		DerivedAlarm : out propagation {MissedAlarm, BogusAlarm};
 	end propagations;
