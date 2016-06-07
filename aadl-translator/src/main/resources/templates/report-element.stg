@@ -40,7 +40,6 @@ fundamentals(model, name) ::=<<
 
 * Element Name: <name>
 * Element Type: <model.name>
-* blah: <length(model.sendPorts)>
 * Successor Link Names:
 	<model.sendPorts.keys:{k | <linkName(k, model.sendPorts.(k))>
 }>* Predecessor Link Names:

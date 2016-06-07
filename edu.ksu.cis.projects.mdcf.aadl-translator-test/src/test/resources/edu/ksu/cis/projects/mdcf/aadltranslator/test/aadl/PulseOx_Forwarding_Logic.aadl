@@ -49,7 +49,7 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 				TimeoutViolation : error event {EarlySpO2};
 				TimestampViolation : error event {LateSpO2};
 				
-				-- Detectable internal problems
+				-- Internal problems that manifest as errors
 				PulseOxDeteriorates : error event {Deterioration};
 			transitions
 				SwitchToNoOutput : Normal -[  
