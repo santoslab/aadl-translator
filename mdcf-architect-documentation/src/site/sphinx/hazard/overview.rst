@@ -19,8 +19,8 @@ Contents
 	
 	modeling
 	fundamentals
-	external
-	internal
+	constructs
+	properties
 
 ***********
 Example App
@@ -32,7 +32,7 @@ Example App
 
 In this language walkthrough, we'll be re-using the app developed in the :ref:`aadl-subset-overview`, though we'll extend it to include components and connections that are not used for code generation. The above app diagram has been annotated with two errors (in red). You can :download:`download the annotated model<snippets/pulse-ox-forwarding.zip>` or :download:`view the generated report<PulseOx_Forwarding_System.html>`.
 
-We first :ref:`extend<modeling-outside-elements>` our model to include the patient and clinician, and then -- since T-SAFE is derived from STPA -- start the analysis with system-level :ref:`fundamentals<hazard-analysis-fundamentals>` (eg, accidents to be avoided, safety constraints that prevent them, etc.). Then, the main, component-level analysis examines how safety constraint violations can be caused by either :ref:`incoming errors<external-interactions>` or :ref:`internal faults<internal-faults>`.
+We first :ref:`extend<modeling-outside-elements>` our model to include the patient and clinician, and then -- since T-SAFE is derived from STPA -- start the analysis with system-level :ref:`fundamentals<hazard-analysis-fundamentals>` (eg, accidents to be avoided, safety constraints that prevent them, etc.). Then, the main, component-level analysis documents how safety constraint violations can be caused using both :ref:`constructs<tsafe-constructs>` and :ref:`properties<tsafe-properties>`.
 
 ***********************
 Hazard Analysis Process

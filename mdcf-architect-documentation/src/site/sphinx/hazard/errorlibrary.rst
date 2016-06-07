@@ -5,8 +5,6 @@
 Error Type Libraries
 ####################
 
-.. note:: This documentation assumes that the reader is familiar with the |Systematic Analysis of Faults and Errors| process.
-
 ***********
 Error Types
 ***********
@@ -49,9 +47,9 @@ Here's an example of how the failure domains can be extended to be app-specific:
 Error Behaviors
 ***************
 
-Error behaviors are used to model the behavior of a component in the presence of errors. Though AADL supports fairly rich behavior specifications, T-SAFE only uses the behavior specifications in libraries to enumerate potential states. Transitions between states are specified in the components themselves, and are used in the definition of both :ref:`externally-<external-interactions>` and :ref:`internally-caused <internal-faults>` problems.
+Error behaviors are used to model the behavior of a component in the presence of errors. Though AADL supports fairly rich behavior specifications, T-SAFE only uses the behavior specifications in libraries to enumerate potential states. Transitions between states are specified in the components themselves, and are used in :ref:`T-SAFE's constructs<tsafe-constructs>`.
 
-.. construct:: error behavior
+.. construct:: error behavior state
 
    An list of the states that one of the system's components might be in in the presence of errors.
    
