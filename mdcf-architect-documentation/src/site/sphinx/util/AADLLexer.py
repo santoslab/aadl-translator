@@ -23,7 +23,7 @@ class AADLLexer(RegexLexer):
     iden_rex = r'[a-zA-Z_][a-zA-Z0-9_\.]*'
     class_iden_rex = r'(' + iden_rex + r')(::)('+ iden_rex + r')'
     definition_rex = r'(' + iden_rex + r')' +  r'(\s*:\s*)\b'
-    keyword_rex = r'(device|system|feature|port|connection|process|thread|data|abstract)'
+    keyword_rex = r'(device|system|feature|port|connection|process|thread|data|abstract|all)'
     emv2_keyword_rex = r'(error)(\s*)(type)'
     
     with_tuple = (r'(with)(\s+)', bygroups(Keyword.Namespace, Whitespace), 'with-list')
@@ -204,30 +204,41 @@ class AADLLexer(RegexLexer):
             with_tuple,
             (r'(' + iden_rex + r')(\s+)(is)(\s+)', bygroups(Name.Class, Whitespace, Keyword.Namespace, Whitespace)),
             (definition_rex + r'(constant)', bygroups(Name.Variable.Global, Punctuation, Keyword), 'property-constant-declaration'),
-            (definition_rex + r'(type)(\s+)(record)(\s+)(\()(\s*)', bygroups(Name.Variable.Global, Punctuation, Keyword.Declaration, Whitespace, Keyword.Declaration, Whitespace, Punctuation, Whitespace), 'property-type-declaration'),
-            (definition_rex + r'(record)(\s+)(\()(\s*)', bygroups(Name.Variable.Global, Punctuation, Keyword.Declaration, Whitespace, Punctuation, Whitespace), 'applies-to-property-value-decalration'),
+            (definition_rex + r'(type)(\s+)(record)(\s+)(\()(\s*)', bygroups(Name.Variable.Global, Punctuation, Keyword.Declaration, Whitespace, Keyword.Declaration, Whitespace, Punctuation, Whitespace), 'record-property-type-declaration'),
+            (definition_rex + r'(type)(\s+)(enumeration)(\s+)(\()(\s*)(' + iden_rex + ')', bygroups(Name.Variable.Global, Punctuation, Keyword.Declaration, Whitespace, Keyword.Declaration, Whitespace, Punctuation, Whitespace, Keyword.Entity), 'enum-list'),
+			(definition_rex + r'(type)(\s*)', bygroups(Name.Variable.Global, Punctuation, Keyword.Declaration, Whitespace), 'property-type-declaration'),
+            (definition_rex + r'(record)(\s+)(\()(\s*)', bygroups(Name.Variable.Global, Punctuation, Keyword.Declaration, Whitespace, Punctuation, Whitespace), 'applies-to-property-value-declaration'),
             (definition_rex, bygroups(Name.Variable.Global, Punctuation), 'property-declaration'),
             comment_whitespace_tuple,
             (r'(end)(\s+)(' + iden_rex + r')(;)', bygroups(Keyword.Namespace, Whitespace, Name.Class, Punctuation)),
         	terminator_tuple,
         ],
-        'applies-to-property-value-decalration' : [
-        	(r'(\s*)(applies to)(\s+)', bygroups(Whitespace, Keyword, Whitespace), 'applies-to'),
+        'applies-to-property-value-declaration' : [
+        	(r'(\s*)(applies to)(\s+)(\()' + keyword_rex + '(\))(\s*)(;)(\s*)', bygroups(Whitespace, Keyword, Whitespace, Punctuation, Keyword.Type, Punctuation, Whitespace, Punctuation, Whitespace), '#pop'),
         	(r'(\))(\s*)', bygroups(Punctuation, Whitespace)),
-        	include('property-type-declaration'),
+        	include('record-property-type-declaration'),
         ],
         'property-type-declaration' : [
         	(definition_rex, bygroups(Name.Variable.Global, Punctuation)),
-        	(r'(aadlstring|aadlinteger|aadlreal)', Keyword.Type),
+        	(r'(aadlstring|aadlinteger|aadlreal)(\s*)(;)(\s*)', bygroups(Keyword.Type, Whitespace, Punctuation, Whitespace)),
         	(r'(list)(\s*)(of)(\s*)', bygroups(Keyword.Type, Whitespace, Keyword, Whitespace)),
-        	(r'(;)(\s*)', bygroups(Punctuation, Whitespace)),
         	(r'(reference)(\s*)(\()(\s*)' + keyword_rex, bygroups(Keyword.Declaration, Whitespace, Punctuation, Whitespace, Keyword.Type), 'keyword-list'),
         	(r'(reference)(\s*)(\()(\s*)(\{emv2\}\*\*)(\s*)' + emv2_keyword_rex + '(\))(\s*)', bygroups(Keyword.Declaration, Whitespace, Punctuation, Whitespace, Keyword.Namespace, Whitespace, Keyword.Type, Whitespace, Keyword.Type, Punctuation, Whitespace)),
+            (r'(enumeration)(\s*)(\()(\s*)(' + iden_rex + ')(\s*)', bygroups(Keyword.Declaration, Whitespace, Punctuation, Whitespace, Keyword.Entity, Whitespace), 'enum-list'),
         	(class_iden_rex, bygroups(Name.Namespace, Punctuation, Name.Class)),
+        	(r'(;)(\s*)', bygroups(Punctuation, Whitespace)),
+        	#terminator_tuple,
+        ],
+        'record-property-type-declaration' : [
             (r'(\))(\s*)(;)(\s*)', bygroups(Punctuation, Whitespace, Punctuation, Whitespace), '#pop'),
+            include('property-type-declaration'),
         ],
         'keyword-list' : [
         	(r'(,)(\s*)' + keyword_rex, bygroups(Punctuation, Whitespace, Keyword.Type)),
+			(r'(\))(\s*)(;)(\s*)', bygroups(Punctuation, Whitespace, Punctuation, Whitespace), '#pop'),
+        ],
+        'enum-list' : [
+        	(r'(,)(\s*)(' + iden_rex + ')', bygroups(Punctuation, Whitespace, Keyword.Entity)),
 			(r'(\))(\s*)(;)(\s*)', bygroups(Punctuation, Whitespace, Punctuation, Whitespace), '#pop'),
         ],
         'property-section' : [
