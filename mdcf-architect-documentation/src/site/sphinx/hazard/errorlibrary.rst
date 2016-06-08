@@ -1,5 +1,6 @@
 .. include:: ../util/substitution.rst
 .. default-domain:: aadl
+.. _error-library:
 
 ####################
 Error Type Libraries

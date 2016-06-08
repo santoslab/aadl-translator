@@ -1,6 +1,6 @@
 .. include:: ../util/substitution.rst
 .. default-domain:: aadl
-.. _aadl-feature-component:
+.. _feature-connection:
 
 ####################################
 *Features* and *Feature Connections*

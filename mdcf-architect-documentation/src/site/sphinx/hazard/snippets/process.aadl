@@ -49,7 +49,7 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 				TimeoutViolation : error event {EarlySpO2};
 				TimestampViolation : error event {LateSpO2};
 				
-				-- Internal problems that manifest as errors
+				-- Internal problems that cause successor dangers
 				PulseOxDeteriorates : error event {Deterioration};
 			transitions
 				SwitchToNoOutput : Normal -[  
@@ -96,7 +96,7 @@ with PulseOx_Forwarding_Types, MAP_Properties, MAP_Error_Properties, PulseOx_For
 			] applies to SwitchToNoOutput;
 			
 			MAP_Error_Properties::InternallyCausedDanger => [
-				Explanation => "This is a placeholder explanation to test the InternallyCausedDanger property.";
+				Explanation => "The pulse oximeter can deteriorate, causing inappropriate alarms.";
 			] applies to BogusAlarmsArePossible;
 			
 			MAP_Error_Properties::DesignTimeFaultDetection => [

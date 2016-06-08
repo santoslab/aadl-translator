@@ -22,6 +22,23 @@ These properties can be thought of as forming a collection of trees, where accid
 Hazard Analysis Fundamentals
 ****************************
 
+.. property:: fundamentals
+
+   A container for all the accident levels and explanations associated with a particular system
+   
+   :type: Record
+   :context: :construct:`abstract` subcomponent
+   :subproperty AccidentLevels: A list of the levels of harm this app can cause
+   :subproperty Explanations: Explanations about the high-level system itself.
+   :type AccidentLevels: List of :property:`accidentlevel`
+   :type Explanations: :property:`explanations`
+   :example:
+.. literalinclude:: snippets/fundamentals.aadl
+   :language: aadl
+   :lines: 35-39
+   :dedent: 1
+   :linenos:
+
 .. property:: accidentlevel
 
    The priority of an accident. Used for prioritization when mitigating one hazard would increase exposure to another.
@@ -32,13 +49,13 @@ Hazard Analysis Fundamentals
    :subproperty Explanations: |Explanations|
    :subproperty Accidents: A list of ways losses of this level could occur.
    :type Name: AADLString
-   :type Explanations: List of AADLString
+   :type Explanations: :property:`explanations`
    :type Accidents: List of :property:`accident`
    :example:
 .. literalinclude:: snippets/fundamentals.aadl
    :language: aadl
-   :lines: 38-43
-   :dedent: 2
+   :lines: 40-45
+   :dedent: 3
    :linenos:
    
 .. property:: accident
@@ -52,12 +69,12 @@ Hazard Analysis Fundamentals
    :subproperty Hazards: A list of ways this accident could occur.
    :type Name: AADLString
    :type Description: AADLString
-   :type Explanations: List of AADLString
+   :type Explanations: :property:`explanations`
    :type Accidents: List of :property:`hazard`
    :example:
 .. literalinclude:: snippets/fundamentals.aadl
    :language: aadl
-   :lines: 44-49
+   :lines: 46-51
    :dedent: 4
    :linenos:
    
@@ -78,12 +95,12 @@ Hazard Analysis Fundamentals
    :type HazardousFactor: AADLString
    :type SystemElement: :construct:`device` or :construct:`process` reference
    :type EnvironmentElement: :construct:`abstract` reference
-   :type Explanations: List of AADLString
+   :type Explanations: :property:`explanations`
    :type Constraints: List of :property:`constraint`
    :example:
 .. literalinclude:: snippets/fundamentals.aadl
    :language: aadl
-   :lines: 50-57
+   :lines: 52-59
    :dedent: 5
    :linenos:
 
@@ -99,11 +116,11 @@ Hazard Analysis Fundamentals
    :type Name: AADLString
    :type Description: AADLString
    :type ErrorType: :construct:`errortype`
-   :type Explanations: List of AADLString
+   :type Explanations: :property:`explanations`
    :example:
 .. literalinclude:: snippets/fundamentals.aadl
    :language: aadl
-   :lines: 58-63
+   :lines: 60-65
    :dedent: 6
    :linenos:
    
@@ -115,8 +132,8 @@ Hazard Analysis Fundamentals
    :example:
 .. literalinclude:: snippets/fundamentals.aadl
    :language: aadl
-   :lines: 38-81
-   :emphasize-lines: 5, 11, 26, 38, 43
+   :lines: 39-82
+   :emphasize-lines: 6, 12, 27, 39, 44
    :dedent: 2
    :linenos:
 
