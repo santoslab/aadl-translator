@@ -1,19 +1,6 @@
 property set MAP_Error_Properties is
 with EMV2, MAP_Errors;
 
--- ====================================== --
--- Types related to the report background --
--- ====================================== --
-
-Context : type aadlstring;
-
-Assumption : type aadlstring;
-
-Abbreviation : type record (
-	Full : aadlstring;
-	Definition : aadlstring;
-);
-
 -- =================================== --
 -- Types related to STPA preliminaries --
 -- =================================== --
@@ -50,7 +37,7 @@ Constraint: type record (
 );
 
 Fundamentals : record (
-	Fundamentals : list of MAP_Error_Properties::Accident_Level;
+	AccidentLevels : list of MAP_Error_Properties::Accident_Level;
 	Explanations : list of aadlstring;
 ) applies to (abstract);
 
@@ -61,8 +48,6 @@ ExternallyCausedDanger : record (
 	ProcessVariableConstraint : aadlstring;
 	Explanation : aadlstring;
 ) applies to (all);
-
---Compensation : type aadlstring;
 
 ErrorHandlingApproachType : type enumeration (Rollback, Rollforward, Compensation);
 

@@ -759,8 +759,8 @@ public final class Translator extends AadlProcessingSwitchWithProgress {
 			propTypes.add(PropertyType.RECORD);
 			// Then a list
 			propTypes.add(PropertyType.LIST);
-			// First key is the name "fundamentals"
-			path.add("Fundamentals");
+			// First key is the name "AccidentLevels"
+			path.add("AccidentLevels");
 			// And we want the first one (index 0)
 			path.add(String.valueOf(accidentLevelNumber));
 			// Create the model
