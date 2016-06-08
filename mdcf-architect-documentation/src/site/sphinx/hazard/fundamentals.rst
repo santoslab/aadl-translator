@@ -34,7 +34,7 @@ Hazard Analysis Fundamentals
    :type Explanations: :property:`explanations`
    :example:
 .. literalinclude:: snippets/fundamentals.aadl
-   :language: aadl
+   :language: none
    :lines: 35-39
    :dedent: 1
    :linenos:
@@ -53,7 +53,7 @@ Hazard Analysis Fundamentals
    :type Accidents: List of :property:`accident`
    :example:
 .. literalinclude:: snippets/fundamentals.aadl
-   :language: aadl
+   :language: none
    :lines: 40-45
    :dedent: 3
    :linenos:
@@ -73,7 +73,7 @@ Hazard Analysis Fundamentals
    :type Accidents: List of :property:`hazard`
    :example:
 .. literalinclude:: snippets/fundamentals.aadl
-   :language: aadl
+   :language: none
    :lines: 46-51
    :dedent: 4
    :linenos:
@@ -99,7 +99,7 @@ Hazard Analysis Fundamentals
    :type Constraints: List of :property:`constraint`
    :example:
 .. literalinclude:: snippets/fundamentals.aadl
-   :language: aadl
+   :language: none
    :lines: 52-59
    :dedent: 5
    :linenos:
@@ -119,7 +119,7 @@ Hazard Analysis Fundamentals
    :type Explanations: :property:`explanations`
    :example:
 .. literalinclude:: snippets/fundamentals.aadl
-   :language: aadl
+   :language: none
    :lines: 60-65
    :dedent: 6
    :linenos:
@@ -131,10 +131,10 @@ Hazard Analysis Fundamentals
    :type: List of AADLString
    :example:
 .. literalinclude:: snippets/fundamentals.aadl
-   :language: aadl
-   :lines: 39-82
-   :emphasize-lines: 6, 12, 27, 39, 44
-   :dedent: 2
+   :language: none
+   :lines: 41-82
+   :emphasize-lines: 4, 10, 25, 37, 42
+   :dedent: 3
    :linenos:
 
 *******

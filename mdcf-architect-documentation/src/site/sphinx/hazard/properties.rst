@@ -30,8 +30,8 @@ Properties for Externally-Caused Errors
    :example:
 .. literalinclude:: snippets/process.aadl
 	:language: aadl
-	:lines: 32-33,35,45,64-69
-	:dedent: 2
+	:lines: 22, 29, 32-33,35,45,64-69
+	:dedent: 1
 	:linenos:
 
 .. property:: RuntimeErrorDetection
@@ -46,8 +46,8 @@ Properties for Externally-Caused Errors
    :example:
 .. literalinclude:: snippets/process.aadl
 	:language: aadl
-	:lines: 32-33, 38, 45-47, 49, 63-64, 80-83
-	:dedent: 2
+	:lines: 22, 29, 32-33, 38, 45-47, 49, 63-64, 80-83
+	:dedent: 1
 	:linenos:
 
 .. property:: RuntimeErrorHandling
@@ -62,8 +62,8 @@ Properties for Externally-Caused Errors
    :example:
 .. literalinclude:: snippets/process.aadl
 	:language: aadl
-	:lines: 32-33, 37-38, 45-47, 49-50, 54-58, 63-64, 93-96
-	:dedent: 2
+	:lines: 22, 29, 32-33, 37-38, 45-47, 49-50, 54-58, 63-64, 93-96
+	:dedent: 1
 	:linenos:
 
 ***************************************
@@ -82,8 +82,8 @@ These properties are used in |SAFE|'s Activity 2.
    :example:
 .. literalinclude:: snippets/process.aadl
 	:language: aadl
-	:lines: 32-33,39,45,64,98-100
-	:dedent: 2
+	:lines: 22, 29, 32-33,39,45,64,98-100
+	:dedent: 1
 	:linenos:
 	
 .. warning:: The :construct:`'error source' flow<errorflow>` that this property is applied to should specify the triggering fault class using a ``when`` clause and one of the base fault classes specified in the ``StandardFaultClasses`` error type set in ``MAP_Errors``.
@@ -100,8 +100,8 @@ These properties are used in |SAFE|'s Activity 2.
    :example:
 .. literalinclude:: snippets/process.aadl
 	:language: aadl
-	:lines: 32-33, 39, 45-47, 53, 63-64, 102-105
-	:dedent: 2
+	:lines: 22, 29, 32-33, 39, 45-47, 53, 63-64, 102-105
+	:dedent: 1
 	:linenos:
 
 .. property:: RuntimeFaultHandling
@@ -118,8 +118,8 @@ These properties are used in |SAFE|'s Activity 2.
    :example:
 .. literalinclude:: snippets/process.aadl
 	:language: aadl
-	:lines: 32-33, 39, 45-47, 52-54, 60-64, 107-111
-	:dedent: 2
+	:lines: 22, 29, 32-33, 39, 45-47, 52-54, 60-64, 107-111
+	:dedent: 1
 	:linenos:
 
 .. property:: EliminatedFaults

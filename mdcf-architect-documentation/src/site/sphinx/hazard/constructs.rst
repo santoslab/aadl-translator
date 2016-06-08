@@ -57,8 +57,8 @@ Error Flows
    :example:
 .. literalinclude:: snippets/process.aadl
 	:language: aadl
-	:lines: 32-33, 35-39, 45
-	:dedent: 2
+	:lines: 22, 29,32-33, 35-39, 45
+	:dedent: 1
 	:linenos:
 
 Error Behavior Events
@@ -78,8 +78,8 @@ Error behavior events are used (together with :construct:`transitions<errorbehav
    :example:
 .. literalinclude:: snippets/process.aadl
 	:language: aadl
-	:lines: 46-53,63
-	:dedent: 2
+	:lines: 22, 29, 46-53,63
+	:dedent: 1
 	:linenos:
 
 Error Behavior Transitions
@@ -98,8 +98,8 @@ Error behavior transitions are used (together with :construct:`events<errorbehav
    :example:
 .. literalinclude:: snippets/process.aadl
 	:language: aadl
-	:lines: 46,54-63
-	:dedent: 2
+	:lines: 22, 29, 46,54-63
+	:dedent: 1
 	:linenos:
 
 *******
