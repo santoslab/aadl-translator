@@ -53,7 +53,6 @@ ErrorHandlingApproachType : type enumeration (Rollback, Rollforward, Compensatio
 
 -- Partially tested, no DesignTimeHandling or ControlledProcessState coverage
 InternallyCausedDanger : record (
-	ControlledProcessState : reference({emv2}** error type);
 	Explanation : aadlstring;
 ) applies to (all);
 

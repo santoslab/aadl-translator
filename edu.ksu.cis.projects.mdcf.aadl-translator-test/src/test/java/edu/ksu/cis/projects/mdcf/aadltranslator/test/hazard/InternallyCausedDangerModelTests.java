@@ -78,7 +78,7 @@ public class InternallyCausedDangerModelTests {
 
 	@Test
 	public void testICDMInterpretation() {
-		assertEquals("This is a placeholder explanation to test the InternallyCausedDanger property.",
+		assertEquals("The pulse oximeter can deteriorate, causing inappropriate alarms.",
 				pmDangers.get("BogusAlarmsArePossible").getInterp());
 	}
 }
