@@ -30,6 +30,8 @@
 
 .. |STPA| replace:: `System Theoretic Process Analysis (STPA) <http://ocw.mit.edu/courses/aeronautics-and-astronautics/16-63j-system-safety-fall-2012/lecture-notes/MIT16_63JF12_Class10STPA.pdf>`__
 
+.. |dissertation| replace:: `dissertation <http://samprocter.com/wp-content/uploads/2016/06/dissertation.pdf>`__
+
 .. |prop period| replace:: The task's period. Ignored for sporadic tasks.
 
 .. |prop deadline| replace:: The amount of time that can lapse between the task's dispatch and completion.

@@ -8,7 +8,7 @@ T-SAFE Overview
 
 Once your application has been modeled in the :ref:`supported subset of AADL<aadl-subset-overview>`, you can annotate it to include hazard analysis information. This can be done as part of the tool-supported version of the |Systematic Analysis of Faults and Errors|, or T-SAFE. These annotations will then be used our translator to produce a hazard analysis report and they include both custom properties and a subset of AADL's error-modeling (EMV2) annex.
 
-The resulting report's format can be considered a highly modified form of |STPA|. This work was first discussed in this |MEMOCODE14 publication|, but has evolved considerably since then. The most up-to-date document describing this effort is Sam Procter's |dissertation|.
+The resulting report's format can be considered a highly modified form of |STPA|. This work was first discussed in this |MEMOCODE14 publication|, but has evolved considerably since then. The most up-to-date resource for users is the |SAFE| website, while academics and researchers may be more interested in the |dissertation| this work was based on.
 
 ********
 Contents
