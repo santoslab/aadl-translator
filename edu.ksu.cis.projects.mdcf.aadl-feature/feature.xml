@@ -2,11 +2,12 @@
 <feature
       id="edu.ksu.cis.projects.mdcf.aadlplugin"
       label="Aadl-plugin"
-      version="0.1.0.qualifier"
+      version="2.0.0.qualifier"
       provider-name="SAnToS Lab @ K-State">
 
-   <description url="http://www.example.com/description">
-      The AADL translator project enables conversion from AADL to medical application platform apps.
+   <description url="http://santoslab.org/pub/mdcf-architect/">
+      The AADL translator project enables conversion from AADL to medical
+application platform apps.
    </description>
 
    <copyright url="http://www.example.com/copyright">
@@ -118,7 +119,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
          id="edu.ksu.cis.projects.mdcf.aadl-translator"
          download-size="0"
          install-size="0"
-         version="0.1.0.qualifier"
+         version="2.0.0.qualifier"
          unpack="false"/>
 
 </feature>
