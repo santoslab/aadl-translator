@@ -23,7 +23,7 @@ class AADLLexer(RegexLexer):
     iden_rex = r'[a-zA-Z_][a-zA-Z0-9_\.]*'
     class_iden_rex = r'(' + iden_rex + r')(::)('+ iden_rex + r')'
     definition_rex = r'(' + iden_rex + r')' +  r'(\s*:\s*)\b'
-    keyword_rex = r'(device|system|feature|port|connection|process|thread|data|abstract|all)'
+    keyword_rex = r'(device|system|feature|port|connection|port connection|process|thread|data|abstract|all)'
     emv2_keyword_rex = r'(error)(\s*)(type)'
     
     with_tuple = (r'(with)(\s+)', bygroups(Keyword.Namespace, Whitespace), 'with-list')
@@ -54,8 +54,11 @@ class AADLLexer(RegexLexer):
              (iden_rex, Name.Class),
          ],
         'error-behavior' : [
-	         (r'(states)(\s+)', bygroups(Keyword.Namespace, Whitespace)),
+	         (r'(events|states|transitions)(\s+)', bygroups(Keyword.Namespace, Whitespace)),
         	 (r'(' + iden_rex + ')(\s*)(:)(\s*)(initial)?(\s*)(state)(\s*)(;)(\s*)', bygroups(Name.Attribute, Whitespace, Punctuation, Whitespace, Keyword.Declaration, Whitespace, Keyword.Declaration, Whitespace, Punctuation, Whitespace)),
+        	 (r'(use)(\s+)(types)(\s+)', bygroups(Keyword.Namespace, Whitespace, Keyword.Namespace, Whitespace), 'types-list'),
+        	 (r'(' + iden_rex + ')(\s*)(:)(\s*)(error)(\s+)(event)(\s*)(;)(\s*)', bygroups(Name.Variable.Instance, Whitespace, Punctuation, Whitespace, Keyword.Declaration, Whitespace, Keyword.Declaration, Whitespace, Punctuation, Whitespace)),
+             (r'(' + iden_rex + ')(\s*)(-\[)(\s*)', bygroups(Name.Variable.Instance, Whitespace, Operator, Whitespace), 'error-transition-list'),
 	         (r'(end)(\s+)(behavior)(\s*)(;)(\s*)', bygroups(Keyword, Whitespace, Keyword.Namespace, Whitespace, Punctuation, Whitespace), '#pop'),        	 
         ],
         'component-error-behavior' : [
@@ -68,7 +71,7 @@ class AADLLexer(RegexLexer):
         'error-transition-list' : [
 	        #The use of Name.Attribute here is a hack because SAnToS's stylesheet doesn't differentiate between global (which this should be) and class variables, which makes the code much harder to read.
         	(r'(' + iden_rex + ')(\s+)(ormore|orless|or|and)(\s+)', bygroups(Name.Attribute, Whitespace, Operator, Whitespace)),
-        	(r'(' + iden_rex + ')(\s+)', bygroups(Name.Attribute, Whitespace)),
+        	(r'(' + iden_rex + ')(\s*)', bygroups(Name.Attribute, Whitespace)),
         	(r'(\]->)(\s*)(' + iden_rex + ')(\s*)', bygroups(Operator, Whitespace, Name.Variable.Instance, Whitespace)),
         	terminator_tuple,
         ],
@@ -208,6 +211,8 @@ class AADLLexer(RegexLexer):
             (definition_rex + r'(type)(\s+)(enumeration)(\s+)(\()(\s*)(' + iden_rex + ')', bygroups(Name.Variable.Global, Punctuation, Keyword.Declaration, Whitespace, Keyword.Declaration, Whitespace, Punctuation, Whitespace, Keyword.Entity), 'enum-list'),
 			(definition_rex + r'(type)(\s*)', bygroups(Name.Variable.Global, Punctuation, Keyword.Declaration, Whitespace), 'property-type-declaration'),
             (definition_rex + r'(record)(\s+)(\()(\s*)', bygroups(Name.Variable.Global, Punctuation, Keyword.Declaration, Whitespace, Punctuation, Whitespace), 'applies-to-property-value-declaration'),
+            (definition_rex + class_iden_rex, bygroups(Name.Variable.Global, Punctuation, Name.Namespace, Punctuation, Name.Class), 'applies-to-property-value-declaration'),
+            (definition_rex + r'(Time|Time\_Range|aadlstring)(\s+)', bygroups(Name.Variable.Global, Punctuation, Keyword.Declaration, Whitespace), 'applies-to-property-value-declaration'),
             (definition_rex, bygroups(Name.Variable.Global, Punctuation), 'property-declaration'),
             comment_whitespace_tuple,
             (r'(end)(\s+)(' + iden_rex + r')(;)', bygroups(Keyword.Namespace, Whitespace, Name.Class, Punctuation)),
