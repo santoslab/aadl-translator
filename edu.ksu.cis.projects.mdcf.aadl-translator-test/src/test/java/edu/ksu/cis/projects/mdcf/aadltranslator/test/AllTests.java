@@ -457,6 +457,7 @@ public class AllTests {
 		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
+		actualStr = actualStr.replace("\r\n", "\n"); // Fix line endings if we're on windows
 		assertEquals(expectedStr, actualStr);
 	}
 
